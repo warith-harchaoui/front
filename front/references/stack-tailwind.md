@@ -15,8 +15,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Montserrat', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['ui-monospace', 'Menlo', 'Consolas', 'monospace'],
+        sans: ['Montserrat', 'sans-serif'],
+        mono: ['ui-monospace', 'monospace'],
       },
       colors: {
         brand: {

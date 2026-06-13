@@ -57,6 +57,26 @@
 </span>
 ```
 
+## AI-drafted alt text
+
+When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default: `gemma4:e2b`, `gemma4:e2b-mlx` on Apple Silicon). Local-only — nothing leaves the machine.
+
+Install once:
+
+```bash
+bash front/scripts/install-alt-ai.sh
+```
+
+Generate alt for an image:
+
+```bash
+python3 front/scripts/alt_from_ollama.py ./public/hero.jpg
+```
+
+Output is a single line ≤ 125 characters, or the literal token `EMPTY` if the image is purely decorative (in which case emit `alt="" role="presentation" aria-hidden="true"`).
+
+Full guidance — prompt rules, server-proxy pattern for browser calls, review workflow, failure modes — in `references/alt-text-ai.md`.
+
 ## Checklist
 
 - [ ] Every `<img>` has explicit `width` and `height`.
@@ -65,3 +85,4 @@
 - [ ] Lazy-loaded below the fold.
 - [ ] Dark-mode variant where needed.
 - [ ] No layout shift on load.
+- [ ] AI-drafted `alt` tagged with `data-alt-source="ai"` until a human reviews.

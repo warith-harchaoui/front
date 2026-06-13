@@ -109,6 +109,7 @@ Do **not** use this skill when:
 | "search" | `patterns/searching.md` | `<input type="search">` with debounced JS, results live region |
 | "onboarding" | `patterns/onboarding.md` | One idea per screen, ≤ 8-word headline, skippable |
 | "theme switch" | `foundations/dark-mode.md` | `data-color-scheme` attribute + persisted choice |
+| "chart" / "graph" / "dashboard tile" | `charts-vega.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks |
 
 ## Stack basics
 
@@ -230,6 +231,7 @@ Load these only when needed:
 - `references/color-psychology.md` — Choice / Emotion / Concept / Psychology palettes (Warith Harchaoui).
 - `references/stack-vanilla-js.md` — patterns: modules, custom elements, events, a11y, state, i18n.
 - `references/stack-tailwind.md` — config tokens, plugins, dark mode strategy.
+- `references/charts-vega.md` — Vega-Lite house style (Montserrat, 10 px rounded corners, palette, matplotlib → Vega-Lite axis cleanup map).
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.
 
@@ -239,4 +241,5 @@ Copy / adapt from `assets/`:
 
 - `assets/starter-page.html` — bootstrap a full page with Montserrat + Tailwind + tokens.
 - `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`.
+- `assets/components/chart-bar.json`, `chart-line.json` — Vega-Lite specs ready to load via Vega-Embed.
 - `assets/fonts/montserrat/` — Montserrat variable + italic + 4 static weights + OFL license + paste-ready `fonts.css`.

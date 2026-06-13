@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "House-style bar chart — colors from harchaoui.org/warith/colors, rounded corners 10 px.",
+  "description": "House-style bar chart — Montserrat type, rounded corners 10 px, no top/right spines, no tick marks, colors from harchaoui.org/warith/colors.",
   "data": {
     "values": [
       {"category": "Mon", "value": 120},
@@ -15,7 +15,7 @@
   "mark": { "type": "bar", "cornerRadiusEnd": 10, "color": "#007AFF" },
   "encoding": {
     "x": { "field": "category", "type": "nominal", "axis": { "labelAngle": 0, "title": null } },
-    "y": { "field": "value", "type": "quantitative", "axis": { "title": null, "grid": false } },
+    "y": { "field": "value",    "type": "quantitative", "axis": { "title": null } },
     "tooltip": [
       { "field": "category", "title": "Day" },
       { "field": "value",    "title": "Active users", "format": "," }
@@ -30,20 +30,25 @@
     "axis": {
       "labelFont": "Montserrat",
       "titleFont": "Montserrat",
+      "labelFontWeight": 400,
+      "titleFontWeight": 600,
       "labelColor": "#3C3C43",
       "titleColor": "#000000",
-      "domain": true,
-      "domainColor": "rgba(60,60,67,0.36)",
-      "tickColor": "rgba(60,60,67,0.36)",
-      "labelFontSize": 12
+      "grid": false,
+      "domainColor": "rgba(60,60,67,0.36)"
     },
+    "axisX": { "domain": true, "ticks": false, "labelPadding": 6 },
+    "axisY": { "domain": true, "ticks": false, "labelPadding": 6 },
     "title":  { "font": "Montserrat", "fontWeight": 600, "color": "#000000" },
-    "legend": { "labelFont": "Montserrat", "titleFont": "Montserrat" },
+    "legend": { "labelFont": "Montserrat", "titleFont": "Montserrat", "labelColor": "#3C3C43", "titleColor": "#000000" },
     "range": {
       "category": ["#007AFF","#28CD41","#FF9500","#AF52DE","#FF2D55","#FFCC00","#79DBDC","#FF3B30"],
       "diverging": ["#FF3B30","#FFCC00","#28CD41"],
       "heatmap":   ["#CCE4FF","#007AFF"],
       "ramp":      ["#CCE4FF","#007AFF"]
-    }
+    },
+    "bar":  { "cornerRadiusEnd": 10, "color": "#007AFF" },
+    "rect": { "cornerRadius": 10 },
+    "tick": { "color": "#007AFF" }
   }
 }

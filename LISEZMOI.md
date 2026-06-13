@@ -1,6 +1,7 @@
+# Front
+
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
-# front
 
 Un **skill** Claude qui restreint Claude à une seule pile frontend : JavaScript pur, Tailwind CSS, Montserrat. Conforme à la [spécification Anthropic des skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 

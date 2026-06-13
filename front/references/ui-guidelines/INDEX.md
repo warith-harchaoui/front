@@ -80,3 +80,7 @@ Curated, platform-native UI guidance for vanilla JavaScript + Tailwind CSS outpu
 | Wearable | `platforms/wearable.md` |
 | TV / large-screen | `platforms/tv.md` |
 | Spatial / XR | `platforms/spatial.md` |
+
+## Charts
+
+Vega-Lite spec conventions (Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks): see `references/charts-vega.md` (one level up — not under `ui-guidelines/`).

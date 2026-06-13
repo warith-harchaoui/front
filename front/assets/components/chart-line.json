@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "House-style line + area chart — colors from harchaoui.org/warith/colors, rounded corners 10 px.",
+  "description": "House-style line + area chart — Montserrat type, rounded corners 10 px on marks, no top/right spines, no tick marks, colors from harchaoui.org/warith/colors.",
   "data": {
     "values": [
       {"week": "W1", "value": 1200},
@@ -24,8 +24,8 @@
     {
       "mark": { "type": "point", "color": "#007AFF", "filled": true, "size": 60 },
       "encoding": {
-        "x": { "field": "week", "type": "ordinal", "axis": { "title": null } },
-        "y": { "field": "value", "type": "quantitative", "axis": { "title": null, "grid": false } },
+        "x": { "field": "week",  "type": "ordinal",     "axis": { "title": null } },
+        "y": { "field": "value", "type": "quantitative","axis": { "title": null } },
         "tooltip": [
           { "field": "week",  "title": "Week" },
           { "field": "value", "title": "Active users", "format": "," }
@@ -42,13 +42,15 @@
     "axis": {
       "labelFont": "Montserrat",
       "titleFont": "Montserrat",
+      "labelFontWeight": 400,
+      "titleFontWeight": 600,
       "labelColor": "#3C3C43",
       "titleColor": "#000000",
-      "domain": true,
-      "domainColor": "rgba(60,60,67,0.36)",
-      "tickColor": "rgba(60,60,67,0.36)",
-      "labelFontSize": 12
+      "grid": false,
+      "domainColor": "rgba(60,60,67,0.36)"
     },
+    "axisX": { "domain": true, "ticks": false, "labelPadding": 6 },
+    "axisY": { "domain": true, "ticks": false, "labelPadding": 6 },
     "title":  { "font": "Montserrat", "fontWeight": 600, "color": "#000000" }
   }
 }

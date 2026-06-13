@@ -24,13 +24,45 @@ For production, install via npm (`vega`, `vega-lite`, `vega-embed`) and bundle.
 
 1. **Rounded corners at 10 px** on every chart mark and on the chart container.
 2. **Colors from `color-psychology.md`** — no rainbow palettes, no Vega defaults.
-3. **No 3D**, no drop shadows, no gradients (except a single linear fill for area charts).
-4. **No gridlines on the value axis** unless explicitly needed; light gridlines on the category axis only.
-5. **Tabular numerals** for value labels.
-6. **Dark-mode aware** — provide two specs (light/dark) or override `config` based on `data-color-scheme`.
-7. **Title above** in body weight; subtitle below in label-secondary.
+3. **Montserrat** for every text element (labels, titles, legends).
+4. **No top spine, no right spine** — keep only the bottom (x) and left (y) baselines.
+5. **No tick marks** on either axis — labels alone read fine and look cleaner.
+6. **No gridlines** unless explicitly needed.
+7. **No 3D**, no drop shadows, no gradients (except a single linear fill for area charts).
+8. **Tabular numerals** for value labels.
+9. **Dark-mode aware** — override `config` based on `data-color-scheme`.
+10. **Title above** in body weight; subtitle below in label-secondary.
 
-## Skill color palette in Vega-Lite
+## matplotlib → Vega-Lite axis cleanup translation
+
+The skill targets the same minimalist axis look as the matplotlib idiom below. Translation table:
+
+| matplotlib | Vega-Lite |
+|---|---|
+| `ax.spines["top"].set_visible(False)` | `config.view.stroke = "transparent"` (removes the implicit top/right plot border) |
+| `ax.spines["right"].set_visible(False)` | same as above — Vega-Lite has no separate right spine by default |
+| `ax.spines["bottom"].set_visible(False)` | `config.axisX.domain = false` |
+| `ax.spines["left"].set_visible(False)` | `config.axisY.domain = false` |
+| `ax.tick_params(axis='x', bottom=False, top=False)` | `config.axisX.ticks = false` |
+| `ax.tick_params(axis='y', left=False, right=False)` | `config.axisY.ticks = false` |
+
+The user's exact matplotlib snippet — top/right spines off, x/y tick marks off, bottom/left spines kept — translates to:
+
+```json
+{
+  "config": {
+    "view":  { "stroke": "transparent" },
+    "axisX": { "domain": true,  "ticks": false },
+    "axisY": { "domain": true,  "ticks": false }
+  }
+}
+```
+
+Apply this block on every chart spec; the ready-to-paste house config below already includes it.
+
+## Skill house `config` (light mode)
+
+Paste this `config` block into every spec.
 
 ```json
 {
@@ -40,13 +72,15 @@ For production, install via npm (`vega`, `vega-lite`, `vega-embed`) and bundle.
     "axis": {
       "labelFont": "Montserrat",
       "titleFont": "Montserrat",
+      "labelFontWeight": 400,
+      "titleFontWeight": 600,
       "labelColor": "#3C3C43",
       "titleColor": "#000000",
       "grid": false,
-      "domain": true,
-      "domainColor": "rgba(60,60,67,0.36)",
-      "tickColor": "rgba(60,60,67,0.36)"
+      "domainColor": "rgba(60,60,67,0.36)"
     },
+    "axisX": { "domain": true,  "ticks": false, "labelPadding": 6 },
+    "axisY": { "domain": true,  "ticks": false, "labelPadding": 6 },
     "title":  { "font": "Montserrat", "fontWeight": 600, "color": "#000000" },
     "header": { "labelFont": "Montserrat", "titleFont": "Montserrat" },
     "legend": { "labelFont": "Montserrat", "titleFont": "Montserrat", "labelColor": "#3C3C43", "titleColor": "#000000" },
@@ -66,7 +100,7 @@ For production, install via npm (`vega`, `vega-lite`, `vega-embed`) and bundle.
 }
 ```
 
-Apply this `config` block to every spec. The skill ships a ready-to-include example at `assets/components/chart-bar.json`.
+The skill ships two ready-to-include specs that already use this config: `assets/components/chart-bar.json` and `assets/components/chart-line.json`.
 
 ## Dark-mode override
 

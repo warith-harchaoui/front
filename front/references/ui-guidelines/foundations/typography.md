@@ -38,8 +38,8 @@ If using the variable font, ship a single file and let `font-weight: 400|500|600
 
 ```css
 :root {
-  --font-sans: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-mono: ui-monospace, monospace;
 }
 html { font-family: var(--font-sans); }
 code, pre, kbd, samp { font-family: var(--font-mono); }
@@ -54,8 +54,8 @@ The fallback stack only renders if Montserrat fails — the FOUT (flash of unsty
 theme: {
   extend: {
     fontFamily: {
-      sans: ['Montserrat', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-      mono: ['ui-monospace', 'Menlo', 'Consolas', 'monospace'],
+      sans: ['Montserrat', 'sans-serif'],
+      mono: ['ui-monospace', 'monospace'],
     },
   },
 },
