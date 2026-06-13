@@ -110,6 +110,7 @@ Do **not** use this skill when:
 | "onboarding" | `patterns/onboarding.md` | One idea per screen, ≤ 8-word headline, skippable |
 | "theme switch" | `foundations/dark-mode.md` | `data-color-scheme` attribute + persisted choice |
 | "chart" / "graph" / "dashboard tile" | `charts-vega.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks |
+| "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Call `node scripts/alt-from-ollama.mjs <src>` (Ollama + `gemma4:e2b`, `-mlx` on Apple Silicon). `EMPTY` → `alt="" role="presentation" aria-hidden="true"`. Tag drafts with `data-alt-source="ai"`. |
 
 ## Stack basics
 
