@@ -2,15 +2,23 @@
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
-Auteur : [Warith HARCHAOUI](https://www.linkedin.com/in/warith-harchaoui/)
+## De quoi s'agit-il ?
 
-Un **skill** Claude pour une seule pile frontend : JavaScript pur, Tailwind CSS, Montserrat. Conforme à la [spécification Anthropic des skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
+`front` est un skill Claude qui cadre Claude sur une seule pile frontend — JavaScript pur, Tailwind CSS et Montserrat comme unique police d'interface — et lui fournit un système de design soigné. Demander à Claude de « construire une UI », « créer un composant », « concevoir un tableau de bord » ou « habiller ce CLI d'une IHM » produit du code dans cette pile exacte, avec un parti pris reproductible : HTML sémantique, variante `dark:` sur chaque élément stylé, anneau de focus visible, garde-fous pour `prefers-reduced-motion`, choix de couleurs traçables à une psychologie documentée, graphiques en Vega-Lite, texte alternatif rédigé selon les recommandations W3C / WAI.
+
+## À quoi ça sert ?
+
+La plupart des frontends produits par des LLM partagent une esthétique générique — dégradés violets, cartes glassmorphiques, formules marketing, grilles à trois cartes — parce que le modèle se rabat sur les motifs les plus courants de son entraînement. Ce skill remplace ces réflexes par un parti pris ferme : une seule pile, une seule police, une seule philosophie de couleur, un seul jeu de critères ergonomiques. Le résultat : du code frontend cohérent d'une session à l'autre, débarrassé des « tics » d'IA, prêt à être livré dans tout projet adoptant cette pile.
+
+Le cas d'usage phare, c'est **CLI → IHM** : pointez Claude vers le `--help` d'un outil en ligne de commande existant, et le skill produit l'IHM JavaScript pur + Tailwind correspondante en une seule session. Autres cas d'usage : nouveaux composants, pages entières, audits ergonomiques, tableaux de bord et dataviz, migration depuis un framework vers le JavaScript pur, et outillage d'accessibilité (texte alternatif W3C, meta-tags, jeu de favicons, validateur).
 
 ## Contenu
 
 - `front/SKILL.md` — point d'entrée du skill, avec frontmatter YAML et instructions.
-- `front/references/` — fichiers de référence à divulgation progressive (couleur, stack, checklist, guides UI).
+- `front/references/` — fichiers de référence à divulgation progressive (couleur, stack, checklist, guides UI, dataviz, meta-tags, i18n, anti-patterns, psychologie UX, Material Design, texte alternatif).
 - `front/assets/` — modèles à copier-coller et fichiers Montserrat.
+- `front/scripts/` — utilitaires Python (`validate.py`, `install_alt_ai.py`, `alt_from_ollama.py`, `meta_from_ollama.py`, `favicons.py`) avec `requirements.txt`.
+- `llms.txt` — index du projet conforme à <https://llmstxt.org/> pour les consommateurs LLM.
 
 ## Ce que le skill garantit
 
@@ -115,7 +123,11 @@ front/                              ← racine du dépôt
         └── fonts/montserrat/       ← variable + 4 statiques WOFF2, OFL.txt, fonts.css
 ```
 
-## Remerciements
+## Auteur
+
+[Warith Harchaoui, Ph.D.](https://www.linkedin.com/in/warith-harchaoui/)
+
+Un **skill** Claude pour une seule pile frontend : JavaScript pur, Tailwind CSS, Montserrat. Conforme à la [spécification Anthropic des skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
 Un grand merci à **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**, **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** et **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)** pour nos discussions fructueuses.
 
