@@ -91,7 +91,8 @@ hits=$(grep -rEn --include='*.md' --include='*.html' \
   | grep -v 'foundations/images\.md.*install-alt-ai' \
   | grep -v 'foundations/images\.md.*Apple Silicon' \
   | grep -v 'SKILL\.md.*alt-text-ai\.md' \
-  | grep -v 'SKILL\.md.*alt-from-ollama' )
+  | grep -v 'SKILL\.md.*alt-from-ollama' \
+  | grep -v 'SKILL\.md.*install-alt-ai' )
 if [ -n "$hits" ]; then
   warn "Trademarked UI-platform term in user-facing docs:"
   echo "$hits" | head -10 | while read -r line; do trace "$line"; done

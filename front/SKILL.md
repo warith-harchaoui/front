@@ -109,7 +109,10 @@ Do **not** use this skill when:
 | "search" | `patterns/searching.md` | `<input type="search">` with debounced JS, results live region |
 | "onboarding" | `patterns/onboarding.md` | One idea per screen, ≤ 8-word headline, skippable |
 | "theme switch" | `foundations/dark-mode.md` | `data-color-scheme` attribute + persisted choice |
-| "chart" / "graph" / "dashboard tile" | `charts-vega.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks |
+| "chart" / "graph" / "dashboard tile" | `charts-vega.md` + `dataviz-chart-selection.md` + `dataviz-color-palettes.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks |
+| "dashboard" / "BI" / "KPI summary" | `dashboard-ergonomics.md` (+ chart references above) | One question per tile, title as a question, sticky filters, grid layout (12 cols), skeleton tiles while loading |
+| "map" / "choropleth" / "cartography" | `dataviz-maps.md` | Title states the message, ≤ 7 classes, locator inset for unfamiliar audiences, accessible text alternative below the map |
+| "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria (Boucher / Bastien–Scapin): guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility |
 | "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Call `node scripts/alt-from-ollama.mjs <src>` (Ollama + `gemma4:e2b`, `-mlx` on Apple Silicon). `EMPTY` → `alt="" role="presentation" aria-hidden="true"`. Tag drafts with `data-alt-source="ai"`. |
 
 ## Stack basics
@@ -235,6 +238,11 @@ Load these only when needed.
 - `references/stack-vanilla-js.md` — patterns: modules, custom elements, events, a11y, state, i18n.
 - `references/stack-tailwind.md` — config tokens, plugins, dark mode strategy.
 - `references/charts-vega.md` — Vega-Lite house style (Montserrat, 10 px rounded corners, palette, matplotlib → Vega-Lite axis cleanup map).
+- `references/dataviz-chart-selection.md` — picking the right chart shape (comparison / composition / relationship / distribution).
+- `references/dataviz-color-palettes.md` — accessible color palettes for dataviz (sequential / divergent / categorical).
+- `references/dataviz-maps.md` — choropleth and map-specific ergonomics.
+- `references/dashboard-ergonomics.md` — laying out a dashboard tile-by-tile.
+- `references/ergonomics-criteria.md` — Boucher's eight ergonomic criteria for UX review.
 - `references/alt-text-ai.md` — AI-drafted `alt` via local Ollama + Gemma vision.
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.
