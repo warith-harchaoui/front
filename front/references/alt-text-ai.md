@@ -134,6 +134,18 @@ AI-generated alt is a draft, not a final answer. Tag every AI-drafted attribute 
 
 Strip `data-alt-source="ai"` once a human has reviewed and approved.
 
+## Cache
+
+Both `alt_from_ollama.py` and `meta_from_ollama.py` cache results on disk so the same input never hits the model twice. Stdlib-only, no extra dependency.
+
+- **Location:** `~/.cache/front-skill/alt/` (override with `FRONT_CACHE_DIR=<path>`).
+- **Key:** SHA-256 of (image bytes + `kind` + `lang` + `context` + `model`). Truncated to 32 hex chars for filenames.
+- **Bypass once:** `--no-cache` on the CLI.
+- **Bypass globally:** `FRONT_NO_CACHE=1` in the environment.
+- **Clear:** delete the directory.
+
+Cache writes fail silently (`try/except OSError`) — caching is opportunistic and never fatal.
+
 ## Failure modes
 
 | Symptom | Likely cause | Fix |

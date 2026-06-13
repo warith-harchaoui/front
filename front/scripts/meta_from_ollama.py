@@ -165,7 +165,11 @@ def main() -> int:
     ap.add_argument("--canonical", default="", help="Canonical absolute URL.")
     ap.add_argument("--lang", default=None, help="BCP-47 base tag (en, fr, es, …).")
     ap.add_argument("--model", default=None, help="Override the Ollama model tag.")
+    ap.add_argument("--no-cache", action="store_true", help="Bypass the on-disk cache for this run.")
     args = ap.parse_args()
+    if args.no_cache:
+        global NO_CACHE
+        NO_CACHE = True
 
     if not args.source and not args.goal:
         ap.error("Provide a source (HTML path or URL) or --goal.")
@@ -217,6 +221,7 @@ def main() -> int:
         sys.stderr.write(f"{e}\n")
         return 1
 
+    _cache_set(cache_k, parsed)
     if args.canonical:
         parsed["canonical"] = args.canonical
     json.dump(parsed, sys.stdout, indent=2, ensure_ascii=False)
