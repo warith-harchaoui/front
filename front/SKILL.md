@@ -247,3 +247,9 @@ Copy / adapt from `assets/`:
 - `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`.
 - `assets/components/chart-bar.json`, `chart-line.json` — Vega-Lite specs ready to load via Vega-Embed.
 - `assets/fonts/montserrat/` — Montserrat variable + italic + 4 static weights + OFL license + paste-ready `fonts.css`.
+
+## Scripts
+
+- `scripts/validate.sh` — pre-ship quality gate. Run from anywhere; resolves the skill root from its own location. Exits non-zero on any failure. Checks: frontmatter shape, description length, forbidden framework imports, trademarked UI-platform terms in user-facing docs, LLM-marketing phrases, absence of a README.md inside the skill folder, and that every reference path declared by `references/ui-guidelines/INDEX.md` resolves.
+- `scripts/install-alt-ai.sh` (macOS / Ubuntu) and `scripts/install-alt-ai.ps1` (Windows) — install Ollama if missing, then pull the alt-text vision model (`gemma4:e2b`; `-mlx` variant on Apple Silicon).
+- `scripts/alt-from-ollama.mjs` — Node 18+ ESM helper that returns alt text for an image. See `references/alt-text-ai.md`.

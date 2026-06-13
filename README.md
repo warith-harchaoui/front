@@ -2,6 +2,8 @@
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
+Author: [Warith HARCHAOUI](https://www.linkedin.com/in/warith-harchaoui/)
+
 A Claude **skill** for a single frontend stack: vanilla JavaScript, Tailwind CSS, Montserrat. Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
 ## Contents
@@ -115,7 +117,7 @@ front/                              ← repo root
 
 ## Acknowledgements
 
-Special thanks to **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** for fruitful discussions.
+Special thanks to **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**, **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)**, and **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)** for fruitful discussions.
 
 Color palettes from <https://harchaoui.org/warith/colors/>.
 

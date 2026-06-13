@@ -2,6 +2,7 @@
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
+Auteur : [Warith HARCHAOUI](https://www.linkedin.com/in/warith-harchaoui/)
 
 Un **skill** Claude pour une seule pile frontend : JavaScript pur, Tailwind CSS, Montserrat. Conforme à la [spécification Anthropic des skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
@@ -116,7 +117,7 @@ front/                              ← racine du dépôt
 
 ## Remerciements
 
-Un grand merci à **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** pour nos discussions fructueuses.
+Un grand merci à **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**, **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** et **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)** pour nos discussions fructueuses.
 
 Palettes de couleurs issues de <https://harchaoui.org/warith/colors/>.
 

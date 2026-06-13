@@ -77,6 +77,9 @@ else
 fi
 
 # ── 4. Trademarked UI-platform terms in user-facing docs ───────────────────
+# Install-context exemptions: the alt-text helper requires naming Apple Silicon
+# (for the -mlx variant) and macOS (for the cross-platform installer table).
+# Any other appearance is a real failure.
 hits=$(grep -rEn --include='*.md' --include='*.html' \
   --exclude-dir=scripts \
   -e '\bApple\b' -e '\bApple Silicon\b' -e '\biOS\b' -e '\biPadOS\b' \
@@ -84,9 +87,11 @@ hits=$(grep -rEn --include='*.md' --include='*.html' \
   -e 'SF[[:space:]]*Pro' -e 'SF[[:space:]]*Mono' -e 'SF[[:space:]]*Symbol' \
   -e 'San[[:space:]]*Francisco' -e '\bHIG\b' \
   . 2>/dev/null \
-  | grep -v 'references/alt-text-ai.md' \
-  | grep -v 'foundations/images.md.*Apple Silicon' \
-  | grep -v 'foundations/images.md.*ollama' )
+  | grep -v 'references/alt-text-ai\.md' \
+  | grep -v 'foundations/images\.md.*install-alt-ai' \
+  | grep -v 'foundations/images\.md.*Apple Silicon' \
+  | grep -v 'SKILL\.md.*alt-text-ai\.md' \
+  | grep -v 'SKILL\.md.*alt-from-ollama' )
 if [ -n "$hits" ]; then
   warn "Trademarked UI-platform term in user-facing docs:"
   echo "$hits" | head -10 | while read -r line; do trace "$line"; done
@@ -120,8 +125,19 @@ fi
 idx="references/ui-guidelines/INDEX.md"
 if [ -f "$idx" ]; then
   missing=0
+  # INDEX.md uses three kinds of paths:
+  #   foo/bar.md           → relative to references/ui-guidelines/
+  #   references/foo.md    → relative to the skill root (cross-references)
+  #   foo.md (bare)        → cross-reference up one level (skill root, references/)
   while IFS= read -r rel; do
-    [ -e "references/ui-guidelines/$rel" ] || { warn "INDEX.md references missing file: $rel"; missing=$((missing+1)); }
+    if [[ "$rel" == references/* ]]; then
+      [ -e "$rel" ] || { warn "INDEX.md cross-ref missing: $rel"; missing=$((missing+1)); }
+    elif [[ "$rel" == */* ]]; then
+      [ -e "references/ui-guidelines/$rel" ] || { warn "INDEX.md path missing: $rel"; missing=$((missing+1)); }
+    else
+      # bare filename → expect under references/ at the skill root
+      [ -e "references/$rel" ] || { warn "INDEX.md bare cross-ref missing: $rel"; missing=$((missing+1)); }
+    fi
   done < <(grep -oE '`[a-z][a-z0-9_/-]*\.md`' "$idx" | tr -d '`' | sort -u)
   [ "$missing" = 0 ] && note "All ui-guidelines/INDEX.md paths exist"
 fi
