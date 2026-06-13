@@ -6,6 +6,14 @@ Author: [Warith HARCHAOUI](https://www.linkedin.com/in/warith-harchaoui/)
 
 A Claude **skill** for a single frontend stack: vanilla JavaScript, Tailwind CSS, Montserrat. Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
+Special thanks to **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**, **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)**, and **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)** for fruitful discussions.
+
+Color palettes from <https://harchaoui.org/warith/colors/>.
+
+Montserrat font is bundled in `front/assets/fonts/montserrat/` under the SIL Open Font License — see the bundled `OFL.txt` for the full license and the attached copyright notice.
+
+We also got some knowledge from [Apple  Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) and [Google Material Design](https://material.io/design).
+
 ## Contents
 
 - `front/SKILL.md` — entry point with YAML frontmatter and instructions.
@@ -115,14 +123,7 @@ front/                              ← repo root
         └── fonts/montserrat/       ← variable + 4 static WOFF2, OFL.txt, fonts.css
 ```
 
-## Acknowledgements
-
-Special thanks to **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**, **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)**, and **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)** for fruitful discussions.
-
-Color palettes from <https://harchaoui.org/warith/colors/>.
-
-Montserrat is bundled in `front/assets/fonts/montserrat/` under the SIL Open Font License — see the bundled `OFL.txt` for the full license and the attached copyright notice.
 
 ## License
 
-UNLICENSED — all rights reserved. Montserrat remains under the SIL Open Font License (`front/assets/fonts/montserrat/OFL.txt`).
+UNLICENSED — all rights reserved.
