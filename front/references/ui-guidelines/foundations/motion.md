@@ -7,12 +7,12 @@
 
 ## Core principles
 
-- **Motion communicates causality.** It explains where something came from and where it goes.
-- **Subtle wins.** A 200 ms ease-out feels more native than a flashy 600 ms bounce.
-- **Spatial consistency.** Same origin → same destination. If a sheet rises from the bottom, it dismisses back down.
-- **Match material.** Translucent elements blur/scale; solid elements slide/fade.
-- **Respect `prefers-reduced-motion`.** Replace large transitions with instant or near-instant changes. Do not just shorten duration — remove translate/scale.
-- **Don't animate to inform of an error.** Use focus + copy. Motion is feedback, not the message.
+- Motion communicates causality — where something came from, where it goes.
+- Keep transitions subtle. A 200 ms ease-out feels more native than a flashy 600 ms bounce.
+- Spatial consistency: same origin, same destination. If a sheet rises from the bottom, it dismisses back down.
+- Match material to motion: translucent elements blur and scale; solid elements slide or fade.
+- Honor `prefers-reduced-motion` — replace large transitions with instant or near-instant changes. Don't just shorten duration; remove the translate/scale.
+- Don't animate to signal an error. Use focus and copy. Motion is feedback, not the message.
 
 ## Default durations
 

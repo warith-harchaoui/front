@@ -7,7 +7,7 @@
 
 ## Core principles
 
-- **Undo is mercy.** Most destructive actions should offer a quick undo.
+- **Offer undo by default.** Most destructive actions should leave a quick undo path open.
 - **Show a confirmation only when undo isn't possible.** "Move to Trash" + undo banner ≫ a confirm dialog.
 - **Keyboard shortcuts**: `⌘Z` undo and `⌘⇧Z` redo where Command is the host's primary modifier; `Ctrl+Z` / `Ctrl+Y` everywhere else. Render the right glyph (see `inputs/keyboards.md`).
 - **History stack scope**: per-document, not global.

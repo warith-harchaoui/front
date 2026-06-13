@@ -71,8 +71,8 @@ else
   if ! ollama pull "$MODEL"; then
     cat <<EOF >&2
 
-Could not pull "$MODEL".
-If the tag is not yet in Ollama's registry, retry with a known-good vision tag:
+Could not pull "$MODEL". Check your network connection and the model tag.
+To try a different on-device vision model, set OLLAMA_MODEL and re-run, e.g.:
 
     OLLAMA_MODEL=gemma3n:e2b $0
     # On Apple Silicon:

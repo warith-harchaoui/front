@@ -33,7 +33,7 @@ Does the user need to respond before continuing?
 
 ## Checklist
 
-- [ ] Modal earns its block of focus.
+- [ ] Modal warrants blocking focus.
 - [ ] Dismissal: Escape + backdrop + button.
 - [ ] Focus restored to trigger.
 - [ ] No nested modal.

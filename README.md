@@ -2,7 +2,7 @@
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
-A Claude **skill** that constrains Claude to a single frontend stack: vanilla JavaScript, Tailwind CSS, Montserrat. Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
+A Claude **skill** for a single frontend stack: vanilla JavaScript, Tailwind CSS, Montserrat. Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
 ## Contents
 

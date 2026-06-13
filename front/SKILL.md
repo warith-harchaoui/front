@@ -1,6 +1,6 @@
 ---
 name: front
-description: Generate production-grade frontend code in vanilla JavaScript and Tailwind CSS, with platform-native UI patterns and the Montserrat type system. Use when the user asks to "build a UI", "create a component", "design a page", "make a form/modal/button/nav", "scaffold a landing", "build a web app" — or any frontend work that should NOT use React, Vue, Svelte, Next.js or other JS frameworks. Emits HTML + Tailwind classes + vanilla ES modules; honors accessibility, dark mode, reduced motion, and bilingual (EN/FR) copy.
+description: Generate vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Use when the user asks to "build a UI", "create a component", "design a page", "make a form / modal / button / nav", "scaffold a landing", or "build a web app" — or any frontend work that must NOT use React, Vue, Svelte, Next.js or another JS framework. Output is semantic HTML + Tailwind classes + vanilla ES modules with dark-mode peers, focus rings, reduced-motion guards, and bilingual (EN/FR) copy.
 license: MIT
 metadata:
   author: Warith Harchaoui
@@ -77,7 +77,7 @@ Do **not** use this skill when:
 8. Return code + a one-paragraph rationale.
 ```
 
-## Critical, non-negotiable rules
+## Hard rules
 
 1. **No framework imports.** Output never contains `react`, `vue`, `svelte`, `solid-js`, `next`, `nuxt`, `angular`. The skill REFUSES to emit framework code; if asked, it explains why and offers the vanilla equivalent.
 2. **Tailwind classes only**, never inline `style="…"` except for one-off CSS custom-property values that have no utility (e.g. `style="--accent: #007AFF"`).
@@ -121,7 +121,7 @@ Do **not** use this skill when:
 
 ## Bilingual (EN / FR) defaults
 
-The skill author writes in English by default. When the user writes in French, or asks for French, the skill switches. For repos that ship both languages, the convention is:
+Default output language is English. Switch to French when the user writes in French or asks for it. For repos that ship both languages, the convention is:
 
 - `README.md` (English) and `LISEZMOI.md` (French) — each starts with a switcher: `[🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)`.
 - For runtime copy, use a small `i18n` object keyed by `lang`; default to `navigator.language.startsWith('fr') ? 'fr' : 'en'`.
@@ -227,12 +227,15 @@ Run `references/checklist.md` before returning code. The short version:
 
 ## References (progressive disclosure)
 
-Load these only when needed:
+Load these only when needed.
+
+**Path convention:** every reference path in this file is relative to the skill root. Component, pattern, input, and platform paths shown earlier as `components/buttons.md`, `patterns/loading.md`, etc. resolve to `references/ui-guidelines/components/buttons.md`, `references/ui-guidelines/patterns/loading.md`, and so on.
 
 - `references/color-psychology.md` — Choice / Emotion / Concept / Psychology palettes (Warith Harchaoui).
 - `references/stack-vanilla-js.md` — patterns: modules, custom elements, events, a11y, state, i18n.
 - `references/stack-tailwind.md` — config tokens, plugins, dark mode strategy.
 - `references/charts-vega.md` — Vega-Lite house style (Montserrat, 10 px rounded corners, palette, matplotlib → Vega-Lite axis cleanup map).
+- `references/alt-text-ai.md` — AI-drafted `alt` via local Ollama + Gemma vision.
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.
 

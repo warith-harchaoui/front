@@ -61,8 +61,8 @@ if ($present -contains $Model) {
   ollama pull $Model
   if ($LASTEXITCODE -ne 0) {
     Write-Host ""
-    Write-Host "Could not pull `"$Model`"." -ForegroundColor Yellow
-    Write-Host "If the tag is not yet in Ollama's registry, retry with a known-good vision tag:" -ForegroundColor Yellow
+    Write-Host "Could not pull `"$Model`". Check your network connection and the model tag." -ForegroundColor Yellow
+    Write-Host "To try a different on-device vision model, set OLLAMA_MODEL and re-run, e.g.:" -ForegroundColor Yellow
     Write-Host "    `$env:OLLAMA_MODEL='gemma3n:e2b'; powershell -ExecutionPolicy Bypass -File install-alt-ai.ps1" -ForegroundColor Yellow
     Write-Host "Browse tags at https://ollama.com/library" -ForegroundColor Yellow
     exit 1

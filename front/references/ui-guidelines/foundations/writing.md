@@ -7,13 +7,13 @@
 
 ## Core principles
 
-- **Concise. Clear. Helpful.** In that order.
-- **Use the user's language**, not the developer's. "Free up space" beats "Purge cache."
-- **Verbs in buttons.** "Continue", "Send", "Delete photo" — never "OK" for a consequential action.
-- **Sentence case for everything** except brand names and acronyms. Title Case feels dated.
-- **Don't apologize, don't blame.** "We couldn't find that account" — not "Error 401: invalid credentials".
-- **Plain language**, ~grade-8 reading level. Avoid jargon, idioms, internal product names.
-- **Numbers as numerals** for UI ("3 items"), spelled out only when starting a sentence in long prose.
+- Be concise, clear, and helpful — in that order.
+- Use the user's language, not the developer's: "Free up space" beats "Purge cache."
+- Verbs in buttons: "Continue", "Send", "Delete photo" — never "OK" for a consequential action.
+- Sentence case everywhere except brand names and acronyms. Title Case feels dated.
+- Don't apologize, don't blame: "We couldn't find that account" — not "Error 401: invalid credentials".
+- Plain language, around grade-8 reading level. Avoid jargon, idioms, internal product names.
+- Numbers as numerals in UI ("3 items"); spell them out only when starting a sentence in long prose.
 
 ## Concrete rules
 

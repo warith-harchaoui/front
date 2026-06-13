@@ -4,7 +4,7 @@ The skill emits `<img>` tags with meaningful `alt`. When the author has not supp
 
 - **Model (default):** `gemma4:e2b`
 - **Apple Silicon variant:** `gemma4:e2b-mlx` (selected automatically by the installers and the script)
-- **Override anywhere:** `OLLAMA_MODEL=<tag>` (for example `gemma3n:e2b` if the default tag is not yet in Ollama's registry).
+- **Override anywhere:** `OLLAMA_MODEL=<tag>` (for example `gemma3n:e2b` to use a different on-device vision model).
 
 Runtime: **Node.js 18+** (built-in `fetch`, no `npm install` required).
 
@@ -95,7 +95,7 @@ async function altFor(src, context = '') {
 
 ## Rules the prompt enforces
 
-1. ≤ 125 characters — short alt is kinder to screen readers.
+1. ≤ 125 characters — long alt is fatiguing to listen to.
 2. **Describe meaning, not pixels.** "Person walking a dog at sunset" beats "An image of a person, a dog, and orange sky".
 3. **No "image of …", "picture of …", "photo of …"** prefixes — screen readers already announce "image".
 4. **Don't guess race, gender, age, mood** unless contextually essential.
@@ -127,7 +127,7 @@ Pair complex charts with a longer text alternative in `<figcaption>` or `aria-de
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `Could not reach Ollama at http://localhost:11434` | Daemon not running | `ollama serve` in another terminal, or re-run the installer. |
-| `Error: model not found` | Tag absent from the registry | Re-run with `OLLAMA_MODEL=gemma3n:e2b` (Apple Silicon: `gemma3n:e2b-mlx`). |
+| `Error: model not found` | Tag mistyped or installer skipped | Re-run the installer, or pull manually: `ollama pull gemma4:e2b` (Apple Silicon: `gemma4:e2b-mlx`). |
 | Garbled or hallucinated text | Image very small or low quality | Pre-resize to ≥ 512 px on the long edge. |
 | Very slow first call | First inference loads weights into memory | Subsequent calls are fast; keep the daemon running between calls. |
 

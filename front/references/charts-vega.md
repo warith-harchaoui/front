@@ -20,7 +20,7 @@ The skill emits **Vega-Lite v5 JSON specs**, rendered with the Vega-Embed runtim
 
 For production, install via npm (`vega`, `vega-lite`, `vega-embed`) and bundle.
 
-## House style — non-negotiable defaults
+## House defaults
 
 1. **Rounded corners at 10 px** on every chart mark and on the chart container.
 2. **Colors from `color-psychology.md`** — no rainbow palettes, no Vega defaults.
