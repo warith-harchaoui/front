@@ -60,6 +60,36 @@ OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 DEFAULT_BASE = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e2b")
 MAX_CHARS = 150  # W3C says no fixed limit; ~150 chars stays comfortable for screen readers.
 
+CACHE_DIR = Path(os.environ.get("FRONT_CACHE_DIR", Path.home() / ".cache" / "front-skill")) / "alt"
+NO_CACHE = bool(os.environ.get("FRONT_NO_CACHE"))
+
+
+def _cache_key(image_bytes: bytes, kind: str, lang: str, context: str, model: str) -> str:
+    h = hashlib.sha256()
+    h.update(image_bytes)
+    h.update(b"\x00")
+    h.update(f"{kind}\x00{lang}\x00{context}\x00{model}".encode("utf-8"))
+    return h.hexdigest()[:32]
+
+
+def _cache_get(key: str) -> Optional[str]:
+    if NO_CACHE:
+        return None
+    path = CACHE_DIR / f"{key}.txt"
+    if path.is_file():
+        return path.read_text(encoding="utf-8").rstrip("\n")
+    return None
+
+
+def _cache_set(key: str, text: str) -> None:
+    if NO_CACHE:
+        return
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        (CACHE_DIR / f"{key}.txt").write_text(text + "\n", encoding="utf-8")
+    except OSError:
+        pass  # Fail open: caching is opportunistic, never fatal.
+
 
 def pick_default_model() -> str:
     """Use the -mlx variant on MLX-capable hardware automatically."""
@@ -228,6 +258,12 @@ def describe(
     model = model or pick_default_model()
 
     data = maybe_resize(load_image_bytes(src), resize)
+
+    key = _cache_key(data, kind, lang, context, model)
+    cached = _cache_get(key)
+    if cached is not None:
+        return cached
+
     image_b64 = base64.b64encode(data).decode("ascii")
 
     payload = {
@@ -253,7 +289,9 @@ def describe(
         sys.exit(2)
 
     body = resp.json()
-    return post_process(body.get("response", ""), lang)
+    text = post_process(body.get("response", ""), lang)
+    _cache_set(key, text)
+    return text
 
 
 # ── CLI ──────────────────────────────────────────────────────────────────────
@@ -279,11 +317,15 @@ def _build_argparser() -> argparse.ArgumentParser:
         help="Downscale long edge to N px before sending (Pillow). 0 disables. Default: 1024.",
     )
     p.add_argument("--model", help="Override the Ollama model tag.")
+    p.add_argument("--no-cache", action="store_true", help="Bypass the on-disk cache for this run.")
     return p
 
 
 def main(argv: Optional[list[str]] = None) -> int:
+    global NO_CACHE
     args = _build_argparser().parse_args(argv)
+    if args.no_cache:
+        NO_CACHE = True
     if args.kind == "decorative":
         # W3C: decorative images get alt="" — caller renders <img alt=""> only.
         return 0

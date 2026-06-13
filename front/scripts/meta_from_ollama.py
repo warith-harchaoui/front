@@ -37,6 +37,7 @@ Requires Python 3.9+ and `requests`.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -86,6 +87,38 @@ Rules:
   - If a value is unknown, return an empty string for it.
   - Output strict JSON — double-quoted keys and strings, no trailing comma.
 """
+
+
+CACHE_DIR = Path(os.environ.get("FRONT_CACHE_DIR", Path.home() / ".cache" / "front-skill")) / "meta"
+NO_CACHE = bool(os.environ.get("FRONT_NO_CACHE"))
+
+
+def _cache_key(goal: str, page_text: str, site_name: str, lang: str, model: str) -> str:
+    h = hashlib.sha256()
+    h.update(f"{goal}\x00{page_text}\x00{site_name}\x00{lang}\x00{model}".encode("utf-8"))
+    return h.hexdigest()[:32]
+
+
+def _cache_get(key: str) -> dict | None:
+    if NO_CACHE:
+        return None
+    path = CACHE_DIR / f"{key}.json"
+    if path.is_file():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            return None
+    return None
+
+
+def _cache_set(key: str, value: dict) -> None:
+    if NO_CACHE:
+        return
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        (CACHE_DIR / f"{key}.json").write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
+    except OSError:
+        pass
 
 
 def fetch_url(url: str) -> str:
