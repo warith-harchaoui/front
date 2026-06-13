@@ -179,6 +179,16 @@ def main() -> int:
 
     lang = (args.lang or detect_lang()).lower()[:2]
     model = args.model or pick_default_model()
+
+    cache_k = _cache_key(args.goal, page_text, args.site_name, lang, model)
+    cached = _cache_get(cache_k)
+    if cached is not None:
+        if args.canonical:
+            cached["canonical"] = args.canonical
+        json.dump(cached, sys.stdout, indent=2, ensure_ascii=False)
+        sys.stdout.write("\n")
+        return 0
+
     prompt = build_prompt(args.goal, page_text, args.site_name, lang)
 
     payload = {
