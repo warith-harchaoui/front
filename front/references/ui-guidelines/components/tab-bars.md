@@ -10,7 +10,7 @@
 - **3–5 tabs.** Fewer is a button row; more is a sidebar.
 - **Same tabs across the entire app.** Tab bar is global, not contextual.
 - **Each tab opens a sibling view**, not a modal.
-- **Icon + label.** Labels are non-negotiable for accessibility and scan-ability.
+- **Icon + label.** Labels stay visible — they carry accessibility and scan-ability.
 
 ## Concrete rules
 
