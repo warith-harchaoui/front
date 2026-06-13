@@ -1,0 +1,61 @@
+# front
+
+> A Claude skill for vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Released into the public domain under The Unlicense.
+
+This repository is an [Anthropic skill](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf): drop `front/` under `~/.claude/skills/` to use it from Claude Code, or paste the contents of `front/SKILL.md` as a system-prompt fragment in any tool that accepts one (OpenCode, LangChain, Cursor, Continue, Cline, Aider, the Anthropic Messages API).
+
+The flagship use case: read an existing CLI's `--help` and produce the matching single-page vanilla-JS + Tailwind GUI in one session.
+
+## Skill entry point
+
+- [SKILL.md](front/SKILL.md): YAML frontmatter, decision tree, CLI → GUI workflow, hard rules, examples.
+
+## Core references
+
+- [color-psychology.md](front/references/color-psychology.md): Curated palettes (Choice / Emotion / Concept / Psychology) and the semantic-color mapping.
+- [stack-vanilla-js.md](front/references/stack-vanilla-js.md): Vanilla JS patterns — ES modules, native `<dialog>`, events, state, i18n.
+- [stack-tailwind.md](front/references/stack-tailwind.md): Tailwind config, base CSS, plugins, dark-mode strategy.
+- [checklist.md](front/references/checklist.md): Pre-ship quality gate.
+
+## Charts and dataviz
+
+- [charts-vega.md](front/references/charts-vega.md): Vega-Lite house style (Montserrat, 10 px rounded corners, palette, matplotlib → Vega-Lite axis cleanup).
+- [dataviz-chart-selection.md](front/references/dataviz-chart-selection.md): Decision tree for picking the right chart shape.
+- [dataviz-color-palettes.md](front/references/dataviz-color-palettes.md): Sequential / divergent / categorical palettes with accessibility workflow.
+- [dataviz-maps.md](front/references/dataviz-maps.md): Map-specific ergonomics.
+- [dashboard-ergonomics.md](front/references/dashboard-ergonomics.md): Tile-by-tile dashboard layout.
+
+## Design system
+
+- [ui-guidelines/INDEX.md](front/references/ui-guidelines/INDEX.md): Full map (foundations, patterns, components, inputs, platforms).
+- [material-design.md](front/references/material-design.md): Material 3 distilled with Material → skill-token mapping.
+- [anti-patterns.md](front/references/anti-patterns.md): Visual and copy tells to refuse (gradient text, glassmorphism, marketing buzzwords).
+- [ux-psychology.md](front/references/ux-psychology.md): Applied cognitive principles for review and conversion work.
+- [ergonomics-criteria.md](front/references/ergonomics-criteria.md): Eight ergonomic criteria for UX audit.
+
+## HTML, meta, accessibility, internationalization
+
+- [meta-tags.md](front/references/meta-tags.md): `<meta>` tags — W3C / WHATWG + Open Graph + Twitter Cards + Schema.org JSON-LD.
+- [alt-text-ai.md](front/references/alt-text-ai.md): W3C-compliant alt text via a local Ollama + Gemma vision model.
+- [i18n.md](front/references/i18n.md): Multilingual frontend — URL strategy, `Intl.*`, plurals, RTL.
+
+## Scripts (Python, cross-platform)
+
+- [requirements.txt](front/scripts/requirements.txt): `pip install -r front/scripts/requirements.txt`.
+- [validate.py](front/scripts/validate.py): Pre-ship quality gate.
+- [install_alt_ai.py](front/scripts/install_alt_ai.py): Installs Ollama and pulls the vision model.
+- [alt_from_ollama.py](front/scripts/alt_from_ollama.py): Generates alt text per W3C purpose categories.
+- [meta_from_ollama.py](front/scripts/meta_from_ollama.py): Drafts page `<meta>` tags from a goal or HTML page.
+- [favicons.py](front/scripts/favicons.py): Generates favicon / PWA / apple-touch / maskable icon set + `site.webmanifest` + `head.html`.
+
+## Assets
+
+- [starter-page.html](front/assets/starter-page.html): Bootstrap a full page (Montserrat + Tailwind + tokens).
+- [components/](front/assets/components/): Copy-paste HTML snippets — `button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`, `chart-bar.json`, `chart-line.json`.
+- [fonts/montserrat/](front/assets/fonts/montserrat/): Montserrat WOFF2 (variable + italic-variable + 4 static) + `OFL.txt` + `fonts.css`.
+
+## Optional
+
+- [README.md](README.md): Human-facing English README.
+- [LISEZMOI.md](LISEZMOI.md): Human-facing French README.
+- [LICENSE.md](LICENSE.md): The Unlicense + Montserrat OFL carve-out.

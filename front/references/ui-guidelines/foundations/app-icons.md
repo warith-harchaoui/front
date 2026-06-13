@@ -23,6 +23,34 @@
 - **PWA / manifest**: at minimum 192×192 and 512×512 PNG; mark one `"purpose": "maskable"` so Android can crop.
 - **Theme-color meta**: `<meta name="theme-color" content="#…">` matches the dominant background so the chrome blends in.
 
+## Generate the set from a logo
+
+The skill ships a Pillow-based generator. From a single logo PNG (or SVG + `--raster` fallback):
+
+```bash
+pip install -r front/scripts/requirements.txt
+python front/scripts/favicons.py path/to/logo.png \
+       --out public \
+       --name "Site name" --short-name "Site" \
+       --bg "#FFFFFF" \
+       --theme-light "#FFFFFF" --theme-dark "#000000"
+```
+
+Produces under `public/`:
+
+```
+favicon.svg              (when the input is SVG)
+favicon.ico              multi-resolution (16, 32, 48)
+favicon-16.png  favicon-32.png  favicon-48.png
+apple-touch-icon.png     180×180, opaque, no rounded corners (OS adds them)
+icon-192.png  icon-512.png
+icon-maskable-512.png    PWA maskable, content in the central 80%
+site.webmanifest
+head.html                <link> and <meta> tags ready to paste into <head>
+```
+
+See `references/meta-tags.md` for the full meta-tag set this fits into.
+
 ## HTML head boilerplate
 
 ```html

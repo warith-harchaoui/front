@@ -59,24 +59,31 @@
 
 ## AI-drafted alt text
 
-When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default `gemma4:e2b`; `gemma4:e2b-mlx` on MLX-capable hardware). Local-only — nothing leaves the machine. Runtime is Node.js 18+, no `npm install`.
+When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default `gemma4:e2b`; `gemma4:e2b-mlx` on MLX-capable hardware). Local-only — nothing leaves the machine. Runtime is Python 3.9+.
 
-Install once:
-
-| Shell | Command |
-|---|---|
-| Bash (Homebrew or curl installer) | `bash front/scripts/install-alt-ai.sh` |
-| PowerShell (winget installer) | `powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1` |
-
-Generate alt for an image:
+Install once (cross-platform):
 
 ```bash
-node front/scripts/alt-from-ollama.mjs ./public/hero.jpg
+pip install -r front/scripts/requirements.txt
+python front/scripts/install_alt_ai.py
 ```
 
-Output is one line ≤ 125 characters, or the literal token `EMPTY` for a purely decorative image (in which case emit `alt="" role="presentation" aria-hidden="true"`).
+Generate alt for an image, per the W3C / WAI decision tree:
 
-Full guidance — prompt rules, Node server-proxy pattern for browser calls, review workflow, failure modes — in `references/alt-text-ai.md`.
+```bash
+# informative (default)
+python front/scripts/alt_from_ollama.py ./public/hero.jpg
+
+# functional (inside <a> or <button>)
+python front/scripts/alt_from_ollama.py --kind functional --context "Submit form" ./public/icons/check.png
+
+# complex (chart, diagram) — pair with a long description in <figcaption>
+python front/scripts/alt_from_ollama.py --kind complex --context "Weekly active users" ./public/chart.png
+```
+
+Output is one line ≤ 150 characters at a word boundary (no trailing `…`). For decorative images, emit `alt=""` directly (the script returns empty when called with `--kind decorative`). Do **not** add `role="presentation"` or `aria-hidden="true"` — `alt=""` alone is the WAI-recommended signal.
+
+Full guidance — W3C decision tree, prompt rules, server-side proxy pattern for browser calls, review workflow, failure modes — in `references/alt-text-ai.md`.
 
 ## Checklist
 

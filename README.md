@@ -17,8 +17,10 @@ We also got some knowledge from [Apple  Human Interface Guidelines](https://deve
 ## Contents
 
 - `front/SKILL.md` — entry point with YAML frontmatter and instructions.
-- `front/references/` — progressive-disclosure reference files (color, stack, checklist, UI guidelines).
+- `front/references/` — progressive-disclosure reference files (color, stack, checklist, UI guidelines, dataviz, meta tags, i18n, anti-patterns, UX psychology, Material Design, alt text).
 - `front/assets/` — copy-paste templates and Montserrat font files.
+- `front/scripts/` — Python helpers (`validate.py`, `install_alt_ai.py`, `alt_from_ollama.py`, `meta_from_ollama.py`, `favicons.py`) with `requirements.txt`.
+- `llms.txt` — index of the project per <https://llmstxt.org/> for LLM consumers.
 
 ## What the skill enforces
 

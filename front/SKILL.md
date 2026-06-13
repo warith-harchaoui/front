@@ -117,7 +117,9 @@ Do **not** use this skill when:
 | "material" / "Material 3" / "M3" / named Material component | `material-design.md` | Map Material roles to skill tokens; emit plain HTML + Tailwind (no `mdc-*` classes, no Material Web Components) |
 | "make it look less AI" / "designer review" / "anti-patterns" | `anti-patterns.md` | Refuse gradient text, glassmorphism on body, side-stripe borders, "boost your productivity" copy, three-card grids, marketing buzzwords |
 | "psychology" / "conversion" / "cognitive bias" / "flow not working" | `ux-psychology.md` | Pick ONE applicable principle per screen — Hick / Anchoring / Default Bias / Peak-End / Goal Gradient — and apply concretely |
-| "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Call `node scripts/alt-from-ollama.mjs <src>` (Ollama + `gemma4:e2b`, `-mlx` on MLX-capable hardware). `EMPTY` → `alt="" role="presentation" aria-hidden="true"`. Tag drafts with `data-alt-source="ai"`. |
+| "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Match W3C image-purpose decision tree → `python scripts/alt_from_ollama.py [--kind informative\|decorative\|functional\|text\|complex\|group] [--lang fr] <src>`. Decorative → `alt=""` alone. Tag AI drafts with `data-alt-source="ai"`. |
+| "favicon" / "app icon" / "PWA icons" / "touch icon" | `ui-guidelines/foundations/app-icons.md` + `meta-tags.md` | `python scripts/favicons.py <logo> --out public --name "…" --bg "#…"` → produces favicon.svg/.ico, PNG set, apple-touch-icon, maskable PWA icon, site.webmanifest, head.html snippet. |
+| "meta tags" / "SEO" / "Open Graph" / "Twitter card" / "JSON-LD" | `meta-tags.md` | Base + canonical + OG + Twitter card + JSON-LD `@type`; `python scripts/meta_from_ollama.py [--goal …] [--lang fr] [<page.html\|url>]` drafts the per-page title/description/og_image_alt. |
 
 ## Stack basics
 
@@ -251,7 +253,8 @@ Load these only when needed.
 - `references/anti-patterns.md` — visual and copy tells to refuse (gradients, glassmorphism, marketing buzzwords).
 - `references/ux-psychology.md` — applied cognitive principles for ergonomic review and conversion audits.
 - `references/material-design.md` — Material 3 distilled and mapped to the skill's tokens.
-- `references/alt-text-ai.md` — AI-drafted `alt` via local Ollama + Gemma vision (with `--lang` for multilingual output).
+- `references/meta-tags.md` — `<meta>` tags (W3C / WHATWG + Open Graph + Twitter Cards + Schema.org JSON-LD).
+- `references/alt-text-ai.md` — W3C-compliant alt text via local Ollama + Gemma vision (per-purpose: informative / decorative / functional / text / complex / group).
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.
 
@@ -266,6 +269,10 @@ Copy / adapt from `assets/`:
 
 ## Scripts
 
-- `scripts/validate.sh` — pre-ship quality gate. Run from anywhere; resolves the skill root from its own location. Exits non-zero on any failure. Checks: frontmatter shape, description length, forbidden framework imports, trademarked UI-platform terms in user-facing docs, LLM-marketing phrases, absence of a README.md inside the skill folder, and that every reference path declared by `references/ui-guidelines/INDEX.md` resolves.
-- `scripts/install-alt-ai.sh` (Bash systems) and `scripts/install-alt-ai.ps1` (PowerShell) — install Ollama if missing, then pull the alt-text vision model (`gemma4:e2b`; `-mlx` variant on MLX-capable hardware).
-- `scripts/alt-from-ollama.mjs` — Node 18+ ESM helper that returns alt text for an image. See `references/alt-text-ai.md`.
+All scripts are Python 3.9+, cross-platform. Install deps once: `pip install -r scripts/requirements.txt`.
+
+- `scripts/validate.py` — pre-ship quality gate. Resolves the skill root from its own location, exits non-zero on any failure. Checks: frontmatter shape, description length, forbidden framework imports, trademarked UI-platform terms in user-facing docs, LLM-marketing phrases, absence of `README.md` inside the skill folder, and that every reference path declared by `references/ui-guidelines/INDEX.md` resolves.
+- `scripts/install_alt_ai.py` — installs Ollama if missing (Homebrew / official installer / `winget`), starts the daemon, pulls the vision model (`gemma4:e2b`; `-mlx` variant on MLX-capable hardware).
+- `scripts/alt_from_ollama.py` — generates W3C-compliant alt text via the local model. Handles informative / decorative / functional / text / complex / group per the WAI decision tree. See `references/alt-text-ai.md`.
+- `scripts/favicons.py` — generates the full favicon / app-icon set from a single logo (Pillow): `favicon.svg`/`.ico`, PNG variants, `apple-touch-icon.png`, maskable PWA icon, `site.webmanifest`, and a `head.html` snippet to paste into `<head>`.
+- `scripts/meta_from_ollama.py` — drafts page meta tags (title, description, Open Graph, Twitter, Schema.org `@type`) from a goal description or an HTML page. JSON on stdout. See `references/meta-tags.md`.
