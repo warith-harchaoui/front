@@ -306,6 +306,7 @@ Copy / adapt from `assets/`:
 - `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`.
 - `assets/components/chart-bar.json`, `chart-line.json` — Vega-Lite specs ready to load via Vega-Embed.
 - `assets/fonts/montserrat/` — Montserrat variable + italic + 4 static weights + OFL license + paste-ready `fonts.css`.
+- `assets/examples/cli-gui-demo/` — runnable CLI → GUI worked example. Mock CLI (`cli/imgconvert.py`), Python SSE proxy (`server.py`), and a single-page GUI under `public/`. Launch with `python server.py` and open <http://localhost:8787>. See `assets/examples/cli-gui-demo/README.md` for the 8-step CLI → GUI mapping.
 
 ## Scripts
 
