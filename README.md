@@ -126,4 +126,4 @@ front/                              ← repo root
 
 ## License
 
-UNLICENSED — all rights reserved.
+`UNLICENSED` (npm convention) — proprietary, all rights reserved. See `LICENSE.md` at the repo root for the full notice and the carve-out for bundled third-party assets (Montserrat under the SIL Open Font License).
