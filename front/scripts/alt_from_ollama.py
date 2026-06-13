@@ -288,6 +288,69 @@ BASE_RULES: str = (
 )
 
 
+def long_prompt_for(kind: str, lang: str, context: str = "") -> str:
+    """
+    Build the prompt for a long-form description of a complex image.
+
+    Long descriptions are intended for ``<figcaption>`` or for an element
+    referenced by ``aria-describedby``. They name the chart type, the axes,
+    a handful of key values or outliers, and the takeaway — in that order.
+
+    Parameters
+    ----------
+    kind : str
+        W3C purpose category. Long descriptions only make sense for
+        ``complex`` (and to a lesser extent ``group``); other kinds fall
+        back to a generic structural prompt.
+    lang : str
+        Two-letter target language code.
+    context : str, optional
+        Free-form page-context hint, by default ``""``.
+
+    Returns
+    -------
+    str
+        The fully assembled prompt.
+    """
+    lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
+
+    if kind == "complex":
+        # Structured request that matches what screen-reader users need from
+        # charts and diagrams: type → axes → key values → outliers → takeaway.
+        body = (
+            "Write a LONG description for this complex image (chart, "
+            "diagram, or infographic). The description will be placed in "
+            "<figcaption> or in an element referenced by aria-describedby — "
+            "it is read by a screen-reader user who cannot see the image. "
+            "Structure it as Markdown with this order:\n"
+            "  1. One sentence: chart type / diagram type.\n"
+            "  2. One sentence: axes or dimensions (what is mapped where).\n"
+            "  3. A short bullet list of 3 key values or relationships.\n"
+            "  4. One sentence: outliers or notable features (if any).\n"
+            "  5. One sentence: the single takeaway.\n"
+            "Stay under 400 words. Do not invent numbers — if a value is "
+            "ambiguous from the image, describe the relative position "
+            "(\"highest\", \"middle\", \"lowest\") instead. "
+            "Do not start with 'image of', 'photo of', or the equivalent."
+        )
+    elif kind == "group":
+        body = (
+            "Write a LONG description for this group of related images. "
+            "Cover the relationship between the images, the combined "
+            "meaning, and any notable individual elements. Markdown. "
+            "Stay under 400 words."
+        )
+    else:
+        body = (
+            "Write a long-form description of this image for use in "
+            "<figcaption> or via aria-describedby. Cover the meaningful "
+            "structure and context. Stay under 400 words."
+        )
+
+    ctx: str = f" Page context: {context}." if context else ""
+    return f"{lang_line} {body}{ctx}"
+
+
 def prompt_for(kind: str, lang: str, context: str = "") -> str:
     """
     Build the full prompt sent to the vision model, tuned to the image purpose.
@@ -469,6 +532,89 @@ def post_process(text: str, lang: str) -> str:
 
 # ── Public API ──────────────────────────────────────────────────────────────
 
+def describe_long(
+    src: str,
+    *,
+    kind: str = "complex",
+    lang: Optional[str] = None,
+    context: str = "",
+    resize: int = 1024,
+    model: Optional[str] = None,
+) -> str:
+    """
+    Generate a long description for a complex image.
+
+    Parameters
+    ----------
+    src : str
+        Path or URL to the image.
+    kind : str, optional
+        W3C purpose. Defaults to ``"complex"`` since that is the only kind
+        for which a long description is normally meaningful.
+    lang : str or None, optional
+        BCP-47 base tag. Detected from the environment when ``None``.
+    context : str, optional
+        Page-context hint (e.g. "Weekly active users for the marketing site").
+    resize : int, optional
+        Maximum long-edge in pixels for the image sent to the model.
+    model : str or None, optional
+        Ollama model tag to use.
+
+    Returns
+    -------
+    str
+        Markdown long description, suitable for ``<figcaption>`` or
+        ``aria-describedby``. Empty string when the model returns nothing.
+
+    Raises
+    ------
+    SystemExit
+        With code ``2`` when Ollama is unreachable.
+    """
+    lang = (lang or detect_lang()).lower()[:2]
+    model = model or pick_default_model()
+    data: bytes = maybe_resize(load_image_bytes(src), resize)
+
+    # The cache key distinguishes long descriptions from short alt by
+    # appending ``"long"`` to the parameter mix.
+    key = _cache_key(data, f"{kind}:long", lang, context, model)
+    cached = _cache_get(key)
+    if cached is not None:
+        return cached
+
+    image_b64: str = base64.b64encode(data).decode("ascii")
+    payload: dict = {
+        "model": model,
+        "prompt": long_prompt_for(kind, lang, context),
+        "images": [image_b64],
+        "stream": False,
+        # Long descriptions need more tokens than short alt — 400 words
+        # comfortably fits in 600 tokens for most languages.
+        "options": {"temperature": 0.25, "num_predict": 600},
+    }
+
+    try:
+        resp = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=180)
+        resp.raise_for_status()
+    except requests.exceptions.ConnectionError:
+        sys.stderr.write(
+            f"Cannot reach Ollama at {OLLAMA_URL}.\n"
+            f"Start the daemon (`ollama serve`) or run:\n"
+            f"    python front/scripts/install_alt_ai.py\n"
+        )
+        sys.exit(2)
+    except requests.exceptions.HTTPError as e:
+        sys.stderr.write(f"Ollama responded with HTTP error: {e}\n")
+        sys.exit(2)
+
+    body: dict = resp.json()
+    text: str = (body.get("response") or "").strip()
+    # Long descriptions are NOT post-processed by ``post_process`` — that
+    # would strip Markdown bullets and clip mid-list. They are still cached.
+    _cache_set(key, text)
+    return text
+
+
 def describe(
     src: str,
     *,
@@ -619,6 +765,14 @@ def _build_argparser() -> argparse.ArgumentParser:
         "--no-cache", action="store_true",
         help="Bypass the on-disk cache for this run.",
     )
+    p.add_argument(
+        "--longdesc", action="store_true",
+        help=(
+            "ALSO generate a long description (for <figcaption> or "
+            "aria-describedby). Writes it to <src>.longdesc.md beside the "
+            "image. Only meaningful with --kind complex or group."
+        ),
+    )
     return p
 
 
@@ -669,6 +823,32 @@ def main(argv: Optional[list[str]] = None) -> int:
         )
 
     sys.stdout.write(text + "\n")
+
+    # Long description path — runs after the short alt is written so the
+    # caller still gets the short alt on stdout even if the long path fails.
+    if args.longdesc:
+        if args.kind not in {"complex", "group"}:
+            sys.stderr.write(
+                "Note: --longdesc is only meaningful with --kind complex or group.\n"
+            )
+        long_text = describe_long(
+            args.src,
+            kind=args.kind,
+            lang=args.lang,
+            context=args.context,
+            resize=args.resize,
+            model=args.model,
+        )
+        # Resolve a sibling path: ``<src>.longdesc.md`` for files; for URLs
+        # write into the current working directory under a sanitized name.
+        src_path = Path(args.src)
+        if re.match(r"^https?://", args.src, re.I):
+            out_path = Path(re.sub(r"[^A-Za-z0-9._-]+", "_", args.src) + ".longdesc.md")
+        else:
+            out_path = src_path.with_suffix(src_path.suffix + ".longdesc.md")
+        out_path.write_text(long_text + "\n", encoding="utf-8")
+        sys.stderr.write(f"Long description written to {out_path}\n")
+
     return 0
 
 

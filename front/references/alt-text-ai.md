@@ -59,6 +59,9 @@ python front/scripts/alt_from_ollama.py --kind text ./public/quote-card.png
 # complex (chart) — returns a SHORT summary; pair with a long description
 python front/scripts/alt_from_ollama.py --kind complex --context "Weekly active users" ./public/chart.png
 
+# complex AND long description — writes the Markdown long desc to chart.png.longdesc.md
+python front/scripts/alt_from_ollama.py --kind complex --longdesc --context "Weekly active users" ./public/chart.png
+
 # decorative — no API call needed; the script returns empty
 python front/scripts/alt_from_ollama.py --kind decorative ./public/divider.svg
 ```
