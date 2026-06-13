@@ -1,88 +1,74 @@
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
-# front — vanilla JS + Tailwind frontend skill
+# front
 
-A Claude **skill** ([Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf)) that turns Claude into a focused frontend engineer with one stack and one type family:
+A Claude **skill** that constrains Claude to a single frontend stack: vanilla JavaScript, Tailwind CSS, Montserrat. Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
-- **Vanilla JavaScript** — no React, Vue, Svelte, Next.js. ES modules, native `<dialog>`, custom elements only when justified.
-- **Tailwind CSS** — semantic tokens, dark mode via `data-color-scheme`, sensible plugins.
-- **Montserrat** — self-hosted from the bundled `assets/fonts/montserrat/`.
-- **Curated UI guidelines** — color, typography, layout, motion, materials, accessibility, writing, dark mode, RTL, inclusion, and a full set of component / pattern references.
-- **Color choices grounded in psychology** — using the palettes at <https://harchaoui.org/warith/colors/> (Choice / Emotion / Concept / Psychology).
+## Contents
 
-## Flagship use case — give your CLI a GUI
+- `front/SKILL.md` — entry point with YAML frontmatter and instructions.
+- `front/references/` — progressive-disclosure reference files (color, stack, checklist, UI guidelines).
+- `front/assets/` — copy-paste templates and Montserrat font files.
 
-If you already have a **nicely-built command-line tool**, this skill is enough to build the matching **graphical interface** on top of it, in a single Claude session:
+## What the skill enforces
 
-> *"Read my CLI's `--help` and source, then generate a single-page vanilla-JS + Tailwind UI that drives every sub-command."*
+- Output uses vanilla JS (ES modules, native `<dialog>`, custom elements when justified). No React, Vue, Svelte, Next.js, Nuxt, Angular, Solid.
+- Output uses Tailwind utility classes with semantic tokens (`bg-brand-blue`, `text-label-primary`). No raw hex in markup.
+- Output uses Montserrat as the sole UI typeface, self-hosted from `assets/fonts/montserrat/`.
+- Output sets a `dark:` peer on every styled element, uses `<button>`/`<a>`/`<label>`/`<dialog>`/`<form>` first, exposes a visible focus ring, honors `prefers-reduced-motion`, and meets a 44×44 px hit area.
+- Color choices map to the four palettes in `references/color-psychology.md` (source: <https://harchaoui.org/warith/colors/>).
 
-The skill reads the CLI's argument parser, categorizes each command (one-shot / form-driven / streaming / list), picks a layout (tab bar, sidebar, or `⌘K` palette), maps flags to form controls, wires execution to your host (Tauri / Electron / `fastapi` / `express` / browser stub), streams output to a log panel, and ships a working `index.html`.
+## CLI → GUI
 
-Other use cases the skill handles:
+The skill includes a workflow that takes an existing command-line tool and produces a single-page vanilla-JS + Tailwind GUI for it. The workflow reads the CLI's argument parser, categorizes each command (one-shot / form / streaming / list), maps flags to form controls, and wires execution to the project's host (Tauri, Electron, FastAPI, Express, or a browser stub). See `front/SKILL.md` → "CLI → GUI workflow".
 
-- New components (button, card, modal, sheet, alert, nav, tab bar, form, popover, menu, …).
-- New pages or landing surfaces.
-- Redesigns or audits of existing UI.
-- Token sets and starter templates.
-- Migration *away* from a framework toward vanilla JS.
+## Install
 
-## Quick start
-
-### 1. With Claude Code (CLI)
+### Claude Code
 
 ```bash
-# Clone or download this repo, then place the skill folder in your skills dir
 mkdir -p ~/.claude/skills
 cp -r front ~/.claude/skills/front
+```
 
-# Verify
+Verify:
+
+```bash
 ls ~/.claude/skills/front/SKILL.md
 ```
 
-Then in any Claude Code session:
+Claude Code reads the skill's frontmatter description and applies the skill when a user message matches its trigger phrases.
 
-```text
-Use the front skill to build me a settings page with a theme switcher.
-```
-
-Claude Code auto-discovers the skill from its frontmatter description and applies it when the request matches.
-
-### 2. With OpenCode
-
-[OpenCode](https://opencode.ai) supports the Anthropic skill format. Drop the skill folder in OpenCode's skills directory:
+### OpenCode
 
 ```bash
 mkdir -p ~/.opencode/skills
 cp -r front ~/.opencode/skills/front
 ```
 
-Then trigger from a chat:
+Invoke with `/skill front <request>`.
 
-```text
-/skill front Generate a login form with email + password, dark mode aware.
-```
+### LangChain / Anthropic SDK (Python)
 
-### 3. With LangChain (Python)
-
-For programmatic use, treat `SKILL.md` as a system-prompt fragment. The pattern below loads the skill and any reference file the user's task triggers, then calls Claude via the Anthropic SDK:
+Load `SKILL.md` as a system-prompt fragment. Append referenced files on demand.
 
 ```python
-# pip install anthropic langchain-anthropic
+# pip install anthropic
 from pathlib import Path
 from anthropic import Anthropic
 
 SKILL_DIR = Path("front")
 client = Anthropic()
 
-def load_skill():
-    skill_md = (SKILL_DIR / "SKILL.md").read_text()
-    return skill_md
+def load_skill() -> str:
+    return (SKILL_DIR / "SKILL.md").read_text()
 
 def maybe_load_reference(user_msg: str) -> str:
     refs = []
-    if "color" in user_msg.lower():
+    m = user_msg.lower()
+    if "color" in m:
         refs.append((SKILL_DIR / "references/color-psychology.md").read_text())
-    if "button" in user_msg.lower() or "modal" in user_msg.lower():
+    if "button" in m or "modal" in m or "form" in m:
         refs.append((SKILL_DIR / "references/ui-guidelines/INDEX.md").read_text())
     return "\n\n---\n\n".join(refs)
 
@@ -96,28 +82,20 @@ def ask(user_msg: str) -> str:
     )
     return resp.content[0].text
 
-print(ask("Build me a primary CTA button labeled 'Get started'."))
+print(ask("Generate a primary button labeled 'Get started'."))
 ```
 
-For LangChain proper, wrap the same logic in a `ChatPromptTemplate` with `SystemMessage(content=load_skill())` and use `langchain_anthropic.ChatAnthropic`.
-
-## What the skill produces
-
-- **Semantic HTML** — `<button>`, `<a href>`, `<label for>`, `<dialog>`, `<form>` first; ARIA only when no semantic element fits.
-- **Tailwind classes** with semantic tokens (`bg-brand-blue`, `text-label-primary`) — never raw hex.
-- **Dark-mode peer** on every styled element.
-- **`Escape` closes dialogs**, visible focus rings, ≥ 44×44 hit areas, `prefers-reduced-motion` honored.
-- **Montserrat** preferred, with a system-font fallback stack.
-- **Bilingual EN/FR copy** when the project ships both.
+For LangChain proper, wrap the same logic in `ChatPromptTemplate` with a `SystemMessage(content=load_skill())` and use `langchain_anthropic.ChatAnthropic`.
 
 ## Repository structure
 
 ```
 front/                              ← repo root
-├── README.md / LISEZMOI.md         ← human-facing READMEs (bilingual switcher)
-└── front/                          ← the skill folder (drop into ~/.claude/skills/)
-    ├── SKILL.md                    ← required entry point (frontmatter + instructions)
-    ├── references/                 ← progressive-disclosure reference docs
+├── README.md / LISEZMOI.md         ← EN / FR
+├── .gitignore
+└── front/                          ← skill folder; drop into ~/.claude/skills/
+    ├── SKILL.md
+    ├── references/
     │   ├── color-psychology.md
     │   ├── stack-vanilla-js.md
     │   ├── stack-tailwind.md
@@ -125,28 +103,24 @@ front/                              ← repo root
     │   └── ui-guidelines/
     │       ├── INDEX.md
     │       ├── foundations/        ← color, typography, layout, motion, materials, a11y, …
-    │       ├── components/         ← buttons, alerts, sheets, nav, fields, …
+    │       ├── components/         ← buttons, alerts, sheets, navigation, fields, …
     │       ├── patterns/           ← modality, feedback, loading, settings, …
     │       ├── inputs/             ← keyboard, pointer, touch, focus
     │       └── platforms/          ← mobile, tablet, desktop, wearable, tv, spatial
     └── assets/
-        ├── starter-page.html       ← bootstrap a full page
+        ├── starter-page.html       ← single-file bootstrap (Tailwind Play CDN)
         ├── components/             ← copy-paste HTML snippets
-        └── fonts/montserrat/       ← Montserrat WOFF2 + OFL.txt + paste-ready fonts.css
+        └── fonts/montserrat/       ← variable + 4 static WOFF2, OFL.txt, fonts.css
 ```
-
-## Status
-
-Early but functional. SKILL.md, the core stack docs, and a curated set of UI-guideline references are in place. More component / pattern files are added iteratively as needs surface.
 
 ## Acknowledgements
 
-Special thanks to **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** for fruitful discussions that shaped this skill.
+Special thanks to **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** for fruitful discussions.
 
-Color palettes from <https://harchaoui.org/warith/colors/> — Choice, Emotion, Concept, and Psychology.
+Color palettes from <https://harchaoui.org/warith/colors/>.
 
-Type family **Montserrat** by Julieta Ulanovsky and contributors — <https://github.com/JulietaUla/Montserrat> — under the SIL Open Font License. The font files are bundled in `front/assets/fonts/montserrat/` for offline self-hosting.
+Montserrat by Julieta Ulanovsky and contributors — <https://github.com/JulietaUla/Montserrat> — SIL Open Font License. The font files are bundled in `front/assets/fonts/montserrat/`.
 
 ## License
 
-MIT for the skill source. The bundled Montserrat font is OFL — see `front/assets/fonts/montserrat/OFL.txt`.
+MIT for the skill source. Montserrat is OFL — see `front/assets/fonts/montserrat/OFL.txt`.
