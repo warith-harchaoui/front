@@ -1,6 +1,6 @@
 ---
 name: front
-description: Generate vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Use when the user asks to "build a UI", "create a component", "design a page", "make a form / modal / button / nav", "scaffold a landing", or "build a web app" — or any frontend work that must NOT use React, Vue, Svelte, Next.js or another JS framework. Output is semantic HTML + Tailwind classes + vanilla ES modules with dark-mode peers, focus rings, reduced-motion guards, and bilingual (EN/FR) copy.
+description: Generate vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Modular — use it to "build a UI", "create a component", "design a page", "make a form / modal / button / nav", "scaffold a landing", "build a web app", "wrap this CLI in a GUI", or "turn these markdown files into a website" — or any frontend work that must NOT use React, Vue, Svelte, Next.js or another JS framework. Output is semantic HTML + Tailwind classes + vanilla ES modules with dark-mode peers, focus rings, reduced-motion guards, and bilingual (EN/FR) copy.
 license: Unlicense
 metadata:
   author: Warith Harchaoui
@@ -27,7 +27,21 @@ Activate when the user is asking for any of:
 - A redesign or audit of an existing piece of UI.
 - A design system token set or starter template.
 - A migration AWAY from a framework toward vanilla JS.
-- **"Wrap my CLI in a GUI"** — the user has a working command-line tool and wants a graphical front-end. The skill reads the CLI's flags / sub-commands / I/O contract and emits a single-page vanilla-JS + Tailwind UI that drives it. See the workflow in the next section.
+- **"Wrap my CLI in a GUI"** — the user has a working command-line tool and wants a graphical front-end. See `## CLI → GUI workflow` below.
+- **"Turn these markdown files into a website"** — the user has a documentation tree, a README, a blog folder, or any Markdown-only project and wants a static site. See `## Markdown → website workflow` below.
+
+## Modular use
+
+The skill is modular, not a mono-block. Workflows are independent — picking one does not require buying the rest.
+
+| User starts from | Workflow to pull | Other workflows skipped |
+|---|---|---|
+| A working CLI, no UI | `## CLI → GUI workflow` | MD → website, audit |
+| Markdown docs, no site | `## Markdown → website workflow` | CLI → GUI, audit |
+| Blank page, building components | `## Workflow — every task` + component templates in `assets/` | CLI → GUI, MD → site |
+| Existing UI, needs a review | `references/ergonomics-criteria.md`, `references/ux-psychology.md`, `references/anti-patterns.md`, `references/checklist.md` | CLI → GUI, MD → site, full-build |
+
+Reference files in `references/**` are independently consumable too — load only the ones the current task touches.
 
 ## CLI → GUI workflow (flagship use case)
 
@@ -63,6 +77,28 @@ Do **not** use this skill when:
 - The user explicitly asks for React / Vue / Svelte / Next.js / Nuxt / Angular / SolidJS.
 - The task is backend-only (no UI surface).
 - The user explicitly asks for a non-Tailwind CSS approach (BEM, CSS Modules, vanilla CSS by hand).
+
+## Markdown → website workflow
+
+When the user points to a Markdown-only project (README + docs folder, a blog directory, a knowledge base) and asks for a website:
+
+1. **Inventory the Markdown.** Walk the tree. Group files by purpose: landing (`README.md`), documentation (`docs/**/*.md`), blog posts (`posts/**`, `blog/**`), references (`api/**`), changelogs. Note frontmatter conventions if present (YAML at the top of each file).
+2. **Pick a site shape**:
+   - One README → single landing page with anchored sections from the headings.
+   - README + a `docs/` tree → two-pane docs site (sidebar TOC + content).
+   - Blog directory → home with post list + per-post pages + tag pages.
+   - Multiple shapes → start with the landing; offer the others as additional pages.
+3. **Build a route map**. Each Markdown file becomes one HTML page; preserve the directory shape under the output root. The landing lives at `/index.html`.
+4. **Generate navigation**:
+   - Sticky top bar with the project name on the start, theme switcher on the end (per `ui-guidelines/components/navigation-bars.md`).
+   - Sidebar (lg:) with the section tree on `docs/**` pages.
+   - Bottom tab bar (mobile) when ≤ 5 top-level destinations.
+5. **Convert Markdown to HTML**. Prefer a build-step tool (Pandoc, `markdown-it`, `python-markdown`) so the output is plain HTML; do not import a Markdown runtime into the browser. Apply the typography component classes from `references/stack-tailwind.md` (`h-display`, `t-body`, `t-callout`, `t-footnote`). Code blocks get a server-side syntax highlighter (Pygments, `highlight.js` build step) — never load a runtime highlighter.
+6. **Wire meta tags per page** using `references/meta-tags.md` and (optional) `python scripts/meta_from_ollama.py path/to/page.html` for the title, description, OG, JSON-LD.
+7. **Generate the favicon set** from the project's logo with `python scripts/favicons.py logo.png --out public --name "Project name"`; drop the produced `head.html` snippet into the layout template.
+8. **Emit pages + assets**. One `index.html` per page, one shared `app.js` (theme switcher, search if needed), one `styles.css` (Tailwind directives + Montserrat). Include the favicon set under `public/`. Add a small `README.md` to the output root explaining the build steps.
+
+The output is a static site that drops into any host (GitHub Pages, Netlify, S3, plain Nginx) without a runtime build.
 
 ## Workflow — every task
 

@@ -1,29 +1,60 @@
 #!/usr/bin/env python3
 """
-alt_from_ollama.py — generate accessible alt text per W3C / WAI guidance.
+alt_from_ollama
+===============
 
-Source authority: https://www.w3.org/WAI/tutorials/images/decision-tree/
+Generate W3C/WAI-compliant alternative text for an image, using a local
+vision model served by Ollama. Output is cached on disk so the same image
++ parameters never hit the model twice.
 
-W3C categorizes images by *purpose* in the page, not by pixel content:
+The script implements the W3C image decision tree
+(https://www.w3.org/WAI/tutorials/images/decision-tree/), which categorizes
+images by their *purpose* in the page rather than by their pixel content:
 
-  informative   conveys meaning              → describe the meaning concisely
-  decorative    no information / ornamental  → emit alt=""  (no model call)
-  functional    inside <a> or <button>       → describe the action/destination
-  text          mostly readable text         → alt = the text verbatim
-  complex       chart, diagram, infographic  → short alt + long description elsewhere
-                                                (via aria-describedby or <figcaption>)
-  group         several images, one meaning  → describe as a whole
+    informative   conveys meaning              describe the meaning concisely
+    decorative    no information / ornamental  emit alt="" (no model call)
+    functional    inside <a> or <button>       describe the action / destination
+    text          mostly readable text         alt = the text verbatim
+    complex       chart, diagram, infographic  short alt + long description elsewhere
+    group         several images, one meaning  describe the group as a whole
 
-Pass the purpose with --kind; the prompt is tuned per category.
+Each purpose maps to a different prompt; pass it with ``--kind``.
 
-Multilingual: --lang <bcp-47> or ALT_LANG / LANG env. Default: detect from system.
+Usage
+-----
+::
 
-Requires Python 3.9+ and `requests`. Pillow is used opportunistically if
-installed (to downscale large images before sending to Ollama).
+    # informative (default)
+    python alt_from_ollama.py ./public/hero.jpg
+
+    # functional: describe the destination, not the icon
+    python alt_from_ollama.py --kind functional --context "Submit signup" ./icons/check.png
+
+    # text-as-image: extract verbatim text
+    python alt_from_ollama.py --kind text ./quote.png
+
+    # complex: short alt; pair with a long description in <figcaption>
+    python alt_from_ollama.py --kind complex --context "Weekly users" ./chart.png
+
+    # French output, bypass cache for this run
+    python alt_from_ollama.py --lang fr --no-cache ./hero.jpg
+
+Notes
+-----
+* Requires Python 3.9+, ``requests``. Pillow is opportunistic
+  (used to downscale images before sending; if missing, the original is sent).
+* Default model: ``gemma4:e2b`` (the ``-mlx`` variant is selected automatically
+  on MLX-capable hardware). Override with ``OLLAMA_MODEL=<tag>`` or ``--model``.
+* Default Ollama endpoint: ``http://localhost:11434``. Override with ``OLLAMA_URL``.
+* On-disk cache lives under ``~/.cache/front-skill/alt/`` by default. Override
+  with ``FRONT_CACHE_DIR``; disable globally with ``FRONT_NO_CACHE=1`` or for
+  a single run with ``--no-cache``.
 """
 
 from __future__ import annotations
 
+# Standard library imports only — heavy third-party imports are guarded below
+# so that import errors yield a useful message rather than a stack trace.
 import argparse
 import base64
 import hashlib
@@ -38,70 +69,150 @@ import urllib.request
 from pathlib import Path
 from typing import Optional
 
+# ``requests`` is the one hard third-party dependency (the stdlib ``urllib`` is
+# usable but the request body is awkward; ``requests`` keeps the call site
+# readable). Surface a friendly install hint if it is missing.
 try:
     import requests
-except ImportError:
+except ImportError:  # pragma: no cover — exercised at runtime, not in tests.
     sys.stderr.write(
         "This script needs `requests`. Install with:\n"
         "    pip install -r front/scripts/requirements.txt\n"
     )
     sys.exit(2)
 
+# Pillow is *optional*. If available it is used to downscale the image before
+# sending to the model (faster inference, smaller HTTP payload). The script
+# stays functional without it; large images simply travel uncompressed.
 try:
-    from PIL import Image  # type: ignore
-    HAVE_PILLOW = True
+    from PIL import Image  # type: ignore[import-not-found]
+    HAVE_PILLOW: bool = True
 except ImportError:
     HAVE_PILLOW = False
 
 
-# ── Configuration ─────────────────────────────────────────────────────────────
+# ── Module-level configuration ────────────────────────────────────────────────
 
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-DEFAULT_BASE = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e2b")
-MAX_CHARS = 150  # W3C says no fixed limit; ~150 chars stays comfortable for screen readers.
+#: Ollama daemon endpoint. Override with the ``OLLAMA_URL`` env var.
+OLLAMA_URL: str = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
-CACHE_DIR = Path(os.environ.get("FRONT_CACHE_DIR", Path.home() / ".cache" / "front-skill")) / "alt"
-NO_CACHE = bool(os.environ.get("FRONT_NO_CACHE"))
+#: Base model tag. The "-mlx" variant is appended at runtime on MLX-capable
+#: hardware; both flavors are visible to Ollama as separate tags.
+DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e2b")
 
+#: Hard cap on output length. W3C does not mandate a fixed maximum, but ~150
+#: characters is the upper bound that stays comfortable for screen-reader users.
+MAX_CHARS: int = 150
+
+#: Directory where successful generations are cached. Override with the
+#: ``FRONT_CACHE_DIR`` env var (useful in tests, CI, or for shared caches).
+CACHE_DIR: Path = Path(
+    os.environ.get("FRONT_CACHE_DIR", Path.home() / ".cache" / "front-skill")
+) / "alt"
+
+#: When true, the cache is consulted neither for reads nor for writes.
+#: Toggled at runtime by ``--no-cache`` or globally by ``FRONT_NO_CACHE``.
+NO_CACHE: bool = bool(os.environ.get("FRONT_NO_CACHE"))
+
+
+# ── Cache helpers ────────────────────────────────────────────────────────────
 
 def _cache_key(image_bytes: bytes, kind: str, lang: str, context: str, model: str) -> str:
+    """
+    Compute a 32-character cache key from the inputs that affect the output.
+
+    The key incorporates the *post-resize* image bytes, the purpose category,
+    the output language, any context hint, and the model tag. A change to
+    any of these invalidates the cache entry.
+
+    Parameters
+    ----------
+    image_bytes : bytes
+        Raw bytes of the (possibly downscaled) image actually sent to the model.
+    kind : str
+        W3C purpose category (``informative``, ``functional``, …).
+    lang : str
+        Two-letter language code (``en``, ``fr``, …).
+    context : str
+        Page-context hint passed via ``--context``.
+    model : str
+        Ollama model tag, e.g. ``gemma4:e2b-mlx``.
+
+    Returns
+    -------
+    str
+        32 hex characters, suitable as a filename stem.
+    """
     h = hashlib.sha256()
     h.update(image_bytes)
+    # NUL separator keeps the concatenation of textual parameters unambiguous.
     h.update(b"\x00")
     h.update(f"{kind}\x00{lang}\x00{context}\x00{model}".encode("utf-8"))
     return h.hexdigest()[:32]
 
 
 def _cache_get(key: str) -> Optional[str]:
+    """
+    Return the cached alt text for ``key``, or ``None`` on a miss.
+
+    Cache reads are silent on any error and behave as a miss; the model call
+    will run and (best-effort) refresh the entry.
+    """
     if NO_CACHE:
         return None
     path = CACHE_DIR / f"{key}.txt"
     if path.is_file():
+        # Strip the trailing newline written by ``_cache_set``.
         return path.read_text(encoding="utf-8").rstrip("\n")
     return None
 
 
 def _cache_set(key: str, text: str) -> None:
+    """
+    Store ``text`` in the cache under ``key``. Failures are swallowed.
+
+    The cache is opportunistic — a read-only filesystem or a quota exhaustion
+    must not break the user's primary action.
+    """
     if NO_CACHE:
         return
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         (CACHE_DIR / f"{key}.txt").write_text(text + "\n", encoding="utf-8")
     except OSError:
-        pass  # Fail open: caching is opportunistic, never fatal.
+        # Intentional silent fail — see docstring.
+        pass
 
+
+# ── Model + language helpers ────────────────────────────────────────────────
 
 def pick_default_model() -> str:
-    """Use the -mlx variant on MLX-capable hardware automatically."""
+    """
+    Pick the model tag for the current hardware.
+
+    On Apple-Silicon-class arm64 macOS, the MLX-optimized variant
+    (``<base>-mlx``) is preferred — its first-token latency is materially
+    lower. Everywhere else the base tag is used.
+
+    Returns
+    -------
+    str
+        The model tag to pass to Ollama.
+    """
+    # ``OLLAMA_MODEL`` is the per-call escape hatch and wins outright.
     if model := os.environ.get("OLLAMA_MODEL"):
         return model
+    # ``platform.machine()`` returns ``arm64`` on Apple Silicon, ``aarch64`` on
+    # some Linux ARM hosts; both run MLX (the former natively, the latter not,
+    # but Ollama silently downgrades the request if the tag is unsupported).
     mlx_capable = platform.system() == "Darwin" and platform.machine() in {"arm64", "aarch64"}
     return f"{DEFAULT_BASE}-mlx" if mlx_capable else DEFAULT_BASE
 
 
-# ── Per-language banned prefixes (W3C: never say "image of …") ───────────────
-
-BANNED_PREFIXES = {
+#: Per-language phrases that the model must NOT begin its output with. W3C is
+#: explicit that screen readers already announce "image" — the model parroting
+#: "Image of …" in any language is noise.
+BANNED_PREFIXES: dict[str, tuple[str, ...]] = {
     "en": ("image of", "picture of", "photo of", "photograph of", "illustration of"),
     "fr": ("image de", "photo de", "photographie de", "illustration de"),
     "es": ("imagen de", "foto de", "fotografía de"),
@@ -114,8 +225,10 @@ BANNED_PREFIXES = {
     "zh": ("的图片", "的照片"),
 }
 
-
-LANG_INSTRUCTIONS = {
+#: One-sentence instruction telling the model which language to reply in.
+#: The instruction is itself written in the target language to nudge the model
+#: into committing to the output language immediately.
+LANG_INSTRUCTIONS: dict[str, str] = {
     "en": "Write the alt text in English.",
     "fr": "Rédige le texte alternatif en français.",
     "es": "Escribe el texto alternativo en español.",
@@ -130,31 +243,71 @@ LANG_INSTRUCTIONS = {
 
 
 def detect_lang() -> str:
-    raw = os.environ.get("ALT_LANG") or os.environ.get("LC_ALL") or os.environ.get("LANG")
+    """
+    Detect the desired output language as a two-letter code.
+
+    Resolution order:
+
+    1. ``ALT_LANG`` env var (explicit override).
+    2. ``LC_ALL`` / ``LANG`` env vars (POSIX locale).
+    3. ``locale.getlocale()`` (system locale, may be ``(None, None)``).
+    4. Fallback to English.
+
+    Returns
+    -------
+    str
+        Lower-case two-letter language code (``en``, ``fr``, …).
+    """
+    raw: Optional[str] = (
+        os.environ.get("ALT_LANG")
+        or os.environ.get("LC_ALL")
+        or os.environ.get("LANG")
+    )
     if not raw:
         try:
             raw, _ = locale.getlocale()
-        except Exception:
+        except (TypeError, ValueError):
             raw = "en"
     raw = (raw or "en").lower()
+    # Locale strings look like ``fr_FR.UTF-8`` — strip the encoding and region.
     return raw.split("_")[0].split(".")[0][:2]
 
 
-# ── Prompts, one per W3C category ────────────────────────────────────────────
+# ── Prompt construction ─────────────────────────────────────────────────────
 
-BASE_RULES = (
+#: Generic rules appended to every prompt except the ``text`` purpose (where
+#: the verbatim-extraction goal makes generic rules counter-productive).
+BASE_RULES: str = (
     f"Reply with the alt text only — no quotes, no prefix, no trailing punctuation tricks. "
     f"Stay under {MAX_CHARS} characters. "
     f"Match the meaning of the image in its likely page context, not its pixels. "
     f"Do not start with 'image of', 'picture of', 'photo of', 'illustration of', "
     f"or the equivalent in your language. "
-    f"Be specific where relevant to meaning (e.g. for a news photo, name visible people, "
-    f"setting, action). Don't invent facts you can't see."
+    f"Be specific where relevant to meaning (e.g. for a news photo, name visible "
+    f"people, setting, action). Don't invent facts you can't see."
 )
 
 
 def prompt_for(kind: str, lang: str, context: str = "") -> str:
-    lang_line = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
+    """
+    Build the full prompt sent to the vision model, tuned to the image purpose.
+
+    Parameters
+    ----------
+    kind : str
+        Image purpose per the W3C decision tree.
+    lang : str
+        Two-letter target language code.
+    context : str, optional
+        Free-form page-context hint, by default ``""``.
+
+    Returns
+    -------
+    str
+        The fully assembled prompt, ready to send to Ollama.
+    """
+    # The language line opens every prompt so the model commits early.
+    lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
 
     if kind == "informative":
         head = "Write alt text for this informative image."
@@ -169,7 +322,8 @@ def prompt_for(kind: str, lang: str, context: str = "") -> str:
             "This image is mostly text. "
             "Return the readable text verbatim, exactly as it appears, with no description added."
         )
-        return f"{lang_line} {head}"  # banned-prefix rule doesn't apply to text-as-text.
+        # Banned-prefix rule does not apply when the goal is verbatim extraction.
+        return f"{lang_line} {head}"
     elif kind == "complex":
         head = (
             "This is a complex image (chart, diagram, infographic). "
@@ -186,60 +340,134 @@ def prompt_for(kind: str, lang: str, context: str = "") -> str:
     return f"{lang_line} {head}{ctx} {BASE_RULES}"
 
 
-# ── Image loading + optional downscale (Pillow if available) ─────────────────
+# ── Image loading + optional downscale ──────────────────────────────────────
 
 def load_image_bytes(src: str) -> bytes:
+    """
+    Load the bytes of an image from a local path or an HTTP(S) URL.
+
+    Parameters
+    ----------
+    src : str
+        Either a filesystem path or a fully-qualified ``http(s)://`` URL.
+
+    Returns
+    -------
+    bytes
+        Raw bytes of the image, as fetched.
+
+    Raises
+    ------
+    urllib.error.URLError
+        On any network failure during URL fetch.
+    OSError
+        On any filesystem failure during local read.
+    """
     if re.match(r"^https?://", src, re.I):
+        # ``urllib`` is preferred over ``requests`` here because it streams from
+        # the response object directly and avoids an extra dependency boundary.
         with urllib.request.urlopen(src, timeout=10) as resp:
             return resp.read()
     return Path(src).read_bytes()
 
 
 def maybe_resize(data: bytes, max_edge: int) -> bytes:
-    """Downscale to max_edge px on the long side if Pillow is available."""
+    """
+    Downscale ``data`` so the longest edge is ≤ ``max_edge`` pixels.
+
+    The downscale is best-effort: if Pillow is not installed, or if the image
+    cannot be decoded, the original bytes are returned unchanged.
+
+    Parameters
+    ----------
+    data : bytes
+        Raw image bytes.
+    max_edge : int
+        Target maximum dimension in pixels. ``0`` disables resizing.
+
+    Returns
+    -------
+    bytes
+        Possibly-resized image bytes, encoded as JPEG (q=88) if resizing
+        actually occurred; otherwise the original bytes.
+    """
     if not HAVE_PILLOW or max_edge <= 0:
         return data
     try:
         im = Image.open(io.BytesIO(data))
+        # Convert palette / alpha-only modes to RGB so the JPEG re-encode works.
         if im.mode in ("RGBA", "LA", "P"):
             im = im.convert("RGB")
         w, h = im.size
         if max(w, h) <= max_edge:
+            # Already smaller than the target — no work to do.
             return data
-        scale = max_edge / float(max(w, h))
+        # Use the float ratio to keep the aspect ratio precise after rounding.
+        scale: float = max_edge / float(max(w, h))
         im = im.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
         buf = io.BytesIO()
         im.save(buf, format="JPEG", quality=88, optimize=True)
         return buf.getvalue()
     except Exception:
-        return data  # Fail open: if we can't resize, send the original.
+        # Fail open: a malformed or exotic image type should not break the call.
+        return data
 
 
-# ── Output post-processing (W3C: no ellipsis-truncation) ─────────────────────
+# ── Output post-processing ──────────────────────────────────────────────────
 
 def post_process(text: str, lang: str) -> str:
+    """
+    Clean up a raw model reply for use as an ``alt`` attribute value.
+
+    Three transformations are applied, in order:
+
+    1. Strip a single layer of surrounding quotes (the model sometimes wraps
+       the reply in straight or typographic quotes).
+    2. Strip a banned prefix (``"image of"`` and its translations) when it
+       appears at the start. The matching is case-insensitive and tolerant
+       of common punctuation separators (``:``, ``,``, ``—``).
+    3. Hard cap at :data:`MAX_CHARS`. **No trailing ellipsis** — per W3C,
+       truncating alt text with ``…`` confuses screen readers; cut cleanly
+       at a word boundary instead.
+
+    Parameters
+    ----------
+    text : str
+        Raw text returned by the model.
+    lang : str
+        Two-letter language code used to choose the banned-prefix list.
+
+    Returns
+    -------
+    str
+        Post-processed text, safe to drop straight into an ``alt`` attribute.
+    """
     text = text.strip()
 
-    # Strip a single layer of wrapping quotes.
+    # 1. Strip wrapping quotes (single layer only — chained quotes are rare
+    # and stripping them blindly would corrupt verbatim text in "text" mode).
     if len(text) >= 2 and text[0] == text[-1] and text[0] in {'"', "'", "“", "”", "«", "»"}:
         text = text[1:-1].strip()
 
-    # Strip banned prefixes if the model ignored the instruction.
+    # 2. Strip banned prefixes. Try the target language first, fall back to
+    # English (the model sometimes lapses into English even when instructed
+    # otherwise).
     for prefix in BANNED_PREFIXES.get(lang, ()) + BANNED_PREFIXES["en"]:
-        # Case-insensitive removal at the start, with optional ":" or "—" separator.
         m = re.match(rf"^{re.escape(prefix)}[\s:,.\-—]*", text, flags=re.IGNORECASE)
         if m:
             text = text[m.end():].lstrip()
-            break
+            break  # Only one prefix could possibly match; stop after the first hit.
 
-    # W3C: don't truncate with ellipsis. Hard cap at a word boundary, no "…".
+    # 3. Hard cap at MAX_CHARS without ellipsis. ``rsplit(" ", 1)[0]`` cuts at
+    # the last word boundary inside the window; if there is no space, fall
+    # back to the raw truncation (extremely long single word, unlikely).
     if len(text) > MAX_CHARS:
         head = text[:MAX_CHARS].rsplit(" ", 1)[0] or text[:MAX_CHARS]
         text = head.rstrip(",.;:—-")
     return text
 
 
-# ── Public API ───────────────────────────────────────────────────────────────
+# ── Public API ──────────────────────────────────────────────────────────────
 
 def describe(
     src: str,
@@ -250,27 +478,80 @@ def describe(
     resize: int = 1024,
     model: Optional[str] = None,
 ) -> str:
-    """Return alt text for `src` (path or URL). Empty string if kind=='decorative'."""
+    """
+    Generate alt text for an image.
+
+    Parameters
+    ----------
+    src : str
+        Path or URL to the image. Ignored when ``kind == "decorative"``.
+    kind : str, optional
+        Image purpose per the W3C decision tree — one of ``informative``
+        (default), ``decorative``, ``functional``, ``text``, ``complex``,
+        ``group``.
+    lang : str or None, optional
+        BCP-47 base tag (``en``, ``fr``, …). When ``None`` (default), the
+        language is detected from the environment via :func:`detect_lang`.
+    context : str, optional
+        Page-context hint. For ``--kind functional``, this is where the
+        caller names the action or destination.
+    resize : int, optional
+        Maximum long-edge in pixels for the image sent to the model.
+        ``0`` disables resizing. Default ``1024``.
+    model : str or None, optional
+        Ollama model tag to use. ``None`` (default) picks the right tag for
+        the current hardware via :func:`pick_default_model`.
+
+    Returns
+    -------
+    str
+        Post-processed alt text, ``≤ MAX_CHARS`` characters. Empty string
+        when ``kind == "decorative"``.
+
+    Raises
+    ------
+    SystemExit
+        With code ``2`` when Ollama is unreachable or returns an HTTP error.
+
+    Examples
+    --------
+    >>> describe("hero.jpg", kind="informative")              # doctest: +SKIP
+    'Teacher leading a class'
+    >>> describe("divider.svg", kind="decorative")
+    ''
+    """
+    # Decorative images bypass the model entirely: the caller renders
+    # ``<img alt="">`` directly. W3C explicitly forbids both omitting the
+    # attribute and decorating it with ``role="presentation"``.
     if kind == "decorative":
         return ""
 
+    # Normalize language and pick the model tag once so the cache key is stable.
     lang = (lang or detect_lang()).lower()[:2]
     model = model or pick_default_model()
 
-    data = maybe_resize(load_image_bytes(src), resize)
+    # Resize before computing the cache key so size-equivalent images share an
+    # entry (two photos that downscale to the same JPEG hit the same key).
+    data: bytes = maybe_resize(load_image_bytes(src), resize)
 
     key = _cache_key(data, kind, lang, context, model)
     cached = _cache_get(key)
     if cached is not None:
+        # Cache hit — return immediately, no network round-trip.
         return cached
 
-    image_b64 = base64.b64encode(data).decode("ascii")
+    # Encode the image once. Base64 is what Ollama's REST API expects in the
+    # ``images`` array.
+    image_b64: str = base64.b64encode(data).decode("ascii")
 
-    payload = {
+    payload: dict = {
         "model": model,
         "prompt": prompt_for(kind, lang, context),
         "images": [image_b64],
         "stream": False,
+        # ``temperature`` low to make the output reproducible across runs.
+        # ``num_predict`` bounds the model output token count; alt text is short
+        # so 120 tokens is generous.
         "options": {"temperature": 0.2, "num_predict": 120},
     }
 
@@ -288,26 +569,40 @@ def describe(
         sys.stderr.write(f"Ollama responded with HTTP error: {e}\n")
         sys.exit(2)
 
-    body = resp.json()
+    body: dict = resp.json()
     text = post_process(body.get("response", ""), lang)
     _cache_set(key, text)
     return text
 
 
-# ── CLI ──────────────────────────────────────────────────────────────────────
+# ── CLI ─────────────────────────────────────────────────────────────────────
 
 def _build_argparser() -> argparse.ArgumentParser:
+    """
+    Construct the CLI ``ArgumentParser``.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Parser with all flags registered.
+    """
     p = argparse.ArgumentParser(
         description="Generate W3C-compliant alt text for an image via a local Ollama vision model.",
     )
-    p.add_argument("src", help="Path or URL to the image. Ignored when --kind decorative.")
+    p.add_argument(
+        "src",
+        help="Path or URL to the image. Ignored when --kind decorative.",
+    )
     p.add_argument(
         "--kind",
         choices=["informative", "decorative", "functional", "text", "complex", "group"],
         default="informative",
         help="Image purpose per W3C decision tree. Default: informative.",
     )
-    p.add_argument("--lang", "-l", help="BCP-47 base tag (en, fr, es, de, …).")
+    p.add_argument(
+        "--lang", "-l",
+        help="BCP-47 base tag (en, fr, es, de, …).",
+    )
     p.add_argument(
         "--context", "-c", default="",
         help="Page-context hint. For --kind functional, name the action/destination.",
@@ -316,19 +611,45 @@ def _build_argparser() -> argparse.ArgumentParser:
         "--resize", type=int, default=1024,
         help="Downscale long edge to N px before sending (Pillow). 0 disables. Default: 1024.",
     )
-    p.add_argument("--model", help="Override the Ollama model tag.")
-    p.add_argument("--no-cache", action="store_true", help="Bypass the on-disk cache for this run.")
+    p.add_argument(
+        "--model",
+        help="Override the Ollama model tag.",
+    )
+    p.add_argument(
+        "--no-cache", action="store_true",
+        help="Bypass the on-disk cache for this run.",
+    )
     return p
 
 
 def main(argv: Optional[list[str]] = None) -> int:
+    """
+    CLI entry point.
+
+    Parameters
+    ----------
+    argv : list of str or None, optional
+        Argument vector excluding ``argv[0]``. When ``None`` (default),
+        ``argparse`` reads from ``sys.argv``.
+
+    Returns
+    -------
+    int
+        Process exit code. ``0`` on success, ``2`` on infrastructure failure
+        (Ollama unreachable / HTTP error).
+    """
+    # ``global`` is unfortunate but keeps the cache-bypass flag colocated with
+    # the module-level switch the helpers read.
     global NO_CACHE
     args = _build_argparser().parse_args(argv)
     if args.no_cache:
         NO_CACHE = True
+
     if args.kind == "decorative":
-        # W3C: decorative images get alt="" — caller renders <img alt=""> only.
+        # W3C: decorative images get alt="" — the caller renders <img alt=""> only.
+        # No model call, no output. Exit code 0 signals success.
         return 0
+
     text = describe(
         args.src,
         kind=args.kind,
@@ -337,12 +658,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         resize=args.resize,
         model=args.model,
     )
+
     if not text and args.kind == "complex":
+        # Empty output for a complex image is almost always a sign that the
+        # caller forgot to supply a context hint. Nudge them.
         sys.stderr.write(
             "Note: returned alt is empty. For complex images, the W3C decision tree "
             "calls for a short alt AND a long description elsewhere (<figcaption> or "
             "aria-describedby). Provide a context hint and retry.\n"
         )
+
     sys.stdout.write(text + "\n")
     return 0
 
