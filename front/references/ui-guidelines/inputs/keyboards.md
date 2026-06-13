@@ -12,14 +12,14 @@
 - **`Escape` closes** dialogs, popovers, menus, panels.
 - **`Tab` moves** forward, `Shift+Tab` back. Order matches visual order.
 - **`Enter` activates** the default action; `Space` activates buttons; arrow keys navigate lists / menus / radio groups.
-- **Shortcuts use modifier keys** consistently (`⌘` on Mac, `Ctrl` elsewhere). Show the right one to the right user.
+- **Shortcuts use the host's primary modifier** consistently — Command (`⌘`) where present, Control (`Ctrl`) otherwise. Show the right one to the right user.
 
 ## Concrete rules
 
 1. Set `inputmode` correctly so mobile keyboards specialize (see `components/text-fields.md`).
 2. Use `accesskey` sparingly; conflicts with screen-reader hotkeys.
 3. **Don't trap focus** anywhere except inside intentionally modal contexts.
-4. Detect platform with `navigator.platform.includes('Mac')`; show `⌘K` on Mac, `Ctrl+K` elsewhere.
+4. Detect the host's primary modifier — feature-test via `navigator.userAgentData?.platform` (modern) or fall back to inspecting `navigator.platform` — and render the matching glyph (`⌘K` vs. `Ctrl+K`).
 
 ## Common shortcuts (web)
 
@@ -35,8 +35,10 @@
 ## Pattern — shortcut display
 
 ```js
-const isMac = /Mac/.test(navigator.platform);
-const cmd = isMac ? '⌘' : 'Ctrl';
+// Detect whether Command is the host's primary modifier.
+const platform = navigator.userAgentData?.platform ?? navigator.platform ?? '';
+const commandPrimary = /darwin|macintosh/i.test(platform);
+const cmd = commandPrimary ? '⌘' : 'Ctrl';
 button.querySelector('[data-shortcut]').textContent = `${cmd}K`;
 ```
 
