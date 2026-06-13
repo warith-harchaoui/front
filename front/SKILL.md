@@ -152,6 +152,7 @@ The output is a static site that drops into any host (GitHub Pages, Netlify, S3,
 | "a11y lint" / "check this HTML for accessibility" / "WCAG check" | `lint-a11y.md` | Run `python scripts/lint_a11y.py <file-or-dir>`; 14 rules cover the bulk of WCAG / WAI-ARIA failures decidable from source. Exit 1 on any finding. |
 | "plain language" / "simplify this copy" / "rewrite at grade N" | `plain-language.md` | `cat copy.md \| python scripts/plain_language.py --target-grade 8 --lang en` — keeps meaning, strips marketing voice, output length ≤ 1.1×. |
 | "color blind preview" / "CVD check" / "how does this look to a deuteranope" | `cvd-simulation.md` | `python scripts/simulate_cvd.py <image> [--grid]` → renders the image as protanopia / deuteranopia / tritanopia viewers see it. Catches red/green pairing before it ships. |
+| "contrast audit" / "WCAG ratio" / "is my palette accessible" | `contrast-audit.md` | `python scripts/audit_contrast.py [--palette p.json] [--target 4.5\|7\|3] [--fix]` → walks every (label, surface) pair, suggests the nearest OKLCH-neighbour fix for failures. Exit 1 on any failure. |
 | "i18n" / "multilingual" / "translate" / "localize" | `i18n.md` | One URL strategy, `<html lang>` always set, `Intl.*` for formatting + plurals, logical CSS for RTL, persisted user choice wins over auto-detect |
 | "material" / "Material 3" / "M3" / named Material component | `material-design.md` | Map Material roles to skill tokens; emit plain HTML + Tailwind (no `mdc-*` classes, no Material Web Components) |
 | "make it look less AI" / "designer review" / "anti-patterns" | `anti-patterns.md` | Refuse gradient text, glassmorphism on body, side-stripe borders, "boost your productivity" copy, three-card grids, marketing buzzwords |
@@ -296,6 +297,7 @@ Load these only when needed.
 - `references/lint-a11y.md` — static a11y linter rule catalogue and CI integration.
 - `references/plain-language.md` — rewriter that simplifies copy at a target reading level.
 - `references/cvd-simulation.md` — color-blindness simulator (protanopia / deuteranopia / tritanopia).
+- `references/contrast-audit.md` — WCAG contrast audit and OKLCH-neighbour fix suggester.
 - `references/alt-text-ai.md` — W3C-compliant alt text via local Ollama + Gemma vision (per-purpose: informative / decorative / functional / text / complex / group).
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.
@@ -320,5 +322,6 @@ All scripts are Python 3.9+, cross-platform. Install deps once: `pip install -r 
 - `scripts/lint_a11y.py` — static a11y linter for emitted HTML; 14 rules covering the WCAG / WAI-ARIA violations decidable from source. See `references/lint-a11y.md`.
 - `scripts/plain_language.py` — rewrite UI copy at a target reading level via the local model; preserves meaning, strips marketing voice. See `references/plain-language.md`.
 - `scripts/simulate_cvd.py` — render an image as protanopia / deuteranopia / tritanopia viewers see it. Pillow + Machado et al. matrices, no model. See `references/cvd-simulation.md`.
+- `scripts/audit_contrast.py` — WCAG contrast audit + OKLCH-neighbour fix suggester for a palette. No dependencies. See `references/contrast-audit.md`.
 - `scripts/favicons.py` — generates the full favicon / app-icon set from a single logo (Pillow): `favicon.svg`/`.ico`, PNG variants, `apple-touch-icon.png`, maskable PWA icon, `site.webmanifest`, and a `head.html` snippet to paste into `<head>`.
 - `scripts/meta_from_ollama.py` — drafts page meta tags (title, description, Open Graph, Twitter, Schema.org `@type`) from a goal description or an HTML page. JSON on stdout. See `references/meta-tags.md`.
