@@ -1,6 +1,6 @@
 # Map Ergonomics
 
-Translated and adapted from Jérôme Gombert's deck *Dataviz : ergo cartes*. Read alongside `dashboard-ergonomics.md` and `dataviz-color-palettes.md`.
+Map-specific ergonomics. Read alongside `dashboard-ergonomics.md` and `dataviz-color-palettes.md`.
 
 A map is a chart with a built-in coordinate system. The same dataviz rules apply, plus a small set of map-specific ones.
 

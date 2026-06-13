@@ -1,6 +1,6 @@
 # Dataviz Color Palettes (Accessible)
 
-Translated and adapted from Jérôme Gombert's deck *Couleurs accessibles et Dataviz*. Read alongside `color-psychology.md` (the curated brand palette), `charts-vega.md` (Vega-Lite house style), and `ui-guidelines/foundations/accessibility.md`.
+Accessible color choices for data visualization. Read alongside `color-psychology.md` (the curated brand palette), `charts-vega.md` (Vega-Lite house style), and `ui-guidelines/foundations/accessibility.md`.
 
 Color in a data visualization carries a dimension. It is not decoration. Picking colors badly makes the chart unreadable for color-blind users, illegible at small sizes, or actively misleading.
 

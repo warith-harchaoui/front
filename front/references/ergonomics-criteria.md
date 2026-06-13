@@ -1,8 +1,6 @@
-# Ergonomic Criteria (Boucher / Bastien–Scapin)
+# Ergonomic Criteria
 
-Source: Amélie Boucher's synthesis of the Bastien–Scapin ergonomic criteria — see *Ergonomie web et UX design* (Eyrolles). Originally <https://capian.co/fr/amelie-boucher-criteres-ergonomie> (in French).
-
-These eight criteria are a checklist for evaluating any UI. Use them when reviewing a page or component, before shipping, and when the user asks for an "ergonomic audit".
+Eight criteria for evaluating any UI. Use them when reviewing a page or component, before shipping, and when the user asks for an "ergonomic audit".
 
 ---
 

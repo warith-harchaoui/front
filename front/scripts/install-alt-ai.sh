@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# install-alt-ai.sh — macOS and Ubuntu/Linux installer for the local
-# Ollama-based alt-text generator. For Windows, use install-alt-ai.ps1.
+# install-alt-ai.sh — Bash installer for the local Ollama-based alt-text
+# generator. For PowerShell, use install-alt-ai.ps1.
 #
 # Installs (if missing): Ollama.
-# Pulls: gemma4:e2b   (Apple Silicon: gemma4:e2b-mlx)
+# Pulls: gemma4:e2b   (MLX-capable hardware: gemma4:e2b-mlx)
 # Override with: OLLAMA_MODEL=<tag>  e.g. OLLAMA_MODEL=gemma3n:e2b
 #
 # After this script finishes, generate alt text with:
@@ -26,27 +26,18 @@ echo "→ Target model: $MODEL"
 
 # 1. Install Ollama if missing.
 if ! command -v ollama >/dev/null 2>&1; then
-  case "$OS" in
-    Darwin)
-      if command -v brew >/dev/null 2>&1; then
-        echo "→ Installing Ollama via Homebrew…"
-        brew install ollama
-      else
-        echo "Homebrew not found. Install from https://brew.sh, then re-run this script." >&2
-        echo "Or download the macOS app directly from https://ollama.com/download" >&2
-        exit 1
-      fi
-      ;;
-    Linux)
-      echo "→ Installing Ollama via the official installer script…"
-      curl -fsSL https://ollama.com/install.sh | sh
-      ;;
-    *)
-      echo "Unsupported OS for this script: $OS." >&2
-      echo "On Windows, run: powershell -ExecutionPolicy Bypass -File install-alt-ai.ps1" >&2
-      exit 1
-      ;;
-  esac
+  if command -v brew >/dev/null 2>&1; then
+    echo "→ Installing Ollama via Homebrew…"
+    brew install ollama
+  elif [ "$OS" = "Linux" ]; then
+    echo "→ Installing Ollama via the official installer script…"
+    curl -fsSL https://ollama.com/install.sh | sh
+  else
+    echo "Could not auto-install Ollama on this OS ($OS)." >&2
+    echo "Install Homebrew (https://brew.sh) and re-run, or download Ollama from https://ollama.com/download" >&2
+    echo "On Windows, run: powershell -ExecutionPolicy Bypass -File install-alt-ai.ps1" >&2
+    exit 1
+  fi
 fi
 
 # 2. Make sure the daemon is up.
@@ -75,7 +66,7 @@ Could not pull "$MODEL". Check your network connection and the model tag.
 To try a different on-device vision model, set OLLAMA_MODEL and re-run, e.g.:
 
     OLLAMA_MODEL=gemma3n:e2b $0
-    # On Apple Silicon:
+    # On MLX-capable hardware:
     OLLAMA_MODEL=gemma3n:e2b-mlx $0
 
 Browse tags at https://ollama.com/library

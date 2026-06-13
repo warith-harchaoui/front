@@ -1,6 +1,6 @@
 # Choosing the Right Chart
 
-Translated and adapted from Jérôme Gombert's deck *Dataviz : choisir son graph*. Read alongside `charts-vega.md` (house style for the chart you pick) and `dashboard-ergonomics.md` (how it sits in a tile).
+A decision guide for picking the right chart shape. Read alongside `charts-vega.md` (house style for the chart you pick) and `dashboard-ergonomics.md` (how it sits in a tile).
 
 ## Two questions first
 

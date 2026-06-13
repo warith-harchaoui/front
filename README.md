@@ -121,8 +121,8 @@ Special thanks to **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects
 
 Color palettes from <https://harchaoui.org/warith/colors/>.
 
-Montserrat by Julieta Ulanovsky and contributors — <https://github.com/JulietaUla/Montserrat> — SIL Open Font License. The font files are bundled in `front/assets/fonts/montserrat/`.
+Montserrat is bundled in `front/assets/fonts/montserrat/` under the SIL Open Font License — see the bundled `OFL.txt` for the full license and the attached copyright notice.
 
 ## License
 
-MIT for the skill source. Montserrat is OFL — see `front/assets/fonts/montserrat/OFL.txt`.
+UNLICENSED — all rights reserved. Montserrat remains under the SIL Open Font License (`front/assets/fonts/montserrat/OFL.txt`).

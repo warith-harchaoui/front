@@ -1,7 +1,7 @@
 ---
 name: front
 description: Generate vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Use when the user asks to "build a UI", "create a component", "design a page", "make a form / modal / button / nav", "scaffold a landing", or "build a web app" — or any frontend work that must NOT use React, Vue, Svelte, Next.js or another JS framework. Output is semantic HTML + Tailwind classes + vanilla ES modules with dark-mode peers, focus rings, reduced-motion guards, and bilingual (EN/FR) copy.
-license: MIT
+license: UNLICENSED
 metadata:
   author: Warith Harchaoui
   version: 0.1.0
@@ -112,8 +112,9 @@ Do **not** use this skill when:
 | "chart" / "graph" / "dashboard tile" | `charts-vega.md` + `dataviz-chart-selection.md` + `dataviz-color-palettes.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks |
 | "dashboard" / "BI" / "KPI summary" | `dashboard-ergonomics.md` (+ chart references above) | One question per tile, title as a question, sticky filters, grid layout (12 cols), skeleton tiles while loading |
 | "map" / "choropleth" / "cartography" | `dataviz-maps.md` | Title states the message, ≤ 7 classes, locator inset for unfamiliar audiences, accessible text alternative below the map |
-| "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria (Boucher / Bastien–Scapin): guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility |
-| "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Call `node scripts/alt-from-ollama.mjs <src>` (Ollama + `gemma4:e2b`, `-mlx` on Apple Silicon). `EMPTY` → `alt="" role="presentation" aria-hidden="true"`. Tag drafts with `data-alt-source="ai"`. |
+| "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria: guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility |
+| "i18n" / "multilingual" / "translate" / "localize" | `i18n.md` | One URL strategy, `<html lang>` always set, `Intl.*` for formatting + plurals, logical CSS for RTL, persisted user choice wins over auto-detect |
+| "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Call `node scripts/alt-from-ollama.mjs <src>` (Ollama + `gemma4:e2b`, `-mlx` on MLX-capable hardware). `EMPTY` → `alt="" role="presentation" aria-hidden="true"`. Tag drafts with `data-alt-source="ai"`. |
 
 ## Stack basics
 
@@ -242,8 +243,9 @@ Load these only when needed.
 - `references/dataviz-color-palettes.md` — accessible color palettes for dataviz (sequential / divergent / categorical).
 - `references/dataviz-maps.md` — choropleth and map-specific ergonomics.
 - `references/dashboard-ergonomics.md` — laying out a dashboard tile-by-tile.
-- `references/ergonomics-criteria.md` — Boucher's eight ergonomic criteria for UX review.
-- `references/alt-text-ai.md` — AI-drafted `alt` via local Ollama + Gemma vision.
+- `references/ergonomics-criteria.md` — eight ergonomic criteria for UX review.
+- `references/i18n.md` — multilingual frontend (URL strategy, `Intl.*`, plurals, RTL, persisted choice).
+- `references/alt-text-ai.md` — AI-drafted `alt` via local Ollama + Gemma vision (with `--lang` for multilingual output).
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.
 
@@ -259,5 +261,5 @@ Copy / adapt from `assets/`:
 ## Scripts
 
 - `scripts/validate.sh` — pre-ship quality gate. Run from anywhere; resolves the skill root from its own location. Exits non-zero on any failure. Checks: frontmatter shape, description length, forbidden framework imports, trademarked UI-platform terms in user-facing docs, LLM-marketing phrases, absence of a README.md inside the skill folder, and that every reference path declared by `references/ui-guidelines/INDEX.md` resolves.
-- `scripts/install-alt-ai.sh` (macOS / Ubuntu) and `scripts/install-alt-ai.ps1` (Windows) — install Ollama if missing, then pull the alt-text vision model (`gemma4:e2b`; `-mlx` variant on Apple Silicon).
+- `scripts/install-alt-ai.sh` (Bash systems) and `scripts/install-alt-ai.ps1` (PowerShell) — install Ollama if missing, then pull the alt-text vision model (`gemma4:e2b`; `-mlx` variant on MLX-capable hardware).
 - `scripts/alt-from-ollama.mjs` — Node 18+ ESM helper that returns alt text for an image. See `references/alt-text-ai.md`.

@@ -4,10 +4,10 @@
  *
  * Generate descriptive `alt` text for an image using a local Ollama vision model.
  *
- *   Default model:        gemma4:e2b
- *   Apple Silicon default: gemma4:e2b-mlx
- *   Override:              OLLAMA_MODEL=<tag>
- *   Custom server:         OLLAMA_URL=http://host:port  (default http://localhost:11434)
+ *   Default model:            gemma4:e2b
+ *   MLX-capable hardware:     gemma4:e2b-mlx  (selected automatically)
+ *   Override:                 OLLAMA_MODEL=<tag>
+ *   Custom server:            OLLAMA_URL=http://host:port  (default http://localhost:11434)
  *
  * Usage:
  *   node alt-from-ollama.mjs path/to/image.jpg
@@ -31,19 +31,46 @@ const DEFAULT_BASE = process.env.OLLAMA_MODEL_BASE ?? "gemma4:e2b";
 
 function pickDefaultModel() {
   if (process.env.OLLAMA_MODEL) return process.env.OLLAMA_MODEL;
-  const isAppleSilicon = platform() === "darwin" && arch() === "arm64";
-  return isAppleSilicon ? `${DEFAULT_BASE}-mlx` : DEFAULT_BASE;
+  const isMlxCapable = platform() === "darwin" && arch() === "arm64";
+  return isMlxCapable ? `${DEFAULT_BASE}-mlx` : DEFAULT_BASE;
 }
 const MODEL = pickDefaultModel();
 
-const PROMPT =
-  "Write alt text for this image, 125 characters or fewer. " +
-  "Describe meaning, not pixels. " +
-  "Do NOT start with 'image of', 'picture of', or 'photo of'. " +
-  "Avoid guessing race, gender, age, or mood. " +
-  "If the image is purely decorative (texture, ornament, divider), reply with the single literal word EMPTY. " +
-  "If the image is mostly text, include the readable text verbatim. " +
-  "Reply with the alt text only, no quotes, no prefix.";
+// BCP-47 language tag → display name + native-language instruction fragment.
+// Pass `--lang fr` / `--lang en` / `--lang es` / …, or set ALT_LANG.
+// Default: detect from LANG / LC_ALL, fall back to English.
+const LANG_INSTRUCTIONS = {
+  en: { name: "English",   line: "Write the alt text in English." },
+  fr: { name: "French",    line: "Rédige le texte alternatif en français." },
+  es: { name: "Spanish",   line: "Escribe el texto alternativo en español." },
+  de: { name: "German",    line: "Schreibe den Alt-Text auf Deutsch." },
+  it: { name: "Italian",   line: "Scrivi il testo alternativo in italiano." },
+  pt: { name: "Portuguese",line: "Escreva o texto alternativo em português." },
+  nl: { name: "Dutch",     line: "Schrijf de alternatieve tekst in het Nederlands." },
+  ar: { name: "Arabic",    line: "اكتب النص البديل باللغة العربية." },
+  ja: { name: "Japanese",  line: "代替テキストを日本語で書いてください。" },
+  zh: { name: "Chinese",   line: "用中文写替代文本。" },
+};
+
+function detectLang() {
+  if (process.env.ALT_LANG) return process.env.ALT_LANG.toLowerCase().slice(0, 2);
+  const sys = (process.env.LC_ALL || process.env.LANG || "en").toLowerCase();
+  return sys.slice(0, 2);
+}
+
+function promptFor(lang) {
+  const i18n = LANG_INSTRUCTIONS[lang] ?? LANG_INSTRUCTIONS.en;
+  return (
+    `${i18n.line} ` +
+    "Write alt text for this image, 125 characters or fewer. " +
+    "Describe meaning, not pixels. " +
+    "Do NOT start with 'image of', 'picture of', or 'photo of' (or the equivalent in your language). " +
+    "Avoid guessing race, gender, age, or mood. " +
+    "If the image is purely decorative (texture, ornament, divider), reply with the single literal word EMPTY. " +
+    "If the image is mostly text, include the readable text verbatim. " +
+    "Reply with the alt text only, no quotes, no prefix."
+  );
+}
 
 async function loadImageBase64(src) {
   if (/^https?:\/\//i.test(src)) {
@@ -56,9 +83,10 @@ async function loadImageBase64(src) {
   return buf.toString("base64");
 }
 
-export async function describe(src, context = "") {
+export async function describe(src, context = "", lang = detectLang()) {
   const image = await loadImageBase64(src);
-  const prompt = context ? `${PROMPT} Context: ${context}` : PROMPT;
+  const base = promptFor(lang);
+  const prompt = context ? `${base} Context: ${context}` : base;
 
   let body;
   try {
@@ -79,8 +107,9 @@ export async function describe(src, context = "") {
     stderr.write(
       `Could not reach Ollama at ${OLLAMA_URL}: ${err.message}\n` +
       "Is it running? Try `ollama serve` in another terminal,\n" +
-      "or run `bash front/scripts/install-alt-ai.sh` (macOS / Linux)\n" +
-      "        / `powershell -File front/scripts/install-alt-ai.ps1` (Windows).\n"
+      "or run the installer for your shell:\n" +
+      "  bash front/scripts/install-alt-ai.sh   (Bash)\n" +
+      "  powershell -File front/scripts/install-alt-ai.ps1   (PowerShell)\n"
     );
     exit(2);
   }
@@ -98,16 +127,34 @@ export async function describe(src, context = "") {
   return text;
 }
 
+function parseArgs(args) {
+  const out = { src: null, ctx: "", lang: null };
+  const positional = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === "--lang" || a === "-l") {
+      out.lang = (args[++i] ?? "").toLowerCase().slice(0, 2) || null;
+    } else if (a.startsWith("--lang=")) {
+      out.lang = a.slice(7).toLowerCase().slice(0, 2) || null;
+    } else {
+      positional.push(a);
+    }
+  }
+  out.src = positional[0] ?? null;
+  out.ctx = positional[1] ?? "";
+  return out;
+}
+
 async function main() {
-  if (argv.length < 3) {
+  const { src, ctx, lang } = parseArgs(argv.slice(2));
+  if (!src) {
     stderr.write(
-      "Usage: node alt-from-ollama.mjs <image-path-or-url> [context]\n"
+      "Usage: node alt-from-ollama.mjs [--lang <bcp47>] <image-path-or-url> [context]\n" +
+      "  --lang en|fr|es|de|it|pt|nl|ar|ja|zh   (defaults to ALT_LANG or LANG)\n"
     );
     exit(1);
   }
-  const src = argv[2];
-  const ctx = argv[3] ?? "";
-  const text = await describe(src, ctx);
+  const text = await describe(src, ctx, lang ?? detectLang());
   stdout.write(text + "\n");
 }
 

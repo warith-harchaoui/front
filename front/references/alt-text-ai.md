@@ -3,28 +3,20 @@
 The skill emits `<img>` tags with meaningful `alt`. When the author has not supplied one, the skill drafts alt text with a **local vision model running on Ollama** — nothing leaves the machine.
 
 - **Model (default):** `gemma4:e2b`
-- **Apple Silicon variant:** `gemma4:e2b-mlx` (selected automatically by the installers and the script)
+- **MLX-capable hardware variant:** `gemma4:e2b-mlx` (selected automatically by the installers and the script)
 - **Override anywhere:** `OLLAMA_MODEL=<tag>` (for example `gemma3n:e2b` to use a different on-device vision model).
 
 Runtime: **Node.js 18+** (built-in `fetch`, no `npm install` required).
 
 ## Install Ollama + pull the model
 
-### macOS
+### Bash systems (Homebrew or curl installer)
 
 ```bash
 bash front/scripts/install-alt-ai.sh
 ```
 
-The script uses Homebrew (`brew install ollama`). If Homebrew is missing, install it from <https://brew.sh> first, or download the macOS app directly from <https://ollama.com/download>. On Apple Silicon the script automatically pulls the `-mlx` variant.
-
-### Ubuntu / Linux
-
-```bash
-bash front/scripts/install-alt-ai.sh
-```
-
-The script uses the official installer (`curl -fsSL https://ollama.com/install.sh | sh`). Re-run after `apt install curl` if `curl` is missing.
+The script detects Homebrew (`brew install ollama`) when present, and falls back to the official Linux installer (`curl -fsSL https://ollama.com/install.sh | sh`) elsewhere. If neither is available, download Ollama manually from <https://ollama.com/download>. On MLX-capable hardware the script automatically pulls the `-mlx` variant.
 
 ### Windows
 
@@ -32,9 +24,9 @@ The script uses the official installer (`curl -fsSL https://ollama.com/install.s
 powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1
 ```
 
-The script uses `winget install Ollama.Ollama`. If `winget` is missing (older Windows 10), install "App Installer" from the Microsoft Store, or download Ollama manually from <https://ollama.com/download>.
+The script uses `winget install Ollama.Ollama`. If `winget` is missing, install "App Installer" from the Microsoft Store, or download Ollama manually from <https://ollama.com/download>.
 
-Each installer also: starts the daemon if it isn't running, then `ollama pull`s the right tag (with `-mlx` on Apple Silicon).
+Each installer also: starts the daemon if it isn't running, then `ollama pull`s the right tag (with `-mlx` on MLX-capable hardware).
 
 ## Generate alt text
 
@@ -127,7 +119,7 @@ Pair complex charts with a longer text alternative in `<figcaption>` or `aria-de
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `Could not reach Ollama at http://localhost:11434` | Daemon not running | `ollama serve` in another terminal, or re-run the installer. |
-| `Error: model not found` | Tag mistyped or installer skipped | Re-run the installer, or pull manually: `ollama pull gemma4:e2b` (Apple Silicon: `gemma4:e2b-mlx`). |
+| `Error: model not found` | Tag mistyped or installer skipped | Re-run the installer, or pull manually: `ollama pull gemma4:e2b` (MLX-capable hardware: `gemma4:e2b-mlx`). |
 | Garbled or hallucinated text | Image very small or low quality | Pre-resize to ≥ 512 px on the long edge. |
 | Very slow first call | First inference loads weights into memory | Subsequent calls are fast; keep the daemon running between calls. |
 

@@ -59,14 +59,14 @@
 
 ## AI-drafted alt text
 
-When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default `gemma4:e2b`; `gemma4:e2b-mlx` on Apple Silicon). Local-only — nothing leaves the machine. Runtime is Node.js 18+, no `npm install`.
+When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default `gemma4:e2b`; `gemma4:e2b-mlx` on MLX-capable hardware). Local-only — nothing leaves the machine. Runtime is Node.js 18+, no `npm install`.
 
 Install once:
 
-| Platform | Command |
+| Shell | Command |
 |---|---|
-| macOS, Ubuntu / Linux | `bash front/scripts/install-alt-ai.sh` |
-| Windows | `powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1` |
+| Bash (Homebrew or curl installer) | `bash front/scripts/install-alt-ai.sh` |
+| PowerShell (winget installer) | `powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1` |
 
 Generate alt for an image:
 

@@ -1,5 +1,5 @@
-# install-alt-ai.ps1 — Windows installer for the local Ollama-based alt-text
-# generator. For macOS / Linux, use install-alt-ai.sh.
+# install-alt-ai.ps1 — Windows / PowerShell installer for the local
+# Ollama-based alt-text generator. For Bash shells, use install-alt-ai.sh.
 #
 # Installs (if missing): Ollama (via winget).
 # Pulls: gemma4:e2b  (override with the OLLAMA_MODEL env var).
