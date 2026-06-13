@@ -27,6 +27,36 @@ Activate when the user is asking for any of:
 - A redesign or audit of an existing piece of UI.
 - A design system token set or starter template.
 - A migration AWAY from a framework toward vanilla JS.
+- **"Wrap my CLI in a GUI"** — the user has a working command-line tool and wants a graphical front-end. The skill reads the CLI's flags / sub-commands / I/O contract and emits a single-page vanilla-JS + Tailwind UI that drives it. See the workflow in the next section.
+
+## CLI → GUI workflow (flagship use case)
+
+When the user points to an existing CLI project and asks for a GUI:
+
+1. **Inventory the CLI.** Read the help output (`tool --help`, `tool sub --help`), the README, the source's argument parser (`argparse`, `clap`, `commander`, `cobra`, …). Build a map of: sub-commands → flags → input types → output shape.
+2. **Categorize each command** by surface:
+   - One-shot action (single button + result panel).
+   - Form-driven (multiple inputs → run).
+   - Long-running (streaming output → progress + log panel).
+   - List-producing (table view with filters).
+3. **Pick a layout**:
+   - 2–4 commands → tab bar at the bottom (mobile) or sidebar (desktop).
+   - 5–8 → sidebar with grouped sections.
+   - 9+ → command palette (`⌘K`) + categorized sidebar.
+4. **Map flags to form controls**:
+   - boolean flag → toggle.
+   - enum flag → segmented control (≤4 options) or select.
+   - path → file input + drag-drop zone.
+   - string → text field.
+   - number → stepper or slider.
+   - repeated flag → tag list.
+5. **Wire execution.** Choose ONE of these depending on the project:
+   - **Local-only**, packaged as Tauri / Electron / web view: invoke via the host's `invoke()` / IPC.
+   - **HTTP-served**: emit a tiny `fetch` wrapper assuming the CLI is wrapped by `python -m http.server`, `express`, `fastapi`, etc.
+   - **Browser-only demo**: stub execution with `console.log` and clearly mark TODOs.
+6. **Stream output** to a monospace `<pre>` panel; convert ANSI to HTML if needed.
+7. **Emit a single `index.html` + `app.js` + Tailwind** that runs out of the box. Ship the Montserrat fonts in `./fonts/`.
+8. **Document** in the project's README how to launch the GUI alongside the CLI.
 
 Do **not** use this skill when:
 
