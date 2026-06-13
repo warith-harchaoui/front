@@ -283,10 +283,16 @@ marketing_pat: re.Pattern[str] = re.compile(
 )
 
 hits = []
+
+#: Files that intentionally contain banned marketing words as
+#: examples / refusal targets, not as the doc's own voice.
+MARKETING_EXEMPT: frozenset[str] = frozenset({
+    "references/anti-patterns.md",
+    "references/plain-language.md",
+})
+
 for f in all_files("*.md"):
-    # The anti-patterns file lists these words for refusal; finding them there
-    # is the whole point of the file.
-    if f.relative_to(SKILL_ROOT).as_posix() == "references/anti-patterns.md":
+    if f.relative_to(SKILL_ROOT).as_posix() in MARKETING_EXEMPT:
         continue
     for i, line in enumerate(
         f.read_text(encoding="utf-8", errors="ignore").splitlines(), 1
