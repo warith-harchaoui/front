@@ -25,32 +25,22 @@ Le skill inclut un workflow qui prend un outil en ligne de commande existant et 
 
 ## Installation
 
-Cloner le dépôt, puis choisir le runtime que vous utilisez.
-
-```bash
-git clone https://github.com/<user>/front.git
-cd front
-```
-
-### Option A — Claude Code (CLI)
+### Claude Code
 
 ```bash
 mkdir -p ~/.claude/skills
 cp -r front ~/.claude/skills/front
-ls ~/.claude/skills/front/SKILL.md   # contrôle
+```
+
+Vérification :
+
+```bash
+ls ~/.claude/skills/front/SKILL.md
 ```
 
 Claude Code lit la description du frontmatter et applique le skill quand un message utilisateur correspond à ses phrases déclencheuses.
 
-### Option B — Claude.ai (web)
-
-1. Compresser le dossier du skill :
-   ```bash
-   (cd front && zip -r ../front.zip .)
-   ```
-2. Dans Claude.ai → **Réglages → Capacités → Skills → Téléverser un skill**, charger `front.zip`.
-
-### Option C — OpenCode
+### OpenCode
 
 ```bash
 mkdir -p ~/.opencode/skills
@@ -59,9 +49,9 @@ cp -r front ~/.opencode/skills/front
 
 Invocation : `/skill front <demande>`.
 
-### Option D — LangChain / SDK Anthropic (Python)
+### LangChain / SDK Anthropic (Python)
 
-Charger `front/SKILL.md` comme fragment de system prompt. Ajouter les fichiers référencés à la demande.
+Charger `SKILL.md` comme fragment de system prompt. Ajouter les fichiers référencés à la demande.
 
 ```python
 # pip install anthropic
@@ -81,8 +71,6 @@ def reference_eventuelle(message: str) -> str:
         refs.append((SKILL_DIR / "references/color-psychology.md").read_text())
     if "bouton" in m or "modale" in m or "formulaire" in m:
         refs.append((SKILL_DIR / "references/ui-guidelines/INDEX.md").read_text())
-    if "graphique" in m or "chart" in m:
-        refs.append((SKILL_DIR / "references/charts-vega.md").read_text())
     return "\n\n---\n\n".join(refs)
 
 def demander(message: str) -> str:
@@ -99,21 +87,6 @@ print(demander("Génère un bouton principal libellé « Commencer »."))
 ```
 
 Pour LangChain à proprement parler, encapsuler la même logique dans un `ChatPromptTemplate` avec un `SystemMessage(content=charger_skill())` et utiliser `langchain_anthropic.ChatAnthropic`.
-
-### Autres runtimes
-
-La spécification de skill Anthropic est chargée nativement par **Claude Code**, **Claude.ai** et **OpenCode**. Partout ailleurs, le skill fonctionne toujours — mais en tant que **system prompt personnalisé**, pas comme un skill analysé. Coller `front/SKILL.md` dans l'emplacement system prompt de l'hôte, et charger les fichiers de référence (`front/references/**`) à la main quand la tâche le demande. Forme vérifiée avec Cursor (`.cursor/rules`), Continue (contexte personnalisé `config.json`), Cline, Aider (`.aider.conf.yml`), et appels directs à l'API Messages.
-
-### Optionnel — assistant alt-text local
-
-Le skill peut auto-rédiger un `alt` pour les balises `<img>` via un modèle de vision Ollama local (`gemma4:e2b`, `gemma4:e2b-mlx` sur Apple Silicon). 100 % local — rien ne quitte la machine.
-
-| Plateforme | Installation en une commande |
-|---|---|
-| macOS, Ubuntu / Linux | `bash front/scripts/install-alt-ai.sh` |
-| Windows | `powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1` |
-
-Puis : `node front/scripts/alt-from-ollama.mjs ./chemin/vers/image.jpg`. Guide complet dans `front/references/alt-text-ai.md`.
 
 ## Structure du dépôt
 
