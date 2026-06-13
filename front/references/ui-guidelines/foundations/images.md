@@ -59,23 +59,24 @@
 
 ## AI-drafted alt text
 
-When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default: `gemma4:e2b`, `gemma4:e2b-mlx` on Apple Silicon). Local-only — nothing leaves the machine.
+When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default `gemma4:e2b`; `gemma4:e2b-mlx` on Apple Silicon). Local-only — nothing leaves the machine. Runtime is Node.js 18+, no `npm install`.
 
 Install once:
 
-```bash
-bash front/scripts/install-alt-ai.sh
-```
+| Platform | Command |
+|---|---|
+| macOS, Ubuntu / Linux | `bash front/scripts/install-alt-ai.sh` |
+| Windows | `powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1` |
 
 Generate alt for an image:
 
 ```bash
-python3 front/scripts/alt_from_ollama.py ./public/hero.jpg
+node front/scripts/alt-from-ollama.mjs ./public/hero.jpg
 ```
 
-Output is a single line ≤ 125 characters, or the literal token `EMPTY` if the image is purely decorative (in which case emit `alt="" role="presentation" aria-hidden="true"`).
+Output is one line ≤ 125 characters, or the literal token `EMPTY` for a purely decorative image (in which case emit `alt="" role="presentation" aria-hidden="true"`).
 
-Full guidance — prompt rules, server-proxy pattern for browser calls, review workflow, failure modes — in `references/alt-text-ai.md`.
+Full guidance — prompt rules, Node server-proxy pattern for browser calls, review workflow, failure modes — in `references/alt-text-ai.md`.
 
 ## Checklist
 

@@ -1,37 +1,49 @@
 # AI-assisted Alt Text
 
-The skill emits `<img>` tags with meaningful `alt`. When the author has not supplied one, the skill drafts alt text with a **local vision model running on Ollama**. Local-only — nothing leaves the machine.
+The skill emits `<img>` tags with meaningful `alt`. When the author has not supplied one, the skill drafts alt text with a **local vision model running on Ollama** — nothing leaves the machine.
 
-- Model (default): `gemma4:e2b`
-- Apple Silicon variant: `gemma4:e2b-mlx` (MLX-optimized; selected automatically)
-- Override anytime with `OLLAMA_MODEL=<tag>` (e.g. `gemma3n:e2b` if the above tag is not yet in the Ollama registry).
+- **Model (default):** `gemma4:e2b`
+- **Apple Silicon variant:** `gemma4:e2b-mlx` (selected automatically by the installers and the script)
+- **Override anywhere:** `OLLAMA_MODEL=<tag>` (for example `gemma3n:e2b` if the default tag is not yet in Ollama's registry).
 
-## Install
+Runtime: **Node.js 18+** (built-in `fetch`, no `npm install` required).
+
+## Install Ollama + pull the model
+
+### macOS
 
 ```bash
 bash front/scripts/install-alt-ai.sh
 ```
 
-The installer:
+The script uses Homebrew (`brew install ollama`). If Homebrew is missing, install it from <https://brew.sh> first, or download the macOS app directly from <https://ollama.com/download>. On Apple Silicon the script automatically pulls the `-mlx` variant.
 
-1. Installs Ollama if missing (`brew install ollama` on macOS, official script on Linux).
-2. Starts the Ollama daemon if not already running.
-3. Pulls the right model tag — `-mlx` suffix on Apple Silicon, plain otherwise.
-4. Suggests `gemma3n:e2b` as a fallback if the primary tag is not yet published.
-
-No Python dependencies required — `front/scripts/alt_from_ollama.py` uses only the standard library. The optional extras in `front/scripts/requirements.txt` (Pillow for pre-resize) are commented out.
-
-## Use
+### Ubuntu / Linux
 
 ```bash
-# from a path
-python3 front/scripts/alt_from_ollama.py ./public/hero.jpg
+bash front/scripts/install-alt-ai.sh
+```
 
-# from a URL
-python3 front/scripts/alt_from_ollama.py https://example.com/photo.jpg
+The script uses the official installer (`curl -fsSL https://ollama.com/install.sh | sh`). Re-run after `apt install curl` if `curl` is missing.
 
-# with a context hint (helps the model disambiguate)
-python3 front/scripts/alt_from_ollama.py ./team.jpg "Photo on a careers page"
+### Windows
+
+```powershell
+powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1
+```
+
+The script uses `winget install Ollama.Ollama`. If `winget` is missing (older Windows 10), install "App Installer" from the Microsoft Store, or download Ollama manually from <https://ollama.com/download>.
+
+Each installer also: starts the daemon if it isn't running, then `ollama pull`s the right tag (with `-mlx` on Apple Silicon).
+
+## Generate alt text
+
+Same command on every platform:
+
+```bash
+node front/scripts/alt-from-ollama.mjs ./public/hero.jpg
+node front/scripts/alt-from-ollama.mjs ./public/hero.jpg "Photo on a careers page"
+node front/scripts/alt-from-ollama.mjs https://example.com/photo.jpg
 ```
 
 Output: one line of alt text on stdout, ≤ 125 characters. The literal token `EMPTY` (no quotes) means the model judged the image **purely decorative**; the caller emits:
@@ -42,43 +54,37 @@ Output: one line of alt text on stdout, ≤ 125 characters. The literal token `E
 
 ## Use from the skill (vanilla JS, server-side proxy)
 
-Calling Ollama from the browser is blocked by CORS in most setups. Run a tiny proxy that re-uses the Python script:
+Calling Ollama from the browser is blocked by CORS in most setups. Run a small Node proxy that re-uses the script's `describe()` export:
 
-```bash
-# minimal proxy — adapt to your runtime
-python3 -m http.server 8000     # serves static files
-# alt-text endpoint: invoke alt_from_ollama.py from your server framework
+```js
+// server.mjs — Node 18+, no deps
+import http from 'node:http';
+import { describe } from './front/scripts/alt-from-ollama.mjs';
+
+http.createServer(async (req, res) => {
+  if (req.method !== 'POST' || req.url !== '/alt') {
+    res.writeHead(404).end(); return;
+  }
+  let body = '';
+  req.on('data', (c) => body += c);
+  req.on('end', async () => {
+    try {
+      const { src, context = '' } = JSON.parse(body);
+      const text = await describe(src, context);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ alt: text === 'EMPTY' ? '' : text, decorative: text === 'EMPTY' }));
+    } catch (err) {
+      res.writeHead(500).end(err.message);
+    }
+  });
+}).listen(8787, () => console.log('alt-proxy on http://localhost:8787'));
 ```
 
-A FastAPI sketch:
-
-```python
-# pip install fastapi uvicorn
-from fastapi import FastAPI
-from pydantic import BaseModel
-from pathlib import Path
-import sys
-
-sys.path.insert(0, str(Path(__file__).parent.parent / "front/scripts"))
-from alt_from_ollama import describe
-
-app = FastAPI()
-
-class Req(BaseModel):
-    src: str
-    context: str = ""
-
-@app.post("/alt")
-def alt(req: Req) -> dict:
-    text = describe(req.src, req.context)
-    return {"alt": "" if text == "EMPTY" else text, "decorative": text == "EMPTY"}
-```
-
-Browser call:
+Browser side:
 
 ```js
 async function altFor(src, context = '') {
-  const r = await fetch('/alt', {
+  const r = await fetch('http://localhost:8787/alt', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ src, context }),
@@ -93,10 +99,10 @@ async function altFor(src, context = '') {
 2. **Describe meaning, not pixels.** "Person walking a dog at sunset" beats "An image of a person, a dog, and orange sky".
 3. **No "image of …", "picture of …", "photo of …"** prefixes — screen readers already announce "image".
 4. **Don't guess race, gender, age, mood** unless contextually essential.
-5. **Decorative recognition.** If the image is texture / ornament / divider, model returns `EMPTY`.
+5. **Decorative recognition.** Texture / ornament / divider → model returns `EMPTY`.
 6. **Text-in-image** is preserved verbatim.
 
-The hard 125-char cap is enforced again in Python after generation, in case the model overshoots.
+The 125-character cap is enforced again in JS after generation, in case the model overshoots.
 
 ## Review workflow
 
@@ -120,15 +126,15 @@ Pair complex charts with a longer text alternative in `<figcaption>` or `aria-de
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `Could not reach Ollama at http://localhost:11434` | Daemon not running | `ollama serve` in another terminal, or re-run `install-alt-ai.sh`. |
-| `Error: model not found` | Tag absent from registry | Re-run with `OLLAMA_MODEL=gemma3n:e2b` (or `gemma3n:e2b-mlx`). |
+| `Could not reach Ollama at http://localhost:11434` | Daemon not running | `ollama serve` in another terminal, or re-run the installer. |
+| `Error: model not found` | Tag absent from the registry | Re-run with `OLLAMA_MODEL=gemma3n:e2b` (Apple Silicon: `gemma3n:e2b-mlx`). |
 | Garbled or hallucinated text | Image very small or low quality | Pre-resize to ≥ 512 px on the long edge. |
-| Very slow first call | First inference loads weights | Subsequent calls are fast; keep the daemon running between calls. |
+| Very slow first call | First inference loads weights into memory | Subsequent calls are fast; keep the daemon running between calls. |
 
 ## Checklist
 
-- [ ] `install-alt-ai.sh` ran successfully and the model is in `ollama list`.
-- [ ] `alt_from_ollama.py` returns a non-empty string on a known photo.
-- [ ] Server proxy in place if calling from the browser.
+- [ ] Installer ran successfully and the chosen model is listed in `ollama list`.
+- [ ] `node front/scripts/alt-from-ollama.mjs <test image>` returns a non-empty string.
+- [ ] Browser callers go through the Node proxy (CORS).
 - [ ] Every AI-drafted `alt` carries `data-alt-source="ai"` until a human reviews it.
 - [ ] Decorative responses (`EMPTY`) translate to `alt="" role="presentation" aria-hidden="true"`.
