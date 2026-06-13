@@ -126,4 +126,4 @@ front/                              ← repo root
 
 ## License
 
-`UNLICENSED` (npm convention) — proprietary, all rights reserved. See `LICENSE.md` at the repo root for the full notice and the carve-out for bundled third-party assets (Montserrat under the SIL Open Font License).
+**The Unlicense** — released into the public domain, no copyright, no restrictions. Use, modify, redistribute, sell — without permission, attribution, or fee. See `LICENSE.md` for the canonical text. The bundled Montserrat font remains under the SIL Open Font License (`front/assets/fonts/montserrat/OFL.txt`); the public-domain dedication doesn't change that.

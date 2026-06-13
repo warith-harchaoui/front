@@ -1,7 +1,7 @@
 ---
 name: front
 description: Generate vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Use when the user asks to "build a UI", "create a component", "design a page", "make a form / modal / button / nav", "scaffold a landing", or "build a web app" — or any frontend work that must NOT use React, Vue, Svelte, Next.js or another JS framework. Output is semantic HTML + Tailwind classes + vanilla ES modules with dark-mode peers, focus rings, reduced-motion guards, and bilingual (EN/FR) copy.
-license: UNLICENSED
+license: Unlicense
 metadata:
   author: Warith Harchaoui
   version: 0.1.0
@@ -114,6 +114,9 @@ Do **not** use this skill when:
 | "map" / "choropleth" / "cartography" | `dataviz-maps.md` | Title states the message, ≤ 7 classes, locator inset for unfamiliar audiences, accessible text alternative below the map |
 | "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria: guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility |
 | "i18n" / "multilingual" / "translate" / "localize" | `i18n.md` | One URL strategy, `<html lang>` always set, `Intl.*` for formatting + plurals, logical CSS for RTL, persisted user choice wins over auto-detect |
+| "material" / "Material 3" / "M3" / named Material component | `material-design.md` | Map Material roles to skill tokens; emit plain HTML + Tailwind (no `mdc-*` classes, no Material Web Components) |
+| "make it look less AI" / "designer review" / "anti-patterns" | `anti-patterns.md` | Refuse gradient text, glassmorphism on body, side-stripe borders, "boost your productivity" copy, three-card grids, marketing buzzwords |
+| "psychology" / "conversion" / "cognitive bias" / "flow not working" | `ux-psychology.md` | Pick ONE applicable principle per screen — Hick / Anchoring / Default Bias / Peak-End / Goal Gradient — and apply concretely |
 | "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Call `node scripts/alt-from-ollama.mjs <src>` (Ollama + `gemma4:e2b`, `-mlx` on MLX-capable hardware). `EMPTY` → `alt="" role="presentation" aria-hidden="true"`. Tag drafts with `data-alt-source="ai"`. |
 
 ## Stack basics
@@ -245,6 +248,9 @@ Load these only when needed.
 - `references/dashboard-ergonomics.md` — laying out a dashboard tile-by-tile.
 - `references/ergonomics-criteria.md` — eight ergonomic criteria for UX review.
 - `references/i18n.md` — multilingual frontend (URL strategy, `Intl.*`, plurals, RTL, persisted choice).
+- `references/anti-patterns.md` — visual and copy tells to refuse (gradients, glassmorphism, marketing buzzwords).
+- `references/ux-psychology.md` — applied cognitive principles for ergonomic review and conversion audits.
+- `references/material-design.md` — Material 3 distilled and mapped to the skill's tokens.
 - `references/alt-text-ai.md` — AI-drafted `alt` via local Ollama + Gemma vision (with `--lang` for multilingual output).
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.

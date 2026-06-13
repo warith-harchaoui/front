@@ -1,0 +1,9 @@
+# Runtime dependencies for the alt-text helper.
+#
+# Install:
+#   pip install -r front/scripts/requirements.txt
+#
+# Python 3.9 or newer.
+
+requests>=2.31.0
+Pillow>=10.0.0

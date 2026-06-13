@@ -127,4 +127,4 @@ Le skill puise également des connaissances dans les [Apple Human Interface Guid
 
 ## Licence
 
-UNLICENSED — tous droits réservés. Voir `LICENSE.md` à la racine. Montserrat reste sous SIL Open Font License (`front/assets/fonts/montserrat/OFL.txt`).
+**The Unlicense** — code publié dans le domaine public, sans copyright ni restrictions. Vous pouvez l'utiliser, le modifier, le redistribuer ou le vendre, sans permission, attribution ni redevance. Voir `LICENSE.md` pour le texte canonique. La police Montserrat reste sous SIL Open Font License (`front/assets/fonts/montserrat/OFL.txt`) — la dédicace au domaine public ne change pas ce point.
