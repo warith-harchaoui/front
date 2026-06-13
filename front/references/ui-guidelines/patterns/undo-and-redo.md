@@ -34,6 +34,6 @@
 ## Checklist
 
 - [ ] Toast offers undo instead of pre-confirming.
-- [ ] `⌘Z` / `Ctrl+Z` work.
+- [ ] `⌘Z` / `Ctrl+Z` work (whichever matches the host's primary modifier).
 - [ ] Stack scope makes sense.
 - [ ] Disabled state for Undo/Redo when empty.

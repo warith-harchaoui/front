@@ -1,6 +1,6 @@
-[🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
+# Front
 
-# front
+[🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
 A Claude **skill** that constrains Claude to a single frontend stack: vanilla JavaScript, Tailwind CSS, Montserrat. Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
@@ -24,32 +24,22 @@ The skill includes a workflow that takes an existing command-line tool and produ
 
 ## Install
 
-Clone the repo, then choose the runtime you use.
-
-```bash
-git clone https://github.com/<user>/front.git
-cd front
-```
-
-### Option A — Claude Code (CLI)
+### Claude Code
 
 ```bash
 mkdir -p ~/.claude/skills
 cp -r front ~/.claude/skills/front
-ls ~/.claude/skills/front/SKILL.md   # sanity check
+```
+
+Verify:
+
+```bash
+ls ~/.claude/skills/front/SKILL.md
 ```
 
 Claude Code reads the skill's frontmatter description and applies the skill when a user message matches its trigger phrases.
 
-### Option B — Claude.ai (web)
-
-1. Zip the skill folder:
-   ```bash
-   (cd front && zip -r ../front.zip .)
-   ```
-2. In Claude.ai → **Settings → Capabilities → Skills → Upload skill**, upload `front.zip`.
-
-### Option C — OpenCode
+### OpenCode
 
 ```bash
 mkdir -p ~/.opencode/skills
@@ -58,9 +48,9 @@ cp -r front ~/.opencode/skills/front
 
 Invoke with `/skill front <request>`.
 
-### Option D — LangChain / Anthropic SDK (Python)
+### LangChain / Anthropic SDK (Python)
 
-Load `front/SKILL.md` as a system-prompt fragment. Append referenced files on demand.
+Load `SKILL.md` as a system-prompt fragment. Append referenced files on demand.
 
 ```python
 # pip install anthropic
@@ -80,8 +70,6 @@ def maybe_load_reference(user_msg: str) -> str:
         refs.append((SKILL_DIR / "references/color-psychology.md").read_text())
     if "button" in m or "modal" in m or "form" in m:
         refs.append((SKILL_DIR / "references/ui-guidelines/INDEX.md").read_text())
-    if "chart" in m or "graph" in m:
-        refs.append((SKILL_DIR / "references/charts-vega.md").read_text())
     return "\n\n---\n\n".join(refs)
 
 def ask(user_msg: str) -> str:
@@ -98,21 +86,6 @@ print(ask("Generate a primary button labeled 'Get started'."))
 ```
 
 For LangChain proper, wrap the same logic in `ChatPromptTemplate` with a `SystemMessage(content=load_skill())` and use `langchain_anthropic.ChatAnthropic`.
-
-### Other runtimes
-
-The Anthropic Skill spec is loaded natively by **Claude Code**, **Claude.ai**, and **OpenCode**. Everywhere else, the skill still works — but as a **custom system prompt**, not a parsed skill. Paste `front/SKILL.md` into the host's system-prompt slot, and load reference files (`front/references/**`) yourself when the task calls for them. Shape verified with Cursor (`.cursor/rules`), Continue (`config.json` custom context), Cline, Aider (`.aider.conf.yml`), and direct Messages API calls.
-
-### Optional — local alt-text helper
-
-The skill can auto-draft `alt` for `<img>` tags via a local Ollama vision model (`gemma4:e2b`, `gemma4:e2b-mlx` on Apple Silicon). Local-only, no data leaves the machine.
-
-| Platform | One-shot install |
-|---|---|
-| macOS, Ubuntu / Linux | `bash front/scripts/install-alt-ai.sh` |
-| Windows | `powershell -ExecutionPolicy Bypass -File front\scripts\install-alt-ai.ps1` |
-
-Then: `node front/scripts/alt-from-ollama.mjs ./path/to/image.jpg`. Full guidance in `front/references/alt-text-ai.md`.
 
 ## Repository structure
 
