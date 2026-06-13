@@ -1,0 +1,54 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "House-style line + area chart — colors from harchaoui.org/warith/colors, rounded corners 10 px.",
+  "data": {
+    "values": [
+      {"week": "W1", "value": 1200},
+      {"week": "W2", "value": 1410},
+      {"week": "W3", "value": 1305},
+      {"week": "W4", "value": 1612},
+      {"week": "W5", "value": 1780},
+      {"week": "W6", "value": 1844},
+      {"week": "W7", "value": 1910}
+    ]
+  },
+  "layer": [
+    {
+      "mark": { "type": "area", "color": "#007AFF", "opacity": 0.18, "interpolate": "monotone" },
+      "encoding": { "x": { "field": "week", "type": "ordinal" }, "y": { "field": "value", "type": "quantitative" } }
+    },
+    {
+      "mark": { "type": "line", "color": "#007AFF", "strokeWidth": 2.5, "interpolate": "monotone" },
+      "encoding": { "x": { "field": "week", "type": "ordinal" }, "y": { "field": "value", "type": "quantitative" } }
+    },
+    {
+      "mark": { "type": "point", "color": "#007AFF", "filled": true, "size": 60 },
+      "encoding": {
+        "x": { "field": "week", "type": "ordinal", "axis": { "title": null } },
+        "y": { "field": "value", "type": "quantitative", "axis": { "title": null, "grid": false } },
+        "tooltip": [
+          { "field": "week",  "title": "Week" },
+          { "field": "value", "title": "Active users", "format": "," }
+        ]
+      }
+    }
+  ],
+  "width": "container",
+  "height": 220,
+  "padding": 8,
+  "config": {
+    "background": "transparent",
+    "view": { "stroke": "transparent" },
+    "axis": {
+      "labelFont": "Montserrat",
+      "titleFont": "Montserrat",
+      "labelColor": "#3C3C43",
+      "titleColor": "#000000",
+      "domain": true,
+      "domainColor": "rgba(60,60,67,0.36)",
+      "tickColor": "rgba(60,60,67,0.36)",
+      "labelFontSize": 12
+    },
+    "title":  { "font": "Montserrat", "fontWeight": 600, "color": "#000000" }
+  }
+}
