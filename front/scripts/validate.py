@@ -154,6 +154,10 @@ def _is_user_facing_doc(path: Path, line: str) -> bool:
     # install path, which legitimately names the hardware platform.
     if rel == "references/alt-text-ai.md":
         return False
+    # The captions reference documents whisper.cpp install per OS; same shape
+    # as alt-text-ai.md, exempt for the same reason.
+    if rel == "references/captions-ai.md":
+        return False
     # The Material Design reference compares tokens by name; the file's whole
     # purpose is to map third-party design-system vocabulary to the skill.
     if rel == "references/material-design.md":
