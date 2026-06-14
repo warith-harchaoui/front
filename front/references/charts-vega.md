@@ -32,6 +32,37 @@ For production, install via npm (`vega`, `vega-lite`, `vega-embed`) and bundle.
 8. **Tabular numerals** for value labels.
 9. **Dark-mode aware** — override `config` based on `data-color-scheme`.
 10. **Title above** in body weight; subtitle below in label-secondary.
+11. **State the polarity** of every measured axis — *higher is better*, *lower is better*, or *target = N*. See "Polarity — higher or lower is better" below.
+
+## Polarity — higher or lower is better
+
+Every quantitative axis encodes a value with a moral direction the reader needs to know in 3 seconds. Don't assume they share your domain instinct: latency-down is good, conversion-up is good, churn-up is bad, error-rate-down is good, satisfaction-up is good — but a brand-new viewer can't tell from a number alone. **Always state it.**
+
+Where to put it (pick the first that fits):
+
+1. **Axis title.** Append a short tag in parentheses: `"Response time (ms — lower is better)"`, `"Conversion rate (% — higher is better)"`, `"Defect rate per 1k units (target ≤ 2)"`.
+2. **Subtitle.** When the axis title is already long, hoist it: `subtitle: "Lower is better"` under the chart title.
+3. **Tile / figure caption** for dashboard tiles — see `dashboard-ergonomics.md`.
+4. **`aria-label`.** The accessible label must restate the polarity in words: `aria-label="Response time over the last 30 days, lower is better; current value 142 ms"`.
+
+Don't lean on color alone. Green = good / red = bad fails for the ~8 % of viewers with red-green CVD (see `cvd-simulation.md`). Pair color with a glyph or word: `↓ better`, `↑ better`, "(target ≤ 2)".
+
+For **neutral** axes (categories, time, geographic regions) skip the polarity tag — it has no direction. For **target-with-tolerance** metrics (SLA latency, temperature setpoint) state the target and the acceptable band: `"Oven temperature (°C — target 180 ± 5)"`. For **bidirectional** metrics (variance from forecast) center the axis on zero and label both ends: `"Forecast error — over ←  0  → under"`.
+
+Vega-Lite shorthand: put the polarity tag in `encoding.{x|y}.axis.title`, and the long-form rationale in the spec's `title.subtitle` and the wrapper's `aria-label`.
+
+```json
+{
+  "title": {
+    "text":     "p95 response time, last 30 days",
+    "subtitle": "Lower is better — SLA = 200 ms"
+  },
+  "encoding": {
+    "y": { "field": "ms", "type": "quantitative",
+           "axis": { "title": "Response time (ms — lower is better)" } }
+  }
+}
+```
 
 ## matplotlib → Vega-Lite axis cleanup translation
 
@@ -154,3 +185,5 @@ Use SVG renderer (sharper, smaller for typical chart sizes, themable via CSS).
 - [ ] Dark-mode override wired.
 - [ ] `role="img"` + `aria-label`.
 - [ ] SVG renderer.
+- [ ] Polarity stated for every quantitative axis: *higher is better*, *lower is better*, or *target = N* — in the axis title or subtitle, and restated in the `aria-label`. Neutral axes (time, category, region) skip this.
+- [ ] Polarity not carried by color alone — paired with a word or glyph (`↓ better`, `↑ better`, "target ≤ N").
