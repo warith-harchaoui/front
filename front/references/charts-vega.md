@@ -36,9 +36,31 @@ For production, install via npm (`vega`, `vega-lite`, `vega-embed`) and bundle.
 
 ## Polarity — higher or lower is better
 
-Every quantitative axis encodes a value with a moral direction the reader needs to know in 3 seconds. Don't assume they share your domain instinct: latency-down is good, conversion-up is good, churn-up is bad, error-rate-down is good, satisfaction-up is good — but a brand-new viewer can't tell from a number alone. **Always state it.**
+Every quantitative axis encodes a value the reader needs to read in 3 seconds, and "is this trend good or bad?" is the first question they ask. **Whenever the answer is well-defined for the chart's context, state it on the chart.** Don't assume the reader shares your domain instinct.
 
-Where to put it (pick the first that fits):
+### Polarity is contextual
+
+The same metric can flip direction across products, audiences, and time horizons. A few examples:
+
+| Metric | "Higher is better" when… | "Lower is better" when… |
+|---|---|---|
+| Time in app | Engagement product (social, learning, game) | Productivity tool, support flow, wellness app |
+| Bugs filed per week | QA process is being scaled up / coverage improves | Codebase is mature; goal is stability |
+| Server CPU usage | Capacity planning view — show utilization | Reliability view — show headroom for spikes |
+| Number of meetings | Sales pipeline (more contacts) | Engineering org (less interruption) |
+| Cart size | Retail conversion view | Returns-cost / fraud-risk view |
+
+If the polarity isn't obvious from the metric name alone, decide it for **this chart, this audience, this question** — and state the *reason* in the label, not just the direction.
+
+### When to state polarity
+
+- **State it** for any quantitative axis whose "good direction" is well-defined for the chart's context.
+- **Skip it** for neutral axes — time, category, geography — they have no direction.
+- **Skip it or use a target band** when the polarity is genuinely ambiguous or non-monotonic (e.g. employee headcount, inventory level, blood-glucose target). Prefer `target = N ± k` framing over a forced up/down arrow.
+
+### Where to put it
+
+Pick the first that fits:
 
 1. **Axis title.** Append a short tag in parentheses: `"Response time (ms — lower is better)"`, `"Conversion rate (% — higher is better)"`, `"Defect rate per 1k units (target ≤ 2)"`.
 2. **Subtitle.** When the axis title is already long, hoist it: `subtitle: "Lower is better"` under the chart title.
@@ -47,7 +69,7 @@ Where to put it (pick the first that fits):
 
 Don't lean on color alone. Green = good / red = bad fails for the ~8 % of viewers with red-green CVD (see `cvd-simulation.md`). Pair color with a glyph or word: `↓ better`, `↑ better`, "(target ≤ 2)".
 
-For **neutral** axes (categories, time, geographic regions) skip the polarity tag — it has no direction. For **target-with-tolerance** metrics (SLA latency, temperature setpoint) state the target and the acceptable band: `"Oven temperature (°C — target 180 ± 5)"`. For **bidirectional** metrics (variance from forecast) center the axis on zero and label both ends: `"Forecast error — over ←  0  → under"`.
+For **target-with-tolerance** metrics (SLA latency, temperature setpoint, blood pressure) state the target and the acceptable band: `"Oven temperature (°C — target 180 ± 5)"`. For **bidirectional** metrics (variance from forecast) center the axis on zero and label both ends: `"Forecast error — over ←  0  → under"`.
 
 Vega-Lite shorthand: put the polarity tag in `encoding.{x|y}.axis.title`, and the long-form rationale in the spec's `title.subtitle` and the wrapper's `aria-label`.
 
@@ -185,5 +207,5 @@ Use SVG renderer (sharper, smaller for typical chart sizes, themable via CSS).
 - [ ] Dark-mode override wired.
 - [ ] `role="img"` + `aria-label`.
 - [ ] SVG renderer.
-- [ ] Polarity stated for every quantitative axis: *higher is better*, *lower is better*, or *target = N* — in the axis title or subtitle, and restated in the `aria-label`. Neutral axes (time, category, region) skip this.
+- [ ] Polarity decided for the chart's context — same metric can flip across products. Whenever well-defined, stated on the axis title or subtitle and restated in the `aria-label` (*higher is better*, *lower is better*, or *target = N ± k*). Neutral axes (time, category, region) and genuinely ambiguous metrics skip this.
 - [ ] Polarity not carried by color alone — paired with a word or glyph (`↓ better`, `↑ better`, "target ≤ N").
