@@ -36,7 +36,7 @@ Body text is reliably readable.
 
 - Body ≥ 16 px; line height 1.5–1.6; line length 45–75 characters.
 - Contrast ≥ 4.5:1 for text, ≥ 3:1 for UI.
-- Single typeface (Montserrat in this skill); no more than ~6 sizes per page.
+- Single typeface (Montserrat); no more than ~6 sizes per page.
 - Avoid all-caps for body; reserve for short labels with letter-spacing.
 
 ## 2. Workload

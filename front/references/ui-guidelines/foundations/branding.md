@@ -19,7 +19,7 @@
 1. **Logo placement**: top-left on desktop, top-center or top-left on mobile. Never in the content body.
 2. **Logo size**: 24–40 px tall in the chrome. Larger only on the marketing landing surface.
 3. **Wordmark vs. logomark**: use the wordmark in the chrome (more legible), keep the standalone mark for favicons / very tight spots.
-4. **Brand tint**: one accent color (`bg-brand-blue` in this skill) applied to primary CTAs, links, focus rings. Secondary colors stay reserved for semantics.
+4. **Brand tint**: one accent color (`bg-brand-blue`) applied to primary CTAs, links, focus rings. Secondary colors stay reserved for semantics.
 5. **Brand voice**: see `foundations/writing.md`. Voice is brand.
 
 ## Pattern

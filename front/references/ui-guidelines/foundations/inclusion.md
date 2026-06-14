@@ -15,7 +15,7 @@
 - **Show diverse, authentic representation** in imagery and example content — not stock tokens.
 - **Don't ask for what you don't need.** Every data field is a potential exclusion vector.
 - **Localize beyond translation.** Dates, numbers, names, address formats, currency, RTL — all change per locale.
-- **Plain language wins.** Aim for ~grade-8 reading level. Avoid jargon, acronyms, idioms.
+- **Prefer plain language.** Aim for ~grade-8 reading level. Avoid jargon, acronyms, idioms.
 
 ## Concrete rules — web
 

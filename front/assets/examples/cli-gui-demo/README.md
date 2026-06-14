@@ -4,7 +4,7 @@ Worked example of the **front** skill's flagship CLI → GUI workflow. A mock CL
 
 ## What it shows
 
-The CLI is intentionally small but exercises every flag-to-control mapping in the skill's CLI → GUI recipe:
+The CLI is small but exercises every flag-to-control mapping in the skill's CLI → GUI recipe:
 
 | CLI flag shape | GUI control |
 |---|---|
@@ -57,7 +57,7 @@ cli-gui-demo/
 
 Total emitted lines (excluding fonts): ~700.
 
-## What's deliberately NOT here
+## What's not here
 
 - **Real image conversion** — the CLI writes a stub file. Adding Pillow would distract from the GUI-mapping demo.
 - **Authentication, persistence, multi-step wizards** — not relevant to this demo.

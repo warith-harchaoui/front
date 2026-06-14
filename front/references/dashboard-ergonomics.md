@@ -38,7 +38,7 @@ Goal: see how sales split by product category.
 
 ## Ergonomic essentials for any tile
 
-Each one is a lever; pick deliberately, don't drift.
+Each one is a lever; choose with intent.
 
 | Element | Question to ask |
 |---|---|

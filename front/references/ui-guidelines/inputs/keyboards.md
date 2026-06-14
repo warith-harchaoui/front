@@ -18,7 +18,7 @@
 
 1. Set `inputmode` correctly so mobile keyboards specialize (see `components/text-fields.md`).
 2. Use `accesskey` sparingly; conflicts with screen-reader hotkeys.
-3. **Don't trap focus** anywhere except inside intentionally modal contexts.
+3. **Don't trap focus** anywhere except inside modal contexts.
 4. Detect the host's primary modifier — feature-test via `navigator.userAgentData?.platform` (modern) or fall back to inspecting `navigator.platform` — and render the matching glyph (`⌘K` vs. `Ctrl+K`).
 
 ## Common shortcuts (web)

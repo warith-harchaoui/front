@@ -40,7 +40,7 @@ src/
 
 ## Custom elements (use sparingly)
 
-Only define a custom element when the widget is **truly reusable** (used in 3+ places) and has internal state worth encapsulating. Otherwise, a plain function + template wins.
+Only define a custom element when the widget is **truly reusable** (used in 3+ places) and has internal state worth encapsulating. Otherwise, a plain function + template is enough.
 
 ```js
 class CopyButton extends HTMLElement {
@@ -120,7 +120,7 @@ For larger apps, consider a tiny library (Zustand-vanilla, nanostores). Avoid Re
 ```js
 export function mountDialog(dlg) {
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close('cancel'); });
-  // Escape closes for free.
+  // Escape closes natively.
 }
 ```
 

@@ -53,7 +53,7 @@ Three escape valves:
 
 1. **`--ignore rule-id[,rule-id…]`** for a single run.
 2. **Fix the markup.** Most findings have a one-line fix (add `alt=""`, wrap in `<label>`, add `motion-reduce:transition-none`).
-3. **File-level suppression** is intentionally NOT supported — adding it would invite the linter to be silenced for a whole page. Per-element exemption belongs in the markup itself (the `role="button"` + `tabindex` escape for `div-onclick`, for example).
+3. **File-level suppression** is not supported. It would invite the linter to be silenced for a whole page. Per-element exemption belongs in the markup itself (the `role="button"` + `tabindex` escape for `div-onclick`, for example).
 
 ## CI integration
 
