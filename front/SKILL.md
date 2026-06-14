@@ -338,7 +338,19 @@ Copy / adapt from `assets/`:
 
 ## Scripts
 
-All scripts are Python 3.9+, cross-platform. Install deps once: `pip install -r scripts/requirements.txt`.
+All scripts are Python 3.9+, cross-platform. Dependencies are split by feature so users only install what they need:
+
+| Install command | Enables |
+|---|---|
+| *nothing* (stdlib only) | `validate.py`, `lint_a11y.py`, `audit_contrast.py`, `site_indexes.py` |
+| `pip install -r scripts/requirements-favicons.txt` | `favicons.py` |
+| `pip install -r scripts/requirements-cvd.txt` | `simulate_cvd.py` |
+| `pip install -r scripts/requirements-alt-text.txt` | `alt_from_ollama.py` |
+| `pip install -r scripts/requirements-meta-tags.txt` | `meta_from_ollama.py` |
+| `pip install -r scripts/requirements-plain-language.txt` | `plain_language.py` |
+| `pip install -r scripts/requirements-captions.txt` | `install_captions.py` + `captions_from_whisper.py` |
+
+Compose with multiple `-r` flags. The `requirements.txt` at the scripts root documents the directory of feature files and has no dependencies of its own.
 
 - `scripts/validate.py` — pre-ship quality gate. Resolves the skill root from its own location, exits non-zero on any failure. Checks: frontmatter shape, description length, forbidden framework imports, trademarked UI-platform terms in user-facing docs, LLM-marketing phrases, absence of `README.md` inside the skill folder, and that every reference path declared by `references/ui-guidelines/INDEX.md` resolves.
 - `scripts/install_alt_ai.py` — installs Ollama if missing (Homebrew / official installer / `winget`), starts the daemon, pulls the vision model (`gemma4:e2b`; `-mlx` variant on MLX-capable hardware).

@@ -64,7 +64,7 @@ When the author has not supplied `alt`, the skill drafts it with a **local visio
 Install once (cross-platform):
 
 ```bash
-pip install -r front/scripts/requirements.txt
+pip install -r front/scripts/requirements-alt-text.txt
 python front/scripts/install_alt_ai.py
 ```
 

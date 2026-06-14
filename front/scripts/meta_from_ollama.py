@@ -391,7 +391,14 @@ def main() -> int:
                 Path(args.source).read_text(encoding="utf-8", errors="ignore")
             )
 
-    lang: str = (args.lang or detect_lang()).lower()[:2]
+    # Language: explicit --lang wins. Otherwise prefer langdetect against
+    # the extracted page text, falling back to env-derived locale.
+    if args.lang:
+        lang: str = args.lang.lower()[:2]
+    elif page_text:
+        lang = detect_text_language(page_text, fallback=detect_lang())
+    else:
+        lang = detect_lang()
     model: str = args.model or pick_default_model()
 
     # Cache check — fast path returns immediately when the inputs match a

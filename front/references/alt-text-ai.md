@@ -28,7 +28,7 @@ Every image has a *purpose* in the page. Match the purpose to the right alt stra
 One command on every platform — the installer is in Python:
 
 ```bash
-pip install -r front/scripts/requirements.txt
+pip install -r front/scripts/requirements-alt-text.txt
 python front/scripts/install_alt_ai.py
 ```
 

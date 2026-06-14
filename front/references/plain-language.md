@@ -16,7 +16,7 @@ Users who benefit beyond cognitive disabilities: second-language readers, anyone
 If you've already run `python front/scripts/install_alt_ai.py` for alt text, you're done — the same Ollama daemon and model serve the rewriter. If not:
 
 ```bash
-pip install -r front/scripts/requirements.txt
+pip install -r front/scripts/requirements-plain-language.txt
 python front/scripts/install_alt_ai.py
 ```
 

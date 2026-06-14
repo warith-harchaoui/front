@@ -11,7 +11,7 @@ The simulation is qualitative: a real viewer's experience varies with severity a
 ## Install
 
 ```bash
-pip install -r front/scripts/requirements.txt
+pip install -r front/scripts/requirements-cvd.txt
 ```
 
 Pillow is the only dependency.

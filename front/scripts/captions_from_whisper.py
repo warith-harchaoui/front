@@ -62,9 +62,10 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
-# Vocabulary helpers — shared with alt_from_ollama via the _vocab module.
+# Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))
-from _vocab import resolve_vocab_terms  # noqa: E402
+from _vocab import resolve_vocab_terms, surrounding_text  # noqa: E402
+from _lang import detect_text_language  # noqa: E402
 
 
 # ── Module-level configuration ────────────────────────────────────────────────
@@ -615,13 +616,27 @@ def main() -> int:
         sys.stderr.write(f"No such file: {args.source}\n")
         return 1
 
+    # Language for the opener: explicit --lang wins. Otherwise sniff the
+    # vocabulary sources for a language signal before falling back to "en".
+    vocab_lang: str = args.lang
+    if not vocab_lang:
+        sniff: str = ""
+        if args.vocab_from is not None and args.vocab_from.is_file():
+            sniff = args.vocab_from.read_text(encoding="utf-8", errors="ignore")[:4000]
+        elif args.vocab is not None and args.vocab.is_file():
+            sniff = args.vocab.read_text(encoding="utf-8", errors="ignore")[:4000]
+        if sniff:
+            vocab_lang = detect_text_language(sniff, fallback="en")
+        else:
+            vocab_lang = "en"
+
     initial_prompt: str = resolve_vocab(
         args.source,
         prompt=args.prompt,
         vocab_file=args.vocab,
         vocab_from=args.vocab_from,
         auto_project=args.auto_project,
-        lang=(args.lang or "en"),
+        lang=vocab_lang,
     )
 
     text = transcribe(

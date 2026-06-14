@@ -28,7 +28,7 @@
 The skill ships a Pillow-based generator. From a single logo PNG (or SVG + `--raster` fallback):
 
 ```bash
-pip install -r front/scripts/requirements.txt
+pip install -r front/scripts/requirements-favicons.txt
 python front/scripts/favicons.py path/to/logo.png \
        --out public \
        --name "Site name" --short-name "Site" \
