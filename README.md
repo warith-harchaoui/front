@@ -2,9 +2,13 @@
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
+![front logo](assets/logo.png)
+
 ## What this is
 
 `front` is a Claude skill that constrains Claude to a single, consistent frontend stack — vanilla JavaScript, Tailwind CSS, and Montserrat as the only typeface — and gives it a curated design system to draw from. Asking Claude to "build a UI", "create a component", "design a dashboard", or "wrap this CLI in a GUI" produces output in this exact stack with a repeatable point of view: semantic HTML, dark-mode peers on every styled element, focus rings, reduced-motion guards, color choices traceable to a documented psychology, charts via Vega-Lite, alt text drafted to W3C / WAI guidance.
+
+
 
 ## What it's for
 
