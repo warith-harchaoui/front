@@ -90,6 +90,7 @@ from alt_from_ollama import (  # noqa: E402 — runtime import after sys.path tw
     detect_lang,
     pick_default_model,
 )
+from _lang import detect_text_language  # noqa: E402
 
 
 # ── Module-level configuration ────────────────────────────────────────────────
