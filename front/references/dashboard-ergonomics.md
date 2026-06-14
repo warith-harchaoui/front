@@ -47,6 +47,7 @@ Each one is a lever; choose with intent.
 | Size | Is the most important tile the largest? |
 | Tooltip | Does hovering reveal the exact value and the dimension? |
 | Title | Does the title state the question the tile answers? |
+| Polarity | If the metric has a well-defined "good direction" *in this dashboard's context*, is it stated on the tile? (*Higher / lower is better*, or `target = N ± k`.) Skip for neutral axes and genuinely ambiguous metrics. |
 | Shape | Is the chart shape the right one for the data shape? |
 | Surface | Does it work on mobile, tablet, and desktop without rearranging meaning? |
 
@@ -77,16 +78,17 @@ When the skill emits a dashboard, apply these defaults — they sit on top of `c
 
 1. **One question per tile.** A tile that tries to answer two questions answers neither well.
 2. **Title as a question or assertion**, not a label. "Where do sales come from?" beats "Sales".
-3. **Reading order top-to-bottom, left-to-right** matches the story: overview tile at top-left, drill-downs flowing toward the bottom-right. Reverse for RTL layouts.
-4. **Same metric, same color across tiles.** If "active users" is `brand-blue` in tile 1, it's `brand-blue` in tile 4.
-5. **No more than two color hues per tile**, plus neutrals. Color carries a dimension; if there's no dimension to carry, drop the color.
-6. **Tabular numerals** on every numeric label (`tabular-nums`).
-7. **Skeleton tiles while loading.** No spinners for ≥ 300 ms waits — see `ui-guidelines/patterns/loading.md`.
-8. **Filters at the top**, applied to every tile in scope. Filter chips show what's active; one-tap clears.
-9. **Per-tile timeframe selector** if tiles cover different windows.
-10. **Empty state per tile.** Tell the user what to do next, not just "no data".
-11. **Sticky header** (`ui-guidelines/components/navigation-bars.md`) with the dashboard name, the global filter state, and a "Reset" affordance.
-12. **Print-aware**: a print stylesheet that drops translucent materials and forces solid surfaces.
+3. **Polarity stated on every measurable tile — when it's well-defined for *this* dashboard.** The same metric can be "higher is better" in one product and "lower is better" in another (time-in-app on a social app vs. a productivity tool; bug count on a young vs. mature codebase). Decide the polarity for the audience of this dashboard, then surface it as a tag — *↑ higher is better*, *↓ lower is better*, or *target = N ± k* — in the tile subtitle or chip next to the value. Skip the tag for neutral axes and ambiguous metrics. Never carry polarity by color alone; pair color with a word or glyph. Detail in `charts-vega.md` → "Polarity — higher or lower is better".
+4. **Reading order top-to-bottom, left-to-right** matches the story: overview tile at top-left, drill-downs flowing toward the bottom-right. Reverse for RTL layouts.
+5. **Same metric, same color across tiles.** If "active users" is `brand-blue` in tile 1, it's `brand-blue` in tile 4.
+6. **No more than two color hues per tile**, plus neutrals. Color carries a dimension; if there's no dimension to carry, drop the color.
+7. **Tabular numerals** on every numeric label (`tabular-nums`).
+8. **Skeleton tiles while loading.** No spinners for ≥ 300 ms waits — see `ui-guidelines/patterns/loading.md`.
+9. **Filters at the top**, applied to every tile in scope. Filter chips show what's active; one-tap clears.
+10. **Per-tile timeframe selector** if tiles cover different windows.
+11. **Empty state per tile.** Tell the user what to do next, not just "no data".
+12. **Sticky header** (`ui-guidelines/components/navigation-bars.md`) with the dashboard name, the global filter state, and a "Reset" affordance.
+13. **Print-aware**: a print stylesheet that drops translucent materials and forces solid surfaces.
 
 ## Layout patterns
 
@@ -110,7 +112,9 @@ Hero tile spans both columns; supporting tiles pair up below.
   </section>
   <aside class="col-span-12 lg:col-span-4 space-y-4">
     <article class="rounded-[10px] bg-surface-secondary p-4 dark:bg-surface-secondary-dark">
-      <p class="text-[13px] uppercase tracking-wider text-label-tertiary">Revenue</p>
+      <p class="text-[13px] uppercase tracking-wider text-label-tertiary">
+        Revenue <span class="ml-1 normal-case tracking-normal text-label-tertiary">· ↑ higher is better</span>
+      </p>
       <p class="mt-1 text-4xl font-bold tabular-nums">€1.84M</p>
       <p class="mt-1 text-[13px] text-brand-green">+8.4 % WoW</p>
     </article>
@@ -128,6 +132,7 @@ Hero tile spans both columns; supporting tiles pair up below.
 
 - [ ] Every tile answers one specific question.
 - [ ] Titles read as questions or assertions, not labels.
+- [ ] Polarity decided for the dashboard's context and stated on each tile whose "good direction" is well-defined (*↑ higher is better*, *↓ lower is better*, or *target = N ± k*), not carried by color alone.
 - [ ] Same metric uses the same color across tiles.
 - [ ] No tile uses more than two hues plus neutrals.
 - [ ] Tabular numerals on numeric labels.

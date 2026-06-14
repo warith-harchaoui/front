@@ -79,3 +79,11 @@ Run this before returning any non-trivial UI code. Each item is a hard gate — 
 - [ ] `<html lang="…">` set correctly.
 - [ ] If the repo ships bilingual: `README.md` + `LISEZMOI.md` with switcher line at the top.
 - [ ] Runtime copy keyed by `lang`; default fallback to English.
+
+## Charts & dashboards
+
+- [ ] Vega-Lite spec (not hand-written SVG), house `config` from `charts-vega.md`.
+- [ ] Title states the conclusion or the question, not the dimensions.
+- [ ] **Polarity decided for the chart's context and stated** on every quantitative axis / KPI whose "good direction" is well-defined for this audience — *↑ higher is better*, *↓ lower is better*, or *target = N ± k* — in the axis title, subtitle, or tile chip. Skipped for neutral axes (time, category, region) and ambiguous metrics. Never carried by color alone.
+- [ ] `role="img"` + `aria-label` restates the polarity in words for screen readers.
+- [ ] Bars start at zero; pies have ≤ 4 slices; no 3D.

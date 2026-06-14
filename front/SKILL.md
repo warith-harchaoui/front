@@ -145,8 +145,8 @@ The output is a static site that drops into any host (GitHub Pages, Netlify, S3,
 | "search" | `patterns/searching.md` | `<input type="search">` with debounced JS, results live region |
 | "onboarding" | `patterns/onboarding.md` | One idea per screen, ≤ 8-word headline, skippable |
 | "theme switch" | `foundations/dark-mode.md` | `data-color-scheme` attribute + persisted choice |
-| "chart" / "graph" / "dashboard tile" | `charts-vega.md` + `dataviz-chart-selection.md` + `dataviz-color-palettes.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks |
-| "dashboard" / "BI" / "KPI summary" | `dashboard-ergonomics.md` (+ chart references above) | One question per tile, title as a question, sticky filters, grid layout (12 cols), skeleton tiles while loading |
+| "chart" / "graph" / "dashboard tile" | `charts-vega.md` + `dataviz-chart-selection.md` + `dataviz-color-palettes.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines, no tick marks. State polarity when well-defined (*↑ higher is better* / *↓ lower is better* / *target = N ± k*) — it's a contextual choice, not an intrinsic property. |
+| "dashboard" / "BI" / "KPI summary" | `dashboard-ergonomics.md` (+ chart references above) | One question per tile, title as a question, polarity tag on every measurable tile, sticky filters, grid layout (12 cols), skeleton tiles while loading. |
 | "map" / "choropleth" / "cartography" | `dataviz-maps.md` | Title states the message, ≤ 7 classes, locator inset for unfamiliar audiences, accessible text alternative below the map |
 | "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria: guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility |
 | "a11y lint" / "check this HTML for accessibility" / "WCAG check" | `lint-a11y.md` | Run `python scripts/lint_a11y.py <file-or-dir>`; 14 rules cover the bulk of WCAG / WAI-ARIA failures decidable from source. Exit 1 on any finding. |
