@@ -75,9 +75,10 @@ from typing import Optional
 # requirement in ``front/scripts/requirements.txt``.
 import requests
 
-# Vocabulary helpers — shared with captions_from_whisper via the _vocab module.
+# Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))
 from _vocab import resolve_vocab_terms, surrounding_text  # noqa: E402
+from _lang import detect_text_language  # noqa: E402
 
 # Pillow is *optional*. If available it is used to downscale the image before
 # sending to the model (faster inference, smaller HTTP payload). The script
@@ -880,10 +881,21 @@ def main(argv: Optional[list[str]] = None) -> int:
         if ctx_from_doc:
             context = (context + "\n" + ctx_from_doc).strip() if context else ctx_from_doc
 
+    # Language: explicit --lang wins. Otherwise detect from any available
+    # text (surrounding doc, context hint, vocabulary join) via langdetect,
+    # falling back to the env-derived locale.
+    lang: Optional[str] = args.lang
+    if lang is None:
+        detection_text: str = " ".join(
+            [context] + (vocabulary or [])
+        ).strip()
+        if detection_text:
+            lang = detect_text_language(detection_text, fallback=detect_lang())
+
     text = describe(
         args.src,
         kind=args.kind,
-        lang=args.lang,
+        lang=lang,
         context=context,
         resize=args.resize,
         model=args.model,

@@ -1,0 +1,12 @@
+# Requirements for meta_from_ollama.py
+#
+# Install:
+#   pip install -r front/scripts/requirements-meta-tags.txt
+#
+# Used for:
+#   - requests   : Ollama HTTP API (POST /api/generate).
+#   - langdetect : detect language from extracted page text so the
+#                  generated <meta> tags match the page language.
+
+requests>=2.31.0
+langdetect>=1.0.9

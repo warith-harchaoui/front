@@ -1,0 +1,12 @@
+# Requirements for plain_language.py
+#
+# Install:
+#   pip install -r front/scripts/requirements-plain-language.txt
+#
+# Used for:
+#   - requests   : Ollama HTTP API (POST /api/generate).
+#   - langdetect : detect language from the input text so the rewrite
+#                  stays in the same language without --lang.
+
+requests>=2.31.0
+langdetect>=1.0.9
