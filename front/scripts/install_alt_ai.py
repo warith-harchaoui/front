@@ -53,6 +53,10 @@ Notes
 * On Linux the official installer is downloaded and piped to ``sh`` via
   an intermediate string, which avoids the standard ``curl | sh`` security
   caveat while still being one command.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

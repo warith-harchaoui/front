@@ -48,6 +48,10 @@ Notes
 * Matrices: Machado, Oliveira, Fernandes (2009),
   "A Physiologically-based Model for Simulation of Color Vision Deficiency",
   IEEE Transactions on Visualization and Computer Graphics.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

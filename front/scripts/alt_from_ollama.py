@@ -49,6 +49,10 @@ Notes
 * On-disk cache lives under ``~/.cache/front-skill/alt/`` by default. Override
   with ``FRONT_CACHE_DIR``; disable globally with ``FRONT_NO_CACHE=1`` or for
   a single run with ``--no-cache``.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

@@ -36,6 +36,10 @@ Notes
 * The downloaded model is referenced by every invocation of the generator;
   removing the file (or pointing ``FRONT_WHISPER_MODEL=<path>``) forces a
   re-download or a different binary.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

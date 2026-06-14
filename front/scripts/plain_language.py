@@ -49,6 +49,10 @@ Notes
   disable with ``FRONT_NO_CACHE=1`` or ``--no-cache``.
 * The rewriter refuses to invent facts. If the input is already plain
   language, the model returns it unchanged.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

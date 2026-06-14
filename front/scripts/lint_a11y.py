@@ -69,6 +69,10 @@ Notes
   tags, missing closures, and inline scripts without raising.
 * This linter is a *first pass*, not a replacement for ``axe-core`` or
   manual screen-reader testing. It catches the violations easiest to fix.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

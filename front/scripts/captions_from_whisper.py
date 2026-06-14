@@ -47,6 +47,10 @@ Notes
 
 .. _audio-helper: https://github.com/warith-harchaoui/audio-helper
 .. _video-helper: https://github.com/warith-harchaoui/video-helper
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

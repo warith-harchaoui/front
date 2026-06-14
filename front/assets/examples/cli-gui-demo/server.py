@@ -28,6 +28,10 @@ Notes
 * Python 3.9+, stdlib only.
 * The server uses a thread per request so the SSE stream and any
   concurrent static-asset fetches do not block each other.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

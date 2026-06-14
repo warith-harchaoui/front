@@ -40,6 +40,10 @@ Notes
 * Python 3.9+, stdlib only.
 * The "fix" search walks the OKLCH L axis at 0.01 resolution; in practice
   the search converges in tens of microseconds per pair.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

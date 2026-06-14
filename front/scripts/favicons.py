@@ -56,6 +56,10 @@ Notes
   * Maskable icons reserve the central 80 % (40 % radius from center).
   * ``<meta name="theme-color">`` matches the favicon's background for
     both color schemes.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

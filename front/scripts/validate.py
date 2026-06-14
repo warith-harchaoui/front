@@ -41,6 +41,10 @@ Notes
 * Python 3.9+, stdlib only.
 * The script intentionally avoids importing anything from the skill so it
   can run in a minimal CI container.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations

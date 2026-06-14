@@ -28,6 +28,10 @@ Usage
 Notes
 -----
 * Python 3.9+, stdlib only (``argparse``, ``sys``, ``time``, ``pathlib``).
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from __future__ import annotations
