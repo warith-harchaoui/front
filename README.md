@@ -20,6 +20,29 @@ Most LLM-generated frontends share a generic look — purple gradients, glassmor
 
 The flagship use case is **CLI → GUI**: point Claude at an existing command-line tool's `--help`, and the skill produces the matching vanilla-JS + Tailwind GUI in one session. Other use cases: new components, full pages, ergonomic audits, dashboards and dataviz, migrations away from a framework toward vanilla JS, and accessibility tooling (W3C-grade alt text, meta tags, favicon set, validator).
 
+## Inputs → outputs
+
+What you give Claude, and what comes back. Each row is a self-contained flow — pick one, ignore the rest. Every output respects the stack rules in *What the skill enforces*.
+
+| What you provide (input) | How you phrase it | What Claude returns (output) | Tools touched |
+|---|---|---|---|
+| A working CLI (`tool --help`, source with `argparse` / `clap` / `commander` / `cobra`) | "Wrap this CLI in a GUI" + the project path | One-page `index.html` + `app.js` + Tailwind CSS, sub-commands mapped to forms / streams / tables, wired to your host (Tauri / Electron / FastAPI / Express / browser stub). Montserrat self-hosted. | `front/SKILL.md` → CLI → GUI workflow; `assets/examples/cli-gui-demo/` |
+| A folder of Markdown files (README, `docs/**`, blog posts) | "Turn these markdown files into a website" | Static site: one HTML page per `.md`, sticky top bar, sidebar TOC for `docs/`, dark-mode peer, favicons, `<meta>` tags, `robots.txt` + `sitemap.xml` + `llms.txt` + Atom feed. Drops into GitHub Pages / Netlify / S3 / Nginx. | `references/meta-tags.md`, `scripts/favicons.py`, `scripts/meta_from_ollama.py`, `scripts/site_indexes.py` |
+| A free-form ask ("primary button", "confirm dialog", "settings page", "bottom sheet") | "Build a `<component>`" | Semantic HTML + Tailwind classes + minimal vanilla JS, focus ring, `dark:` peer, 44×44 hit area, `Escape` close on dialogs, reduced-motion guard. | `references/ui-guidelines/components/*.md`, `assets/components/*.html` |
+| A data shape (CSV, JSON, a few rows pasted into chat) | "Chart this" / "Dashboard for X" | Vega-Lite v5 JSON spec + a `<figure>` wrapper. House style (Montserrat, 10 px corners, no top/right spines, palette from `color-psychology.md`), axis labelled with polarity (*↑ higher is better* / *↓ lower is better* / *target = N ± k*), `role="img"` + `aria-label`. | `references/charts-vega.md`, `references/dataviz-chart-selection.md`, `references/dashboard-ergonomics.md`, `assets/components/chart-*.json` |
+| An existing HTML page or screenshot | "Audit this" / "Make it look less AI" / "Ergonomic review" / "WCAG check" | Findings against the 8 ergonomic criteria + the anti-patterns catalogue; concrete diffs to fix; pre-ship checklist run. | `references/ergonomics-criteria.md`, `references/anti-patterns.md`, `references/ux-psychology.md`, `references/checklist.md`, `scripts/lint_a11y.py`, `scripts/audit_contrast.py`, `scripts/simulate_cvd.py` |
+| An image file (`*.png`, `*.jpg`, …) | "Alt text for this image" (optionally with the host doc) | W3C-compliant alt text for the right purpose category (informative / decorative / functional / text / complex / group), drafted in the page's language, tagged `data-alt-source="ai"`. | `references/alt-text-ai.md`, `scripts/alt_from_ollama.py`, `scripts/install_alt_ai.py` |
+| An audio or video file (`.mp4`, `.wav`, `.mp3`, …) | "Captions / transcript" / "Add captions" | WebVTT / SRT / plain-text captions from local Whisper, with project-vocab biasing. `<video>` + `<track kind="captions">` snippet for the page. | `references/captions-ai.md`, `scripts/install_captions.py`, `scripts/captions_from_whisper.py` |
+| A logo (`logo.png` / `.svg`) | "Favicon set" / "App icons" / "PWA icons" | `favicon.svg` + `.ico` + PNG set + `apple-touch-icon.png` + maskable PWA icon + `site.webmanifest` + a `head.html` snippet to paste into every page. | `references/ui-guidelines/foundations/app-icons.md`, `references/meta-tags.md`, `scripts/favicons.py` |
+| A goal description ("page about X") or an HTML page | "Meta tags" / "SEO" / "OG card" | Title + description + Open Graph + Twitter Card + Schema.org JSON-LD, per `meta-tags.md`. JSON on stdout. | `references/meta-tags.md`, `scripts/meta_from_ollama.py` |
+| Draft UI copy | "Plain language" / "Rewrite at grade 8" | Same meaning, marketing voice stripped, output length ≤ 1.1× original. | `references/plain-language.md`, `scripts/plain_language.py` |
+| A palette JSON (or none) | "Contrast audit" / "Is my palette accessible?" | Every `(label, surface)` pair walked, failures listed with the nearest OKLCH-neighbour fix. Exit 1 on any failure. | `references/contrast-audit.md`, `scripts/audit_contrast.py` |
+| A finished page / screenshot | "Pre-ship check" | The `checklist.md` gate executed: stack purity, semantics, contrast both modes, dark-mode peers, motion, copy, performance, bilingual. | `references/checklist.md`, `scripts/validate.py`, `scripts/lint_a11y.py` |
+
+> Not sure which row you're on? Describe the input in plain English. The skill's `SKILL.md` decision tree maps phrasing → workflow.
+
+For alternatives in every category — and how to decide whether `front` is the right tool — see [LANDSCAPE.md](LANDSCAPE.md).
+
 ## Contents
 
 - `front/SKILL.md` — entry point with YAML frontmatter and instructions.
@@ -31,6 +54,7 @@ The flagship use case is **CLI → GUI**: point Claude at an existing command-li
   - **A11y & accessibility tooling** — `alt_from_ollama.py`, `install_alt_ai.py`, `simulate_cvd.py`, `plain_language.py`.
   - **Captions / transcripts** — `install_captions.py`, `captions_from_whisper.py`.
 - `llms.txt` — index of the project per <https://llmstxt.org/> for LLM consumers.
+- `LANDSCAPE.md` — comparison matrices of alternatives in every category the skill touches (frameworks, CSS, components, dataviz, CLI → GUI hosts, MD → site generators, a11y / alt-text / captions tooling, …) so you can decide whether `front` is the right pick.
 - `assets/logo.png` — project logo (used at the top of this README).
 
 ## What the skill enforces
@@ -80,6 +104,7 @@ OpenCode discovers the skill from the same `SKILL.md` frontmatter description an
 ```
 front/                              ← repo root
 ├── README.md / LISEZMOI.md         ← EN / FR
+├── LANDSCAPE.md                    ← comparison matrices vs alternatives
 ├── LICENSE.md                      ← The Unlicense (OFL carve-out for Montserrat)
 ├── llms.txt                        ← https://llmstxt.org/ index for LLM consumers
 ├── assets/logo.png                 ← project logo (used in this README)

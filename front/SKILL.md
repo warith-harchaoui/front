@@ -43,6 +43,8 @@ The skill is modular, not a mono-block. Workflows are independent — picking on
 
 Reference files in `references/**` are independently consumable too — load only the ones the current task touches.
 
+For a per-category comparison of `front` against the alternatives (frameworks, CSS approaches, component libraries, dataviz libs, CLI → GUI hosts, MD → site generators, a11y / alt-text / captions tooling), see [`LANDSCAPE.md`](../LANDSCAPE.md) at the repo root. The `README.md` "Inputs → outputs" table lists what input shape produces what output for each supported flow.
+
 ## CLI → GUI workflow (flagship use case)
 
 When the user points to an existing CLI project and asks for a GUI:

@@ -56,6 +56,7 @@ The flagship use case: read an existing CLI's `--help` and produce the matching 
 
 ## Optional
 
-- [README.md](README.md): Human-facing English README.
+- [README.md](README.md): Human-facing English README — includes an "Inputs → outputs" table.
 - [LISEZMOI.md](LISEZMOI.md): Human-facing French README.
+- [LANDSCAPE.md](LANDSCAPE.md): Comparison matrices of alternatives in every category the skill touches (frameworks, CSS, components, dataviz, CLI → GUI hosts, MD → site generators, a11y / alt-text / captions tooling).
 - [LICENSE.md](LICENSE.md): The Unlicense + Montserrat OFL carve-out.
