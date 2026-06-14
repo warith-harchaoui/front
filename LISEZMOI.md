@@ -34,6 +34,8 @@ Le skill inclut un workflow qui part d'un outil en ligne de commande existant po
 
 ## Installation
 
+Ce skill suit la [spécification Anthropic des skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf) : il est lu nativement — activation depuis le frontmatter, divulgation progressive des fichiers `references/`, appel direct des `scripts/` — par deux agents de code : **Claude Code** et **OpenCode**. Choisissez celui qui correspond à votre éditeur et à votre modèle préféré.
+
 ### Claude Code
 
 ```bash
@@ -51,51 +53,14 @@ Claude Code lit la description du frontmatter et active le skill dès qu'un mess
 
 ### OpenCode
 
+[OpenCode](https://opencode.ai) est un agent de code en terminal, open source, qui sait piloter Claude, GPT et des modèles locaux derrière la même expérience.
+
 ```bash
 mkdir -p ~/.opencode/skills
 cp -r front ~/.opencode/skills/front
 ```
 
-Invocation : `/skill front <demande>`.
-
-### LangChain / SDK Anthropic (Python)
-
-Charger `SKILL.md` comme fragment de prompt système, puis ajouter les fichiers de référence au fil des besoins.
-
-```python
-# pip install anthropic
-from pathlib import Path
-from anthropic import Anthropic
-
-SKILL_DIR = Path("front")
-client = Anthropic()
-
-def charger_skill() -> str:
-    return (SKILL_DIR / "SKILL.md").read_text()
-
-def reference_eventuelle(message: str) -> str:
-    refs = []
-    m = message.lower()
-    if "couleur" in m or "color" in m:
-        refs.append((SKILL_DIR / "references/color-psychology.md").read_text())
-    if "bouton" in m or "modale" in m or "formulaire" in m:
-        refs.append((SKILL_DIR / "references/ui-guidelines/INDEX.md").read_text())
-    return "\n\n---\n\n".join(refs)
-
-def demander(message: str) -> str:
-    systeme = charger_skill() + "\n\n" + reference_eventuelle(message)
-    resp = client.messages.create(
-        model="claude-opus-4-7",
-        max_tokens=4096,
-        system=systeme,
-        messages=[{"role": "user", "content": message}],
-    )
-    return resp.content[0].text
-
-print(demander("Génère un bouton principal libellé « Commencer »."))
-```
-
-Pour LangChain proprement dit, encapsuler la même logique dans un `ChatPromptTemplate` avec un `SystemMessage(content=charger_skill())`, et utiliser `langchain_anthropic.ChatAnthropic`.
+OpenCode reconnaît le skill via la même description de frontmatter que Claude Code et orchestre les scripts de `front/scripts/` exactement de la même manière. À privilégier si vous voulez l'expérience du skill sans dépendance à un fournisseur unique, ou si OpenCode est déjà votre outil quotidien.
 
 ## Structure du dépôt
 

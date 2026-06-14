@@ -34,6 +34,8 @@ The skill includes a workflow that takes an existing command-line tool and produ
 
 ## Install
 
+This skill is built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf), which means it is read natively — frontmatter auto-trigger, progressive disclosure of `references/`, and direct invocation of `scripts/` — by two coding agents: **Claude Code** and **OpenCode**. Pick whichever matches your editor and model preferences.
+
 ### Claude Code
 
 ```bash
@@ -51,51 +53,14 @@ Claude Code reads the skill's frontmatter description and applies the skill when
 
 ### OpenCode
 
+[OpenCode](https://opencode.ai) is an open-source terminal coding agent that supports Claude, GPT, and local models behind the same UX.
+
 ```bash
 mkdir -p ~/.opencode/skills
 cp -r front ~/.opencode/skills/front
 ```
 
-Invoke with `/skill front <request>`.
-
-### LangChain / Anthropic SDK (Python)
-
-Load `SKILL.md` as a system-prompt fragment. Append referenced files on demand.
-
-```python
-# pip install anthropic
-from pathlib import Path
-from anthropic import Anthropic
-
-SKILL_DIR = Path("front")
-client = Anthropic()
-
-def load_skill() -> str:
-    return (SKILL_DIR / "SKILL.md").read_text()
-
-def maybe_load_reference(user_msg: str) -> str:
-    refs = []
-    m = user_msg.lower()
-    if "color" in m:
-        refs.append((SKILL_DIR / "references/color-psychology.md").read_text())
-    if "button" in m or "modal" in m or "form" in m:
-        refs.append((SKILL_DIR / "references/ui-guidelines/INDEX.md").read_text())
-    return "\n\n---\n\n".join(refs)
-
-def ask(user_msg: str) -> str:
-    system = load_skill() + "\n\n" + maybe_load_reference(user_msg)
-    resp = client.messages.create(
-        model="claude-opus-4-7",
-        max_tokens=4096,
-        system=system,
-        messages=[{"role": "user", "content": user_msg}],
-    )
-    return resp.content[0].text
-
-print(ask("Generate a primary button labeled 'Get started'."))
-```
-
-For LangChain proper, wrap the same logic in `ChatPromptTemplate` with a `SystemMessage(content=load_skill())` and use `langchain_anthropic.ChatAnthropic`.
+OpenCode discovers the skill from the same `SKILL.md` frontmatter description and weaves in the scripts under `front/scripts/` exactly like Claude Code does. Use this when you want the skill's behavior without provider lock-in, or when you're already running OpenCode as your daily driver.
 
 ## Repository structure
 

@@ -2,7 +2,7 @@
 
 > A Claude skill for vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Released into the public domain under The Unlicense.
 
-This repository is an [Anthropic skill](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf): drop `front/` under `~/.claude/skills/` to use it from Claude Code, or paste the contents of `front/SKILL.md` as a system-prompt fragment in any tool that accepts one (OpenCode, LangChain, Cursor, Continue, Cline, Aider, the Anthropic Messages API).
+This repository is an [Anthropic skill](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf). Use it from **Claude Code** (`cp -r front ~/.claude/skills/front`) or from **OpenCode** (`cp -r front ~/.opencode/skills/front`) — both agents read `front/SKILL.md` natively, auto-trigger on its frontmatter description, and orchestrate the scripts under `front/scripts/` per the skill's instructions.
 
 The flagship use case: read an existing CLI's `--help` and produce the matching single-page vanilla-JS + Tailwind GUI in one session.
 
