@@ -3,25 +3,20 @@
 install_captions
 ================
 
-Cross-platform installer for the local whisper.cpp-based caption / transcript
-generator. Companion to :mod:`captions_from_whisper`.
+Cross-platform installer for the local caption / transcript generator.
+
+Uses **pywhispercpp** (Python binding for whisper.cpp). Pre-compiled
+wheels for macOS / Linux / Windows are published to PyPI, so the install
+collapses to a single ``pip install``.
 
 The script:
 
-1. Installs the ``whisper-cli`` binary if it is missing:
-
-   * **Darwin** — Homebrew (``brew install whisper-cpp``).
-   * **Linux**  — Homebrew if present, otherwise build from source with
-     ``cmake`` + ``make`` (compile is single-threaded → patient but works).
-   * **Windows** — winget (``winget install ggerganov.whisper.cpp``) when
-     available; manual download URL otherwise.
-
-2. Downloads the GGML weights for the chosen model into
-   ``~/.cache/front-skill/whisper/`` so the generator can find them without
-   path arithmetic:
-
-   * Default model: ``large-v3-turbo`` — small enough to run on a laptop
-     and large enough to handle multi-speaker / noisy audio well.
+1. Verifies (or installs) the ``pywhispercpp`` Python package. If the
+   import fails, ``pip install pywhispercpp`` is run in the active
+   interpreter.
+2. Pre-downloads the requested GGML weights into
+   ``~/.cache/front-skill/whisper/`` so the first real transcription is
+   not gated on a model download. Default model: ``large-v3-turbo``.
 
 Usage
 -----
@@ -32,10 +27,13 @@ Usage
 
 Notes
 -----
-* Python 3.9+. The installer itself is stdlib-only.
-* The downloaded model is referenced by every invocation of the generator;
-  removing the file (or pointing ``FRONT_WHISPER_MODEL=<path>``) forces a
-  re-download or a different binary.
+* Python 3.9+. The installer itself is stdlib + pip.
+* ``pywhispercpp.utils.download_model`` is the canonical way to pre-fetch
+  weights; pointing the generator at a local file with
+  ``FRONT_WHISPER_MODEL=<path>`` is also supported.
+* Audio extraction (video → WAV) is handled by the generator, not the
+  installer; install ``ffmpeg`` or the author's audio-helper /
+  video-helper packages separately if needed.
 
 Author
 ------
@@ -45,169 +43,152 @@ Author
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import os
-import platform
-import shutil
 import subprocess
 import sys
-import urllib.request
 from pathlib import Path
 
 
-#: Where the GGML weights are cached. Override the directory via the
-#: ``FRONT_CACHE_DIR`` env var.
+#: Where the GGML weights are cached. Override the parent dir via
+#: ``FRONT_CACHE_DIR``; the trailing ``whisper`` subfolder is fixed so
+#: every helper agrees on the lookup path.
 WHISPER_DIR: Path = Path(
     os.environ.get("FRONT_CACHE_DIR", Path.home() / ".cache" / "front-skill")
 ) / "whisper"
 
-#: Maps the short CLI alias to the canonical Hugging Face filename.
-MODELS: dict[str, str] = {
-    "tiny":         "ggml-tiny.bin",
-    "base":         "ggml-base.bin",
-    "small":        "ggml-small.bin",
-    "medium":       "ggml-medium.bin",
-    "large-v3":     "ggml-large-v3.bin",
-    "large-v3-turbo": "ggml-large-v3-turbo.bin",
-}
+#: Aliases that pywhispercpp understands directly via the model registry.
+SUPPORTED_MODELS: tuple[str, ...] = (
+    "tiny", "tiny.en",
+    "base", "base.en",
+    "small", "small.en",
+    "medium", "medium.en",
+    "large-v1", "large-v2", "large-v3", "large-v3-turbo",
+)
 
-#: Public mirror that hosts every official whisper.cpp GGML file.
-MODEL_BASE_URL: str = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/"
-
-
-# ── Helpers ──────────────────────────────────────────────────────────────
-
-def has(cmd: str) -> bool:
-    """Return ``True`` when ``cmd`` resolves on ``PATH``."""
-    return shutil.which(cmd) is not None
+#: Default when no ``--model`` flag is provided.
+DEFAULT_MODEL: str = "large-v3-turbo"
 
 
-def run(cmd: list[str], **kw) -> subprocess.CompletedProcess:
-    """Echo + run a command via :func:`subprocess.run`."""
-    print(f"  $ {' '.join(cmd)}")
-    return subprocess.run(cmd, **kw)
+# ── pywhispercpp install ─────────────────────────────────────────────────
 
-
-# ── whisper-cli install ──────────────────────────────────────────────────
-
-def install_whisper_cli() -> None:
+def _is_installed(pkg: str) -> bool:
     """
-    Install the ``whisper-cli`` executable if it is missing.
+    Return ``True`` when ``pkg`` is importable in the active interpreter.
+
+    Uses :func:`importlib.util.find_spec` so the check has no side effects:
+    nothing is actually imported, no exception is swallowed.
+
+    Parameters
+    ----------
+    pkg : str
+        Top-level package name to probe.
+
+    Returns
+    -------
+    bool
+        ``True`` when ``find_spec`` resolves to a real spec.
+    """
+    return importlib.util.find_spec(pkg) is not None
+
+
+def ensure_pywhispercpp() -> None:
+    """
+    Install the ``pywhispercpp`` PyPI package if it is not importable.
+
+    Calls ``pip install pywhispercpp`` in the current interpreter when
+    :func:`_is_installed` reports it missing. Wheels exist for the three
+    major desktop platforms, so the install almost always avoids a compile.
 
     Raises
     ------
     SystemExit
-        When no installer is available on the host.
+        When ``pip`` itself is unavailable, the install command exits
+        non-zero, or the post-install check still cannot find the package.
     """
-    if has("whisper-cli") or has("whisper") or has("main"):
-        # Different package managers ship the binary under different names.
-        # The generator probes for all three.
-        print("→ whisper-cli already installed.")
+    if _is_installed("pywhispercpp"):
+        print("→ pywhispercpp already installed.")
         return
 
-    system: str = platform.system()
-    print(f"→ Installing whisper.cpp on {system}…")
-
-    if system in {"Darwin", "Linux"}:
-        if has("brew"):
-            run(["brew", "install", "whisper-cpp"], check=True)
-            return
-        if system == "Linux":
-            # Fall back to building from source. Requires git + cmake + make.
-            for tool in ("git", "make"):
-                if not has(tool):
-                    sys.exit(
-                        f"{tool} not found. Install build tools and re-run, "
-                        f"or install Homebrew (https://brew.sh)."
-                    )
-            tmp: Path = WHISPER_DIR / "src"
-            tmp.parent.mkdir(parents=True, exist_ok=True)
-            if not tmp.exists():
-                run(["git", "clone", "--depth", "1",
-                     "https://github.com/ggerganov/whisper.cpp.git", str(tmp)], check=True)
-            run(["make", "-C", str(tmp)], check=True)
-            # The build produces ``main``; install it as ``whisper-cli`` in
-            # the user's local bin if available, else leave it in src/.
-            built = tmp / "main"
-            if built.is_file():
-                target_dir: Path = Path.home() / ".local" / "bin"
-                target_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(built, target_dir / "whisper-cli")
-                print(f"→ whisper-cli installed at {target_dir / 'whisper-cli'}")
-            return
+    print("→ Installing pywhispercpp via pip…")
+    proc = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "--upgrade", "pywhispercpp"],
+    )
+    if proc.returncode != 0:
         sys.exit(
-            "Homebrew not found. Install Homebrew (https://brew.sh) then re-run.\n"
-            "Or build whisper.cpp manually from https://github.com/ggerganov/whisper.cpp."
+            f"pip install pywhispercpp failed (exit {proc.returncode}).\n"
+            "Make sure pip is available in this Python environment and try again."
         )
-    if system == "Windows":
-        if has("winget"):
-            run(["winget", "install", "ggerganov.whisper.cpp", "-e",
-                 "--accept-source-agreements", "--accept-package-agreements"],
-                check=True)
-            return
+    # Post-install probe — fail fast if pip reported success but the
+    # package is not on the active import path.
+    if not _is_installed("pywhispercpp"):
         sys.exit(
-            "winget not found. Download whisper-cli.exe from "
-            "https://github.com/ggerganov/whisper.cpp/releases and put it on PATH."
+            "pywhispercpp installed by pip but cannot be located in the "
+            "active interpreter's import path. Check virtualenv / PYTHONPATH."
         )
-    sys.exit(f"Unsupported OS: {system}.")
 
 
 # ── Model download ───────────────────────────────────────────────────────
 
 def download_model(name: str) -> Path:
     """
-    Download the requested GGML model into :data:`WHISPER_DIR`.
+    Pre-fetch the requested GGML model file into :data:`WHISPER_DIR`.
+
+    Delegates to ``pywhispercpp.utils.download_model`` which handles the
+    Hugging Face mirror, checksum validation, and resume-on-interruption.
 
     Parameters
     ----------
     name : str
-        Short alias from :data:`MODELS`.
+        Model alias from :data:`SUPPORTED_MODELS`.
 
     Returns
     -------
     Path
-        Local path to the downloaded file.
+        Local path to the downloaded GGML weights.
 
     Raises
     ------
     SystemExit
         On unknown model or download failure.
     """
-    if name not in MODELS:
-        sys.exit(f"Unknown model: {name}. Known: {', '.join(MODELS)}.")
-    filename: str = MODELS[name]
-    target: Path = WHISPER_DIR / filename
-    if target.is_file():
-        print(f"→ {filename} already present ({target.stat().st_size // (1024 * 1024)} MB).")
-        return target
+    if name not in SUPPORTED_MODELS:
+        sys.exit(
+            f"Unknown model: {name}. Known: {', '.join(SUPPORTED_MODELS)}."
+        )
 
     WHISPER_DIR.mkdir(parents=True, exist_ok=True)
-    url: str = MODEL_BASE_URL + filename
-    print(f"→ Downloading {filename}…")
-    print(f"  {url}")
+
+    # ``download_model`` exists in pywhispercpp >= 1.x. The function takes
+    # (model_name, download_dir) and returns the absolute path to the file.
+    from pywhispercpp.utils import download_model as _download_model
+
+    print(f"→ Pre-downloading model `{name}` into {WHISPER_DIR}…")
     try:
-        # ``urlretrieve`` streams to disk without holding the body in memory.
-        urllib.request.urlretrieve(url, target)
-    except OSError as e:
-        sys.exit(f"Download failed: {e}")
-    size_mb: int = target.stat().st_size // (1024 * 1024)
-    print(f"→ Wrote {target} ({size_mb} MB).")
-    return target
+        path: str = _download_model(name, str(WHISPER_DIR))
+    except Exception as e:
+        sys.exit(f"Model download failed: {e}")
+
+    file_path = Path(path)
+    size_mb: int = file_path.stat().st_size // (1024 * 1024)
+    print(f"→ Wrote {file_path} ({size_mb} MB).")
+    return file_path
 
 
 # ── CLI entry point ─────────────────────────────────────────────────────
 
 def main() -> int:
-    """Run the install + model-download pipeline."""
+    """Run the pip-install + model-prefetch pipeline."""
     p = argparse.ArgumentParser(
-        description="Install whisper-cli and pull a GGML caption model.",
+        description="Install pywhispercpp and pre-download a GGML caption model.",
     )
     p.add_argument(
-        "--model", default="large-v3-turbo", choices=list(MODELS),
-        help="Model to download (default: large-v3-turbo).",
+        "--model", default=DEFAULT_MODEL, choices=list(SUPPORTED_MODELS),
+        help=f"Model alias to pre-download (default: {DEFAULT_MODEL}).",
     )
     args = p.parse_args()
 
-    install_whisper_cli()
+    ensure_pywhispercpp()
     download_model(args.model)
     print()
     print("→ Ready. Test with:")

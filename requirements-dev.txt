@@ -1,0 +1,17 @@
+# Developer dependencies for working on the front skill.
+#
+# Install:
+#   pip install -r requirements-dev.txt
+#
+# Runtime dependencies live in front/scripts/requirements.txt; install
+# both for a full local environment:
+#   pip install -r requirements-dev.txt -r front/scripts/requirements.txt
+
+# Fast deterministic test suite under tests/
+pytest>=8.0.0
+
+# Optional: LLM-output quality assertions under tests/eval/.
+# These tests need a running Ollama daemon and are marked with
+# ``@pytest.mark.eval`` so they are NOT collected in the default run.
+# Enable with: pytest -m eval
+deepeval>=1.0.0

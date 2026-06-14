@@ -162,6 +162,10 @@ def _is_user_facing_doc(path: Path, line: str) -> bool:
     # as alt-text-ai.md, exempt for the same reason.
     if rel == "references/captions-ai.md":
         return False
+    # The site-indexes reference cites Apple Podcasts as the canonical reason
+    # to ship RSS 2.0 instead of Atom — naming the platform is the point.
+    if rel == "references/site-indexes.md":
+        return False
     # The Material Design reference compares tokens by name; the file's whole
     # purpose is to map third-party design-system vocabulary to the skill.
     if rel == "references/material-design.md":

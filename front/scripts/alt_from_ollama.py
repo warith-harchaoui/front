@@ -57,8 +57,6 @@ Author
 
 from __future__ import annotations
 
-# Standard library imports only — heavy third-party imports are guarded below
-# so that import errors yield a useful message rather than a stack trace.
 import argparse
 import base64
 import hashlib
@@ -73,17 +71,13 @@ import urllib.request
 from pathlib import Path
 from typing import Optional
 
-# ``requests`` is the one hard third-party dependency (the stdlib ``urllib`` is
-# usable but the request body is awkward; ``requests`` keeps the call site
-# readable). Surface a friendly install hint if it is missing.
-try:
-    import requests
-except ImportError:  # pragma: no cover — exercised at runtime, not in tests.
-    sys.stderr.write(
-        "This script needs `requests`. Install with:\n"
-        "    pip install -r front/scripts/requirements.txt\n"
-    )
-    sys.exit(2)
+# ``requests`` is the one hard third-party dependency; declared as a runtime
+# requirement in ``front/scripts/requirements.txt``.
+import requests
+
+# Vocabulary helpers — shared with captions_from_whisper via the _vocab module.
+sys.path.insert(0, str(Path(__file__).parent))
+from _vocab import resolve_vocab_terms, surrounding_text  # noqa: E402
 
 # Pillow is *optional*. If available it is used to downscale the image before
 # sending to the model (faster inference, smaller HTTP payload). The script
@@ -619,6 +613,36 @@ def describe_long(
     return text
 
 
+def compose_vocabulary_hint(terms: list[str]) -> str:
+    """
+    Build the vocabulary suffix appended to the alt prompt.
+
+    Unlike the captions prompt (which tells whisper "these terms may
+    appear"), the alt prompt asks the model to *prefer* the supplied
+    names **only when they match what is actually visible** — this guards
+    against hallucination.
+
+    Parameters
+    ----------
+    terms : list of str
+        Candidate terms drawn from the surrounding document or project.
+
+    Returns
+    -------
+    str
+        A short instruction fragment, or empty string when ``terms`` is empty.
+    """
+    if not terms:
+        return ""
+    # Cap at ~60 terms to keep the prompt compact and within Gemma's context.
+    kept = terms[:60]
+    return (
+        " When labeling visible elements, prefer these specific names if "
+        "they apply to what you see: " + ", ".join(kept) +
+        ". Do NOT include a term unless it actually matches what is in the image."
+    )
+
+
 def describe(
     src: str,
     *,
@@ -627,6 +651,7 @@ def describe(
     context: str = "",
     resize: int = 1024,
     model: Optional[str] = None,
+    vocabulary: Optional[list[str]] = None,
 ) -> str:
     """
     Generate alt text for an image.
@@ -684,7 +709,11 @@ def describe(
     # entry (two photos that downscale to the same JPEG hit the same key).
     data: bytes = maybe_resize(load_image_bytes(src), resize)
 
-    key = _cache_key(data, kind, lang, context, model)
+    # Vocabulary suffix on the prompt — and on the cache key so different
+    # vocab produces a different cached output.
+    vocab_suffix: str = compose_vocabulary_hint(vocabulary or [])
+
+    key = _cache_key(data, kind, lang, context + vocab_suffix, model)
     cached = _cache_get(key)
     if cached is not None:
         # Cache hit — return immediately, no network round-trip.
@@ -696,7 +725,7 @@ def describe(
 
     payload: dict = {
         "model": model,
-        "prompt": prompt_for(kind, lang, context),
+        "prompt": prompt_for(kind, lang, context) + vocab_suffix,
         "images": [image_b64],
         "stream": False,
         # ``temperature`` low to make the output reproducible across runs.
@@ -777,6 +806,30 @@ def _build_argparser() -> argparse.ArgumentParser:
             "image. Only meaningful with --kind complex or group."
         ),
     )
+    # Vocabulary biasing — same shape as captions_from_whisper.py.
+    p.add_argument(
+        "--in", dest="in_doc", type=Path, metavar="DOC",
+        help=(
+            "Document the image is embedded in. The text around every "
+            "reference to the image inside DOC is used both as --context "
+            "and as a vocabulary source. Highest signal for alt text."
+        ),
+    )
+    p.add_argument(
+        "--vocab", type=Path,
+        help="Glossary file; one term per line; '#' starts a comment.",
+    )
+    p.add_argument(
+        "--vocab-from", type=Path, dest="vocab_from",
+        help="File or directory whose text is mined for proper nouns and identifiers.",
+    )
+    p.add_argument(
+        "--auto-project", action="store_true",
+        help=(
+            "Walk upward from the source to find the project root, then "
+            "collect vocabulary from the whole tree."
+        ),
+    )
     return p
 
 
@@ -808,13 +861,33 @@ def main(argv: Optional[list[str]] = None) -> int:
         # No model call, no output. Exit code 0 signals success.
         return 0
 
+    # Resolve vocabulary from the supplied sources (--in / --vocab /
+    # --vocab-from / --auto-project / sibling auto-detect).
+    src_path = Path(args.src)
+    vocabulary: list[str] = resolve_vocab_terms(
+        src_path,
+        in_doc=args.in_doc,
+        vocab_file=args.vocab,
+        vocab_from=args.vocab_from,
+        auto_project=args.auto_project,
+    )
+
+    # --in DOC also feeds the explicit context hint with the surrounding
+    # text — strongest signal for what the image is doing on the page.
+    context: str = args.context
+    if args.in_doc is not None:
+        ctx_from_doc: str = surrounding_text(args.in_doc, src_path)
+        if ctx_from_doc:
+            context = (context + "\n" + ctx_from_doc).strip() if context else ctx_from_doc
+
     text = describe(
         args.src,
         kind=args.kind,
         lang=args.lang,
-        context=args.context,
+        context=context,
         resize=args.resize,
         model=args.model,
+        vocabulary=vocabulary,
     )
 
     if not text and args.kind == "complex":

@@ -1,9 +1,16 @@
-# Runtime dependencies for the alt-text helper.
+# Runtime dependencies for the front-skill helper scripts.
 #
 # Install:
 #   pip install -r front/scripts/requirements.txt
 #
 # Python 3.9 or newer.
 
+# Used by alt_from_ollama / meta_from_ollama / plain_language
 requests>=2.31.0
+
+# Used by alt_from_ollama (opportunistic image resize) and favicons.py / simulate_cvd.py
 Pillow>=10.0.0
+
+# Used by captions_from_whisper / install_captions (whisper.cpp via Python).
+# Ships pre-compiled wheels for macOS / Linux / Windows.
+pywhispercpp>=1.2.0

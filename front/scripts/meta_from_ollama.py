@@ -79,14 +79,7 @@ import urllib.request
 from pathlib import Path
 from typing import Optional
 
-try:
-    import requests
-except ImportError:  # pragma: no cover
-    sys.stderr.write(
-        "This script needs `requests`. Install with:\n"
-        "    pip install -r front/scripts/requirements.txt\n"
-    )
-    sys.exit(2)
+import requests
 
 # The alt-text helper owns the language tables and the model-picking logic;
 # importing them here keeps both scripts in lock-step for free.

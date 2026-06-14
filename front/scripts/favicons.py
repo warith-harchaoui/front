@@ -70,14 +70,7 @@ import shutil
 import sys
 from pathlib import Path
 
-try:
-    from PIL import Image
-except ImportError:  # pragma: no cover
-    sys.stderr.write(
-        "This script needs Pillow. Install with:\n"
-        "    pip install -r front/scripts/requirements.txt\n"
-    )
-    sys.exit(2)
+from PIL import Image
 
 
 # ── Module-level configuration ────────────────────────────────────────────────

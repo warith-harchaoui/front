@@ -62,6 +62,13 @@ python front/scripts/alt_from_ollama.py --kind complex --context "Weekly active 
 # complex AND long description — writes the Markdown long desc to chart.png.longdesc.md
 python front/scripts/alt_from_ollama.py --kind complex --longdesc --context "Weekly active users" ./public/chart.png
 
+# Use the surrounding text of a Markdown / HTML document as BOTH context
+# and vocabulary. Highest-signal source for an embedded image.
+python front/scripts/alt_from_ollama.py --in blog/post.md ./blog/figures/hero.png
+
+# Walk the project root for proper-noun vocabulary
+python front/scripts/alt_from_ollama.py --auto-project ./figures/diagram.png
+
 # decorative — no API call needed; the script returns empty
 python front/scripts/alt_from_ollama.py --kind decorative ./public/divider.svg
 ```

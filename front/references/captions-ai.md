@@ -1,6 +1,6 @@
 # Captions / transcripts — `captions_from_whisper.py`
 
-Generate WebVTT captions, SRT subtitles, or plain transcripts from any audio or video file, using a **local** [whisper.cpp](https://github.com/ggerganov/whisper.cpp) build. The default model is **`large-v3-turbo`** — small enough to run on a laptop and accurate enough for production captions.
+Generate WebVTT captions, SRT subtitles, or plain transcripts from any audio or video file using **[pywhispercpp](https://github.com/absadiki/pywhispercpp)** — the Python binding for whisper.cpp. The default model is **`large-v3-turbo`** — small enough to run on a laptop and accurate enough for production captions.
 
 The script handles both video (caption track for a `<video>`) and audio-only files (transcript for a podcast or interview).
 
@@ -10,9 +10,10 @@ WCAG SC 1.2.2 (Captions, Prerecorded) is a Level A requirement and is almost uni
 
 ## Install
 
-One command:
+Single command — `pip install` plus a pre-download of the GGML weights:
 
 ```bash
+pip install -r front/scripts/requirements.txt
 python front/scripts/install_captions.py
 ```
 
@@ -20,13 +21,11 @@ The installer:
 
 | Step | Behavior |
 |---|---|
-| Probe for `whisper-cli` on `PATH` | Skips re-install if a binary is present. |
-| Install whisper.cpp on macOS | `brew install whisper-cpp`. |
-| Install whisper.cpp on Linux | `brew install whisper-cpp` if Homebrew is present; otherwise build from source with `git clone … && make`. |
-| Install whisper.cpp on Windows | `winget install ggerganov.whisper.cpp`. |
-| Download the model | `ggml-large-v3-turbo.bin` (≈ 1.5 GB) into `~/.cache/front-skill/whisper/`. |
+| Probe `import pywhispercpp` | Skips re-install if already importable. |
+| Install via pip | `pip install --upgrade pywhispercpp` in the active interpreter. Pre-compiled wheels exist for macOS / Linux / Windows. |
+| Pre-download the GGML model | Via `pywhispercpp.utils.download_model` into `~/.cache/front-skill/whisper/`. |
 
-`--model` accepts: `tiny`, `base`, `small`, `medium`, `large-v3`, `large-v3-turbo` (default). Smaller models are faster but noticeably less accurate on accents / overlapping speech.
+`--model` accepts every pywhispercpp alias: `tiny[.en]`, `base[.en]`, `small[.en]`, `medium[.en]`, `large-v1`, `large-v2`, `large-v3`, `large-v3-turbo` (default). Smaller models are faster but noticeably less accurate on accents / overlapping speech.
 
 ## Generate
 
@@ -74,18 +73,45 @@ Same shape as the alt-text and meta helpers:
 
 The cache stores the final WebVTT / SRT / text body — re-runs of the same input are near-instant.
 
+## Vocabulary biasing
+
+Whisper's accuracy on proper nouns and jargon drops sharply without domain context. The script accepts four shapes; the first non-empty source wins:
+
+| Flag | Meaning |
+|---|---|
+| `--prompt "<text>"` | Verbatim `initial_prompt` for whisper.cpp. Highest precedence. |
+| `--vocab path/to/glossary.txt` | Glossary file, one term per line, `#` starts a comment. |
+| `--vocab-from path` | File OR directory. Directory → walked as a project root (top-level README / SKILL.md / manifests + `.md` files under `docs/`, `references/`, `src/`, …). |
+| `--auto-project` | Walk upward from the source to discover the project root, then mine the whole tree. |
+
+Beyond those flags, the resolver looks for a **sibling subtitle file** (`<stem>.vtt` / `.srt` / `.txt`) — for re-captioning runs, the prior transcript is the strongest signal — then a sibling README / `index.html`. Pass nothing, and the right thing usually happens.
+
+The composed `initial_prompt` is in natural prose, not a comma list — Whisper was trained on continuous text, so `"The following terms may appear in the audio: Tailwind, Montserrat, OKLCH."` outperforms `"Tailwind, Montserrat, OKLCH"`. The opener is selected from a per-language template.
+
 ## Integration in the page
 
-For video:
+For `<video>`, ALWAYS emit `<track kind="captions">`. Add the other kinds when they apply.
 
 ```html
 <video controls preload="metadata">
   <source src="/talk.mp4" type="video/mp4">
+
+  <!-- Speech + sound effects in the source language. Required. -->
   <track kind="captions" src="/talk.vtt" srclang="en" label="English" default>
+
+  <!-- Translation of dialogue. -->
+  <track kind="subtitles" src="/talk.fr.vtt" srclang="fr" label="Français">
+
+  <!-- Narration of visuals for blind users.
+       Out of scope for whisper — separate workflow. -->
+  <track kind="descriptions" src="/talk.descriptions.vtt" srclang="en" label="Audio descriptions">
+
+  <!-- Navigation markers. Emit when the source has chapters. -->
+  <track kind="chapters" src="/talk.chapters.vtt" srclang="en" label="Chapters">
 </video>
 ```
 
-For audio:
+For `<audio>`, captions don't render in the player — pair the file with an expandable transcript:
 
 ```html
 <audio controls preload="metadata">
@@ -97,15 +123,24 @@ For audio:
 </details>
 ```
 
+The four `<track>` kinds:
+
+| `kind` | Use | Source |
+|---|---|---|
+| `captions` | Speech + sound effects | `captions_from_whisper.py` (this script) |
+| `subtitles` | Dialogue translation | Pass `--lang <target>` and a target-language vocabulary, or run a second pass per target language. Future flag `--task translate` will route through whisper.cpp's built-in English-translation mode. |
+| `descriptions` | Visual narration for blind users | Out of scope for an audio model — frame extraction + Gemma vision. Documented as a future helper. |
+| `chapters` | Navigation markers | Heuristic on long segment pauses; documented as a future helper. |
+
 `meta-tags.md` covers the social-preview tags that pair with these surfaces.
 
 ## Failure modes
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `whisper.cpp binary not found on PATH` | Installer skipped or `PATH` not refreshed | Run `install_captions.py`; open a new shell. |
-| `Model file … not found` | Installer didn't run, or wrong alias | Run `install_captions.py --model <alias>`. |
-| `Neither audio-helper / video-helper nor ffmpeg is available` | No extractor on the host | `brew install ffmpeg` or install the helper packages. |
+| `pywhispercpp not installed` | pip install skipped | `python front/scripts/install_captions.py`. |
+| `Model … not found` on first transcribe | Pre-download skipped; pywhispercpp falls back to its own download but may fail offline | Run `install_captions.py --model <alias>` to pre-fetch, or set `FRONT_WHISPER_MODEL=/path/to/ggml-model.bin`. |
+| `Neither audio-helper / video-helper nor ffmpeg is available` | No extractor on the host | Install one of the helper packages or `ffmpeg`. |
 | Output is empty | Source has no audio track | Re-check the source; for video, confirm `ffprobe` finds an audio stream. |
 | Bad accents or hallucinated text | Model too small for difficult audio | Use `large-v3-turbo` (default) or `large-v3`. |
 | French in, English out | Language auto-detection misfired | Pass `--lang fr` explicitly. |

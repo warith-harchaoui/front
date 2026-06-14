@@ -153,14 +153,35 @@ The output is a static site that drops into any host (GitHub Pages, Netlify, S3,
 | "plain language" / "simplify this copy" / "rewrite at grade N" | `plain-language.md` | `cat copy.md \| python scripts/plain_language.py --target-grade 8 --lang en` — keeps meaning, strips marketing voice, output length ≤ 1.1×. |
 | "color blind preview" / "CVD check" / "how does this look to a deuteranope" | `cvd-simulation.md` | `python scripts/simulate_cvd.py <image> [--grid]` → renders the image as protanopia / deuteranopia / tritanopia viewers see it. Catches red/green pairing before it ships. |
 | "contrast audit" / "WCAG ratio" / "is my palette accessible" | `contrast-audit.md` | `python scripts/audit_contrast.py [--palette p.json] [--target 4.5\|7\|3] [--fix]` → walks every (label, surface) pair, suggests the nearest OKLCH-neighbour fix for failures. Exit 1 on any failure. |
-| "captions" / "transcribe video" / "transcribe audio" / "WCAG 1.2" | `captions-ai.md` | `python scripts/install_captions.py` then `python scripts/captions_from_whisper.py <audio-or-video> [--format vtt\|srt\|text] [--lang fr]`. Local whisper.cpp + `large-v3-turbo` model. |
+| "captions" / "transcribe video" / "transcribe audio" / "WCAG 1.2" | `captions-ai.md` | `python scripts/install_captions.py` then `python scripts/captions_from_whisper.py <audio-or-video> [--format vtt\|srt\|text] [--lang fr] [--vocab-from DIR] [--auto-project]`. Local `pywhispercpp` + `large-v3-turbo` model. Always emit `<track kind="captions">` (plus optional `subtitles` / `descriptions` / `chapters`) on `<video>` and `<audio>` elements. |
+| "embed video" / "embed audio" / "podcast page" | `captions-ai.md` + `meta-tags.md` | Emit `<video>` with `<track kind="captions" srclang="…">`. For accessibility add `<track kind="subtitles">` (translation), `<track kind="descriptions">` (audio descriptions for blind users), `<track kind="chapters">` (navigation). Audio gets a `<details><summary>Transcript</summary>` block under the player. |
+| "site indexes" / "robots.txt" / "sitemap" / "llms.txt" / "feed" / "atom" / "RSS" | `site-indexes.md` | `python scripts/site_indexes.py --root . --base-url https://example.com [--feed-from posts] [--rss] [--humans]`. Always emits robots.txt + sitemap.xml + llms.txt. Auto-detects a blog folder for the Atom feed. RSS 2.0 with `--rss`. humans.txt when `--humans` or AUTHORS file. |
+| "publish site" / "deploy" / "ship the website" | `site-indexes.md` + `meta-tags.md` + `app-icons.md` | Run `favicons.py` → `meta_from_ollama.py` per page → `site_indexes.py` for the whole site. Add `<link rel="sitemap">` and `<link rel="alternate" type="application/atom+xml">` to every page's `<head>`. |
 | "i18n" / "multilingual" / "translate" / "localize" | `i18n.md` | One URL strategy, `<html lang>` always set, `Intl.*` for formatting + plurals, logical CSS for RTL, persisted user choice wins over auto-detect |
 | "material" / "Material 3" / "M3" / named Material component | `material-design.md` | Map Material roles to skill tokens; emit plain HTML + Tailwind (no `mdc-*` classes, no Material Web Components) |
 | "make it look less AI" / "designer review" / "anti-patterns" | `anti-patterns.md` | Refuse gradient text, glassmorphism on body, side-stripe borders, "boost your productivity" copy, three-card grids, marketing buzzwords |
 | "psychology" / "conversion" / "cognitive bias" / "flow not working" | `ux-psychology.md` | Pick ONE applicable principle per screen — Hick / Anchoring / Default Bias / Peak-End / Goal Gradient — and apply concretely |
-| "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Match W3C image-purpose decision tree → `python scripts/alt_from_ollama.py [--kind informative\|decorative\|functional\|text\|complex\|group] [--lang fr] <src>`. Decorative → `alt=""` alone. Tag AI drafts with `data-alt-source="ai"`. |
+| "alt text" / `<img>` with no `alt` / "describe this image" | `alt-text-ai.md` | Match W3C image-purpose decision tree → `python scripts/alt_from_ollama.py [--kind informative\|decorative\|functional\|text\|complex\|group] [--lang fr] [--in DOC] [--vocab-from DIR] <src>`. Decorative → `alt=""` alone. When the image is referenced inside a markdown / HTML doc, ALWAYS pass `--in <that-doc>` — surrounding text is the strongest context signal. Tag AI drafts with `data-alt-source="ai"`. |
 | "favicon" / "app icon" / "PWA icons" / "touch icon" | `ui-guidelines/foundations/app-icons.md` + `meta-tags.md` | `python scripts/favicons.py <logo> --out public --name "…" --bg "#…"` → produces favicon.svg/.ico, PNG set, apple-touch-icon, maskable PWA icon, site.webmanifest, head.html snippet. |
 | "meta tags" / "SEO" / "Open Graph" / "Twitter card" / "JSON-LD" | `meta-tags.md` | Base + canonical + OG + Twitter card + JSON-LD `@type`; `python scripts/meta_from_ollama.py [--goal …] [--lang fr] [<page.html\|url>]` drafts the per-page title/description/og_image_alt. |
+
+## Tool composition (take initiative)
+
+The scripts under `scripts/` are single-purpose tools; the skill weaves them together. Claude should compose them WITHOUT being asked to, in these situations:
+
+| Situation | Compose this chain |
+|---|---|
+| Emitting an `<img>` whose source path appears in a Markdown / HTML doc | `alt_from_ollama.py --in <that-doc> <image>` — surrounding text becomes both `--context` and vocabulary. |
+| Emitting `<img>` in a project directory with no obvious `--in DOC` | `alt_from_ollama.py --auto-project <image>` — walks upward to find a project root (`.git`, `SKILL.md`, `package.json`) and mines its docs. |
+| Emitting `<video>` or `<audio>` | After generating the file, run `captions_from_whisper.py --auto-project <media>`. ALWAYS emit `<track kind="captions" srclang="…" default>` on the element. Add `<track kind="subtitles">` for translations, `<track kind="descriptions">` for audio descriptions, `<track kind="chapters">` for navigation when chapters exist. |
+| Re-captioning a media file that already has a `.vtt` / `.srt` / `.txt` sibling | The vocab extractor uses the prior subtitle automatically as the highest-signal term source — no extra flag needed. |
+| Emitting a whole website (Markdown → website workflow) | Order: `favicons.py` (icons + manifest) → `meta_from_ollama.py` per page → `site_indexes.py` (robots / sitemap / llms.txt / feed) → `lint_a11y.py` over the output → `audit_contrast.py` over the palette. |
+| Reviewing emitted HTML before declaring "done" | `lint_a11y.py <output>` — exit 1 fails the task; fix the markup, don't suppress. |
+| Designer reviewing a chart or screenshot | `simulate_cvd.py <image> --grid` to surface red/green collisions. |
+| Producing UI copy | Pipe drafts through `plain_language.py --target-grade 8 --preserve "<brand names>"`. |
+| Always | `validate.py` is the last step before claiming completion. |
+
+The pattern: when you have the right context (a doc the image lives in, a project root, a media file with a transcript), use it without asking.
 
 ## Stack basics
 
@@ -299,7 +320,8 @@ Load these only when needed.
 - `references/plain-language.md` — rewriter that simplifies copy at a target reading level.
 - `references/cvd-simulation.md` — color-blindness simulator (protanopia / deuteranopia / tritanopia).
 - `references/contrast-audit.md` — WCAG contrast audit and OKLCH-neighbour fix suggester.
-- `references/captions-ai.md` — local whisper.cpp captions / transcripts for video and audio.
+- `references/captions-ai.md` — local pywhispercpp captions / transcripts for video and audio, with vocabulary biasing.
+- `references/site-indexes.md` — robots.txt, sitemap.xml, llms.txt, Atom / RSS feed, humans.txt.
 - `references/alt-text-ai.md` — W3C-compliant alt text via local Ollama + Gemma vision (per-purpose: informative / decorative / functional / text / complex / group).
 - `references/checklist.md` — pre-ship quality gate.
 - `references/ui-guidelines/INDEX.md` — full map of foundations, patterns, components, inputs, platforms.
@@ -325,7 +347,9 @@ All scripts are Python 3.9+, cross-platform. Install deps once: `pip install -r 
 - `scripts/plain_language.py` — rewrite UI copy at a target reading level via the local model; preserves meaning, strips marketing voice. See `references/plain-language.md`.
 - `scripts/simulate_cvd.py` — render an image as protanopia / deuteranopia / tritanopia viewers see it. Pillow + Machado et al. matrices, no model. See `references/cvd-simulation.md`.
 - `scripts/audit_contrast.py` — WCAG contrast audit + OKLCH-neighbour fix suggester for a palette. No dependencies. See `references/contrast-audit.md`.
-- `scripts/install_captions.py` — installs whisper.cpp (`brew` / source build / `winget`) and downloads the requested GGML model. See `references/captions-ai.md`.
-- `scripts/captions_from_whisper.py` — generates WebVTT / SRT / plain-text captions or transcripts from any audio or video file via the local whisper.cpp build. Uses audio-helper / video-helper when installed; `ffmpeg` as fallback. Cached. See `references/captions-ai.md`.
+- `scripts/install_captions.py` — `pip install pywhispercpp` + pre-download the GGML model. See `references/captions-ai.md`.
+- `scripts/captions_from_whisper.py` — generates WebVTT / SRT / plain-text captions or transcripts from any audio or video file via local `pywhispercpp`. Vocabulary biasing via `--prompt` / `--vocab` / `--vocab-from` / `--auto-project`; sibling `.vtt` / `.srt` / `.txt` files are picked up automatically. Uses `audio-helper` / `video-helper` when installed; `ffmpeg` as fallback. Cached. See `references/captions-ai.md`.
+- `scripts/site_indexes.py` — emits `robots.txt`, `sitemap.xml`, `llms.txt`, optionally `feed.atom` (or `rss.xml`) and `humans.txt` for a project's web output. Stdlib only. See `references/site-indexes.md`.
+- `scripts/_vocab.py` — shared vocabulary extraction (used by `alt_from_ollama.py` and `captions_from_whisper.py`). Not a CLI; called by the other scripts.
 - `scripts/favicons.py` — generates the full favicon / app-icon set from a single logo (Pillow): `favicon.svg`/`.ico`, PNG variants, `apple-touch-icon.png`, maskable PWA icon, `site.webmanifest`, and a `head.html` snippet to paste into `<head>`.
 - `scripts/meta_from_ollama.py` — drafts page meta tags (title, description, Open Graph, Twitter, Schema.org `@type`) from a goal description or an HTML page. JSON on stdout. See `references/meta-tags.md`.
