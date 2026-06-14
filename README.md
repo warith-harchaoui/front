@@ -10,7 +10,7 @@
 
 ## What this is
 
-`front` is a Claude skill that constrains Claude to a single, consistent frontend stack — vanilla JavaScript, Tailwind CSS, and Montserrat as the only typeface — and gives it a curated design system to draw from. Asking Claude to "build a UI", "create a component", "design a dashboard", or "wrap this CLI in a GUI" produces output in this exact stack with a repeatable point of view: semantic HTML, dark-mode peers on every styled element, focus rings, reduced-motion guards, color choices traceable to a documented psychology, charts via Vega-Lite, alt text drafted to W3C / WAI guidance.
+`front` is a  skilled agent that constrains Claude to a single, consistent frontend stack — vanilla JavaScript, Tailwind CSS, and Montserrat as the only typeface — and gives it a curated design system to draw from. Asking Claude to "build a UI", "create a component", "design a dashboard", or "wrap this CLI in a GUI" produces output in this exact stack with a repeatable point of view: semantic HTML, dark-mode peers on every styled element, focus rings, reduced-motion guards, color choices traceable to a documented psychology, charts via Vega-Lite, alt text drafted to W3C / WAI guidance.
 
 
 
@@ -22,7 +22,7 @@ The flagship use case is **CLI → GUI**: point Claude at an existing command-li
 
 ## Inputs → outputs
 
-What you give Claude, and what comes back. Each row is a self-contained flow — pick one, ignore the rest. Every output respects the stack rules in *What the skill enforces*.
+What you give this skilled agent and what comes back. Each row is a self-contained flow — pick one, ignore the rest. Every output respects the stack rules in *What the skill enforces*.
 
 | What you provide (input) | How you phrase it | What Claude returns (output) | Tools touched |
 |---|---|---|---|
