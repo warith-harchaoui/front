@@ -1,8 +1,12 @@
+
+
 # Front
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
-![front logo](assets/logo.png)
+<p align="center">
+  <img src="assets/logo.png" alt="Front — a Claude skill for vanilla JS + Tailwind + Montserrat frontends" width="240">
+</p>
 
 ## What this is
 
@@ -19,10 +23,15 @@ The flagship use case is **CLI → GUI**: point Claude at an existing command-li
 ## Contents
 
 - `front/SKILL.md` — entry point with YAML frontmatter and instructions.
-- `front/references/` — progressive-disclosure reference files (color, stack, checklist, UI guidelines, dataviz, meta tags, i18n, anti-patterns, UX psychology, Material Design, alt text).
-- `front/assets/` — copy-paste templates and Montserrat font files.
-- `front/scripts/` — Python helpers (`validate.py`, `install_alt_ai.py`, `alt_from_ollama.py`, `meta_from_ollama.py`, `favicons.py`) with `requirements.txt`.
+- `front/references/` — progressive-disclosure reference files (color, stack, checklist, UI guidelines, dataviz, meta tags, i18n, anti-patterns, UX psychology, Material Design, alt text, captions, contrast / CVD audits, plain-language rewriter, a11y lint, site indexes).
+- `front/assets/` — copy-paste templates, Montserrat font files, and a runnable CLI → GUI example (`assets/examples/cli-gui-demo/`).
+- `front/scripts/` — Python helpers, each with its own feature-scoped requirements file:
+  - **Pre-ship gate** — `validate.py`, `lint_a11y.py`, `audit_contrast.py`, `site_indexes.py` (stdlib only).
+  - **Assets & meta** — `favicons.py`, `meta_from_ollama.py`.
+  - **A11y & accessibility tooling** — `alt_from_ollama.py`, `install_alt_ai.py`, `simulate_cvd.py`, `plain_language.py`.
+  - **Captions / transcripts** — `install_captions.py`, `captions_from_whisper.py`.
 - `llms.txt` — index of the project per <https://llmstxt.org/> for LLM consumers.
+- `assets/logo.png` — project logo (used at the top of this README).
 
 ## What the skill enforces
 
@@ -71,6 +80,9 @@ OpenCode discovers the skill from the same `SKILL.md` frontmatter description an
 ```
 front/                              ← repo root
 ├── README.md / LISEZMOI.md         ← EN / FR
+├── LICENSE.md                      ← The Unlicense (OFL carve-out for Montserrat)
+├── llms.txt                        ← https://llmstxt.org/ index for LLM consumers
+├── assets/logo.png                 ← project logo (used in this README)
 ├── .gitignore
 └── front/                          ← skill folder; drop into ~/.claude/skills/
     ├── SKILL.md
@@ -79,6 +91,11 @@ front/                              ← repo root
     │   ├── stack-vanilla-js.md
     │   ├── stack-tailwind.md
     │   ├── checklist.md
+    │   ├── charts-vega.md / dataviz-*.md / dashboard-ergonomics.md
+    │   ├── meta-tags.md / site-indexes.md / i18n.md
+    │   ├── alt-text-ai.md / captions-ai.md / plain-language.md
+    │   ├── contrast-audit.md / cvd-simulation.md / lint-a11y.md
+    │   ├── anti-patterns.md / ergonomics-criteria.md / ux-psychology.md / material-design.md
     │   └── ui-guidelines/
     │       ├── INDEX.md
     │       ├── foundations/        ← color, typography, layout, motion, materials, a11y, …
@@ -86,9 +103,16 @@ front/                              ← repo root
     │       ├── patterns/           ← modality, feedback, loading, settings, …
     │       ├── inputs/             ← keyboard, pointer, touch, focus
     │       └── platforms/          ← mobile, tablet, desktop, wearable, tv, spatial
+    ├── scripts/                    ← Python helpers (3.9+, cross-platform)
+    │   ├── validate.py / lint_a11y.py / audit_contrast.py / site_indexes.py   (stdlib only)
+    │   ├── favicons.py / meta_from_ollama.py
+    │   ├── alt_from_ollama.py / install_alt_ai.py / simulate_cvd.py / plain_language.py
+    │   ├── install_captions.py / captions_from_whisper.py
+    │   └── requirements*.txt        ← one per feature (alt-text, captions, cvd, favicons, …)
     └── assets/
         ├── starter-page.html       ← single-file bootstrap (Tailwind Play CDN)
-        ├── components/             ← copy-paste HTML snippets
+        ├── components/             ← copy-paste HTML snippets + Vega-Lite chart specs
+        ├── examples/cli-gui-demo/  ← runnable CLI → GUI worked example
         └── fonts/montserrat/       ← variable + 4 static WOFF2, OFL.txt, fonts.css
 ```
 
@@ -104,7 +128,7 @@ Color palettes from <https://harchaoui.org/warith/colors/>.
 
 Montserrat font is bundled in `front/assets/fonts/montserrat/` under the SIL Open Font License — see the bundled `OFL.txt` for the full license and the attached copyright notice.
 
-We also got some knowledge from [Apple  Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) and [Google Material Design](https://material.io/design).
+We also drew on the [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) and [Google Material Design](https://material.io/design).
 
 ## License
 

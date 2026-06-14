@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Front — un skill Claude pour des frontends JavaScript pur + Tailwind + Montserrat" width="240">
+</p>
+
 # Front
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
@@ -15,10 +19,15 @@ Le cas d'usage phare, c'est **CLI → IHM** : pointez Claude vers le `--help` d'
 ## Contenu
 
 - `front/SKILL.md` — point d'entrée du skill, avec frontmatter YAML et instructions.
-- `front/references/` — fichiers de référence à divulgation progressive (couleur, stack, checklist, guides UI, dataviz, meta-tags, i18n, anti-patterns, psychologie UX, Material Design, texte alternatif).
-- `front/assets/` — modèles à copier-coller et fichiers Montserrat.
-- `front/scripts/` — utilitaires Python (`validate.py`, `install_alt_ai.py`, `alt_from_ollama.py`, `meta_from_ollama.py`, `favicons.py`) avec `requirements.txt`.
+- `front/references/` — fichiers de référence à divulgation progressive (couleur, stack, checklist, guides UI, dataviz, meta-tags, i18n, anti-patterns, psychologie UX, Material Design, texte alternatif, sous-titres, audits contraste / daltonisme, réécriture en langage clair, lint a11y, index de site).
+- `front/assets/` — modèles à copier-coller, fichiers Montserrat, et un exemple CLI → IHM exécutable (`assets/examples/cli-gui-demo/`).
+- `front/scripts/` — utilitaires Python, chacun avec son fichier de dépendances dédié :
+  - **Garde-fou pré-livraison** — `validate.py`, `lint_a11y.py`, `audit_contrast.py`, `site_indexes.py` (stdlib uniquement).
+  - **Assets & meta** — `favicons.py`, `meta_from_ollama.py`.
+  - **Outillage accessibilité** — `alt_from_ollama.py`, `install_alt_ai.py`, `simulate_cvd.py`, `plain_language.py`.
+  - **Sous-titres / transcription** — `install_captions.py`, `captions_from_whisper.py`.
 - `llms.txt` — index du projet conforme à <https://llmstxt.org/> pour les consommateurs LLM.
+- `assets/logo.png` — logo du projet (utilisé en tête de ce LISEZMOI).
 
 ## Ce que le skill garantit
 
@@ -67,6 +76,9 @@ OpenCode reconnaît le skill via la même description de frontmatter que Claude 
 ```
 front/                              ← racine du dépôt
 ├── README.md / LISEZMOI.md         ← EN / FR
+├── LICENSE.md                      ← The Unlicense (Montserrat reste sous OFL)
+├── llms.txt                        ← index https://llmstxt.org/ pour les LLM
+├── assets/logo.png                 ← logo du projet (utilisé dans ce LISEZMOI)
 ├── .gitignore
 └── front/                          ← dossier du skill ; à déposer dans ~/.claude/skills/
     ├── SKILL.md
@@ -75,6 +87,11 @@ front/                              ← racine du dépôt
     │   ├── stack-vanilla-js.md
     │   ├── stack-tailwind.md
     │   ├── checklist.md
+    │   ├── charts-vega.md / dataviz-*.md / dashboard-ergonomics.md
+    │   ├── meta-tags.md / site-indexes.md / i18n.md
+    │   ├── alt-text-ai.md / captions-ai.md / plain-language.md
+    │   ├── contrast-audit.md / cvd-simulation.md / lint-a11y.md
+    │   ├── anti-patterns.md / ergonomics-criteria.md / ux-psychology.md / material-design.md
     │   └── ui-guidelines/
     │       ├── INDEX.md
     │       ├── foundations/        ← couleur, typo, mise en page, animation, matériaux, accessibilité, …
@@ -82,9 +99,16 @@ front/                              ← racine du dépôt
     │       ├── patterns/           ← modalité, feedback, chargement, réglages, …
     │       ├── inputs/             ← clavier, pointeur, toucher, focus
     │       └── platforms/          ← mobile, tablette, ordinateur, montre, téléviseur, spatial
+    ├── scripts/                    ← utilitaires Python (3.9+, multi-plateformes)
+    │   ├── validate.py / lint_a11y.py / audit_contrast.py / site_indexes.py   (stdlib uniquement)
+    │   ├── favicons.py / meta_from_ollama.py
+    │   ├── alt_from_ollama.py / install_alt_ai.py / simulate_cvd.py / plain_language.py
+    │   ├── install_captions.py / captions_from_whisper.py
+    │   └── requirements*.txt        ← un fichier par fonctionnalité (alt-text, sous-titres, daltonisme, favicons, …)
     └── assets/
         ├── starter-page.html       ← amorçage en un seul fichier (Tailwind Play CDN)
-        ├── components/             ← extraits HTML à copier-coller
+        ├── components/             ← extraits HTML à copier-coller + specs Vega-Lite
+        ├── examples/cli-gui-demo/  ← exemple CLI → IHM exécutable
         └── fonts/montserrat/       ← variable + 4 statiques WOFF2, OFL.txt, fonts.css
 ```
 
