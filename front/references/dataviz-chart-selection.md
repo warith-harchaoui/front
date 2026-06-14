@@ -75,6 +75,7 @@ Every chart belongs to one of four families. Identify the family before picking 
 6. **Axes start at zero for bars** (truncated bars lie). For lines, truncation is acceptable when the message is the shape of change.
 7. **Annotate the message** — a single highlighted point or short label beats forcing the user to find it.
 8. **Title = the conclusion.** "Revenue grew 18 % in Q3" beats "Revenue by quarter".
+9. **State the polarity.** Every quantitative axis should say whether *higher is better*, *lower is better*, or *target = N*. Put the tag in the axis title (`"Latency (ms — lower is better)"`) or the subtitle. Reading a chart shouldn't require domain instinct — a stranger glancing at it must know in 3 seconds whether the trend is good news or bad. Skip this for neutral axes (time, category, geography). See `charts-vega.md` → "Polarity — higher or lower is better".
 
 ## Variables count and axis design
 
