@@ -50,7 +50,7 @@ For alternatives in every category — and how to decide whether `front` is the 
 
 - Output uses vanilla JS (ES modules, native `<dialog>`, custom elements when justified). No React, Vue, Svelte, Next.js, Nuxt, Angular, Solid.
 - Output uses Tailwind utility classes with semantic tokens (`bg-brand-blue`, `text-label-primary`). No raw hex literals in markup.
-- Output uses **Montserrat** by default for marketing / prose surfaces, or **Inter** for dense developer / dashboard / data UI. Two choices, no more. Both are self-hosted.
+- Output uses **Montserrat** by default for marketing / prose surfaces, or **Inter** for dense developer / dashboard / data UI. If Montserrat is not the right call for your project (brand mismatch, language coverage, custom identity), drop a self-hosted family under `front-ui/assets/fonts/<family>/` (TTF or WOFF2 + license) and `front-ui` will swap to it. Every family is self-hosted (no Google Fonts CDN in production).
 - Output sets a `dark:` peer on every styled element, uses `<button>`/`<a>`/`<label>`/`<dialog>`/`<form>` first, exposes a visible focus ring, honors `prefers-reduced-motion` and meets a 44×44 px hit area.
 - Color choices map to the palettes in `front-ui/references/color-psychology.md` (source: <https://harchaoui.org/warith/colors/>).
 - Tailwind has a build step. The starter page uses the Play CDN, which is for prototyping only — see `front-ui/references/stack-tailwind.md` for the production swap (Tailwind CLI or Vite).

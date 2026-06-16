@@ -67,8 +67,11 @@ que `front` est le bon outil ? », voir [LANDSCAPE.md](LANDSCAPE.md).
   hexadécimale brute dans le balisage.
 - Le code utilise **Montserrat** par défaut pour les surfaces
   marketing / texte long, ou **Inter** pour les UI denses
-  développeur / tableau de bord / data. Deux choix, pas plus. Les
-  deux sont auto-hébergées.
+  développeur / tableau de bord / data. Montserrat n'est pas toujours
+  le bon choix : si vous déposez une famille auto-hébergée sous
+  `front-ui/assets/fonts/<famille>/` (TTF ou WOFF2 + licence),
+  `front-ui` bascule vers cette famille. Toutes les polices sont
+  auto-hébergées (pas de CDN Google Fonts en production).
 - Le code pose une variante `dark:` sur chaque élément stylé,
   privilégie `<button>` / `<a>` / `<label>` / `<dialog>` / `<form>`,
   expose un anneau de focus visible, respecte `prefers-reduced-motion`,

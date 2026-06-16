@@ -48,7 +48,15 @@ into `~/.claude/skills/`).
 
 - **Inter is now an accepted alternate font** (Montserrat default; Inter
   for dense dev / dashboard / admin / data surfaces). Hard rule 3 in
-  every SKILL.md is updated. Two choices, no more.
+  every SKILL.md is updated.
+- **User-supplied custom typefaces are supported.** If a project ships
+  a folder under `front-ui/assets/fonts/<family>/` with the TTF or
+  WOFF2 files and a license file, the skill swaps `fontFamily.sans` to
+  that family without touching the rest of the stack. Recipe is in
+  `front-ui/references/stack-tailwind.md` → "Typography — default,
+  alternate, and custom swap". The previous "two choices, no more"
+  framing was too rigid for projects with brand-mismatch or
+  language-coverage constraints.
 
 ### Added — i18n
 

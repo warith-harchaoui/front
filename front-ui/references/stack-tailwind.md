@@ -5,6 +5,43 @@ This skill emits Tailwind utility classes for all styling. Two valid setups:
 - **Play CDN** (`assets/starter-page.html` uses this) — zero-config, fine for prototypes.
 - **Built CSS via Tailwind CLI or Vite** — recommended for production.
 
+## Typography — default, alternate, and custom swap
+
+The `fontFamily.sans` token defaults to **Montserrat**. Montserrat is
+not always the perfect choice — language coverage, brand identity, and
+small-size legibility on dense UIs are real reasons to pick something
+else. Two supported escape hatches:
+
+1. **Documented alternate — Inter.** Drop the WOFF2 files into
+   `assets/fonts/inter/` and set
+   `sans: ['Inter Variable', 'Inter', 'sans-serif']` in
+   `tailwind.config.js`. Inter has a larger x-height and stronger
+   hinting at 12–14 px, which fits dashboards, admin panels, dev tools
+   and data-heavy surfaces better than Montserrat.
+
+2. **User-supplied custom family.** Ship a folder under
+   `assets/fonts/<family>/` containing the TTF or WOFF2 files plus the
+   license (OFL.txt, license.txt, …). Then in three places:
+
+   - `tailwind.config.js` — change `fontFamily.sans` to your family.
+   - `src/styles/app.css` — replace `@import` of the Montserrat CSS
+     with the equivalent `@font-face` block for your family (variable
+     axis preferred when available; otherwise the four static weights
+     400 / 500 / 600 / 700 with matching italic if relevant).
+   - Project README — record which family is in use and why, so a
+     future maintainer does not have to read the CSS to find out.
+
+   Every other rule (semantic tokens, dark-mode peers, focus ring,
+   reduced-motion guard, 44 × 44 hit area) stays unchanged.
+
+**Always self-host.** No Google Fonts CDN in production. The jsDelivr
+`gh` proxy is acceptable for a prototype with a self-hosted fallback;
+production builds should ship the WOFF2 / TTF files alongside the
+HTML. Run the validator (`front-ui/scripts/validate.py`) after any
+font swap — it does not check the family itself but it catches the
+forbidden raw-hex / framework-import regressions a font swap can
+accidentally introduce.
+
 ## Tailwind config (drop into `tailwind.config.js`)
 
 ```js
