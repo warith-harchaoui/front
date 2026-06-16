@@ -392,7 +392,9 @@ def ai_suggest_mermaid(mermaid_src: str, model: str) -> Optional[list[dict]]:
         return None
     payload = {
         "model": model,
-        "prompt": render_prompt("mermaid_labels", mermaid_src=mermaid_src),
+        "prompt": render_prompt("mermaid_labels",
+                                 prompts_dir=Path(__file__).resolve().parent / "prompts",
+                                 mermaid_src=mermaid_src),
         "stream": False,
         "options": {"temperature": 0.2},
     }
@@ -411,7 +413,9 @@ def ai_caption_latex(latex_src: str, lang: str, model: str) -> Optional[str]:
         return None
     payload = {
         "model": model,
-        "prompt": render_prompt("latex_caption", latex_src=latex_src, lang=lang),
+        "prompt": render_prompt("latex_caption",
+                                 prompts_dir=Path(__file__).resolve().parent / "prompts",
+                                 latex_src=latex_src, lang=lang),
         "stream": False,
         "options": {"temperature": 0.2},
     }

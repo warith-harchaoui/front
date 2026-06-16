@@ -21,30 +21,44 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PUBLISH_SCRIPTS = REPO_ROOT / "front-publish" / "scripts"
+A11Y_SCRIPTS = REPO_ROOT / "front-a11y" / "scripts"
 
 
 @pytest.fixture(scope="module", autouse=True)
 def _add_publish_scripts_to_path() -> None:
     sys.path.insert(0, str(PUBLISH_SCRIPTS))
+    sys.path.insert(0, str(A11Y_SCRIPTS))
 
 
 # ── YAML files load cleanly ─────────────────────────────────────────────────
 
 @pytest.mark.parametrize(
-    "name, must_contain",
+    "skill, name, must_contain",
     [
-        ("mermaid_labels",          "Reply with a JSON array"),
-        ("latex_caption",           "Plain UTF-8 text"),
-        ("plain_language_rewrite",  "Reply with the rewritten text only"),
-        ("meta_tags_json",          "Return a single JSON object"),
+        # front-publish prompts
+        ("front-publish", "mermaid_labels",          "Reply with a JSON array"),
+        ("front-publish", "latex_caption",           "Plain UTF-8 text"),
+        ("front-publish", "plain_language_rewrite",  "Reply with the rewritten text only"),
+        ("front-publish", "meta_tags_json",          "Return a single JSON object"),
+        # front-a11y alt-text prompts (short + long)
+        ("front-a11y",    "alt_short_default",       "Reply with the alt text only"),
+        ("front-a11y",    "alt_short_informative",   "informative image"),
+        ("front-a11y",    "alt_short_functional",    "action or destination"),
+        ("front-a11y",    "alt_short_text",          "verbatim"),
+        ("front-a11y",    "alt_short_complex",       "complex image"),
+        ("front-a11y",    "alt_short_group",         "group of images"),
+        ("front-a11y",    "alt_long_complex",        "Markdown"),
+        ("front-a11y",    "alt_long_group",          "group of related images"),
+        ("front-a11y",    "alt_long_default",        "long-form description"),
     ],
 )
-def test_prompt_yaml_loads(name: str, must_contain: str) -> None:
+def test_prompt_yaml_loads(skill: str, name: str, must_contain: str) -> None:
     """Every prompt YAML the project ships parses and exposes its contract."""
     from _prompts import load_prompt  # type: ignore
-    data = load_prompt(name)
+    prompts_dir = REPO_ROOT / skill / "scripts" / "prompts"
+    data = load_prompt(name, prompts_dir=prompts_dir)
     assert "template" in data
-    haystack = data.get("output_contract", "") + data["template"]
+    haystack = data.get("output_contract", "") + data["template"] + data.get("task", "")
     assert must_contain in haystack
 
 
@@ -95,3 +109,58 @@ def test_meta_build_prompt_omits_blocks_when_empty() -> None:
     assert "Page goal" not in out
     assert "Return a single JSON object" in out
     assert "Write the JSON now." in out
+
+
+# ── alt_from_ollama.prompt_for + long_prompt_for ───────────────────────────
+
+@pytest.mark.parametrize(
+    "kind, must_contain",
+    [
+        ("informative", "informative image"),
+        ("functional",  "link or button"),
+        ("text",        "verbatim"),
+        ("complex",     "complex image"),
+        ("group",       "group of images"),
+        ("decorative",  "Write alt text for this image"),  # falls through to default
+    ],
+)
+def test_alt_short_prompt_per_kind(kind: str, must_contain: str) -> None:
+    from alt_from_ollama import prompt_for  # type: ignore
+    out = prompt_for(kind=kind, lang="en", context="A dashboard tile")
+    assert "Write the alt text in English." in out
+    assert must_contain in out
+
+
+def test_alt_short_text_kind_skips_base_rules() -> None:
+    """The `text` purpose extracts verbatim text; generic rules don't apply."""
+    from alt_from_ollama import prompt_for  # type: ignore
+    out = prompt_for(kind="text", lang="en", context="")
+    # The "do not start with image of" rule belongs to the generic kinds.
+    assert "Do not start with 'image of'" not in out
+    assert "verbatim" in out
+
+
+@pytest.mark.parametrize(
+    "kind, must_contain",
+    [
+        ("complex", "chart type / diagram type"),
+        ("group",   "group of related images"),
+        ("other",   "long-form description"),  # falls through to default
+    ],
+)
+def test_alt_long_prompt_per_kind(kind: str, must_contain: str) -> None:
+    from alt_from_ollama import long_prompt_for  # type: ignore
+    out = long_prompt_for(kind=kind, lang="en", context="")
+    assert must_contain in out
+
+
+def test_alt_prompt_substitutes_context_when_supplied() -> None:
+    from alt_from_ollama import prompt_for  # type: ignore
+    out = prompt_for(kind="informative", lang="en", context="Hero image of the homepage")
+    assert "Page context: Hero image of the homepage." in out
+
+
+def test_alt_prompt_omits_context_block_when_empty() -> None:
+    from alt_from_ollama import prompt_for  # type: ignore
+    out = prompt_for(kind="informative", lang="en", context="")
+    assert "Page context:" not in out

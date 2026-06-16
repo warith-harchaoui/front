@@ -208,6 +208,7 @@ def build_prompt(text: str, grade: int, lang: str, preserve: list[str]) -> str:
 
     return render_prompt(
         "plain_language_rewrite",
+        prompts_dir=Path(__file__).resolve().parent / "prompts",
         lang_line=lang_line,
         grade=grade,
         preserve_line=preserve_line,

@@ -292,6 +292,39 @@ BASE_RULES: str = (
 )
 
 
+# Prompt bodies live in scripts/prompts/alt_short_*.yaml and
+# scripts/prompts/alt_long_*.yaml. _prompts.render() substitutes the
+# runtime fields (lang_line, ctx, max_chars). The Python wrapper below
+# only picks the right YAML based on the W3C purpose kind.
+
+try:
+    from _prompts import render as _render_prompt  # type: ignore
+    _HAVE_PROMPTS = True
+except ImportError:
+    _HAVE_PROMPTS = False
+
+
+# Each skill ships its own prompts/ folder. Passing the directory
+# explicitly keeps a11y prompts isolated from publish prompts even when
+# both helpers are loaded into the same Python process (tests, the
+# front-cli driver, etc.).
+_PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+
+
+_SHORT_PROMPTS: dict[str, str] = {
+    "informative": "alt_short_informative",
+    "functional":  "alt_short_functional",
+    "text":        "alt_short_text",
+    "complex":     "alt_short_complex",
+    "group":       "alt_short_group",
+}
+
+_LONG_PROMPTS: dict[str, str] = {
+    "complex": "alt_long_complex",
+    "group":   "alt_long_group",
+}
+
+
 def long_prompt_for(kind: str, lang: str, context: str = "") -> str:
     """
     Build the prompt for a long-form description of a complex image.
@@ -317,42 +350,15 @@ def long_prompt_for(kind: str, lang: str, context: str = "") -> str:
         The fully assembled prompt.
     """
     lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
-
-    if kind == "complex":
-        # Structured request that matches what screen-reader users need from
-        # charts and diagrams: type → axes → key values → outliers → takeaway.
-        body = (
-            "Write a LONG description for this complex image (chart, "
-            "diagram, or infographic). The description will be placed in "
-            "<figcaption> or in an element referenced by aria-describedby — "
-            "it is read by a screen-reader user who cannot see the image. "
-            "Structure it as Markdown with this order:\n"
-            "  1. One sentence: chart type / diagram type.\n"
-            "  2. One sentence: axes or dimensions (what is mapped where).\n"
-            "  3. A short bullet list of 3 key values or relationships.\n"
-            "  4. One sentence: outliers or notable features (if any).\n"
-            "  5. One sentence: the single takeaway.\n"
-            "Stay under 400 words. Do not invent numbers — if a value is "
-            "ambiguous from the image, describe the relative position "
-            "(\"highest\", \"middle\", \"lowest\") instead. "
-            "Do not start with 'image of', 'photo of', or the equivalent."
-        )
-    elif kind == "group":
-        body = (
-            "Write a LONG description for this group of related images. "
-            "Cover the relationship between the images, the combined "
-            "meaning, and any notable individual elements. Markdown. "
-            "Stay under 400 words."
-        )
-    else:
-        body = (
-            "Write a long-form description of this image for use in "
-            "<figcaption> or via aria-describedby. Cover the meaningful "
-            "structure and context. Stay under 400 words."
-        )
-
     ctx: str = f" Page context: {context}." if context else ""
-    return f"{lang_line} {body}{ctx}"
+    name = _LONG_PROMPTS.get(kind, "alt_long_default")
+
+    if not _HAVE_PROMPTS:
+        # Stdlib-only fallback — should not be reached in practice since
+        # _prompts.py ships alongside this script.
+        return f"{lang_line} Long description for this image.{ctx}"
+
+    return _render_prompt(name, prompts_dir=_PROMPTS_DIR, lang_line=lang_line, ctx=ctx)
 
 
 def prompt_for(kind: str, lang: str, context: str = "") -> str:
@@ -373,38 +379,15 @@ def prompt_for(kind: str, lang: str, context: str = "") -> str:
     str
         The fully assembled prompt, ready to send to Ollama.
     """
-    # The language line opens every prompt so the model commits early.
     lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
+    ctx: str = f" Page context: {context}." if context else ""
+    name = _SHORT_PROMPTS.get(kind, "alt_short_default")
 
-    if kind == "informative":
-        head = "Write alt text for this informative image."
-    elif kind == "functional":
-        head = (
-            "This image is inside a link or button. "
-            "Describe the action or destination the control performs, NOT the image's appearance. "
-            "Example: a magnifying-glass icon inside a search button → 'Search'."
-        )
-    elif kind == "text":
-        head = (
-            "This image is mostly text. "
-            "Return the readable text verbatim, exactly as it appears, with no description added."
-        )
-        # Banned-prefix rule does not apply when the goal is verbatim extraction.
-        return f"{lang_line} {head}"
-    elif kind == "complex":
-        head = (
-            "This is a complex image (chart, diagram, infographic). "
-            "Write a SHORT alt that names the chart type and the single takeaway. "
-            "A separate long description will live in <figcaption> or aria-describedby — "
-            "do NOT try to fit everything into the alt."
-        )
-    elif kind == "group":
-        head = "Describe the group of images as a whole, conveying their combined meaning."
-    else:
-        head = "Write alt text for this image."
+    if not _HAVE_PROMPTS:
+        # Stdlib-only fallback. Kept in lockstep with the YAML default body.
+        return f"{lang_line} Write alt text for this image.{ctx} {BASE_RULES}"
 
-    ctx = f" Page context: {context}." if context else ""
-    return f"{lang_line} {head}{ctx} {BASE_RULES}"
+    return _render_prompt(name, prompts_dir=_PROMPTS_DIR, lang_line=lang_line, ctx=ctx, max_chars=MAX_CHARS)
 
 
 # ── Image loading + optional downscale ──────────────────────────────────────

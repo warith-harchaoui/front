@@ -315,6 +315,7 @@ def build_prompt(goal: str, page_text: str, site_name: str, lang: str) -> str:
 
     return render_prompt(
         "meta_tags_json",
+        prompts_dir=Path(__file__).resolve().parent / "prompts",
         lang_line=lang_line,
         brand_block=brand_block,
         goal_block=goal_block,
