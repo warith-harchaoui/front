@@ -1,0 +1,113 @@
+---
+name: front-cli-gui
+description: Wrap an existing command-line tool in a single-page vanilla-JavaScript + Tailwind GUI. Reads the CLI's argument parser (argparse, click, clap, commander, cobra), maps sub-commands and flags to forms / segmented controls / file inputs / streaming log panels, and emits one index.html + app.js + Tailwind config. For solo developers and small teams (Python / Node / Go / Rust CLI authors, ML researchers, data scientists, DevOps / SRE) who need a usable web UI without picking up React or learning Gradio's / Streamlit's look. Trigger phrases: "wrap this CLI in a GUI", "build a UI for my CLI", "argparse to GUI", "click to web UI", "GUI for my Python script". Output follows the front-ui stack rules — install front-ui alongside for full design tokens.
+license: Unlicense
+metadata:
+  author: Warith Harchaoui
+  version: 0.2.0
+---
+
+# front-cli-gui — CLI → web GUI
+
+## Audience and positioning
+
+Solo developers and small teams who have a working CLI (Python / Node / Go / Rust) and need a usable web UI for it. Common cases:
+
+- ML researcher with a `train.py` / `eval.py` that teammates run with the wrong flags.
+- Data scientist with a Click pipeline that stakeholders should be able to launch.
+- DevOps engineer with internal `argparse` tools that should not require shell access.
+- Indie hacker shipping a CLI tool whose first user-facing surface is a web page.
+
+### Why this skill, not Gradio / Streamlit / Tauri / Taipy
+
+The auto-form generators are excellent at the 80% case and frustrating at the last 20%. They produce a UI that **looks like the tool's UI**, not yours. The trade-offs:
+
+- **Gradio / Streamlit / Taipy / Shiny.** Server-side runtimes that auto-generate widgets from your function signature. Fast for ML demos. The cost: every Gradio app looks like a Gradio app; every Streamlit app looks like a Streamlit app. The CSS surface to override is non-trivial and brittle across versions. You also ship the runtime — minimum ~50 MB of Python deps and a long-lived server process.
+- **Tauri / Wails / Electron.** Native desktop wrappers. Real desktop integration, real binary you can hand to a non-technical user. They wrap a web view — `front-cli-gui` is what you'd put **inside** the web view. Pick Tauri when the deliverable must be a desktop app; pick `front-cli-gui` when the deliverable is a single HTML page that runs anywhere.
+- **Gooey / dearpygui.** Native widgets, no web. Pick these when you specifically want OS-native chrome.
+
+What `front-cli-gui` does instead:
+
+1. Emits **plain HTML + Tailwind + vanilla JS** — same files you'd write by hand. No runtime, no lock-in. You can edit it without learning a framework.
+2. Uses your **own** design tokens (semantic color, typography, dark mode, focus rings) via the shared front-ui stack rules. The UI does not look like every other auto-generated tool UI.
+3. Speaks to the CLI through a tiny adapter (HTTP + SSE, Tauri `invoke()`, or stub) — you pick the host. The GUI is decoupled from the runtime.
+4. Ships a worked example you can copy in `assets/examples/cli-gui-demo/`.
+
+Honest limitation: this skill **scaffolds** the GUI. You still need to wire execution to your CLI through the host of your choice. We provide a Python SSE proxy reference implementation in the demo; for production you'll harden it (auth, rate-limit, sandbox).
+
+## CLI → GUI workflow (the flagship)
+
+When the user points to an existing CLI project and asks for a GUI:
+
+1. **Inventory the CLI.** Read the help output (`tool --help`, `tool sub --help`), the README, the source's argument parser (`argparse`, `click`, `clap`, `commander`, `cobra`, …). Build a map: sub-commands → flags → input types → output shape.
+2. **Categorize each command** by surface:
+   - One-shot action (single button + result panel).
+   - Form-driven (multiple inputs → run).
+   - Long-running (streaming output → progress + log panel).
+   - List-producing (table view with filters).
+3. **Pick a layout**:
+   - 2–4 commands → tab bar at the bottom (mobile) or sidebar (desktop).
+   - 5–8 → sidebar with grouped sections.
+   - 9+ → command palette (`⌘K`) + categorized sidebar.
+4. **Map flags to form controls**:
+   - boolean flag → toggle.
+   - enum flag → segmented control (≤ 4 options) or `<select>`.
+   - path → `<input type="file">` + drag-drop zone.
+   - string → text field.
+   - number → stepper or slider.
+   - repeated flag → tag list.
+5. **Wire execution.** Choose ONE depending on the project:
+   - **Local-only**, packaged as Tauri / Electron / web view: invoke via the host's `invoke()` / IPC.
+   - **HTTP-served**: emit a tiny `fetch` wrapper assuming the CLI is wrapped by `python -m http.server`, `express`, `fastapi`, or the demo's stdlib SSE proxy.
+   - **Browser-only mock**: stub execution with `console.log` and clearly mark TODOs.
+6. **Stream output** to a monospace `<pre>` panel; convert ANSI escapes to HTML if needed.
+7. **Emit a single `index.html` + `app.js` + Tailwind** that runs out of the box. Ship the Montserrat (or Inter) fonts in `./fonts/`.
+8. **Document** in the project's README how to launch the GUI alongside the CLI.
+
+## Stack rules (inherited)
+
+Output follows the front-ui stack rules. If front-ui is not installed in the same agent, apply these directly:
+
+- **Vanilla JS** (ES modules), no framework.
+- **Tailwind utility classes**, semantic tokens, dark-mode peer on every styled element.
+- **Montserrat** (default) or **Inter** (for dense dev UI). Self-hosted. The CLI → GUI flagship usually picks **Inter** because the surface is dense (forms, log panels, tables).
+- Semantic HTML, visible focus rings, 44 × 44 hit area, `prefers-reduced-motion` honored.
+- Both color schemes.
+
+For full rules, see `front-ui/SKILL.md` and `front-ui/references/`.
+
+## When NOT to use this skill
+
+- The user wants a **desktop app binary**, not a web page. → Use Tauri (this skill can supply Tauri's web view content).
+- The user wants **ML model auto-demos** with sliders and audio playback wired automatically. → Use Gradio.
+- The user wants **a data app with charts as the primary surface** and is fine with the runtime's look. → Use Streamlit.
+- The CLI is **purely interactive** (REPL, prompt-heavy) — a TUI like Textual / Bubble Tea is the better fit.
+
+## Worked example
+
+`assets/examples/cli-gui-demo/` is a runnable, ~700-LOC demo of the whole workflow:
+
+- A mock CLI `imgconvert` with three sub-commands.
+- A Python stdlib HTTP + SSE proxy (`server.py`).
+- A single-page GUI (`public/index.html` + `public/app.js`).
+- Per-flag-shape → control-shape table.
+
+Launch:
+
+```bash
+cd front-cli-gui/assets/examples/cli-gui-demo
+python server.py
+# open http://localhost:8787
+```
+
+## References
+
+- `references/cli-gui-workflow.md` — Long-form workflow notes, host-adapter patterns (Tauri / FastAPI / Express / stdlib proxy), streaming output, error states, repeated-flag editors.
+
+## Companion skills
+
+| You also need… | Install |
+|---|---|
+| Full UI design tokens (color, typography, components, dark mode) | `front-ui` |
+| a11y lint + contrast audit on the emitted HTML | `front-a11y` |
+| Favicon / meta / docs site for the wrapping page | `front-publish` |

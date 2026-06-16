@@ -1,9 +1,9 @@
 """
 conftest.py — shared pytest configuration for the front-skill test suite.
 
-Adds ``front/scripts/`` to ``sys.path`` so test modules can ``import
-alt_from_ollama`` etc. directly, mirroring how the scripts use each
-other at runtime.
+Adds each skill's ``scripts/`` directory to ``sys.path`` so test modules
+can ``import alt_from_ollama`` etc. directly, mirroring how the scripts
+use each other at runtime.
 
 Author
 ------
@@ -19,11 +19,19 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SCRIPTS_DIR = REPO_ROOT / "front" / "scripts"
 
-# Inject the scripts directory at the front of sys.path so its modules
+# Skill scripts live in one folder per skill since the 0.2.0 split. Tests
+# can import from any of them.
+SKILL_SCRIPTS_DIRS = (
+    REPO_ROOT / "front-a11y" / "scripts",
+    REPO_ROOT / "front-publish" / "scripts",
+    REPO_ROOT / "front-ui" / "scripts",
+)
+
+# Inject every scripts directory at the front of sys.path so its modules
 # resolve before any like-named package elsewhere in the environment.
-sys.path.insert(0, str(SCRIPTS_DIR))
+for d in SKILL_SCRIPTS_DIRS:
+    sys.path.insert(0, str(d))
 
 
 @pytest.fixture(autouse=True)

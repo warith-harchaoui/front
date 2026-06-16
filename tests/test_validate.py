@@ -22,7 +22,7 @@ from pathlib import Path
 def test_validate_passes_on_shipped_skill(repo_root: Path) -> None:
     """The skill on ``main`` must validate green at all times."""
     proc = subprocess.run(
-        [sys.executable, str(repo_root / "front" / "scripts" / "validate.py")],
+        [sys.executable, str(repo_root / "front-ui" / "scripts" / "validate.py")],
         capture_output=True,
         text=True,
     )

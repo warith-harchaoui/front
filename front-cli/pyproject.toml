@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "front-cli"
+version = "0.2.0"
+description = "Unified front driver — single entry point for the four front skills (front-ui, front-cli-gui, front-publish, front-a11y)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Unlicense" }
+authors = [{ name = "Warith Harchaoui" }]
+keywords = ["front", "claude", "skill", "cli", "tailwind", "a11y"]
+
+dependencies = [
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[project.scripts]
+front = "front_cli.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]

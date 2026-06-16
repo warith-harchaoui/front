@@ -1,8 +1,19 @@
 # Landscape — alternatives to `front`
 
-`front` is one opinionated answer to a wide question: *how should an LLM produce frontend code?* This file maps the alternatives in every category the skill touches as **matrices** — rows are tools, columns are characteristics you actually care about. Use it to choose with eyes open.
+`front` is one opinionated answer to a wide question: *how should an LLM produce frontend code?* This file maps the alternatives in every category the four skills touch as **matrices** — rows are tools, columns are characteristics you actually care about. Use it to choose with eyes open.
 
-Legend used in every matrix:
+## A note on bias
+
+This file is written by the author of `front`. The "Skill alignment" column flags whether each alternative aligns with what `front` emits — it does not claim `front` is better than every alternative. Read it as "does this row fit inside `front`'s emitted output" or "is this row a reasonable companion." Most alternatives are excellent at what they do; if the row gets a ✗ it's usually because `front` made a different design choice (e.g. no React, no framework-tied design system), not because the alternative is worse.
+
+Two categories where `front` is genuinely a strong pick:
+
+1. **CLI → GUI for solo / small-team Python projects** that need a real HTML deliverable (not a Streamlit/Gradio runtime) and want to avoid picking up React. See § 7.
+2. **Pre-commit a11y + contrast gates in CI without a browser**. The static gates in `front-a11y` complement (do not replace) runtime audits like axe-core or Pa11y. See § 9, § 10.
+
+Most other categories: there is a better tool if you specialize. The matrices below name it explicitly.
+
+## Legend
 
 - **✓** yes / built-in
 - **~** partial / requires config
@@ -15,25 +26,22 @@ Costs are MIT/Apache-permissive unless otherwise noted. Stack column lists the l
 
 ## Quick pick
 
-What kind of work are you doing? Find the row, follow the recommendation.
+What kind of work are you doing? Find the row and the honest recommendation.
 
-| You want… | Pick `front`? | Reasonable alternative |
-|---|:---:|---|
-| Vanilla JS + Tailwind output, no framework | ✓ | — |
-| React + design system stack | ✗ | [shadcn/ui](https://ui.shadcn.com), [MUI](https://mui.com) |
-| Material-3 native look | ✗ | [Material Web Components](https://material-web.dev) |
-| Wrap a Python / Node / Go CLI in a web GUI | ✓ | — |
-| Wrap a CLI as a native desktop app | ~ | [Tauri](https://tauri.app) wrapping `front`'s output |
-| Auto-form from `argparse` (no UX control) | ✗ | [Gradio](https://gradio.app), [Gooey](https://github.com/chriskiehl/Gooey) |
-| Build a docs site from Markdown | ~ | [Hugo](https://gohugo.io), [MkDocs Material](https://squidfunk.github.io/mkdocs-material/), [Astro](https://astro.build) |
-| Declarative JSON charts with a house style | ✓ | — |
-| Bespoke / 3D / scientific charts | ✗ | [D3](https://d3js.org), [Plotly](https://plotly.com), [Three.js](https://threejs.org) |
-| A11y lint in CI, no browser | ✓ | — |
-| A11y audit after JS runs in a real DOM | ✗ | [axe-core](https://github.com/dequelabs/axe-core), [Pa11y](https://pa11y.org), Lighthouse |
-| Local-only alt-text drafting | ✓ | — |
-| Top-quality hosted alt-text | ✗ | [Claude vision](https://docs.claude.com/en/docs/build-with-claude/vision), [Azure AI Vision](https://learn.microsoft.com/azure/ai-services/computer-vision/), [GPT-4o vision](https://platform.openai.com/docs/guides/vision) |
-| Local CPU-friendly captions | ✓ | — |
-| Real-time live captions | ✗ | [Deepgram](https://deepgram.com), [AssemblyAI](https://www.assemblyai.com) |
+| You want… | `front` skill | When to pick something else |
+|---|---|---|
+| Vanilla JS + Tailwind UI output, no framework | `front-ui` | If the team has already picked React/Vue/Svelte. `front` refuses to emit framework code; you'd be fighting it. |
+| React + design system stack | none | [shadcn/ui](https://ui.shadcn.com), [Mantine](https://mantine.dev), [MUI](https://mui.com). shadcn is closest in philosophy (copy-paste, no runtime lock-in). |
+| Material-3 native look | none | [Material Web Components](https://material-web.dev) for first-party Material; `front-ui/references/material-design.md` only maps Material roles into the skill's tokens. |
+| Wrap a Python / Node / Go CLI in a web GUI | `front-cli-gui` | If you want auto-form-from-signature with no UI control: [Gradio](https://gradio.app) (ML demos), [Streamlit](https://streamlit.io) (data apps), [Taipy](https://taipy.io). `front-cli-gui` scaffolds plain HTML you edit — those tools give you a runtime UI you cannot easily restyle. |
+| Wrap a CLI as a native desktop app binary | `front-cli-gui` (UI) + Tauri (shell) | [Tauri](https://tauri.app) is the desktop shell; `front-cli-gui` emits what goes inside the web view. If you only need the desktop, Tauri's defaults are fine. |
+| Build a docs site from a small README + `docs/` | `front-publish` | For 100+ versioned pages or for a docs site with side-by-side per-release views: [MkDocs Material](https://squidfunk.github.io/mkdocs-material/), [Hugo](https://gohugo.io), [Astro](https://astro.build), [Docusaurus](https://docusaurus.io). `front-publish` is for small projects (< 30 pages). |
+| Declarative JSON charts with a house style | `front-ui` | For bespoke / 3D / scientific charts: [D3](https://d3js.org), [Plotly](https://plotly.com), [Three.js](https://threejs.org). `front-ui` ships Vega-Lite v5 specs. |
+| A11y lint in CI without a browser | `front-a11y` | This is a pre-commit gate. For runtime DOM audits (post-JS, dynamic ARIA, focus order after async): [axe-core](https://github.com/dequelabs/axe-core), [Pa11y](https://pa11y.org), Lighthouse. Pair both. |
+| Local-only alt-text drafting | `front-a11y` | For top-quality hosted alt-text: [Claude vision](https://docs.claude.com/en/docs/build-with-claude/vision), [GPT-4o vision](https://platform.openai.com/docs/guides/vision), [Gemini Vision](https://ai.google.dev/gemini-api/docs/vision). Hosted is more accurate; local is free and private. |
+| Local CPU-friendly captions | `front-a11y` | For real-time live captions: [Deepgram](https://deepgram.com), [AssemblyAI](https://www.assemblyai.com). `front-a11y` uses whisper.cpp — fast on CPU, not live. |
+| Marketing landing page | none | Webflow, Framer, or a design agency. `front` enforces a stack that's optimized for clarity, not brand differentiation. |
+| Custom visual identity for a consumer app | none | Hire a designer. `front` uses one palette family and two fonts on purpose. |
 
 ---
 

@@ -96,7 +96,7 @@ OpenCode reconnaît le skill via la même description de frontmatter que Claude 
 
 ## Structure du dépôt
 
-```
+```text
 front/                              ← racine du dépôt
 ├── README.md / LISEZMOI.md         ← EN / FR
 ├── LANDSCAPE.md                    ← matrices comparatives vs alternatives

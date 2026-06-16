@@ -1,62 +1,81 @@
 # front
 
-> A Claude skill for vanilla JavaScript + Tailwind CSS frontend code, using Montserrat as the only typeface. Released into the public domain under The Unlicense.
+> Four Claude / OpenCode skills for vanilla JavaScript + Tailwind CSS + Montserrat/Inter frontends. Released into the public domain under The Unlicense. For solo developers and small teams shipping internal tools without a designer.
 
-This repository is an [Anthropic skill](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf). Use it from **Claude Code** (`cp -r front ~/.claude/skills/front`) or from **OpenCode** (`cp -r front ~/.opencode/skills/front`) — both agents read `front/SKILL.md` natively, auto-trigger on its frontmatter description, and orchestrate the scripts under `front/scripts/` per the skill's instructions.
+This repository is a **bundle of four [Anthropic skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf)**. Use them from **Claude Code** (`cp -r front-* ~/.claude/skills/`) or from **OpenCode** (`cp -r front-* ~/.opencode/skills/`). Each skill auto-triggers on its frontmatter description.
 
-The flagship use case: read an existing CLI's `--help` and produce the matching single-page vanilla-JS + Tailwind GUI in one session.
+## Skill entry points
 
-## Skill entry point
+- [front-ui/SKILL.md](front-ui/SKILL.md): UI generation core — components, pages, dataviz, design system, dark mode. Always install.
+- [front-cli-gui/SKILL.md](front-cli-gui/SKILL.md): Wrap an existing CLI in a single-page vanilla-JS + Tailwind GUI. Flagship.
+- [front-publish/SKILL.md](front-publish/SKILL.md): Markdown → website, meta tags, favicons, site indexes, plain language.
+- [front-a11y/SKILL.md](front-a11y/SKILL.md): a11y lint, contrast audit, CVD simulation, alt text, captions.
 
-- [SKILL.md](front/SKILL.md): YAML frontmatter, decision tree, CLI → GUI workflow, hard rules, examples.
+## front-ui core references
 
-## Core references
+- [color-psychology.md](front-ui/references/color-psychology.md): Curated palettes (Choice / Emotion / Concept / Psychology) and the semantic-color mapping.
+- [stack-vanilla-js.md](front-ui/references/stack-vanilla-js.md): Vanilla JS patterns — ES modules, native `<dialog>`, events, state, i18n.
+- [stack-tailwind.md](front-ui/references/stack-tailwind.md): Tailwind config, base CSS, plugins, dark-mode strategy, Inter swap.
+- [checklist.md](front-ui/references/checklist.md): Pre-ship quality gate.
 
-- [color-psychology.md](front/references/color-psychology.md): Curated palettes (Choice / Emotion / Concept / Psychology) and the semantic-color mapping.
-- [stack-vanilla-js.md](front/references/stack-vanilla-js.md): Vanilla JS patterns — ES modules, native `<dialog>`, events, state, i18n.
-- [stack-tailwind.md](front/references/stack-tailwind.md): Tailwind config, base CSS, plugins, dark-mode strategy.
-- [checklist.md](front/references/checklist.md): Pre-ship quality gate.
+## front-ui charts and dataviz
 
-## Charts and dataviz
+- [charts-vega.md](front-ui/references/charts-vega.md): Vega-Lite house style.
+- [dataviz-chart-selection.md](front-ui/references/dataviz-chart-selection.md): Decision tree for picking the right chart shape.
+- [dataviz-color-palettes.md](front-ui/references/dataviz-color-palettes.md): Sequential / divergent / categorical palettes.
+- [dataviz-maps.md](front-ui/references/dataviz-maps.md): Map-specific ergonomics.
+- [dashboard-ergonomics.md](front-ui/references/dashboard-ergonomics.md): Tile-by-tile dashboard layout.
 
-- [charts-vega.md](front/references/charts-vega.md): Vega-Lite house style (Montserrat, 10 px rounded corners, palette, matplotlib → Vega-Lite axis cleanup).
-- [dataviz-chart-selection.md](front/references/dataviz-chart-selection.md): Decision tree for picking the right chart shape.
-- [dataviz-color-palettes.md](front/references/dataviz-color-palettes.md): Sequential / divergent / categorical palettes with accessibility workflow.
-- [dataviz-maps.md](front/references/dataviz-maps.md): Map-specific ergonomics.
-- [dashboard-ergonomics.md](front/references/dashboard-ergonomics.md): Tile-by-tile dashboard layout.
+## front-ui design system
 
-## Design system
+- [ui-guidelines/INDEX.md](front-ui/references/ui-guidelines/INDEX.md): Full map (foundations, patterns, components, inputs, platforms). Apple HIG-derived.
+- [material-design.md](front-ui/references/material-design.md): Material 3 distilled with Material → skill-token mapping.
+- [anti-patterns.md](front-ui/references/anti-patterns.md): Visual and copy tells to refuse.
+- [ux-psychology.md](front-ui/references/ux-psychology.md): Applied cognitive principles.
+- [ergonomics-criteria.md](front-ui/references/ergonomics-criteria.md): Eight ergonomic criteria for UX audit.
 
-- [ui-guidelines/INDEX.md](front/references/ui-guidelines/INDEX.md): Full map (foundations, patterns, components, inputs, platforms).
-- [material-design.md](front/references/material-design.md): Material 3 distilled with Material → skill-token mapping.
-- [anti-patterns.md](front/references/anti-patterns.md): Visual and copy tells to refuse (gradient text, glassmorphism, marketing buzzwords).
-- [ux-psychology.md](front/references/ux-psychology.md): Applied cognitive principles for review and conversion work.
-- [ergonomics-criteria.md](front/references/ergonomics-criteria.md): Eight ergonomic criteria for UX audit.
+## front-publish — HTML, meta, i18n, indexes
 
-## HTML, meta, accessibility, internationalization
+- [meta-tags.md](front-publish/references/meta-tags.md): `<meta>` tags — W3C / WHATWG + Open Graph + Twitter Cards + Schema.org JSON-LD.
+- [site-indexes.md](front-publish/references/site-indexes.md): robots.txt + sitemap.xml + llms.txt + Atom/RSS + humans.txt.
+- [plain-language.md](front-publish/references/plain-language.md): Copy rewriting at a target grade.
+- [i18n.md](front-publish/references/i18n.md): Multilingual frontend — URL strategy, `Intl.*`, plurals, RTL. Language pair configurable.
 
-- [meta-tags.md](front/references/meta-tags.md): `<meta>` tags — W3C / WHATWG + Open Graph + Twitter Cards + Schema.org JSON-LD.
-- [alt-text-ai.md](front/references/alt-text-ai.md): W3C-compliant alt text via a local Ollama + Gemma vision model.
-- [i18n.md](front/references/i18n.md): Multilingual frontend — URL strategy, `Intl.*`, plurals, RTL.
+## front-a11y — accessibility audits and content
+
+- [lint-a11y.md](front-a11y/references/lint-a11y.md): 14-rule static a11y lint. Honest framing — pre-commit gate, not a replacement for axe-core.
+- [contrast-audit.md](front-a11y/references/contrast-audit.md): WCAG ratio audit + OKLCH-neighbour fix hint.
+- [cvd-simulation.md](front-a11y/references/cvd-simulation.md): Protanopia / deuteranopia / tritanopia rendering.
+- [alt-text-ai.md](front-a11y/references/alt-text-ai.md): W3C-compliant alt text via local Ollama + Gemma vision.
+- [captions-ai.md](front-a11y/references/captions-ai.md): WebVTT / SRT captions via local pywhispercpp.
 
 ## Scripts (Python, cross-platform)
 
-- [requirements.txt](front/scripts/requirements.txt): `pip install -r front/scripts/requirements.txt`.
-- [validate.py](front/scripts/validate.py): Pre-ship quality gate.
-- [install_alt_ai.py](front/scripts/install_alt_ai.py): Installs Ollama and pulls the vision model.
-- [alt_from_ollama.py](front/scripts/alt_from_ollama.py): Generates alt text per W3C purpose categories.
-- [meta_from_ollama.py](front/scripts/meta_from_ollama.py): Drafts page `<meta>` tags from a goal or HTML page.
-- [favicons.py](front/scripts/favicons.py): Generates favicon / PWA / apple-touch / maskable icon set + `site.webmanifest` + `head.html`.
+- [front-ui/scripts/validate.py](front-ui/scripts/validate.py): Pre-ship quality gate. Stdlib only.
+- [front-publish/scripts/favicons.py](front-publish/scripts/favicons.py): Favicon / PWA / Apple-touch / maskable icon set + manifest + head snippet.
+- [front-publish/scripts/meta_from_ollama.py](front-publish/scripts/meta_from_ollama.py): Drafts page meta tags from a goal or HTML page.
+- [front-publish/scripts/site_indexes.py](front-publish/scripts/site_indexes.py): robots, sitemap, llms.txt, feed, humans.
+- [front-publish/scripts/plain_language.py](front-publish/scripts/plain_language.py): Rewrites UI copy at a target reading grade.
+- [front-a11y/scripts/lint_a11y.py](front-a11y/scripts/lint_a11y.py): 14-rule static a11y lint.
+- [front-a11y/scripts/audit_contrast.py](front-a11y/scripts/audit_contrast.py): WCAG contrast audit + OKLCH fix suggester.
+- [front-a11y/scripts/simulate_cvd.py](front-a11y/scripts/simulate_cvd.py): CVD image transforms.
+- [front-a11y/scripts/alt_from_ollama.py](front-a11y/scripts/alt_from_ollama.py): W3C alt text via local Ollama.
+- [front-a11y/scripts/install_alt_ai.py](front-a11y/scripts/install_alt_ai.py): Installs Ollama + Gemma vision.
+- [front-a11y/scripts/captions_from_whisper.py](front-a11y/scripts/captions_from_whisper.py): WebVTT / SRT captions via pywhispercpp.
+- [front-a11y/scripts/install_captions.py](front-a11y/scripts/install_captions.py): Installs pywhispercpp + model.
 
 ## Assets
 
-- [starter-page.html](front/assets/starter-page.html): Bootstrap a full page (Montserrat + Tailwind + tokens).
-- [components/](front/assets/components/): Copy-paste HTML snippets — `button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`, `chart-bar.json`, `chart-line.json`.
-- [fonts/montserrat/](front/assets/fonts/montserrat/): Montserrat WOFF2 (variable + italic-variable + 4 static) + `OFL.txt` + `fonts.css`.
+- [front-ui/assets/starter-page.html](front-ui/assets/starter-page.html): Single-file page bootstrap (Montserrat + Tailwind + tokens).
+- [front-ui/assets/components/](front-ui/assets/components/): Copy-paste HTML snippets + Vega-Lite chart specs.
+- [front-ui/assets/fonts/montserrat/](front-ui/assets/fonts/montserrat/): Montserrat WOFF2 + `OFL.txt` + `fonts.css`.
+- [front-cli-gui/assets/examples/cli-gui-demo/](front-cli-gui/assets/examples/cli-gui-demo/): Runnable CLI → GUI worked example.
 
 ## Optional
 
-- [README.md](README.md): Human-facing English README — includes an "Inputs → outputs" table.
-- [LISEZMOI.md](LISEZMOI.md): Human-facing French README.
-- [LANDSCAPE.md](LANDSCAPE.md): Comparison matrices of alternatives in every category the skill touches (frameworks, CSS, components, dataviz, CLI → GUI hosts, MD → site generators, a11y / alt-text / captions tooling).
+- [README.md](README.md): Human-facing English README with the "Inputs → outputs" table and the audience definition.
+- [LISEZMOI.md](LISEZMOI.md): Human-facing French README (legacy — pending 0.2.0 parity update).
+- [LANDSCAPE.md](LANDSCAPE.md): Comparison matrices vs alternatives.
+- [CHANGELOG.md](CHANGELOG.md): Release notes (0.2.0 = the four-skill split).
+- [CONTRIBUTING.md](CONTRIBUTING.md): How to propose changes.
 - [LICENSE.md](LICENSE.md): The Unlicense + Montserrat OFL carve-out.

@@ -1,0 +1,104 @@
+---
+name: front-publish
+description: Turn a folder of Markdown files (README + docs/ + blog/) into a static website, draft per-page meta tags (title + description + Open Graph + Twitter Card + Schema.org JSON-LD), generate the full favicon / app-icon / PWA-icon set from a single logo, emit robots.txt + sitemap.xml + llms.txt + Atom or RSS feed + humans.txt, and rewrite UI copy in plain language at a target reading level. For solo developers and small teams who have content (Markdown, a logo, draft copy) and need a deployable site without standing up Hugo, Astro, Docusaurus or Next. Trigger phrases: "turn these markdown files into a website", "meta tags", "OG card", "favicons", "app icons", "PWA icons", "robots.txt", "sitemap", "llms.txt", "Atom feed", "RSS", "plain language", "rewrite at grade N", "simplify this copy". Output follows the front-ui stack rules — install front-ui alongside for full design tokens.
+license: Unlicense
+metadata:
+  author: Warith Harchaoui
+  version: 0.2.0
+---
+
+# front-publish — Markdown → website, meta, icons, indexes, plain language
+
+## Audience and positioning
+
+Solo developers and small teams shipping:
+
+- A docs site for a small project (≤ 30 pages).
+- A project landing page from a single README.
+- A research / portfolio site from a few Markdown files.
+- An indie blog with ≤ 50 posts.
+
+This skill is **not** the right pick for a docs site with hundreds of versioned pages — pick MkDocs Material, Hugo, or Astro instead. For React-driven content sites, pick Docusaurus.
+
+## What it does
+
+| Trigger phrase | Output |
+|---|---|
+| "turn these markdown files into a website" | Static HTML per `.md` + sticky top nav + sidebar TOC for `docs/` + dark-mode peer + favicons + meta tags + robots / sitemap / llms.txt / Atom feed |
+| "meta tags" / "SEO" / "OG card" / "Twitter card" / "JSON-LD" | Title + description + Open Graph + Twitter + Schema.org `@type`, JSON on stdout |
+| "favicons" / "app icons" / "PWA icons" | `favicon.svg` + `.ico` + PNG set + `apple-touch-icon.png` + maskable PWA icon + `site.webmanifest` + `head.html` snippet |
+| "robots.txt" / "sitemap.xml" / "llms.txt" / "feed" / "Atom" / "RSS" / "humans.txt" | All from a single command; auto-detects a blog folder for the feed |
+| "plain language" / "simplify this copy" / "rewrite at grade N" | Same meaning, marketing voice stripped, output length ≤ 1.1× original |
+
+## Markdown → website workflow
+
+When the user points to a Markdown-only project and asks for a website:
+
+1. **Inventory the Markdown.** Walk the tree. Group files by purpose: landing (`README.md`), documentation (`docs/**/*.md`), blog posts (`posts/**`, `blog/**`), references, changelogs. Note frontmatter conventions if present.
+2. **Pick a site shape**:
+   - One README → single landing page with anchored sections from the headings.
+   - README + a `docs/` tree → two-pane docs site (sidebar TOC + content).
+   - Blog directory → home with post list + per-post pages + tag pages.
+3. **Build a route map**. Each Markdown file becomes one HTML page; preserve the directory shape under the output root. Landing at `/index.html`.
+4. **Generate navigation**:
+   - Sticky top bar with the project name on start, theme switcher on end.
+   - Sidebar (lg:) with section tree on `docs/**` pages.
+   - Bottom tab bar (mobile) when ≤ 5 top-level destinations.
+5. **Convert Markdown to HTML**. Prefer a build-step tool (Pandoc, `markdown-it`, `python-markdown`) so the output is plain HTML; do not import a Markdown runtime into the browser. Apply typography classes from `front-ui/references/stack-tailwind.md`. Code blocks get a server-side syntax highlighter (Pygments, `highlight.js` build step) — never load a runtime highlighter.
+6. **Wire meta tags per page** using `references/meta-tags.md` and (optional) `python scripts/meta_from_ollama.py path/to/page.html`.
+7. **Generate the favicon set** from the project's logo: `python scripts/favicons.py logo.png --out public --name "Project name"`. Drop the produced `head.html` snippet into the layout template.
+8. **Emit indexes**: `python scripts/site_indexes.py --root . --base-url https://example.com [--feed-from posts]` — produces robots.txt + sitemap.xml + llms.txt + optional Atom feed.
+9. **Emit pages + assets**. One `index.html` per page, one shared `app.js` (theme switcher, search if needed), one `styles.css` (Tailwind directives + Montserrat or Inter). Include the favicon set under `public/`. Add a small `README.md` to the output root explaining the build.
+
+Output drops into any host (GitHub Pages, Netlify, S3, Nginx) without a runtime build.
+
+## Stack rules (inherited)
+
+Output follows the front-ui stack rules — vanilla JS, Tailwind, Montserrat (default) or Inter (for dev / doc surfaces with dense prose like changelogs and reference tables). If front-ui is not installed, see `front-ui/SKILL.md` for the full ruleset.
+
+## Tool composition (take initiative)
+
+When emitting a whole website, compose the scripts in this order:
+
+```text
+favicons.py        # icons + manifest
+↓
+meta_from_ollama.py  # per page: title, description, OG, JSON-LD
+↓
+site_indexes.py    # robots, sitemap, llms.txt, feed
+↓
+plain_language.py  # optional: simplify draft copy
+```
+
+Then run `front-a11y/scripts/lint_a11y.py` over the output and `front-a11y/scripts/audit_contrast.py` over the palette before declaring "done".
+
+## When NOT to use this skill
+
+- Versioned docs (semantic versioning, side-by-side per-release docs) → Hugo / MkDocs Material / Docusaurus.
+- 100+ Markdown pages → an SSG with incremental rebuilds is faster.
+- Heavy templating (custom shortcodes, partials, theme inheritance) → use a real SSG; this skill emits flat HTML.
+
+## References
+
+- `references/meta-tags.md` — `<meta>` tags per W3C / WHATWG + Open Graph + Twitter Cards + Schema.org JSON-LD.
+- `references/site-indexes.md` — robots.txt, sitemap.xml, llms.txt, Atom / RSS, humans.txt.
+- `references/plain-language.md` — rewrite copy at a target reading level; preserves meaning.
+- `references/i18n.md` — multilingual frontend (URL strategy, `Intl.*`, plurals, RTL, persisted choice). Default language pair is configurable per project (EN/FR, EN/DE, EN/ES, EN/JA, …).
+
+## Scripts
+
+| Script | Install | Purpose |
+|---|---|---|
+| `scripts/favicons.py` | `pip install -r scripts/requirements-favicons.txt` | Full favicon / PWA icon set + manifest + head snippet from a single logo |
+| `scripts/meta_from_ollama.py` | `pip install -r scripts/requirements-meta-tags.txt` + Ollama | Drafts title / description / OG / Twitter / JSON-LD from a goal or HTML page |
+| `scripts/site_indexes.py` | stdlib only | robots.txt + sitemap.xml + llms.txt + Atom / RSS + humans.txt |
+| `scripts/plain_language.py` | `pip install -r scripts/requirements-plain-language.txt` + Ollama | Rewrites copy at a target grade; strips marketing voice |
+| `scripts/_lang.py`, `scripts/_ollama.py` | (internal helpers) | Language detection + Ollama client shared by other scripts |
+
+## Companion skills
+
+| You also need… | Install |
+|---|---|
+| Full UI design tokens, components, dark mode, dataviz | `front-ui` |
+| a11y lint, contrast audit, alt text, captions | `front-a11y` |
+| Wrap a CLI in a GUI | `front-cli-gui` |

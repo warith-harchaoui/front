@@ -195,11 +195,11 @@ class TestFixturesFreeOfFindings:
     """Whole-file negative tests against the skill's own assets."""
 
     def test_starter_page_passes(self, repo_root: Path) -> None:
-        starter = repo_root / "front" / "assets" / "starter-page.html"
+        starter = repo_root / "front-ui" / "assets" / "starter-page.html"
         findings = lint_file(starter, set())
         assert findings == []
 
     def test_demo_index_passes(self, repo_root: Path) -> None:
-        demo = repo_root / "front" / "assets" / "examples" / "cli-gui-demo" / "public" / "index.html"
+        demo = repo_root / "front-cli-gui" / "assets" / "examples" / "cli-gui-demo" / "public" / "index.html"
         findings = lint_file(demo, set())
         assert findings == []

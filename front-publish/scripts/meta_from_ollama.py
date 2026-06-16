@@ -1,0 +1,460 @@
+#!/usr/bin/env python3
+"""
+meta_from_ollama
+================
+
+Draft HTML ``<meta>`` tags from a page's *goal and content*, using a local
+Ollama model. The tool reads either a free-text goal description, an existing
+HTML file, or a live URL — alone or in combination — and returns a single
+JSON object with suggested values for the canonical web meta surfaces.
+
+The script does NOT write to your HTML. It prints the suggestions to stdout;
+the author reviews and pastes (or pipes into a build step).
+
+Output schema
+-------------
+Every successful run emits a JSON object with these keys (string unless
+otherwise noted):
+
+* ``title`` — page title, ≤ 60 chars, topic first, brand last separated by " — ".
+* ``description`` — meta description, 120–155 chars, one factual sentence.
+* ``og_title`` — Open Graph title, usually the topic part of ``title``.
+* ``og_description`` — Open Graph description, mirrors ``description``.
+* ``og_image_alt`` — short alt for the hero image. ``""`` if no hero known.
+* ``twitter_title``, ``twitter_description`` — mirror the og fields.
+* ``schema_type`` — Schema.org ``@type`` for JSON-LD (``WebSite``, ``Article``, …).
+* ``keywords_hint`` — array of 3–8 short keywords for the author's reference.
+  *Not* meant to be emitted as ``<meta name="keywords">`` (a deprecated tag).
+* ``canonical`` — included only when ``--canonical`` was passed.
+
+Usage
+-----
+::
+
+    # From a goal description only
+    python meta_from_ollama.py --goal "Marketing landing for product X" \\
+                               --site-name "Acme"
+
+    # From a local HTML file
+    python meta_from_ollama.py path/to/page.html --site-name "Acme"
+
+    # From a live URL, in French, pinned to a canonical URL
+    python meta_from_ollama.py https://example.com/about \\
+                               --lang fr --canonical https://example.com/about
+
+    # Bypass the on-disk cache for this single run
+    python meta_from_ollama.py --goal "FAQ page" --no-cache
+
+Standards
+---------
+The keys mirror the union of W3C HTML / WHATWG HTML Living Standard,
+Open Graph (`ogp.me`_), Twitter Cards, Schema.org and Google Search
+Central guidance. See ``front/references/meta-tags.md``.
+
+.. _ogp.me: https://ogp.me/
+
+Notes
+-----
+* Requires Python 3.9+, ``requests``. No Pillow dependency.
+* Default model and endpoint are inherited from :mod:`alt_from_ollama`
+  (``OLLAMA_URL``, ``OLLAMA_MODEL``, ``OLLAMA_MODEL_BASE``).
+* On-disk cache lives under ``~/.cache/front-skill/meta/`` by default.
+  Override with ``FRONT_CACHE_DIR``; disable with ``FRONT_NO_CACHE=1`` or
+  ``--no-cache``.
+
+Author
+------
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import sys
+import urllib.request
+from pathlib import Path
+from typing import Optional
+
+import requests
+
+# The alt-text helper owns the language tables and the model-picking logic;
+# importing them here keeps both scripts in lock-step for free.
+sys.path.insert(0, str(Path(__file__).parent))
+from alt_from_ollama import (  # noqa: E402 — runtime import after sys.path tweak.
+    OLLAMA_URL,
+    LANG_INSTRUCTIONS,
+    detect_lang,
+    pick_default_model,
+)
+from _lang import detect_text_language  # noqa: E402
+
+
+# ── Module-level configuration ────────────────────────────────────────────────
+
+#: Hard limit on the size of HTML text content forwarded to the model. Pages
+#: longer than this are truncated; the meta-tag task does not benefit from
+#: feeding the entire DOM.
+PAGE_TEXT_LIMIT: int = 6000
+
+#: Directory where successful JSON outputs are cached. Override with the
+#: ``FRONT_CACHE_DIR`` env var.
+CACHE_DIR: Path = Path(
+    os.environ.get("FRONT_CACHE_DIR", Path.home() / ".cache" / "front-skill")
+) / "meta"
+
+#: Cache toggle, mirroring the same flag in :mod:`alt_from_ollama`.
+NO_CACHE: bool = bool(os.environ.get("FRONT_NO_CACHE"))
+
+#: Schema-of-output fragment appended to every prompt. Kept verbatim to give
+#: the model an explicit contract — ``format=json`` on the Ollama call also
+#: enforces this at parse time, but the human-readable spec helps the model.
+JSON_SCHEMA_HINT: str = """
+Return a single JSON object, no prose around it, with exactly these keys:
+
+  title              ≤ 60 chars, page-topic first, brand last separated by " — ".
+  description        120–155 chars, one sentence, no marketing buzzwords.
+  og_title           ≤ 60 chars. Usually identical to title (without brand).
+  og_description     ≤ 155 chars. Usually identical to description.
+  og_image_alt       Short description of the hero image content. ≤ 125 chars.
+                     Empty string if no hero image is known.
+  twitter_title      Same content as og_title.
+  twitter_description Same content as og_description.
+  schema_type        One of: WebSite, Article, NewsArticle, BlogPosting,
+                     Product, Person, Recipe, Event, FAQPage,
+                     LocalBusiness, Organization.
+  keywords_hint      Array of 3–8 short keywords for the author's reference.
+                     These are NOT meant to be emitted as <meta name="keywords">.
+
+Rules:
+  - No "Welcome to", no "Discover", no "Boost", no emojis.
+  - Do not invent facts (numbers, names, claims).
+  - If a value is unknown, return an empty string for it.
+  - Output strict JSON — double-quoted keys and strings, no trailing comma.
+"""
+
+
+# ── Cache helpers ───────────────────────────────────────────────────────────
+
+def _cache_key(goal: str, page_text: str, site_name: str, lang: str, model: str) -> str:
+    """
+    Compute a 32-character cache key from the inputs that affect the output.
+
+    Parameters
+    ----------
+    goal : str
+        Free-text goal description supplied via ``--goal``.
+    page_text : str
+        Text extracted from the source (HTML file or URL), or ``""``.
+    site_name : str
+        Brand / site name supplied via ``--site-name``.
+    lang : str
+        Two-letter language code.
+    model : str
+        Ollama model tag, e.g. ``gemma4:e2b-mlx``.
+
+    Returns
+    -------
+    str
+        32 hex characters suitable as a filename stem.
+    """
+    h = hashlib.sha256()
+    # NUL separators avoid ambiguity when one input contains a delimiter.
+    h.update(f"{goal}\x00{page_text}\x00{site_name}\x00{lang}\x00{model}".encode("utf-8"))
+    return h.hexdigest()[:32]
+
+
+def _cache_get(key: str) -> Optional[dict]:
+    """
+    Return the cached JSON object for ``key``, or ``None`` on a miss.
+
+    A corrupt cache file is treated as a miss; the model call runs and
+    rewrites the entry.
+    """
+    if NO_CACHE:
+        return None
+    path = CACHE_DIR / f"{key}.json"
+    if path.is_file():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            return None
+    return None
+
+
+def _cache_set(key: str, value: dict) -> None:
+    """
+    Store ``value`` in the cache under ``key``. Failures are swallowed.
+
+    Cache writes are opportunistic — a read-only filesystem or a quota
+    exhaustion must not break the primary action.
+    """
+    if NO_CACHE:
+        return
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        (CACHE_DIR / f"{key}.json").write_text(
+            json.dumps(value, ensure_ascii=False), encoding="utf-8"
+        )
+    except OSError:
+        # Intentional silent fail.
+        pass
+
+
+# ── HTML fetching + cheap text extraction ───────────────────────────────────
+
+def fetch_url(url: str) -> str:
+    """
+    Fetch an HTTP(S) URL and return the body as a string.
+
+    Parameters
+    ----------
+    url : str
+        Absolute ``http(s)://`` URL.
+
+    Returns
+    -------
+    str
+        Decoded response body. Bytes that fail to decode as UTF-8 are
+        replaced with ``"?"`` (``errors="ignore"`` in ``decode``).
+    """
+    with urllib.request.urlopen(url, timeout=15) as resp:
+        return resp.read().decode("utf-8", errors="ignore")
+
+
+def extract_text(html: str, limit: int = PAGE_TEXT_LIMIT) -> str:
+    """
+    Strip HTML markup and return readable text.
+
+    The extractor is intentionally cheap — it drops ``<script>``, ``<style>``,
+    ``<svg>`` and ``<noscript>`` blocks, then removes all remaining tags and
+    collapses whitespace. It is not a real DOM parser; that is fine for the
+    meta-tag use case, which only needs the gist.
+
+    Parameters
+    ----------
+    html : str
+        Raw HTML.
+    limit : int, optional
+        Truncate the extracted text at this many characters. Default
+        :data:`PAGE_TEXT_LIMIT`.
+
+    Returns
+    -------
+    str
+        Whitespace-collapsed text, truncated to ``limit``.
+    """
+    # Drop noise blocks wholesale; their contents would mislead the model.
+    html = re.sub(r"(?is)<(script|style|svg|noscript)\b.*?</\1>", " ", html)
+    # Strip the remaining tags. Multi-line ``re.S`` matches angle brackets that
+    # span line breaks (rare but it happens in inlined SVG).
+    text = re.sub(r"(?s)<[^>]+>", " ", html)
+    # Collapse runs of whitespace and trim.
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:limit]
+
+
+# ── Prompt + JSON extraction ────────────────────────────────────────────────
+
+def build_prompt(goal: str, page_text: str, site_name: str, lang: str) -> str:
+    """
+    Compose the prompt sent to the model.
+
+    Parameters
+    ----------
+    goal : str
+        Page goal as supplied by the caller.
+    page_text : str
+        Extracted page text (may be empty).
+    site_name : str
+        Brand / site name (may be empty).
+    lang : str
+        Target language code.
+
+    Returns
+    -------
+    str
+        Full prompt ready to send to Ollama's ``/api/generate``.
+    """
+    lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
+    # Build the prompt by accumulating optional sections so the final
+    # body only mentions inputs that were actually supplied.
+    parts: list[str] = [lang_line, JSON_SCHEMA_HINT]
+    if site_name:
+        parts.append(f"\nBrand / site name: {site_name}")
+    if goal:
+        parts.append(f"\nPage goal: {goal}")
+    if page_text:
+        parts.append(f"\nPage content (extracted text):\n{page_text}")
+    # The trailing imperative pushes the model into output mode immediately.
+    parts.append("\nWrite the JSON now.")
+    return "\n".join(parts)
+
+
+def extract_json(text: str) -> dict:
+    """
+    Locate the first JSON object in a (possibly noisy) model reply.
+
+    Some models still wrap their JSON in stray prose despite ``format=json``.
+    The recovery is conservative — slice from the first ``{`` to the last
+    ``}`` and try to parse what is between.
+
+    Parameters
+    ----------
+    text : str
+        Raw model output.
+
+    Returns
+    -------
+    dict
+        Parsed JSON object.
+
+    Raises
+    ------
+    ValueError
+        When no balanced braces are found.
+    json.JSONDecodeError
+        When the bracketed content is not valid JSON.
+    """
+    text = text.strip()
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        raise ValueError(f"Model did not return JSON. Raw response:\n{text}")
+    return json.loads(text[start:end + 1])
+
+
+# ── CLI entry point ─────────────────────────────────────────────────────────
+
+def main() -> int:
+    """
+    CLI entry point.
+
+    Returns
+    -------
+    int
+        Process exit code: ``0`` on success, ``1`` on a JSON parse failure,
+        ``2`` on Ollama connectivity failure.
+    """
+    ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
+    ap.add_argument(
+        "source", nargs="?",
+        help="HTML file path, URL, or empty if --goal is enough.",
+    )
+    ap.add_argument(
+        "--goal", default="",
+        help="Free-text page goal.",
+    )
+    ap.add_argument(
+        "--site-name", default="",
+        help="Brand or site name.",
+    )
+    ap.add_argument(
+        "--canonical", default="",
+        help="Canonical absolute URL. Echoed straight into the JSON output.",
+    )
+    ap.add_argument(
+        "--lang", default=None,
+        help="BCP-47 base tag (en, fr, es, …).",
+    )
+    ap.add_argument(
+        "--model", default=None,
+        help="Override the Ollama model tag.",
+    )
+    ap.add_argument(
+        "--no-cache", action="store_true",
+        help="Bypass the on-disk cache for this run.",
+    )
+    args = ap.parse_args()
+
+    # The cache flag is module-level; flipping it after parsing keeps the
+    # control flow in this function instead of leaking into argparse.
+    if args.no_cache:
+        global NO_CACHE
+        NO_CACHE = True
+
+    # Either a source or a goal must be present; otherwise the model has
+    # nothing to work from.
+    if not args.source and not args.goal:
+        ap.error("Provide a source (HTML path or URL) or --goal.")
+
+    # Pull the page text first so the cache key incorporates the actual content.
+    page_text: str = ""
+    if args.source:
+        if re.match(r"^https?://", args.source, re.I):
+            page_text = extract_text(fetch_url(args.source))
+        else:
+            page_text = extract_text(
+                Path(args.source).read_text(encoding="utf-8", errors="ignore")
+            )
+
+    # Language: explicit --lang wins. Otherwise prefer langdetect against
+    # the extracted page text, falling back to env-derived locale.
+    if args.lang:
+        lang: str = args.lang.lower()[:2]
+    elif page_text:
+        lang = detect_text_language(page_text, fallback=detect_lang())
+    else:
+        lang = detect_lang()
+    model: str = args.model or pick_default_model()
+
+    # Cache check — fast path returns immediately when the inputs match a
+    # previous run.
+    cache_k = _cache_key(args.goal, page_text, args.site_name, lang, model)
+    cached = _cache_get(cache_k)
+    if cached is not None:
+        # The canonical URL is *not* part of the cache key (it does not affect
+        # the model's output), so it is layered on at print time.
+        if args.canonical:
+            cached["canonical"] = args.canonical
+        json.dump(cached, sys.stdout, indent=2, ensure_ascii=False)
+        sys.stdout.write("\n")
+        return 0
+
+    prompt = build_prompt(args.goal, page_text, args.site_name, lang)
+
+    payload: dict = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        # ``format=json`` enables Ollama's JSON-mode constraint decoding.
+        "format": "json",
+        # Low temperature keeps the output stable across runs. ``num_predict``
+        # bounds the model's output token count; the JSON object fits well
+        # under 600 tokens.
+        "options": {"temperature": 0.2, "num_predict": 600},
+    }
+
+    try:
+        resp = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=180)
+        resp.raise_for_status()
+    except requests.exceptions.ConnectionError:
+        sys.stderr.write(
+            f"Cannot reach Ollama at {OLLAMA_URL}. "
+            f"Run `python front-a11y/scripts/install_alt_ai.py` or `ollama serve`.\n"
+        )
+        return 2
+
+    body: dict = resp.json()
+    raw: str = body.get("response", "")
+    try:
+        parsed = extract_json(raw)
+    except Exception as e:
+        # The model failed to produce parseable JSON. Surface the raw output
+        # so the user can debug the prompt instead of getting a cryptic trace.
+        sys.stderr.write(f"{e}\n")
+        return 1
+
+    _cache_set(cache_k, parsed)
+    if args.canonical:
+        parsed["canonical"] = args.canonical
+    json.dump(parsed, sys.stdout, indent=2, ensure_ascii=False)
+    sys.stdout.write("\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
