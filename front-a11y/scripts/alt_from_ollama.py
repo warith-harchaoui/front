@@ -63,6 +63,11 @@ import hashlib
 import io
 import json
 import locale
+import sys as _sys
+from pathlib import Path as _PathHelper
+
+_sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 import os
 import platform
 import re
@@ -766,8 +771,16 @@ def _build_argparser() -> argparse.ArgumentParser:
     argparse.ArgumentParser
         Parser with all flags registered.
     """
-    p = argparse.ArgumentParser(
-        description="Generate W3C-compliant alt text for an image via a local Ollama vision model.",
+    p = make_parser(
+        prog="front-a11y-alt",
+        description="Generate W3C-compliant alt text for an image via a local "
+                    "Ollama vision model. Matches the WAI image-purpose decision "
+                    "tree (informative / decorative / functional / text / "
+                    "complex / group).",
+        epilog="Examples:\n"
+               "  front-a11y-alt --kind informative photo.jpg\n"
+               "  front-a11y-alt --kind functional --context 'Submit form' icon.png\n"
+               "  front-a11y-alt --kind complex --in docs/chart.md chart.png\n",
     )
     p.add_argument(
         "src",

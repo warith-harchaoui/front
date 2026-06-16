@@ -47,6 +47,10 @@ import importlib.util
 import os
 import subprocess
 import sys
+from pathlib import Path as _PathHelper
+
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 from pathlib import Path
 
 
@@ -179,8 +183,10 @@ def download_model(name: str) -> Path:
 
 def main() -> int:
     """Run the pip-install + model-prefetch pipeline."""
-    p = argparse.ArgumentParser(
-        description="Install pywhispercpp and pre-download a GGML caption model.",
+    p = make_parser(
+        prog="front-a11y-install-captions",
+        description="Install pywhispercpp and pre-download a GGML caption model "
+                    "so `front-a11y-captions` runs offline.",
     )
     p.add_argument(
         "--model", default=DEFAULT_MODEL, choices=list(SUPPORTED_MODELS),

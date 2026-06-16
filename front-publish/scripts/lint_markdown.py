@@ -73,6 +73,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
+
 
 # ── Severity levels ────────────────────────────────────────────────────────
 
@@ -521,22 +524,18 @@ def _lint_standalone_mermaid(
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(
-        prog="front-lint-md",
+    p = make_parser(
+        prog="front-publish-lint-md",
         description="Lint Markdown — heading order, code-fence languages, image alt, "
                     "local links, LaTeX delimiter balance, and Mermaid block syntax. "
                     "Optionally render Mermaid blocks to local PNG and ask Ollama for "
                     "label / caption suggestions.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"
-            "  front-lint-md docs/intro.md\n"
-            "  front-lint-md --render-mermaid docs/\n"
-            "  front-lint-md --fix --render-mermaid --ai --ai-lang en docs/\n"
+            "  front-publish-lint-md docs/intro.md\n"
+            "  front-publish-lint-md --render-mermaid docs/\n"
+            "  front-publish-lint-md --fix --render-mermaid --ai --ai-lang en docs/\n"
         ),
-    )
-    p.add_argument(
-        "-V", "--version", action="version", version="%(prog)s 0.2.0",
     )
     p.add_argument("target", type=Path, help="Markdown file or directory.")
     p.add_argument("--format", choices=["text", "json"], default="text",

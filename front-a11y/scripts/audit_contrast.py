@@ -52,6 +52,10 @@ import argparse
 import json
 import math
 import sys
+from pathlib import Path as _PathHelper
+
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 from pathlib import Path
 
 
@@ -382,8 +386,15 @@ def audit(
 
 def main() -> int:
     """Run the audit. Exit code 0 when every checked pair passes, 1 otherwise."""
-    p = argparse.ArgumentParser(
-        description="Audit a palette's foreground/background contrast against WCAG.",
+    p = make_parser(
+        prog="front-a11y-contrast",
+        description="Audit a palette's foreground/background contrast against WCAG. "
+                    "Walks every (label, surface) pair, suggests the nearest OKLCH "
+                    "neighbour for failing pairs when --fix is set.",
+        epilog="Examples:\n"
+               "  front-a11y-contrast --palette palette.json\n"
+               "  front-a11y-contrast --palette palette.json --target 7 --fix\n"
+               "  front-a11y-contrast --format json --palette palette.json\n",
     )
     p.add_argument(
         "--palette", type=Path,

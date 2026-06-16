@@ -72,6 +72,10 @@ import argparse
 import datetime
 import re
 import sys
+from pathlib import Path as _PathHelper
+
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 import xml.etree.ElementTree as ET
 from email.utils import format_datetime
 from pathlib import Path
@@ -595,8 +599,14 @@ def find_blog_dir(root: Path, explicit: Optional[Path]) -> Optional[Path]:
 
 def main() -> int:
     """CLI entry point. Writes the requested files into ``--out`` (default ``root``)."""
-    p = argparse.ArgumentParser(
-        description=__doc__.split("\n", 1)[0],
+    p = make_parser(
+        prog="front-publish-indexes",
+        description="Generate robots.txt, sitemap.xml, llms.txt, an Atom or RSS "
+                    "feed and humans.txt for a static site. Stdlib only.",
+        epilog="Examples:\n"
+               "  front-publish-indexes --root . --base-url https://example.com\n"
+               "  front-publish-indexes --root . --base-url https://example.com --feed-from posts\n"
+               "  front-publish-indexes --root . --base-url https://example.com --rss --humans\n",
     )
     p.add_argument(
         "--root", type=Path, default=Path("."),

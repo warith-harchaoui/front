@@ -59,6 +59,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
+
 # Reuse the Mermaid renderer + fenced-block extractor from the linter so
 # both tools agree on what a Mermaid block looks like and how it is
 # rendered.
@@ -263,16 +266,14 @@ def gather_inputs(target: Path) -> list[Path]:
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(
-        prog="front-md-to-html",
+    p = make_parser(
+        prog="front-publish-md-to-html",
         description="Markdown → HTML converter integrated with the front skill — "
-                    "local Mermaid PNG rendering, KaTeX for LaTeX, Inter + Tailwind shell.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+                    "local Mermaid PNG rendering, KaTeX for LaTeX, Tailwind shell.",
         epilog="Examples:\n"
-               "  front-md-to-html README.md --out site/\n"
-               "  front-md-to-html docs/ --out site/ --title 'Docs' --lang en\n",
+               "  front-publish-md-to-html README.md --out site/\n"
+               "  front-publish-md-to-html docs/ --out site/ --title 'Docs' --lang en\n",
     )
-    p.add_argument("-V", "--version", action="version", version="%(prog)s 0.2.0")
     p.add_argument("target", type=Path, help="Markdown file or directory.")
     p.add_argument("--out", type=Path, required=True, help="Output directory.")
     p.add_argument("--title", default="", help="Page title. Default: first H1 of each source.")

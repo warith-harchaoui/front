@@ -75,6 +75,10 @@ import json
 import os
 import re
 import sys
+from pathlib import Path as _PathHelper
+
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 import urllib.request
 from pathlib import Path
 from typing import Optional
@@ -363,7 +367,15 @@ def main() -> int:
         Process exit code: ``0`` on success, ``1`` on a JSON parse failure,
         ``2`` on Ollama connectivity failure.
     """
-    ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
+    ap = make_parser(
+        prog="front-publish-meta",
+        description="Draft per-page meta tags (title, description, Open Graph, "
+                    "Twitter Card, Schema.org @type) via a local Ollama model. "
+                    "Returns a strict JSON object on stdout.",
+        epilog="Examples:\n"
+               "  front-publish-meta page.html --site-name 'Acme'\n"
+               "  front-publish-meta --goal 'Landing page for an ML lab' --lang en\n",
+    )
     ap.add_argument(
         "source", nargs="?",
         help="HTML file path, URL, or empty if --goal is enough.",

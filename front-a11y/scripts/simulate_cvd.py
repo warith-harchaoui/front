@@ -60,6 +60,9 @@ import argparse
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
+
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -313,8 +316,14 @@ def main() -> int:
     int
         Process exit code; ``0`` on success.
     """
-    p = argparse.ArgumentParser(
-        description="Render an image as a color-blind viewer sees it.",
+    p = make_parser(
+        prog="front-a11y-cvd",
+        description="Render an image as a color-blind viewer sees it. "
+                    "Applies Machado et al. matrices for protanopia, deuteranopia "
+                    "and tritanopia. Catches red/green collisions before ship.",
+        epilog="Examples:\n"
+               "  front-a11y-cvd screenshot.png\n"
+               "  front-a11y-cvd screenshot.png --grid --out previews/\n",
     )
     p.add_argument(
         "source", type=Path,

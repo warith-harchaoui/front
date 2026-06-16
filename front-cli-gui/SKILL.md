@@ -76,6 +76,36 @@ Output follows the front-ui stack rules. If front-ui is not installed in the sam
 
 For full rules, see `front-ui/SKILL.md` and `front-ui/references/`.
 
+## Choosing a CLI parser (for new tools)
+
+When the user is starting a **new** CLI that they know will be wrapped
+in a GUI later, the parser choice matters for two reasons: it shapes
+the quality of `--help` (the primary source the skill reads at step 1)
+and it determines how easily the skill can introspect the command tree
+at step 4. Order, by recommendation:
+
+1. **[Click](https://click.palletsprojects.com/)** — the safe default.
+   Decorator-based, BSD-3, stable since 2014. Generates a clean
+   `--help`, supports nested sub-commands cleanly, ships
+   `click.testing.CliRunner` for tests, and exposes a stable
+   `click.Command` object the skill can walk programmatically.
+2. **[Typer](https://typer.tiangolo.com)** — fine when the team already
+   commits to type hints. Sits on top of Click; same model with
+   nicer-looking help via Rich. Slightly heavier (pulls Click + Rich).
+3. **[argparse](https://docs.python.org/3/library/argparse.html)** —
+   fine when the team wants zero dependencies. The skill reads
+   `tool --help` text as the source of truth, so argparse works for
+   every CLI → GUI flow without an upgrade.
+4. **Avoid [Fire](https://github.com/google/python-fire)** for CLIs
+   you plan to wrap — the reflection model makes the schema implicit
+   in the source class shape, which makes both `--help` parsing and
+   programmatic introspection brittle.
+5. **Avoid [docopt](http://docopt.org/)** — effectively unmaintained.
+
+**Existing CLIs do not need to migrate.** The skill's input contract is
+`tool --help`; argparse, Click and Typer all satisfy it. Migrate only
+if a *different* benefit justifies it.
+
 ## When NOT to use this skill
 
 - The user wants a **desktop app binary**, not a web page. → Use Tauri (this skill can supply Tauri's web view content).

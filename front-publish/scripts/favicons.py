@@ -68,6 +68,10 @@ import argparse
 import json
 import shutil
 import sys
+from pathlib import Path as _PathHelper
+
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 from pathlib import Path
 
 from PIL import Image
@@ -333,7 +337,15 @@ def main() -> int:
     int
         Process exit code; always ``0`` on success.
     """
-    p = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
+    p = make_parser(
+        prog="front-publish-favicons",
+        description="Generate the full favicon / PWA / Apple-touch icon set "
+                    "(including site.webmanifest and a paste-ready head.html) "
+                    "from a single source logo.",
+        epilog="Examples:\n"
+               "  front-publish-favicons logo.svg --out public --name 'Project'\n"
+               "  front-publish-favicons logo.png --bg '#ffffff' --theme-dark '#000000'\n",
+    )
     p.add_argument(
         "source", type=Path,
         help="Path to the logo (PNG, JPG, WebP, or SVG).",

@@ -62,6 +62,9 @@ import hashlib
 import os
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 from typing import Optional
 
 import requests
@@ -334,8 +337,14 @@ def _build_argparser() -> argparse.ArgumentParser:
     argparse.ArgumentParser
         Parser with all flags registered.
     """
-    p = argparse.ArgumentParser(
-        description="Rewrite UI copy at a target reading level via a local Ollama model.",
+    p = make_parser(
+        prog="front-publish-plain",
+        description="Rewrite UI copy at a target reading level via a local Ollama "
+                    "model. Preserves meaning, strips marketing voice; output length "
+                    "≤ 1.1× original.",
+        epilog="Examples:\n"
+               "  cat draft.md | front-publish-plain --target-grade 8 --lang en\n"
+               "  front-publish-plain --input copy.md --preserve 'Front,Tailwind' > out.md\n",
     )
     p.add_argument(
         "--input", "-i", type=Path,

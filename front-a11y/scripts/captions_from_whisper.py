@@ -58,6 +58,11 @@ import os
 import shutil
 import subprocess
 import sys
+from pathlib import Path as _PathHelper
+
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
+import sys
 import tempfile
 from pathlib import Path
 from typing import Optional
@@ -561,8 +566,16 @@ def transcribe(
 
 def main() -> int:
     """CLI entry point. Writes the output to a sibling file by default."""
-    p = argparse.ArgumentParser(
-        description="Generate captions or transcripts via pywhispercpp.",
+    p = make_parser(
+        prog="front-a11y-captions",
+        description="Generate WebVTT / SRT / plain-text captions or a transcript "
+                    "from an audio or video file via local pywhispercpp. "
+                    "Project-vocab biasing via --prompt / --vocab / --vocab-from "
+                    "/ --auto-project.",
+        epilog="Examples:\n"
+               "  front-a11y-captions talk.mp4\n"
+               "  front-a11y-captions podcast.mp3 --format text --lang en\n"
+               "  front-a11y-captions interview.wav --lang fr --format srt\n",
     )
     p.add_argument("source", type=Path, help="Audio or video file.")
     p.add_argument(

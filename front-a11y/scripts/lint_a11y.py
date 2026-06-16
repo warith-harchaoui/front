@@ -81,6 +81,11 @@ import argparse
 import json
 import re
 import sys
+from pathlib import Path as _PathHelper
+
+# Shared parser factory: prog name, RawDescriptionHelpFormatter, --version.
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _argparse import make_parser  # noqa: E402
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
@@ -627,8 +632,15 @@ def main() -> int:
     int
         ``0`` on no findings, ``1`` on any finding.
     """
-    p = argparse.ArgumentParser(
-        description="W3C/WAI accessibility linter for HTML emitted by the front skill.",
+    p = make_parser(
+        prog="front-a11y-lint",
+        description="W3C/WAI accessibility linter for HTML emitted by the front skill. "
+                    "14 rules, exit 1 on any finding. Pre-commit gate — pair with axe-core "
+                    "or Pa11y for runtime DOM audits.",
+        epilog="Examples:\n"
+               "  front-a11y-lint public/index.html\n"
+               "  front-a11y-lint --format json public/\n"
+               "  front-a11y-lint --ignore IMG_ALT,A_HREF dist/\n",
     )
     p.add_argument(
         "target", type=Path,
