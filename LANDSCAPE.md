@@ -62,6 +62,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [HTMX](https://htmx.org) | ~14 KB | ✗ | server-driven HTML swaps | ✓ | good | ~ | Pairs well with `front` — HTMX for nav, `front` for client details. |
 | [Alpine.js](https://alpinejs.dev) | ~7 KB | ✗ | attribute-driven sprinkles | N/A | OK | ~ | "jQuery for 2020s". Same spirit, attribute-first instead of module-first. |
 
+**Pick `front`** for greenfield projects where the deliverable is HTML the team will own for years and nobody on the team wants to track framework versions. **Pick a framework** (React first for hireability, Svelte / Solid / Qwik for payload) when the app has a real component model — large client-side state, complex client-side routing, or a design system the rest of the company already depends on. **HTMX or Lit** are the natural neighbours of `front`: HTMX for server-driven navigation, Lit when a piece of UI is genuinely a reusable web component.
+
 ---
 
 ## 2. CSS approach
@@ -78,6 +80,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [CSS Modules](https://github.com/css-modules/css-modules) | scoped CSS | ✓ | hash-suffixed | manual | manual | ✗ | Standard in many React monorepos. |
 | [Panda CSS](https://panda-css.com) | zero-runtime CSS-in-JS | ✓ | recipes / patterns | typed tokens | first-class | ✗ | Strong in TS apps. |
 | [vanilla-extract](https://vanilla-extract.style) | zero-runtime CSS-in-JS | ✓ | typed stylesheets | typed tokens | first-class | ✗ | TS-only friendly. |
+
+**Pick Tailwind** when the team can run a one-line CLI build (or already runs Vite). **Pick Pico** when the site is mostly prose and you want zero classes in the markup. **Pick Panda / vanilla-extract** when you are in a TypeScript monorepo with typed tokens elsewhere. **Avoid hand-rolled BEM** in 2026 unless the rest of the codebase already lives there.
 
 ---
 
@@ -102,6 +106,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [Lightning](https://www.lightningdesignsystem.com) | LWC / React | npm | strong | Salesforce | free | ✗ | Inside Salesforce. |
 | [Shoelace / Web Awesome](https://shoelace.style) | Web Components | npm | strong | neutral | free | ~ | Framework-agnostic; closest if you want `<sl-button>` over hand-rolled. |
 
+**Pick shadcn/ui** if the team has chosen React and wants the same philosophy as `front` (copy-paste components, no runtime lock-in). **Pick Radix / Headless UI** when you want behaviour only and will skin everything yourself. **Pick Mantine / Chakra / MUI** when speed-to-first-screen matters more than visual differentiation. **Stay inside the BigCo design systems** (Carbon, Fluent, Primer, Polaris, Lightning) only if you ship inside that company's product surface.
+
 ---
 
 ## 4. Typography (UI typeface)
@@ -118,6 +124,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [Manrope](https://manrope.org) | 200–800 | Latin | OFL | ✓ | free | ✗ | Modern geometric. |
 | [Atkinson Hyperlegible](https://www.brailleinstitute.org/freefont/) | 4 weights | Latin | OFL | ✗ | free | ~ | Best for low-vision readers; pairs as accessibility font. |
 
+**Pick Montserrat** (the `front-ui` default) for marketing surfaces, landing pages and prose-heavy reading. **Pick Inter** (the documented alternate) for dense developer / dashboard / admin / data UI — better hinting at small sizes. **Pick Atkinson Hyperlegible** when accessibility is the explicit goal (low-vision readers, large-print modes). **Avoid Google-Fonts CDN** in production: self-host whichever you pick (the `front-ui` skill ships Montserrat as WOFF2; Inter installs the same way).
+
 ---
 
 ## 5. Colour system
@@ -133,6 +141,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [Spectrum (Adobe)](https://spectrum.adobe.com/page/color-system/) | semantic + scales | strong WCAG docs | first-class | Adobe | ✗ | Inside Adobe ecosystem. |
 | [Carbon palettes](https://carbondesignsystem.com/elements/color/overview/) | semantic + scales | strong | first-class | IBM | ✗ | Inside Carbon. |
 | [OKLCH](https://oklch.com) | colour space, not palette | underpins fix-suggestion | N/A | spec | ✓ | What `audit_contrast.py --fix` uses. |
+
+**Pick `front`'s palettes** when you want a small, audited set with semantic tokens (`label-primary`, `surface-secondary`) and dark-mode peers ready. **Pick Radix Colors** when the UI is stateful and you want the 12-step scale per intent (background → text). **Pick Material 3 Dynamic** when the product must feel native on Android. **Pair every choice with `audit_contrast.py`** before shipping — palette aesthetics never reveal a 3:1 ratio failure on their own.
 
 ---
 
@@ -153,6 +163,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [Recharts](https://recharts.org) | React | npm | SVG | ✓ | ✗ | ✗ | React-only. |
 | [Three.js](https://threejs.org), [Babylon.js](https://www.babylonjs.com) | JS API | ~600 KB+ | WebGL | ✗ | ✓ | ✗ | 3D / WebGL. |
 
+**Pick Vega-Lite** (what `front-ui` emits) when the chart can be described declaratively — bar / line / area / scatter / box / heatmap with a known data shape. **Pick Observable Plot** for the same workflow with a JS API instead of JSON. **Pick D3** when the chart is bespoke (custom interactions, non-Cartesian projections). **Pick µPlot** for huge time-series with strict frame budgets. **Pick Plotly / Three.js / Babylon** when 3D or scientific volumes are the point. **Avoid React-tied wrappers (Recharts, Nivo, Visx)** in a vanilla-JS codebase — they pull a framework you do not need.
+
 ---
 
 ## 7. CLI → GUI host
@@ -172,6 +184,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [dearpygui](https://dearpygui.readthedocs.io) | Python + Dear ImGui | desktop, native | N/A | ✗ | ✗ | Game-style immediate-mode UI. |
 | [Textual](https://textual.textualize.io), [Bubble Tea](https://github.com/charmbracelet/bubbletea) | Python / Go | TUI | N/A | ✗ | ✗ | Pick if a TUI is the right answer. |
 
+**Pick `front-cli-gui`** when the deliverable is plain HTML the user can edit (model-demo dashboards, internal admin UIs, lab tools you keep iterating on). **Pick Tauri** when the deliverable must be a desktop binary the user double-clicks — `front-cli-gui` is what you put inside Tauri's web view. **Pick Gradio / Streamlit / Taipy** when the auto-form is exactly what you need and you do not mind looking like every other Gradio / Streamlit app. **Pick Textual or Bubble Tea** when a terminal UI is actually the right surface and a web view is overkill.
+
 ---
 
 ## 8. Markdown → website (SSG)
@@ -190,6 +204,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | [Pandoc](https://pandoc.org) | Haskell | templates | per-file | ~ | ✓ | `front`'s default MD→HTML pipe. |
 | [Quarto](https://quarto.org) | Pandoc-based | templates | medium | ✓ | ~ | Scientific publishing. |
 
+**Pick `front-publish`** for a small docs site (< 30 pages), a project README + a `docs/` tree, or a research / portfolio surface. **Pick MkDocs Material** for Python-project documentation that wants the de-facto navigation patterns out of the box. **Pick Hugo or Eleventy** when build time matters at 100+ pages. **Pick Docusaurus or VitePress** when the team has already picked React or Vue and wants versioned docs + search included. **Pick Quarto** when the site is scientific publishing (notebooks, citations, equations) more than software docs.
+
 ---
 
 ## 9. Accessibility lint / audit
@@ -207,6 +223,8 @@ What kind of work are you doing? Find the row and the honest recommendation.
 
 Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser tests).
 
+**Pick `front-a11y/scripts/lint_a11y.py`** as a fast pre-commit gate that runs in a stdlib-only CI container — exit 1 on any finding. **Pick axe-core or Pa11y** for the dynamic checks: dynamic ARIA state, focus traps after `dialog.showModal()`, color contrast after a runtime theme switch, name/role/value after portal mounts. **Pick Lighthouse** when the a11y audit must come with the performance / SEO audit in the same report. The honest framing: a green static lint does not mean WCAG-compliant — it means the static rules pass.
+
 ---
 
 ## 10. Contrast / colour-blindness audit
@@ -221,6 +239,8 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 | [Polypane](https://polypane.app) | browser | ✓ | ~ | paid | ✗ | Dev browser with a11y panels. |
 | [TPGi Colour Contrast Analyser](https://www.tpgi.com/color-contrast-checker/) | desktop app | ✓ | ✗ | free | ~ | Picker-based. |
 | [axe DevTools color contrast](https://www.deque.com/axe/) | DOM panel | ✓ | ~ | freemium | ~ | Pairs with axe-core. |
+
+**Pick `audit_contrast.py`** when the audit must run in CI on a palette JSON, with optional OKLCH-neighbour fix suggestions. **Pick `simulate_cvd.py`** to render the surface as protanope, deuteranope and tritanope viewers see it — useful for stakeholder review. **Pick Stark or Sim Daltonism** for the live-design loop in Figma or on the desktop. **Treat the `--fix` suggestion as a hint, not a verdict** — a designer still picks the final swatch.
 
 ---
 
@@ -237,6 +257,8 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 | [AWS Rekognition](https://aws.amazon.com/rekognition/) | hosted | proprietary | prompt | paid | proprietary | ✗ | AWS-aligned. |
 | [BLIP / LLaVA / MiniCPM-V](https://huggingface.co/docs/transformers/model_doc/llava) | local GPU | open weights | prompt | $0 | varied | ~ | Self-host alternatives. |
 | [CapAlt](https://capalt.com), [AltGen](https://github.com/Mateo-Wallace/AltGen) | hosted / FE plug-in | depends | depends | varies | varies | ✗ | Purpose-built tools. |
+
+**Pick `alt_from_ollama.py`** when the images are private (internal screenshots, customer data, in-progress work), when offline is a requirement, or when per-call cost matters. **Pick Claude vision, GPT-4o vision or Gemini Vision** when top quality matters more than locality — hosted models are noticeably better at the long tail of unusual images. **Always review the draft** before committing, regardless of which side you picked — alt text is a human-authored contract with screen-reader users.
 
 ---
 
@@ -255,6 +277,8 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 | [Otter](https://otter.ai) | hosted | proprietary | real-time | ✓ | ~ | proprietary | ✗ | Consumer-focused. |
 | [Aeneas](https://github.com/readbeyond/aeneas) | local | force-aligner | fast | ✗ | N/A | AGPL | ~ | Aligns *existing* transcripts — different problem. |
 
+**Pick `captions_from_whisper.py`** when the source files live on disk, CPU-only is acceptable, and the workflow can take a few minutes per file. **Pick Deepgram, AssemblyAI or Rev.ai** for live captions, sub-real-time turnaround, or domain-specific vocabularies tuned by the provider. **Pick Aeneas** when you already have a transcript and only need to align it to audio (force alignment is a different problem from transcription). **Pair captions with alt text** when you ship video: a captioned `<track kind="captions">` plus a `<track kind="descriptions">` is the minimum for parity with sighted users.
+
 ---
 
 ## 13. Static-site indexes (sitemap / feed / llms.txt)
@@ -269,6 +293,8 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 | SSG built-ins (Hugo, Jekyll, Astro, Eleventy) | sitemap + feed | varies | ✓ | ✗ | varied | ~ | Tied to the SSG. |
 | [llmstxt.org spec](https://llmstxt.org) | the format itself | — | — | ✓ | spec | ✓ | Format spec, no generator by design. |
 
+**Pick `site_indexes.py`** when you want a single stdlib-only command that emits robots.txt + sitemap.xml + llms.txt + Atom feed + humans.txt from any directory of HTML. **Pick the SSG's built-ins** (Hugo, Astro, Eleventy, MkDocs) when you already use that SSG — duplicate generators are confusing for the next maintainer. **Pick `feedgen` or `feed npm`** when you want only the feed and want to embed it in a larger build. The `llmstxt.org` row is a spec, not a generator — there is no SaaS to pick.
+
 ---
 
 ## 14. Anthropic skill / agent ecosystem
@@ -280,6 +306,8 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 | Other Claude skills (marketplace) | Domain-specific tools | ~ | Layer with `front` when the domain is non-frontend. |
 | [OpenCode](https://opencode.ai) | Alternative runtime for the same skill format | ✓ | Named in `README.md` install path. |
 | Hand-prompting (no skill) | Whatever you write | ~ | Works for one-shots, drifts across sessions. |
+
+**Pick the four `front-*` skills** when you want repeatable frontend output, ergonomic gates and accessibility content baked into the agent's habits. **Pick Claude Code's built-in commands** (`/init`, `/review`, `/security-review`) for the general-purpose code workflows — they compose with `front-*` rather than compete with it. **Pick OpenCode** when you want the same skill format under a model-agnostic runtime. **Skip skills entirely** for one-shot prompts where the cost of installing a skill folder outweighs the saved typing.
 
 ---
 
