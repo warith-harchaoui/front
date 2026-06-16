@@ -34,8 +34,10 @@ class TestParseHex:
     def test_6_digit_hex(self) -> None:
         r, g, b = parse_hex("#007AFF")
         # Reference blue: linear values for 0x00, 0x7A, 0xFF.
+        # 0x7A = 122; ((122/255 + 0.055) / 1.055) ** 2.4 ≈ 0.194618 per the
+        # canonical sRGB-to-linear transfer (W3C ARIA recommended formula).
         assert r == pytest.approx(0.0, abs=1e-6)
-        assert g == pytest.approx(0.2122308, abs=1e-4)
+        assert g == pytest.approx(0.194618, abs=1e-4)
         assert b == pytest.approx(1.0, abs=1e-6)
 
     def test_3_digit_shorthand(self) -> None:

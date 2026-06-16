@@ -66,9 +66,10 @@ from typing import Optional
 
 import requests
 
-# Share the Ollama plumbing with the alt-text helper so both stay in sync.
+# Shared Ollama helpers live in _ollama.py inside this skill folder so
+# the script does not need a cross-skill import after the 0.2.0 split.
 sys.path.insert(0, str(Path(__file__).parent))
-from alt_from_ollama import (  # noqa: E402
+from _ollama import (  # noqa: E402
     OLLAMA_URL,
     LANG_INSTRUCTIONS,
     detect_lang,
@@ -149,6 +150,20 @@ def _cache_set(key: str, text: str) -> None:
 
 
 # ── Prompt construction ─────────────────────────────────────────────────────
+#
+# The prompt body lives in scripts/prompts/plain_language_rewrite.yaml.
+# This function only assembles the dynamic prefix (language line) and
+# the optional `preserve_line` clause before delegating to the loader.
+
+# Deferred import — keep the prompt loader optional so that this script
+# can still load without PyYAML when callers only need the non-prompt
+# helpers (e.g. `LANG_INSTRUCTIONS`, `detect_text_language`).
+try:
+    from _prompts import render as render_prompt  # type: ignore
+    HAVE_PROMPTS = True
+except ImportError:
+    HAVE_PROMPTS = False
+
 
 def build_prompt(text: str, grade: int, lang: str, preserve: list[str]) -> str:
     """
@@ -173,34 +188,27 @@ def build_prompt(text: str, grade: int, lang: str, preserve: list[str]) -> str:
     # The language line commits the model to a single language early.
     lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
 
-    # Banned words mirror the LLM-marketing list the validator flags.
-    banned = (
-        "production-grade, non-negotiable, world-class, cutting-edge, "
-        "state-of-the-art, seamlessly, effortlessly, leverages, empowers, "
-        "robust, comprehensive, turnkey, boost, unleash, transform, "
-        "revolutionize, supercharge, game-changing"
-    )
-
     preserve_line: str = ""
     if preserve:
         preserve_line = (
             f"Keep these tokens verbatim (do not translate, do not paraphrase): "
-            f"{', '.join(preserve)}. "
+            f"{', '.join(preserve)}.\n"
         )
 
-    return (
-        f"{lang_line} "
-        f"Rewrite the text below at approximately a grade-{grade} reading level. "
-        f"Preserve the meaning EXACTLY — do not add facts, do not remove facts, "
-        f"do not change numbers or names. "
-        f"Use short sentences, common words, active voice. "
-        f"Strip marketing buzzwords. "
-        f"Do NOT use any of these words: {banned}. "
-        f"Do NOT add headers, do NOT add bullet markers that weren't in the source. "
-        f"{preserve_line}"
-        f"Reply with the rewritten text only — no preamble, no quotes, "
-        f"no commentary.\n\n"
-        f"--- TEXT TO REWRITE ---\n{text}\n--- END ---\n"
+    if not HAVE_PROMPTS:
+        # Fallback when _prompts is not importable. Should be unreachable
+        # in practice since this script and _prompts.py ship together.
+        return (
+            f"{lang_line} Rewrite at grade {grade}. Preserve meaning. "
+            f"{preserve_line}--- TEXT ---\n{text}\n--- END ---"
+        )
+
+    return render_prompt(
+        "plain_language_rewrite",
+        lang_line=lang_line,
+        grade=grade,
+        preserve_line=preserve_line,
+        text=text,
     )
 
 

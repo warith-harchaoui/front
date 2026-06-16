@@ -81,10 +81,10 @@ from typing import Optional
 
 import requests
 
-# The alt-text helper owns the language tables and the model-picking logic;
-# importing them here keeps both scripts in lock-step for free.
+# Shared Ollama helpers live in _ollama.py inside this skill folder so
+# the script does not need a cross-skill import after the 0.2.0 split.
 sys.path.insert(0, str(Path(__file__).parent))
-from alt_from_ollama import (  # noqa: E402 — runtime import after sys.path tweak.
+from _ollama import (  # noqa: E402
     OLLAMA_URL,
     LANG_INSTRUCTIONS,
     detect_lang,
@@ -259,6 +259,21 @@ def extract_text(html: str, limit: int = PAGE_TEXT_LIMIT) -> str:
 
 # ── Prompt + JSON extraction ────────────────────────────────────────────────
 
+# ── Prompt construction ─────────────────────────────────────────────────────
+#
+# The prompt body and JSON schema live in
+# scripts/prompts/meta_tags_json.yaml. This function only assembles the
+# dynamic prefix (language line + optional brand / goal / page blocks)
+# before delegating to the loader.
+
+# Deferred import — see plain_language.py for the same pattern.
+try:
+    from _prompts import render as render_prompt  # type: ignore
+    HAVE_PROMPTS = True
+except ImportError:
+    HAVE_PROMPTS = False
+
+
 def build_prompt(goal: str, page_text: str, site_name: str, lang: str) -> str:
     """
     Compose the prompt sent to the model.
@@ -280,18 +295,27 @@ def build_prompt(goal: str, page_text: str, site_name: str, lang: str) -> str:
         Full prompt ready to send to Ollama's ``/api/generate``.
     """
     lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
-    # Build the prompt by accumulating optional sections so the final
-    # body only mentions inputs that were actually supplied.
-    parts: list[str] = [lang_line, JSON_SCHEMA_HINT]
-    if site_name:
-        parts.append(f"\nBrand / site name: {site_name}")
-    if goal:
-        parts.append(f"\nPage goal: {goal}")
-    if page_text:
-        parts.append(f"\nPage content (extracted text):\n{page_text}")
-    # The trailing imperative pushes the model into output mode immediately.
-    parts.append("\nWrite the JSON now.")
-    return "\n".join(parts)
+    brand_block: str = f"\nBrand / site name: {site_name}\n" if site_name else ""
+    goal_block: str = f"\nPage goal: {goal}\n" if goal else ""
+    page_block: str = (
+        f"\nPage content (extracted text):\n{page_text}\n" if page_text else ""
+    )
+
+    if not HAVE_PROMPTS:
+        # Fallback when _prompts is not importable. Keeps a usable —
+        # though minimal — prompt so the script does not hard-crash.
+        return (
+            f"{lang_line}\n{JSON_SCHEMA_HINT}"
+            f"{brand_block}{goal_block}{page_block}\nWrite the JSON now."
+        )
+
+    return render_prompt(
+        "meta_tags_json",
+        lang_line=lang_line,
+        brand_block=brand_block,
+        goal_block=goal_block,
+        page_block=page_block,
+    )
 
 
 def extract_json(text: str) -> dict:
