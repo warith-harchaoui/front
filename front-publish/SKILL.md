@@ -52,6 +52,19 @@ a different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
    - **Alt text** (`front-a11y/scripts/alt_from_ollama.py --lang`).
    - **Captions** (`front-a11y/scripts/captions_from_whisper.py --lang`).
 
+**Runtime override.** For ad-hoc shells, set the `FRONT_LANG_PAIR`
+environment variable instead of editing the frontmatter — the four
+Ollama-backed scripts read its first comma-split entry as the default
+`--lang` when none is passed on the command line:
+
+```bash
+export FRONT_LANG_PAIR="en,de"
+python front-publish/scripts/plain_language.py copy.md     # → German rewrite
+```
+
+Precedence (highest first): explicit `--lang` flag → `FRONT_LANG_PAIR`
+first entry → langdetect on available text → POSIX locale fallback.
+
 See `references/i18n.md` for the full multilingual recipe (URL
 strategy, `Intl.*`, plurals, RTL, non-Latin fonts). The `lang_pair`
 token is the project-level default for the **two main languages** the

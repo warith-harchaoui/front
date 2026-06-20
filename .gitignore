@@ -26,4 +26,12 @@ venv/
 # auto-fetched on demand via tests/fixtures/audio/fetch.py).
 tests/fixtures/audio/*.wav
 
+# Wikipedia eval fixtures (download via tests/fixtures/images/fetch_wikipedia.py)
+# Committed: fetch_wikipedia.py, wiki/truth.json, README. NOT committed: the
+# image bytes themselves (regenerable from upload.wikimedia.org, hash-pinned).
+tests/fixtures/images/wiki/*.jpg
+tests/fixtures/images/wiki/*.jpeg
+tests/fixtures/images/wiki/*.png
+tests/fixtures/images/wiki/*.svg
+
 .*
