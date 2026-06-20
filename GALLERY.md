@@ -14,9 +14,9 @@ at the bottom of this file.
 
 
 
-## [4ml — A Practical Python Environment for Artificial Intelligence](https://harchaoui.org/warith/4ml)
+## [A Practical Python Environment for Artificial Intelligence](https://harchaoui.org/warith/4ml)
 
-> *A practical Python environment for Artificial Intelligence — install, tooling and conventions for AI, ML, CV and NLP, written for AI scientists, students and lab teams.*
+> *A practical webpage for Python environment in AI, ML, CV and NLP — install, tooling and conventions for AI, ML, CV and NLP, written for AI scientists, students and lab teams.*
 
 A long-form, single-page guide aimed at AI scientists, students and
 small lab teams setting up a Python environment for ML / CV / NLP
