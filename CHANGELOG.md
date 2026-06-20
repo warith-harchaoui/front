@@ -18,6 +18,76 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.4.0] — 2026-06-21
+
+Minor release. Adds the three-state colour-scheme toggle component
+(`🌞 Light` / `🌚 Dark` / `🌗 Auto`, Auto-by-default) to the
+front-ui assets, ships a reusable headless-screenshot helper, and
+opens `GALLERY.md` with the first real-site entry.
+
+### Added — theme toggle component
+
+- **`front-ui/assets/components/theme-toggle.html`** — copy-pasteable
+  HTML+JS, three variants in one file:
+  - **A. Segmented radio control** (3 buttons, emoji + label,
+    `role="radiogroup"` / `role="radio"` / `aria-checked`, arrow-key
+    roving focus). Used on ≥ `sm` screens.
+  - **B. Icon-only cycle button** (`Auto → Light → Dark → Auto`,
+    glyph reflects current mode, next mode announced via
+    `aria-label`). Used on narrow viewports.
+  - **C. Fixed bottom-right anchor** wrapper for pages with no
+    sticky chrome (single-card landings, embedded widgets,
+    `cli-gui-demo` log viewer). Uses `safe-area-inset` padding so it
+    clears the mobile home indicator.
+- **Wiring** depends on the existing `applyTheme(mode)` helper from
+  `references/stack-vanilla-js.md` — persists via
+  `localStorage["color-scheme"]` and stays in sync with system
+  `prefers-color-scheme` changes when the mode is `auto`. Auto is
+  the explicit default everywhere — a fresh visitor inherits their
+  OS choice and is never surprised by a hard-coded scheme.
+- **Canonical placement rule** added to
+  `front-ui/references/stack-vanilla-js.md` § "Toggle UI control":
+  top-right of sticky header (priority 1) → footer far-right
+  (priority 2) → fixed bottom-right anchor (priority 3).
+- **`assets/components/nav.html`** updated so the sticky-header
+  variant of the toggle ships in the canonical nav block out of
+  the box; the icon-only fallback appears below `sm`.
+
+### Added — `GALLERY.md` and screenshot tooling
+
+- **`GALLERY.md`** — Markdown-only showcase of real sites and tools
+  shipped on the stack. Two entries at launch:
+  - **4ml — A Practical Python Environment for AI**
+    (<https://harchaoui.org/warith/4ml>) — long-form single-page
+    guide with sticky table of contents, captured headlessly via
+    Playwright in both `prefers-color-scheme` variants.
+  - **md2star — Markdown → branded `.docx`/`.pptx`/`.pdf`**
+    (<https://github.com/warith-harchaoui/md2star>) — the concrete
+    CLI → GUI target `front-cli-gui` was designed for; light/dark
+    hero screenshots sourced from md2star's own README (`assets/
+    screenshots/hero-{light,dark}.png`) so the gallery shows what
+    md2star itself shows, not a re-render.
+  No CMS, no separate showcase site, no build step — every entry
+  is a section in this file with screenshots committed under
+  `assets/gallery/<slug>/{light,dark}.png`.
+- **`scripts/gallery_screenshot.py`** — headless Chromium via
+  Playwright, captures both `prefers-color-scheme` variants in one
+  pass (retina 2× device-scale, default 1440×900 viewport,
+  `--full-page` for the full vertical extent). Calls `pngquant`
+  in-place when it's on `PATH` to trim retina captures from ~8 MB
+  to ~2.7 MB at quality 70-90. Fails-soft when `pngquant` is
+  missing — the PNG just stays uncompressed.
+- **README + LISEZMOI** point to `GALLERY.md` from the "not for
+  X" / "alternatives" paragraph, alongside the existing
+  `LANDSCAPE.md` link, so discovery flows naturally.
+
+### Changed — version bumps
+
+- All four `SKILL.md` files bumped `0.3.2 → 0.4.0` (minor — new
+  user-facing component + new top-level doc).
+- README + LISEZMOI install snippets bumped to `VERSION=0.4.0`.
+  Status snapshot reference bumped to `v0.4.0`.
+
 ## [0.3.2] — 2026-06-21
 
 Cosmetic / hygiene patch release. Closes three of the five roadmap

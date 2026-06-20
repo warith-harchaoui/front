@@ -73,6 +73,8 @@ Ce **n'est pas** le bon choix pour :
 
 Pour les alternatives par catégorie et l'aide à la décision « est-ce
 que `front` est le bon outil ? », voir [LANDSCAPE.md](LANDSCAPE.md).
+Pour des sites réels déjà livrés sur cette pile, voir
+[GALLERY.md](GALLERY.md).
 
 ## Ce que les skills garantissent
 
@@ -117,7 +119,7 @@ que `front` est le bon outil ? », voir [LANDSCAPE.md](LANDSCAPE.md).
 
 ## État d'avancement
 
-Photographie de l'état de chaque surface à `v0.3.2`. Les quatre dossiers
+Photographie de l'état de chaque surface à `v0.4.0`. Les quatre dossiers
 de skills sont stables ; la seule zone en travaux est l'**audio /
 sous-titres**.
 
@@ -170,7 +172,7 @@ stable qui ne dérive pas entre deux mises à jour.
 
 ```bash
 # 1. Téléchargez une release taguée
-VERSION=0.3.2
+VERSION=0.4.0
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \

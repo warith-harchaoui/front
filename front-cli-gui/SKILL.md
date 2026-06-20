@@ -4,7 +4,7 @@ description: Wrap an existing command-line tool in a single-page vanilla-JavaScr
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.3.2
+  version: 0.4.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

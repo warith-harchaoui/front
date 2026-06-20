@@ -12,6 +12,38 @@
     <nav class="ml-auto flex items-center gap-1">
       <a href="/docs" class="rounded-lg px-3 py-2 text-[15px] text-label-secondary hover:bg-surface-secondary dark:text-label-secondary-dark dark:hover:bg-surface-secondary-dark">Docs</a>
       <a href="/pricing" class="rounded-lg px-3 py-2 text-[15px] text-label-secondary hover:bg-surface-secondary dark:text-label-secondary-dark dark:hover:bg-surface-secondary-dark">Pricing</a>
+
+      <!--
+        Theme toggle — canonical placement: top-right of the header,
+        right before the primary action. Auto is the default; the
+        segmented control persists user choice via the theme.js helper.
+        Full markup + wiring in assets/components/theme-toggle.html.
+      -->
+      <div role="radiogroup" aria-label="Color scheme"
+           class="ml-1 hidden h-9 items-center gap-0.5 rounded-full
+                  bg-surface-secondary p-0.5 text-[13px] font-medium
+                  dark:bg-surface-secondary-dark sm:inline-flex"
+           data-theme-toggle>
+        <button type="button" role="radio" aria-checked="false" data-theme="light"
+                class="inline-flex h-8 items-center justify-center gap-1 rounded-full px-3 text-label-secondary aria-checked:bg-surface-primary aria-checked:text-label-primary aria-checked:shadow-sm dark:text-label-secondary-dark dark:aria-checked:bg-surface-primary-dark dark:aria-checked:text-label-primary-dark">
+          <span aria-hidden="true">🌞</span><span class="sr-only md:not-sr-only">Light</span>
+        </button>
+        <button type="button" role="radio" aria-checked="false" data-theme="dark"
+                class="inline-flex h-8 items-center justify-center gap-1 rounded-full px-3 text-label-secondary aria-checked:bg-surface-primary aria-checked:text-label-primary aria-checked:shadow-sm dark:text-label-secondary-dark dark:aria-checked:bg-surface-primary-dark dark:aria-checked:text-label-primary-dark">
+          <span aria-hidden="true">🌚</span><span class="sr-only md:not-sr-only">Dark</span>
+        </button>
+        <button type="button" role="radio" aria-checked="true" data-theme="auto"
+                class="inline-flex h-8 items-center justify-center gap-1 rounded-full px-3 text-label-secondary aria-checked:bg-surface-primary aria-checked:text-label-primary aria-checked:shadow-sm dark:text-label-secondary-dark dark:aria-checked:bg-surface-primary-dark dark:aria-checked:text-label-primary-dark">
+          <span aria-hidden="true">🌗</span><span class="sr-only md:not-sr-only">Auto</span>
+        </button>
+      </div>
+      <!-- On <sm screens, fall back to the icon-only cycle button. -->
+      <button type="button" aria-label="Color scheme: Auto. Activate to switch to Light."
+              data-theme-cycle
+              class="ml-1 grid h-11 w-11 place-items-center rounded-full text-[18px] text-label-primary hover:bg-surface-secondary dark:text-label-primary-dark dark:hover:bg-surface-secondary-dark sm:hidden">
+        <span data-theme-glyph aria-hidden="true">🌗</span>
+      </button>
+
       <a href="/login" class="rounded-full bg-brand-blue px-4 py-2 text-[15px] font-medium text-white hover:opacity-90">Sign in</a>
     </nav>
   </div>

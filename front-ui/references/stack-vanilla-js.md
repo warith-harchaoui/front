@@ -173,6 +173,39 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
 applyTheme();
 ```
 
+### Toggle UI control — 🌞 Light / 🌚 Dark / 🌗 Auto
+
+Every page that ships dark-mode peers also ships a visible toggle.
+**Auto is the default** so a fresh visitor inherits the OS choice and
+never gets surprised by a hard-coded scheme.
+
+**Canonical placement, in priority order:**
+
+1. **Top-right of any sticky header**, immediately before the primary
+   action (Sign in / Get started). Standard placement across the major
+   docs sites and developer tools — users look there first.
+2. **Footer**, far-right column — for content-only sites with no
+   sticky chrome (long-form docs that opt out of the header).
+3. **Fixed bottom-right corner** with `safe-area-inset` padding — for
+   single-card pages, embedded widgets, and the `cli-gui-demo` log
+   viewer that have no global chrome at all.
+
+**Control shape:**
+
+- **Segmented control (3 radios)** when there is space (≥ `sm`
+  breakpoint, ~640 px). One button per mode, emoji glyph + text label
+  side by side, `role="radiogroup"` / `role="radio"` /
+  `aria-checked`, arrow-key roving focus.
+- **Icon-only cycle button** (`Auto → Light → Dark → Auto`) on
+  narrower viewports. The visible glyph reflects the *current* mode;
+  the *next* mode is announced via `aria-label`.
+
+Both variants and the full vanilla-JS wiring (clicks, keyboard,
+sync-across-instances, system-change pass-through) live in
+[`front-ui/assets/components/theme-toggle.html`](../assets/components/theme-toggle.html).
+Drop the block, import `applyTheme` from `theme.js`, and it works —
+no other state to wire.
+
 ## i18n (EN / FR)
 
 ```js
