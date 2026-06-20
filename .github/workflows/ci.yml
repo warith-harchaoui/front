@@ -1,0 +1,58 @@
+name: ci
+
+# Runs the deterministic test suite + validator on every push to main and
+# every PR. The eval suite (tests/eval/, opt-in via `pytest -m eval`) needs
+# a running Ollama daemon and is **not** executed here — we only verify
+# collection so a syntax error in an eval test fails CI loudly.
+
+# `on` is quoted because PyYAML's 1.1 mode parses bare `on:` as boolean True;
+# GitHub's own parser handles either form. Quoting keeps `yaml.safe_load`
+# happy for offline tooling.
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dev + per-skill requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          # Per-skill runtime deps so the Ollama-backed scripts import
+          # cleanly during collection (they don't call the daemon — that's
+          # gated by the `eval` marker).
+          for req in front-a11y/scripts/requirements-*.txt front-publish/scripts/requirements-*.txt; do
+            pip install -r "$req"
+          done
+          # The driver itself — installs the `front` console script so
+          # downstream tests can import it.
+          pip install ./front-cli
+
+      - name: Run deterministic test suite
+        run: python -m pytest -q
+
+      - name: Validate front-ui assets
+        run: python front-ui/scripts/validate.py
+
+      - name: Collect eval suite (do not run)
+        # The eval marker is deselected in pytest.ini; `--collect-only` plus
+        # explicit `-m eval` proves the files import even though the suite
+        # itself is opt-in.
+        run: python -m pytest -m eval --collect-only -q

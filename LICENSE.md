@@ -37,3 +37,21 @@ third-party assets retain their own licenses:
   `front/assets/fonts/montserrat/OFL.txt`. This is unaffected by the
   public-domain dedication above; OFL is permissive but its terms apply
   to the font files.
+
+- **Common Voice audio clips** — extracted into
+  `tests/fixtures/audio/cv/<lang>/` from Common Voice 26.0, obtained
+  via [Mozilla Data Collective][mdc] under the dataset's **CC0 1.0
+  Universal** dedication (public domain). The clips themselves are
+  redistributable for any purpose, commercial or non-commercial, with
+  no attribution requirement. Attribution to Mozilla and the Common
+  Voice contributors is provided here as good practice, not as a
+  license obligation. Per the Mozilla Data Collective platform terms
+  and the spirit of contributor consent, **we do not attempt to
+  identify or re-identify speakers**; the per-language `MANIFEST.json`
+  records the Common Voice opaque `client_id` hash for reproducibility
+  only, never raw identifiers. Contributors withdrawing consent
+  upstream should refresh fixtures by re-running
+  `tests/fixtures/audio/extract_cv_subset.py` against the latest
+  release.
+
+[mdc]: https://mozilladatacollective.com/organization/cmfh0j9o10006ns07jq45h7xk

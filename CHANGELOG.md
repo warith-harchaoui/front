@@ -18,6 +18,133 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.3.0] — 2026-06-20
+
+### Added — unified driver and ergonomics
+
+- **`front-cli/` package** ships a Click-based top-level driver. A single
+  `front` executable maps `front <skill> <action> [...]` onto each
+  per-skill script via `subprocess`. Shell completion is documented for
+  bash/zsh/fish in `front-cli/README.md`. Stdlib-only validators stay
+  zero-dep when invoked directly; the driver is additive.
+- **Four Ollama-backed scripts migrated from argparse to Click**:
+  `alt_from_ollama.py`, `captions_from_whisper.py`, `meta_from_ollama.py`,
+  `plain_language.py`. Behaviour preserved (all 323 deterministic tests
+  unchanged); `--help` now formatted by Click. `install_alt_ai.py`
+  gained `-h/--help` and `--model` flags.
+- **Stdlib-only validators** (`lint_a11y.py`, `audit_contrast.py`,
+  `simulate_cvd.py`, `site_indexes.py`, `favicons.py`, `validate.py`,
+  `lint_markdown.py`, `md_to_html.py`, `install_captions.py`) gained a
+  shared `_argparse.make_parser` factory that standardises `prog`,
+  `formatter_class`, `epilog`, and the `-V/--version` flag — addressing
+  the 13 argparse inconsistencies catalogued in `.private/click.md`.
+
+### Added — runtime language configuration
+
+- **`FRONT_LANG_PAIR` env var** drives the default `--lang` for the four
+  Ollama-backed scripts. Precedence: explicit `--lang` flag →
+  `FRONT_LANG_PAIR` first comma-split entry → existing detection
+  fallback. Lets a user set their pair once (`export FRONT_LANG_PAIR="en,de"`)
+  instead of repeating `--lang` on every invocation.
+- **`lang_pair` frontmatter token** added to all four `SKILL.md` files
+  with a "Changing the language pair" recipe section. EN/FR remains the
+  example default; switching to EN/DE / EN/ES / EN/JA / … is now a
+  documented per-project edit.
+- **Test coverage**: `tests/test_lang.py` gained 6 new cases for
+  `lang_pair_default()` (env-unset, whitespace tolerance, empty-string
+  handling, precedence).
+
+### Added — eval test suite
+
+- **`tests/eval/`** — opt-in (`pytest -m eval`) quality bench for the
+  AI-backed scripts. Four modules: `test_alt_eval.py`,
+  `test_plain_language_eval.py`, `test_meta_tags_eval.py`,
+  `test_captions_eval.py`. Skip cleanly when Ollama is unreachable, the
+  pulled model is missing, or fixtures haven't been populated.
+- **Wikipedia image fixtures** for alt-text eval. `tests/fixtures/images/
+  fetch_wikipedia.py` downloads 4 hash-pinned upload.wikimedia.org
+  images (informative-EN, complex-EN, functional-EN, informative-FR)
+  with their human-written alt + caption as ground truth. The
+  decorative case keeps a synthetic Pillow image (W3C-decorative has
+  no caption to verify). DeepEval `AnswerRelevancyMetric` is the
+  primary scorer; a stdlib char-trigram Jaccard fallback (≥ 0.10
+  threshold) runs when DeepEval misconfigures.
+- **Common Voice extractor** for captions WER bench.
+  `tests/fixtures/audio/extract_cv_subset.py` (stdlib + ffmpeg) reads a
+  Common Voice 26.0 tarball, stratified-samples N clips per language
+  balanced on gender / age / accent (capped at 3 clips per opaque
+  speaker hash), transcodes to 16 kHz mono PCM WAV, writes
+  per-language `MANIFEST.json` + `STATS.json`. Idempotent via `--seed`.
+  Test wires `LANGUAGES = ("en", "fr", "es")` with a parametrised
+  per-language median-WER assertion (`≤ 0.10`). Adding a language is
+  one line.
+- `tests/test_extract_cv_subset.py` — 18 deterministic tests for the
+  extractor's pure logic (filter cutoffs, stratified sampling,
+  per-speaker cap, determinism with same seed, diversity stats).
+- `tests/fixtures/audio/fetch.py` ships as a single-clip LibriVox /
+  archive.org fallback for projects without Common Voice headroom.
+
+### Added — release infrastructure
+
+- **`scripts/release.sh`** — bash, no new deps. Takes a version
+  argument, builds five tarballs (one per skill + a bundle), generates
+  `SHA256SUMS`, and self-verifies. Prefers `shasum -a 256` (macOS) with
+  `sha256sum` fallback (Linux). Prints a copy-pasteable `gh release
+  create` next-steps message.
+- **`.github/workflows/ci.yml`** — pytest + validator + eval-collect
+  across Python 3.10 / 3.11 / 3.12 on every push and PR.
+- **`.github/workflows/release.yml`** — tag-driven (`v*.*.*`) release
+  via `scripts/release.sh` + `gh release create --generate-notes`.
+
+### Added — Wikipedia / Common Voice licensing
+
+- **`LICENSE.md` § "Bundled third-party assets"** gained a "Common
+  Voice audio clips" entry documenting the CC0 dedication, voluntary
+  attribution, and the platform's no-speaker-identification rule.
+  Manifests record opaque CV `client_id` hashes only, never raw
+  identifiers.
+
+### Changed — honesty pass on positioning
+
+- README + LISEZMOI gained a structured "**Who this is for**" block
+  with four explicit audiences (solo devs, pentesters writing internal
+  dashboards, data scientists wrapping CLIs, bilingual docs sites)
+  replacing the prior "anyone building a frontend" framing.
+- `LANDSCAPE.md` gained a "**Where `front` is genuinely the best
+  pick**" section naming three concrete categories (CLI→GUI mock-ups
+  in skill form, pre-ship a11y gates without a browser, bilingual
+  docs sites with EN/FR/DE/ES/JA pairing) and a "**Where to pick
+  something else**" hand-off to shadcn/ui and HTMX + classless CSS.
+- `lint-a11y.md` and `contrast-audit.md` reframed: pre-commit gate
+  positioning explicit, "**not a replacement for axe-core / Pa11y /
+  Lighthouse**" stated up front.
+
+### Fixed
+
+- **`front-cli` driver was intercepting `--help` at the leaf-command
+  level** instead of forwarding it to the wrapped script. Users typing
+  `front a11y alt --help` saw Click's one-line stub instead of the real
+  script options. Fix: `add_help_option=False` on every leaf command;
+  groups keep their own help handling via `GROUP_CONTEXT_SETTINGS`.
+- **`__MACOSX/` macOS-zip-artefact** added to `.gitignore`; the
+  previously-tracked directory removed.
+- **`tests/test_lint_markdown.py`** lost its dependence on lucky
+  `sys.path` ordering after the new Click migration changed import
+  order. Now uses explicit `prompts_dir=` kwarg.
+
+### Deferred to a future release
+
+- **Full reshaping of `references/`**. Teaching prose still mixed with
+  rule-shaped content in some reference files. Future pass will split
+  into `*-rules.md` + `*-guide.md` where the boundary is clear.
+- **`vocab-biasing-clip.wav`** is user-supplied. The glossary contains
+  project-brand terms (`pywhispercpp`, `VisionCell`, …) that no Common
+  Voice contributor has uttered, so this clip stays a record-it-yourself
+  asset.
+- **5 real users** and a **live trigger-phrasing session against the
+  updated frontmatters** are the two adoption-side milestones that
+  determine whether 0.3.0 needs a fast follow-up.
+
 ## [0.2.0] — 2026-06-16
 
 ### Changed — the big restructure

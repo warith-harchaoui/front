@@ -109,7 +109,11 @@ que `front` est le bon outil ? », voir [LANDSCAPE.md](LANDSCAPE.md).
   par projet se règle dans le token `metadata.lang_pair` du frontmatter
   de n'importe quel skill (EN/FR, EN/DE, EN/ES, EN/JA, …) — voir
   chaque `SKILL.md` → « Changing the language pair » et
-  `front-publish/references/i18n.md`.
+  `front-publish/references/i18n.md`. Pour une surcharge ponctuelle
+  depuis le shell, utilisez la variable d'environnement
+  `FRONT_LANG_PAIR` (par exemple `export FRONT_LANG_PAIR="en,fr"`) ;
+  la première entrée devient le `--lang` par défaut des scripts
+  Ollama quand aucun drapeau n'est passé.
 
 ## Entrées → sorties
 
@@ -202,6 +206,18 @@ récente. Le nom du dossier installé est stable, donc
 `cp -r front-ui ~/.claude/skills/` écrase l'install précédente sur
 place. Le `SHA256SUMS` de chaque release fait foi : si la vérification
 échoue, n'installez pas l'artefact.
+
+### Complétion shell
+
+Le pilote `front` (et les quatre CLI par-script migrés à Click —
+`alt_from_ollama.py`, `captions_from_whisper.py`,
+`meta_from_ollama.py`, `plain_language.py`) embarquent la complétion
+`bash` / `zsh` / `fish` gratuitement via l'astuce
+`_<OUTIL>_COMPLETE=<shell>_source` de Click. Voir
+[`front-cli/README.md`](front-cli/README.md#shell-completion) pour la
+mise en place en une ligne par shell. Le même motif marche pour les
+CLI par-script lancés directement (par exemple
+`_ALT_FROM_OLLAMA_COMPLETE=zsh_source alt_from_ollama.py`).
 
 ## CLI → IHM, le cas d'usage phare
 

@@ -80,14 +80,21 @@ def _run_script(skill: str, script: str, extra: tuple[str, ...]) -> int:
 # ── Root group ──────────────────────────────────────────────────────────────
 
 CONTEXT_SETTINGS = {
-    # Forward unknown options to the wrapped script.
+    # Forward unknown options to the wrapped script. We deliberately
+    # omit `help_option_names` here — with `add_help_option=False` on
+    # leaf commands, `--help` (and `-h`) flow through to the wrapped
+    # script so the user sees the script's real options, not Click's
+    # one-line stub.
     "allow_extra_args": True,
     "ignore_unknown_options": True,
-    "help_option_names": ["-h", "--help"],
 }
 
+# Groups keep their own help handling so `front --help`, `front a11y --help`,
+# etc. show the driver's subcommand listing.
+GROUP_CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 
-@click.group(context_settings={"help_option_names": ["-h", "--help"]})
+
+@click.group(context_settings=GROUP_CONTEXT_SETTINGS)
 @click.version_option(__version__, "-V", "--version", prog_name="front")
 def cli() -> None:
     """
@@ -101,12 +108,12 @@ def cli() -> None:
 
 # ── ui ──────────────────────────────────────────────────────────────────────
 
-@cli.group(help="UI generation skill (front-ui).")
+@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="UI generation skill (front-ui).")
 def ui() -> None:
     """front-ui — UI generation and pre-ship validation."""
 
 
-@ui.command(name="validate", context_settings=CONTEXT_SETTINGS,
+@ui.command(name="validate", context_settings=CONTEXT_SETTINGS, add_help_option=False,
             help="Run the front-ui pre-ship quality gate.")
 @click.pass_context
 def ui_validate(ctx: click.Context) -> None:
@@ -115,54 +122,54 @@ def ui_validate(ctx: click.Context) -> None:
 
 # ── a11y ────────────────────────────────────────────────────────────────────
 
-@cli.group(help="Accessibility skill (front-a11y).")
+@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="Accessibility skill (front-a11y).")
 def a11y() -> None:
     """front-a11y — pre-commit a11y gates and content tooling."""
 
 
-@a11y.command(name="lint", context_settings=CONTEXT_SETTINGS,
+@a11y.command(name="lint", context_settings=CONTEXT_SETTINGS, add_help_option=False,
               help="Static a11y lint over HTML files (14 rules).")
 @click.pass_context
 def a11y_lint(ctx: click.Context) -> None:
     sys.exit(_run_script("front-a11y", "lint_a11y.py", tuple(ctx.args)))
 
 
-@a11y.command(name="contrast", context_settings=CONTEXT_SETTINGS,
+@a11y.command(name="contrast", context_settings=CONTEXT_SETTINGS, add_help_option=False,
               help="WCAG contrast audit + OKLCH-neighbour fix hint.")
 @click.pass_context
 def a11y_contrast(ctx: click.Context) -> None:
     sys.exit(_run_script("front-a11y", "audit_contrast.py", tuple(ctx.args)))
 
 
-@a11y.command(name="cvd", context_settings=CONTEXT_SETTINGS,
+@a11y.command(name="cvd", context_settings=CONTEXT_SETTINGS, add_help_option=False,
               help="Color-vision-deficiency (protanopia / deuteranopia / tritanopia) rendering.")
 @click.pass_context
 def a11y_cvd(ctx: click.Context) -> None:
     sys.exit(_run_script("front-a11y", "simulate_cvd.py", tuple(ctx.args)))
 
 
-@a11y.command(name="alt", context_settings=CONTEXT_SETTINGS,
+@a11y.command(name="alt", context_settings=CONTEXT_SETTINGS, add_help_option=False,
               help="W3C-compliant alt text via a local Ollama vision model.")
 @click.pass_context
 def a11y_alt(ctx: click.Context) -> None:
     sys.exit(_run_script("front-a11y", "alt_from_ollama.py", tuple(ctx.args)))
 
 
-@a11y.command(name="captions", context_settings=CONTEXT_SETTINGS,
+@a11y.command(name="captions", context_settings=CONTEXT_SETTINGS, add_help_option=False,
               help="WebVTT / SRT / plain-text captions via local whisper.cpp.")
 @click.pass_context
 def a11y_captions(ctx: click.Context) -> None:
     sys.exit(_run_script("front-a11y", "captions_from_whisper.py", tuple(ctx.args)))
 
 
-@a11y.command(name="install-alt-ai", context_settings=CONTEXT_SETTINGS,
+@a11y.command(name="install-alt-ai", context_settings=CONTEXT_SETTINGS, add_help_option=False,
               help="Install Ollama and pull the vision model used by `front a11y alt`.")
 @click.pass_context
 def a11y_install_alt_ai(ctx: click.Context) -> None:
     sys.exit(_run_script("front-a11y", "install_alt_ai.py", tuple(ctx.args)))
 
 
-@a11y.command(name="install-captions", context_settings=CONTEXT_SETTINGS,
+@a11y.command(name="install-captions", context_settings=CONTEXT_SETTINGS, add_help_option=False,
               help="Install pywhispercpp and download the model used by `front a11y captions`.")
 @click.pass_context
 def a11y_install_captions(ctx: click.Context) -> None:
@@ -171,47 +178,47 @@ def a11y_install_captions(ctx: click.Context) -> None:
 
 # ── publish ─────────────────────────────────────────────────────────────────
 
-@cli.group(help="Publishing skill (front-publish): MD → site, meta, favicons, indexes, plain language.")
+@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="Publishing skill (front-publish): MD → site, meta, favicons, indexes, plain language.")
 def publish() -> None:
     """front-publish — site, meta, favicons, indexes, plain language."""
 
 
-@publish.command(name="favicons", context_settings=CONTEXT_SETTINGS,
+@publish.command(name="favicons", context_settings=CONTEXT_SETTINGS, add_help_option=False,
                  help="Generate favicon / PWA icon set + manifest from a logo.")
 @click.pass_context
 def publish_favicons(ctx: click.Context) -> None:
     sys.exit(_run_script("front-publish", "favicons.py", tuple(ctx.args)))
 
 
-@publish.command(name="meta", context_settings=CONTEXT_SETTINGS,
+@publish.command(name="meta", context_settings=CONTEXT_SETTINGS, add_help_option=False,
                  help="Draft per-page meta tags (title, description, OG, Twitter, JSON-LD).")
 @click.pass_context
 def publish_meta(ctx: click.Context) -> None:
     sys.exit(_run_script("front-publish", "meta_from_ollama.py", tuple(ctx.args)))
 
 
-@publish.command(name="indexes", context_settings=CONTEXT_SETTINGS,
+@publish.command(name="indexes", context_settings=CONTEXT_SETTINGS, add_help_option=False,
                  help="Emit robots.txt + sitemap.xml + llms.txt + Atom/RSS + humans.txt.")
 @click.pass_context
 def publish_indexes(ctx: click.Context) -> None:
     sys.exit(_run_script("front-publish", "site_indexes.py", tuple(ctx.args)))
 
 
-@publish.command(name="plain", context_settings=CONTEXT_SETTINGS,
+@publish.command(name="plain", context_settings=CONTEXT_SETTINGS, add_help_option=False,
                  help="Rewrite UI copy in plain language at a target grade.")
 @click.pass_context
 def publish_plain(ctx: click.Context) -> None:
     sys.exit(_run_script("front-publish", "plain_language.py", tuple(ctx.args)))
 
 
-@publish.command(name="lint-md", context_settings=CONTEXT_SETTINGS,
+@publish.command(name="lint-md", context_settings=CONTEXT_SETTINGS, add_help_option=False,
                  help="Lint Markdown — headings, alt text, links, LaTeX delimiters, Mermaid (rendered locally).")
 @click.pass_context
 def publish_lint_md(ctx: click.Context) -> None:
     sys.exit(_run_script("front-publish", "lint_markdown.py", tuple(ctx.args)))
 
 
-@publish.command(name="md-to-html", context_settings=CONTEXT_SETTINGS,
+@publish.command(name="md-to-html", context_settings=CONTEXT_SETTINGS, add_help_option=False,
                  help="Convert Markdown → HTML with local Mermaid PNG embed, KaTeX LaTeX, Inter + Tailwind shell.")
 @click.pass_context
 def publish_md_to_html(ctx: click.Context) -> None:

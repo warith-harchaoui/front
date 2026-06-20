@@ -57,6 +57,40 @@ to discover available actions. `front-cli` collapses the surface to a
 single `git`-style command, ships `--version`, and (when installed via
 `pip install`) wires shell completion automatically through Click.
 
+## Shell completion
+
+Click ships completion scripts for `bash`, `zsh`, and `fish`. Generate
+one once, source it from your shell rc, and tab-completion for `front`
+sub-commands + options Just Works.
+
+```bash
+# Bash
+_FRONT_COMPLETE=bash_source front > ~/.front-complete.bash
+echo 'source ~/.front-complete.bash' >> ~/.bashrc
+
+# Zsh
+_FRONT_COMPLETE=zsh_source front > ~/.front-complete.zsh
+echo 'source ~/.front-complete.zsh' >> ~/.zshrc
+
+# Fish
+_FRONT_COMPLETE=fish_source front > ~/.config/fish/completions/front.fish
+```
+
+The same `_<TOOL>_COMPLETE=<shell>_source` trick works for the per-script
+CLIs that were migrated to Click — useful if you invoke them directly
+rather than through the `front` driver:
+
+```bash
+_ALT_FROM_OLLAMA_COMPLETE=zsh_source alt_from_ollama.py > ~/.alt-complete.zsh
+_CAPTIONS_FROM_WHISPER_COMPLETE=zsh_source captions_from_whisper.py > ~/.captions-complete.zsh
+_META_FROM_OLLAMA_COMPLETE=zsh_source meta_from_ollama.py > ~/.meta-complete.zsh
+_PLAIN_LANGUAGE_COMPLETE=zsh_source plain_language.py > ~/.plain-complete.zsh
+```
+
+These commands invoke the script with a special env var so Click prints
+the completion shell snippet to stdout — nothing is installed, modified,
+or downloaded.
+
 ## License
 
 The Unlicense. The same applies as for the rest of the `front` repo.

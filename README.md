@@ -71,7 +71,7 @@ is the right pick — see [LANDSCAPE.md](LANDSCAPE.md).
 - Output sets a `dark:` peer on every styled element, uses `<button>`/`<a>`/`<label>`/`<dialog>`/`<form>` first, exposes a visible focus ring, honors `prefers-reduced-motion` and meets a 44×44 px hit area.
 - Color choices map to the palettes in `front-ui/references/color-psychology.md` (source: <https://harchaoui.org/warith/colors/>).
 - Skill output is **prototype-grade single-file HTML** by default — suitable for demos, mockups, internal tools and small landing pages. The starter page uses the Tailwind Play CDN, which Tailwind itself warns is for prototyping only. For production sites at scale, run **Tailwind CLI** or **Vite + Tailwind** over the emitted HTML before shipping; the class names are stable, so the same files survive the swap. See `front-ui/references/stack-tailwind.md`.
-- Bilingual-ready copy (EN/FR by default — configurable via `lang_pair`). Default English; switch on the user's language. Set the project-level pair in any skill's `metadata.lang_pair` frontmatter token (EN/FR, EN/DE, EN/ES, EN/JA, …) — see each `SKILL.md` → "Changing the language pair" and `front-publish/references/i18n.md`.
+- Bilingual-ready copy (EN/FR by default — configurable via `lang_pair`). Default English; switch on the user's language. Set the project-level pair in any skill's `metadata.lang_pair` frontmatter token (EN/FR, EN/DE, EN/ES, EN/JA, …) — see each `SKILL.md` → "Changing the language pair" and `front-publish/references/i18n.md`. For an ad-hoc shell override use the `FRONT_LANG_PAIR` env var (e.g. `export FRONT_LANG_PAIR="en,fr"`); its first comma-split entry becomes the default `--lang` for the Ollama-backed scripts when no flag is passed.
 
 ## Inputs → outputs
 
@@ -159,6 +159,17 @@ skill folder name is stable, so `cp -r front-ui ~/.claude/skills/`
 overwrites the previous install in place. The `SHA256SUMS` for each
 release is the source of truth — if the checksum check fails, do not
 install the artifact.
+
+### Shell completion
+
+The `front` driver (and the four Click-migrated per-script CLIs —
+`alt_from_ollama.py`, `captions_from_whisper.py`, `meta_from_ollama.py`,
+`plain_language.py`) ship `bash` / `zsh` / `fish` completion for free
+via Click's `_<TOOL>_COMPLETE=<shell>_source` trick. See
+[`front-cli/README.md`](front-cli/README.md#shell-completion) for the
+one-line setup per shell. The same env-var pattern works for any of
+the per-script CLIs invoked directly (e.g.
+`_ALT_FROM_OLLAMA_COMPLETE=zsh_source alt_from_ollama.py`).
 
 ## CLI → GUI flagship
 

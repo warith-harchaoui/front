@@ -86,6 +86,19 @@ plain-language rewriter — lives in
 `front-publish/SKILL.md` → "Changing the language pair" and
 `front-publish/references/i18n.md`.
 
+**Runtime override.** Set the `FRONT_LANG_PAIR` environment variable to
+override the pair from the shell — its first comma-split entry becomes
+the default `--lang` for `alt_from_ollama.py` and
+`captions_from_whisper.py` when no flag is passed:
+
+```bash
+export FRONT_LANG_PAIR="en,de"
+python front-a11y/scripts/alt_from_ollama.py photo.jpg   # → German alt text
+```
+
+Precedence (highest first): explicit `--lang` flag → `FRONT_LANG_PAIR`
+first entry → langdetect on available text → POSIX locale fallback.
+
 ## When NOT to use this skill
 
 - You need runtime DOM-aware a11y testing (React-mounted components, dynamic ARIA states, focus management after async state change) → use **axe-core** + Playwright.
