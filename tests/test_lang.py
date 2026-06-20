@@ -65,3 +65,38 @@ class TestFallbackPath:
         # capability probe. The detector must not raise; it must fall back.
         monkeypatch.setattr(_lang, "_have_langdetect", lambda: False)
         assert _lang.detect_text_language(SAMPLES["en"], fallback="xx") == "xx"
+
+
+class TestLangPairDefault:
+    """
+    ``lang_pair_default()`` reads ``FRONT_LANG_PAIR`` and returns the
+    first comma-split entry. It is the runtime hook that lets the four
+    Ollama-backed scripts honour the ``lang_pair`` SKILL.md frontmatter
+    without forcing the user to pass ``--lang`` every call.
+    """
+
+    def test_env_unset_returns_none(self, monkeypatch):
+        monkeypatch.delenv("FRONT_LANG_PAIR", raising=False)
+        assert _lang.lang_pair_default() is None
+
+    def test_env_empty_returns_none(self, monkeypatch):
+        monkeypatch.setenv("FRONT_LANG_PAIR", "")
+        assert _lang.lang_pair_default() is None
+
+    def test_env_whitespace_only_returns_none(self, monkeypatch):
+        monkeypatch.setenv("FRONT_LANG_PAIR", "   ")
+        assert _lang.lang_pair_default() is None
+
+    def test_first_entry_returned(self, monkeypatch):
+        monkeypatch.setenv("FRONT_LANG_PAIR", "en,fr")
+        assert _lang.lang_pair_default() == "en"
+
+    def test_whitespace_tolerant(self, monkeypatch):
+        monkeypatch.setenv("FRONT_LANG_PAIR", "  fr ,  de ")
+        assert _lang.lang_pair_default() == "fr"
+
+    def test_single_entry_no_comma(self, monkeypatch):
+        # Even without a comma we honour the single entry — useful for
+        # users who only set one language.
+        monkeypatch.setenv("FRONT_LANG_PAIR", "ja")
+        assert _lang.lang_pair_default() == "ja"

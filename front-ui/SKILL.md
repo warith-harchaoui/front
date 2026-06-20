@@ -68,6 +68,20 @@ different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
    `og:locale_alternate`, the docs site's `<link rel="alternate"
    hreflang>` pairs.
 
+**Runtime override.** For ad-hoc shells, set the `FRONT_LANG_PAIR`
+environment variable instead of editing the frontmatter — the four
+Ollama-backed scripts (`alt_from_ollama.py`, `captions_from_whisper.py`,
+`meta_from_ollama.py`, `plain_language.py`) read its first comma-split
+entry as the default `--lang` when none is passed on the command line:
+
+```bash
+export FRONT_LANG_PAIR="en,de"
+python front-a11y/scripts/alt_from_ollama.py photo.jpg   # → German alt text
+```
+
+Precedence (highest first): explicit `--lang` flag → `FRONT_LANG_PAIR`
+first entry → langdetect on available text → POSIX locale fallback.
+
 The wider i18n model (URL strategy, `Intl.*`, plurals, RTL,
 non-Latin fonts) is in `front-publish/references/i18n.md`. The
 `lang_pair` token is a project-level default for the **two main

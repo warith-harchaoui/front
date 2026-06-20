@@ -78,7 +78,7 @@ from _ollama import (  # noqa: E402
     detect_lang,
     pick_default_model,
 )
-from _lang import detect_text_language  # noqa: E402
+from _lang import detect_text_language, lang_pair_default  # noqa: E402
 
 
 # ── Module-level configuration ────────────────────────────────────────────────
@@ -263,9 +263,12 @@ def rewrite(
         # Trivial round-trip — no need to spin up the model.
         return text
 
-    # Language: explicit ``lang`` wins. Otherwise detect from the input
-    # text itself (the source language is exactly what we want the rewrite
-    # to stay in), and fall back to the env-derived locale.
+    # Language: explicit ``lang`` wins. Then FRONT_LANG_PAIR (first entry).
+    # Otherwise detect from the input text itself (the source language is
+    # exactly what we want the rewrite to stay in), and fall back to the
+    # env-derived locale.
+    if lang is None:
+        lang = lang_pair_default()
     if lang is None:
         lang = detect_text_language(text, fallback=detect_lang())
     lang = lang.lower()[:2]

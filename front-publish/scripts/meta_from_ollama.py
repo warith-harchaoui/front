@@ -94,7 +94,7 @@ from _ollama import (  # noqa: E402
     detect_lang,
     pick_default_model,
 )
-from _lang import detect_text_language  # noqa: E402
+from _lang import detect_text_language, lang_pair_default  # noqa: E402
 
 
 # ── Module-level configuration ────────────────────────────────────────────────
@@ -445,10 +445,14 @@ def _cli(
                 Path(source).read_text(encoding="utf-8", errors="ignore")
             )
 
-    # Language: explicit --lang wins. Otherwise prefer langdetect against
-    # the extracted page text, falling back to env-derived locale.
+    # Language: explicit --lang wins. Then FRONT_LANG_PAIR (first entry).
+    # Otherwise prefer langdetect against the extracted page text, falling
+    # back to env-derived locale.
+    pair_lang = lang_pair_default()
     if lang:
         resolved_lang: str = lang.lower()[:2]
+    elif pair_lang:
+        resolved_lang = pair_lang.lower()[:2]
     elif page_text:
         resolved_lang = detect_text_language(page_text, fallback=detect_lang())
     else:

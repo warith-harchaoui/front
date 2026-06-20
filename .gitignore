@@ -1,5 +1,6 @@
 .private/
 .DS_Store
+__MACOSX/
 node_modules/
 dist/
 .env
@@ -19,5 +20,10 @@ venv/
 4ml/
 4ml.zip
 4ml-new/
+
+# Audio fixtures for the eval suite — committed: fetch.py, MANIFEST.json,
+# *.txt truth files, README. NOT committed: the WAVs themselves (too bulky,
+# auto-fetched on demand via tests/fixtures/audio/fetch.py).
+tests/fixtures/audio/*.wav
 
 .*
