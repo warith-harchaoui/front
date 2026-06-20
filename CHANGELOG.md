@@ -18,6 +18,96 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.3.1] — 2026-06-20
+
+Patch release. Documents the current status of each surface, marks
+audio captions explicitly **WiP** so users don't expect a finished WER
+gate, and ships one defensive fix for Ollama 0.30 MLX vision
+quantizations. No behaviour change for the stable scripts.
+
+### Added — status and roadmap
+
+- **`README.md` → "Status" section** spells out where each of the five
+  surfaces (`front-ui`, `front-cli`, `front-cli-gui`, `front-publish`,
+  `front-a11y`) stands today and isolates the one WiP area (captions /
+  audio). Replaces the implicit "everything is stable" reading of the
+  previous README.
+- **`README.md` → "Inputs → outputs" table** now flags the audio /
+  video row as **WiP** and links back to "Status". Users won't be
+  surprised by the missing per-language WER baselines or the
+  user-supplied `vocab-biasing-clip.wav`.
+- **`CHANGELOG.md` → "Roadmap"** section (below) records the four
+  outstanding threads we're carrying into 0.4.0: captions baselines,
+  LISEZMOI parity, full `references/` reshape, and `front-cli-gui`
+  production-hardening notes.
+
+### Changed — `front-a11y/SKILL.md`
+
+- Captions row of the "Honest framing" table and the decision-tree
+  entry both flagged *(WiP)* with a one-line pointer to
+  `tests/fixtures/audio/README.md` for the current shape of the eval
+  fixtures. The script itself is unchanged.
+
+### Changed — version bumps
+
+- All four `SKILL.md` files bumped from `0.2.0` → `0.3.1`. They were
+  left at `0.2.0` through 0.3.0 by accident — this aligns the on-disk
+  frontmatter with the release tag so skill consumers can tell
+  versions apart.
+
+### Fixed
+
+- **`alt_from_ollama.py` MLX vision auto-detection** (commit
+  `af010c7`). Ollama 0.30 ships MLX quantizations of Gemma vision
+  models (`gemma4:e2b-mlx`) that silently discard the image input on
+  some manifest variants. New `_model_has_vision(model)` queries
+  `/api/show` and falls back to the non-MLX tag when the manifest
+  reports no `vision` capability. Defensive: returns `True` on any
+  request error so a flaky daemon doesn't silently downgrade.
+
+## Roadmap
+
+Open threads being carried into the next minor release. Listed in
+priority order; each line is the smallest deliverable that lets the
+item be retired.
+
+1. **Captions WER baselines.** Run `tests/fixtures/audio/
+   extract_cv_subset.py` against Common Voice 26.0 for `en` / `fr` /
+   `es`, record the per-language median WER, commit
+   `MANIFEST.json` + `STATS.json` + `clip-*.txt` for each, then
+   publish the median numbers in `front-a11y/references/captions-ai.md`
+   so users have an honest expectation of accuracy on each language.
+   Blocking the captions WiP → Stable transition.
+2. **`vocab-biasing-clip.wav` reference recording.** A 10-second clip
+   speaking at least one term from `tests/fixtures/vocab/glossary.txt`
+   (`pywhispercpp`, `VisionCell`, …). Owner-recorded; not redrawable
+   from Common Voice. Lands together with the transcript update in
+   `tests/fixtures/audio/vocab-biasing-clip.txt`.
+3. **`LISEZMOI.md` parity pass.** French README has drifted since the
+   0.2.0 restructure. Translate the new "Status", "Who this is for",
+   "What the skills enforce", and updated "Inputs → outputs" rows.
+   Single-PR translation, no semantic change.
+4. **`references/` reshape pass.** Split teaching prose from rules
+   where the boundary is clear (`<name>-rules.md` + `<name>-guide.md`).
+   Deferred from 0.2.0 and 0.3.0; pick the two most prose-heavy files
+   (`color-psychology.md`, `stack-tailwind.md`) and do them first as
+   the pattern.
+5. **`front-cli-gui` hardening notes.** Add a short production-readiness
+   reference (`front-cli-gui/references/hardening.md`): auth on the
+   SSE proxy, per-route rate limit, subprocess sandbox (`shell=False`,
+   timeout, cwd), CORS posture. Keeps the demo's "scaffolds the GUI,
+   you wire the host" honesty while giving the host wiring an
+   opinionated checklist.
+
+Not in scope for 0.4.0 (kept here for visibility):
+
+- Realtime / streaming captions — out of scope. Pointer to Deepgram /
+  AssemblyAI in `front-a11y/SKILL.md` § "When NOT to use this skill"
+  stands.
+- Provider-hosted vision (Claude vision / GPT-4o) as a primary path —
+  out of scope. The local-only Ollama path is a deliberate design
+  decision; hosted is an alternative in `LANDSCAPE.md`.
+
 ## [0.3.0] — 2026-06-20
 
 ### Added — unified driver and ergonomics
