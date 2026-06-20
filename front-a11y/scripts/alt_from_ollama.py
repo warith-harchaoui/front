@@ -57,7 +57,6 @@ Author
 
 from __future__ import annotations
 
-import argparse
 import base64
 import hashlib
 import io
@@ -67,7 +66,7 @@ import sys as _sys
 from pathlib import Path as _PathHelper
 
 _sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
-from _argparse import make_parser  # noqa: E402
+from _click import front_command, run_command  # noqa: E402
 import os
 import platform
 import re
@@ -75,6 +74,8 @@ import sys
 import urllib.request
 from pathlib import Path
 from typing import Optional
+
+import click
 
 # ``requests`` is the one hard third-party dependency; declared as a runtime
 # requirement in ``front/scripts/requirements.txt``.
@@ -745,89 +746,220 @@ def describe(
 
 # ── CLI ─────────────────────────────────────────────────────────────────────
 
-def _build_argparser() -> argparse.ArgumentParser:
-    """
-    Construct the CLI ``ArgumentParser``.
 
-    Returns
-    -------
-    argparse.ArgumentParser
-        Parser with all flags registered.
+@front_command(
+    "front-a11y-alt",
+    help=(
+        "Generate W3C-compliant alt text for an image via a local Ollama "
+        "vision model. Matches the WAI image-purpose decision tree "
+        "(informative / decorative / functional / text / complex / group)."
+    ),
+    epilog=(
+        "Examples:\n"
+        "  front-a11y-alt --kind informative photo.jpg\n"
+        "  front-a11y-alt --kind functional --context 'Submit form' icon.png\n"
+        "  front-a11y-alt --kind complex --in docs/chart.md chart.png\n"
+    ),
+)
+@click.argument("src")
+@click.option(
+    "--kind",
+    type=click.Choice(
+        ["informative", "decorative", "functional", "text", "complex", "group"]
+    ),
+    default="informative",
+    show_default=True,
+    help="Image purpose per W3C decision tree.",
+)
+@click.option(
+    "--lang", "-l",
+    default=None,
+    help="BCP-47 base tag (en, fr, es, de, …).",
+)
+@click.option(
+    "--context", "-c",
+    default="",
+    help="Page-context hint. For --kind functional, name the action/destination.",
+)
+@click.option(
+    "--resize",
+    type=int,
+    default=1024,
+    show_default=True,
+    help="Downscale long edge to N px before sending (Pillow). 0 disables.",
+)
+@click.option(
+    "--model",
+    default=None,
+    help="Override the Ollama model tag.",
+)
+@click.option(
+    "--no-cache",
+    "no_cache",
+    is_flag=True,
+    default=False,
+    help="Bypass the on-disk cache for this run.",
+)
+@click.option(
+    "--longdesc",
+    is_flag=True,
+    default=False,
+    help=(
+        "ALSO generate a long description (for <figcaption> or "
+        "aria-describedby). Writes it to <src>.longdesc.md beside the "
+        "image. Only meaningful with --kind complex or group."
+    ),
+)
+# Vocabulary biasing — same shape as captions_from_whisper.py.
+@click.option(
+    "--in",
+    "in_doc",
+    type=click.Path(path_type=Path),
+    metavar="DOC",
+    default=None,
+    help=(
+        "Document the image is embedded in. The text around every "
+        "reference to the image inside DOC is used both as --context "
+        "and as a vocabulary source. Highest signal for alt text."
+    ),
+)
+@click.option(
+    "--vocab",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Glossary file; one term per line; '#' starts a comment.",
+)
+@click.option(
+    "--vocab-from",
+    "vocab_from",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="File or directory whose text is mined for proper nouns and identifiers.",
+)
+@click.option(
+    "--auto-project",
+    "auto_project",
+    is_flag=True,
+    default=False,
+    help=(
+        "Walk upward from the source to find the project root, then "
+        "collect vocabulary from the whole tree."
+    ),
+)
+def _cli(
+    src: str,
+    kind: str,
+    lang: Optional[str],
+    context: str,
+    resize: int,
+    model: Optional[str],
+    no_cache: bool,
+    longdesc: bool,
+    in_doc: Optional[Path],
+    vocab: Optional[Path],
+    vocab_from: Optional[Path],
+    auto_project: bool,
+) -> int:
+    """Click command body for ``alt_from_ollama``; returns an integer exit code.
+
+    Behaviour is identical to the prior argparse-driven ``main``: writes
+    the generated alt text to stdout, optionally writes a long description
+    to ``<src>.longdesc.md``, and exits ``0`` on success or ``2`` when
+    Ollama is unreachable.
     """
-    p = make_parser(
-        prog="front-a11y-alt",
-        description="Generate W3C-compliant alt text for an image via a local "
-                    "Ollama vision model. Matches the WAI image-purpose decision "
-                    "tree (informative / decorative / functional / text / "
-                    "complex / group).",
-        epilog="Examples:\n"
-               "  front-a11y-alt --kind informative photo.jpg\n"
-               "  front-a11y-alt --kind functional --context 'Submit form' icon.png\n"
-               "  front-a11y-alt --kind complex --in docs/chart.md chart.png\n",
+    # ``global`` is unfortunate but keeps the cache-bypass flag colocated with
+    # the module-level switch the helpers read.
+    global NO_CACHE
+    if no_cache:
+        NO_CACHE = True
+
+    if kind == "decorative":
+        # W3C: decorative images get alt="" — the caller renders <img alt=""> only.
+        # No model call, no output. Exit code 0 signals success.
+        return 0
+
+    # Preserve the raw CLI inputs — describe_long is intentionally called
+    # with the un-augmented context and un-detected lang in the argparse
+    # implementation; mirror that exactly.
+    raw_lang: Optional[str] = lang
+    raw_context: str = context
+
+    # Resolve vocabulary from the supplied sources (--in / --vocab /
+    # --vocab-from / --auto-project / sibling auto-detect).
+    src_path = Path(src)
+    vocabulary: list[str] = resolve_vocab_terms(
+        src_path,
+        in_doc=in_doc,
+        vocab_file=vocab,
+        vocab_from=vocab_from,
+        auto_project=auto_project,
     )
-    p.add_argument(
-        "src",
-        help="Path or URL to the image. Ignored when --kind decorative.",
+
+    # --in DOC also feeds the explicit context hint with the surrounding
+    # text — strongest signal for what the image is doing on the page.
+    if in_doc is not None:
+        ctx_from_doc: str = surrounding_text(in_doc, src_path)
+        if ctx_from_doc:
+            context = (context + "\n" + ctx_from_doc).strip() if context else ctx_from_doc
+
+    # Language: explicit --lang wins. Otherwise detect from any available
+    # text (surrounding doc, context hint, vocabulary join) via langdetect,
+    # falling back to the env-derived locale.
+    if lang is None:
+        detection_text: str = " ".join(
+            [context] + (vocabulary or [])
+        ).strip()
+        if detection_text:
+            lang = detect_text_language(detection_text, fallback=detect_lang())
+
+    text = describe(
+        src,
+        kind=kind,
+        lang=lang,
+        context=context,
+        resize=resize,
+        model=model,
+        vocabulary=vocabulary,
     )
-    p.add_argument(
-        "--kind",
-        choices=["informative", "decorative", "functional", "text", "complex", "group"],
-        default="informative",
-        help="Image purpose per W3C decision tree. Default: informative.",
-    )
-    p.add_argument(
-        "--lang", "-l",
-        help="BCP-47 base tag (en, fr, es, de, …).",
-    )
-    p.add_argument(
-        "--context", "-c", default="",
-        help="Page-context hint. For --kind functional, name the action/destination.",
-    )
-    p.add_argument(
-        "--resize", type=int, default=1024,
-        help="Downscale long edge to N px before sending (Pillow). 0 disables. Default: 1024.",
-    )
-    p.add_argument(
-        "--model",
-        help="Override the Ollama model tag.",
-    )
-    p.add_argument(
-        "--no-cache", action="store_true",
-        help="Bypass the on-disk cache for this run.",
-    )
-    p.add_argument(
-        "--longdesc", action="store_true",
-        help=(
-            "ALSO generate a long description (for <figcaption> or "
-            "aria-describedby). Writes it to <src>.longdesc.md beside the "
-            "image. Only meaningful with --kind complex or group."
-        ),
-    )
-    # Vocabulary biasing — same shape as captions_from_whisper.py.
-    p.add_argument(
-        "--in", dest="in_doc", type=Path, metavar="DOC",
-        help=(
-            "Document the image is embedded in. The text around every "
-            "reference to the image inside DOC is used both as --context "
-            "and as a vocabulary source. Highest signal for alt text."
-        ),
-    )
-    p.add_argument(
-        "--vocab", type=Path,
-        help="Glossary file; one term per line; '#' starts a comment.",
-    )
-    p.add_argument(
-        "--vocab-from", type=Path, dest="vocab_from",
-        help="File or directory whose text is mined for proper nouns and identifiers.",
-    )
-    p.add_argument(
-        "--auto-project", action="store_true",
-        help=(
-            "Walk upward from the source to find the project root, then "
-            "collect vocabulary from the whole tree."
-        ),
-    )
-    return p
+
+    if not text and kind == "complex":
+        # Empty output for a complex image is almost always a sign that the
+        # caller forgot to supply a context hint. Nudge them.
+        click.echo(
+            "Note: returned alt is empty. For complex images, the W3C decision tree "
+            "calls for a short alt AND a long description elsewhere (<figcaption> or "
+            "aria-describedby). Provide a context hint and retry.",
+            err=True,
+        )
+
+    click.echo(text)
+
+    # Long description path — runs after the short alt is written so the
+    # caller still gets the short alt on stdout even if the long path fails.
+    if longdesc:
+        if kind not in {"complex", "group"}:
+            click.echo(
+                "Note: --longdesc is only meaningful with --kind complex or group.",
+                err=True,
+            )
+        long_text = describe_long(
+            src,
+            kind=kind,
+            lang=raw_lang,
+            context=raw_context,
+            resize=resize,
+            model=model,
+        )
+        # Resolve a sibling path: ``<src>.longdesc.md`` for files; for URLs
+        # write into the current working directory under a sanitized name.
+        if re.match(r"^https?://", src, re.I):
+            out_path = Path(re.sub(r"[^A-Za-z0-9._-]+", "_", src) + ".longdesc.md")
+        else:
+            out_path = src_path.with_suffix(src_path.suffix + ".longdesc.md")
+        out_path.write_text(long_text + "\n", encoding="utf-8")
+        click.echo(f"Long description written to {out_path}", err=True)
+
+    return 0
 
 
 def main(argv: Optional[list[str]] = None) -> int:
@@ -838,103 +970,15 @@ def main(argv: Optional[list[str]] = None) -> int:
     ----------
     argv : list of str or None, optional
         Argument vector excluding ``argv[0]``. When ``None`` (default),
-        ``argparse`` reads from ``sys.argv``.
+        Click reads from ``sys.argv``.
 
     Returns
     -------
     int
         Process exit code. ``0`` on success, ``2`` on infrastructure failure
-        (Ollama unreachable / HTTP error).
+        (Ollama unreachable / HTTP error or a usage error).
     """
-    # ``global`` is unfortunate but keeps the cache-bypass flag colocated with
-    # the module-level switch the helpers read.
-    global NO_CACHE
-    args = _build_argparser().parse_args(argv)
-    if args.no_cache:
-        NO_CACHE = True
-
-    if args.kind == "decorative":
-        # W3C: decorative images get alt="" — the caller renders <img alt=""> only.
-        # No model call, no output. Exit code 0 signals success.
-        return 0
-
-    # Resolve vocabulary from the supplied sources (--in / --vocab /
-    # --vocab-from / --auto-project / sibling auto-detect).
-    src_path = Path(args.src)
-    vocabulary: list[str] = resolve_vocab_terms(
-        src_path,
-        in_doc=args.in_doc,
-        vocab_file=args.vocab,
-        vocab_from=args.vocab_from,
-        auto_project=args.auto_project,
-    )
-
-    # --in DOC also feeds the explicit context hint with the surrounding
-    # text — strongest signal for what the image is doing on the page.
-    context: str = args.context
-    if args.in_doc is not None:
-        ctx_from_doc: str = surrounding_text(args.in_doc, src_path)
-        if ctx_from_doc:
-            context = (context + "\n" + ctx_from_doc).strip() if context else ctx_from_doc
-
-    # Language: explicit --lang wins. Otherwise detect from any available
-    # text (surrounding doc, context hint, vocabulary join) via langdetect,
-    # falling back to the env-derived locale.
-    lang: Optional[str] = args.lang
-    if lang is None:
-        detection_text: str = " ".join(
-            [context] + (vocabulary or [])
-        ).strip()
-        if detection_text:
-            lang = detect_text_language(detection_text, fallback=detect_lang())
-
-    text = describe(
-        args.src,
-        kind=args.kind,
-        lang=lang,
-        context=context,
-        resize=args.resize,
-        model=args.model,
-        vocabulary=vocabulary,
-    )
-
-    if not text and args.kind == "complex":
-        # Empty output for a complex image is almost always a sign that the
-        # caller forgot to supply a context hint. Nudge them.
-        sys.stderr.write(
-            "Note: returned alt is empty. For complex images, the W3C decision tree "
-            "calls for a short alt AND a long description elsewhere (<figcaption> or "
-            "aria-describedby). Provide a context hint and retry.\n"
-        )
-
-    sys.stdout.write(text + "\n")
-
-    # Long description path — runs after the short alt is written so the
-    # caller still gets the short alt on stdout even if the long path fails.
-    if args.longdesc:
-        if args.kind not in {"complex", "group"}:
-            sys.stderr.write(
-                "Note: --longdesc is only meaningful with --kind complex or group.\n"
-            )
-        long_text = describe_long(
-            args.src,
-            kind=args.kind,
-            lang=args.lang,
-            context=args.context,
-            resize=args.resize,
-            model=args.model,
-        )
-        # Resolve a sibling path: ``<src>.longdesc.md`` for files; for URLs
-        # write into the current working directory under a sanitized name.
-        src_path = Path(args.src)
-        if re.match(r"^https?://", args.src, re.I):
-            out_path = Path(re.sub(r"[^A-Za-z0-9._-]+", "_", args.src) + ".longdesc.md")
-        else:
-            out_path = src_path.with_suffix(src_path.suffix + ".longdesc.md")
-        out_path.write_text(long_text + "\n", encoding="utf-8")
-        sys.stderr.write(f"Long description written to {out_path}\n")
-
-    return 0
+    return run_command(_cli, argv)
 
 
 if __name__ == "__main__":

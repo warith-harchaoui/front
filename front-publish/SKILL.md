@@ -5,6 +5,7 @@ license: Unlicense
 metadata:
   author: Warith Harchaoui
   version: 0.2.0
+  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
 # front-publish — Markdown → website, meta, icons, indexes, plain language
@@ -30,6 +31,34 @@ This skill is **not** the right pick for a docs site with hundreds of versioned 
 | "robots.txt" / "sitemap.xml" / "llms.txt" / "feed" / "Atom" / "RSS" / "humans.txt" | All from a single command; auto-detects a blog folder for the feed |
 | "plain language" / "simplify this copy" / "rewrite at grade N" | Same meaning, marketing voice stripped, output length ≤ 1.1× original |
 
+## Changing the language pair
+
+`front-publish` is **bilingual** (EN/FR by default — configurable via
+`lang_pair`). The pair lives in this file's frontmatter, under
+`metadata.lang_pair`, as two comma-separated BCP-47 base tags. To use
+a different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
+
+1. Edit `metadata.lang_pair` in `SKILL.md` (this file).
+2. Mirror the same value in `front-ui/SKILL.md` and
+   `front-a11y/SKILL.md` so the three skills stay in lock-step.
+3. The pair is consumed everywhere the skill currently uses EN/FR:
+   - **Meta tags** (`scripts/meta_from_ollama.py`): `og:locale` defaults
+     to the first tag, `og:locale_alternate` to the second.
+   - **Site indexes** (`scripts/site_indexes.py`): `<link
+     rel="alternate" hreflang>` pairs in the sitemap.
+   - **Plain-language rewriter** (`scripts/plain_language.py`): the
+     `--lang` default falls back to the first tag if the environment
+     locale isn't set.
+   - **Alt text** (`front-a11y/scripts/alt_from_ollama.py --lang`).
+   - **Captions** (`front-a11y/scripts/captions_from_whisper.py --lang`).
+
+See `references/i18n.md` for the full multilingual recipe (URL
+strategy, `Intl.*`, plurals, RTL, non-Latin fonts). The `lang_pair`
+token is the project-level default for the **two main languages** the
+skill maintains in lock-step; sites that ship in three or more
+languages should keep `lang_pair` as the two anchored languages and
+use the i18n reference's `supported` list for the rest.
+
 ## Markdown → website workflow
 
 When the user points to a Markdown-only project and asks for a website:
@@ -50,7 +79,7 @@ When the user points to a Markdown-only project and asks for a website:
 8. **Emit indexes**: `python scripts/site_indexes.py --root . --base-url https://example.com [--feed-from posts]` — produces robots.txt + sitemap.xml + llms.txt + optional Atom feed.
 9. **Emit pages + assets**. One `index.html` per page, one shared `app.js` (theme switcher, search if needed), one `styles.css` (Tailwind directives + Montserrat or Inter). Include the favicon set under `public/`. Add a small `README.md` to the output root explaining the build.
 
-Output drops into any host (GitHub Pages, Netlify, S3, Nginx) without a runtime build.
+Output is static HTML + CSS + a small `app.js`. For a small project (≤ 30 pages, prototype-grade) the Tailwind Play CDN keeps the deliverable build-free and it drops into GitHub Pages / Netlify / S3 / Nginx as-is. For anything you treat as production, run the Tailwind CLI / Vite build step from `front-ui/references/stack-tailwind.md` over the emitted HTML before deploying — the class names are stable, so the same files survive the swap.
 
 ## Stack rules (inherited)
 

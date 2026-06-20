@@ -64,8 +64,12 @@ def test_prompts_load_without_pyyaml() -> None:
     sys.path.insert(0, str(REPO_ROOT / "front-publish" / "scripts"))
     from _prompts import load_prompt  # type: ignore
 
-    mermaid = load_prompt("mermaid_labels")
-    latex = load_prompt("latex_caption")
+    # ``_prompts`` may already live in ``sys.modules`` from a sibling test
+    # that loaded it through a different skill's scripts/ — pass the dir
+    # explicitly so this test is order-independent.
+    prompts_dir = REPO_ROOT / "front-publish" / "scripts" / "prompts"
+    mermaid = load_prompt("mermaid_labels", prompts_dir=prompts_dir)
+    latex = load_prompt("latex_caption", prompts_dir=prompts_dir)
     assert "Reply with a JSON array" in mermaid["output_contract"]
     assert "Plain UTF-8 text" in latex["output_contract"]
     assert mermaid["rules_numbered"].startswith("1.")

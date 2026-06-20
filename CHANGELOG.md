@@ -6,6 +6,18 @@ The project follows a loose [SemVer](https://semver.org/) — major version
 bumps mean the on-disk skill layout changes (users have to re-copy folders
 into `~/.claude/skills/`).
 
+## Releases
+
+Each tagged release publishes five tarballs on GitHub Releases (one per
+skill plus a bundle of all four) and a single `SHA256SUMS` covering
+every artifact. Users download the bundle (or a per-skill tarball),
+run `shasum -a 256 -c SHA256SUMS` to verify it, extract, and copy the
+folders they need into `~/.claude/skills/`. The README's *Install*
+section walks the full flow. To upgrade, repeat the steps with a newer
+`VERSION` — the on-disk folder name is stable so the copy overwrites in
+place. If the checksum check fails, do not install the artifact.
+Release tarballs are produced by `scripts/release.sh <version>`.
+
 ## [0.2.0] — 2026-06-16
 
 ### Changed — the big restructure

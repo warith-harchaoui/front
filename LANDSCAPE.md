@@ -4,14 +4,27 @@
 
 ## A note on bias
 
-This file is written by the author of `front`. The "Skill alignment" column flags whether each alternative aligns with what `front` emits — it does not claim `front` is better than every alternative. Read it as "does this row fit inside `front`'s emitted output" or "is this row a reasonable companion." Most alternatives are excellent at what they do; if the row gets a ✗ it's usually because `front` made a different design choice (e.g. no React, no framework-tied design system), not because the alternative is worse.
+This file is written by the author of `front`. The "Skill alignment" column is **not a quality score** — it flags whether each alternative fits inside `front`'s emitted output (vanilla JS, Tailwind, no framework runtime). Most alternatives marked ✗ are excellent at what they do; the mark just means "different design choice, not a drop-in companion." Read the Notes column and the "Pick X when…" paragraph after each table for the honest one-liner. If you came here looking for "is `front` better?" the answer is **almost never in absolute terms — only better for a few specific shapes of project**, named below.
 
-Two categories where `front` is genuinely a strong pick:
+## Where `front` is genuinely the best pick
 
-1. **CLI → GUI for solo / small-team Python projects** that need a real HTML deliverable (not a Streamlit/Gradio runtime) and want to avoid picking up React. See § 7.
-2. **Pre-commit a11y + contrast gates in CI without a browser**. The static gates in `front-a11y` complement (do not replace) runtime audits like axe-core or Pa11y. See § 9, § 10.
+Three concrete categories where the four skills together do something no other listed tool does in skill form:
 
-Most other categories: there is a better tool if you specialize. The matrices below name it explicitly.
+1. **CLI → GUI mock-ups from `tool --help`.** `front-cli-gui` scaffolds a vanilla-JS + Tailwind GUI from a Python / Node / Go CLI's argument parser, in skill form, with no runtime framework. No other listed tool does this as a Claude / OpenCode skill — Gradio / Streamlit / Gooey produce a runtime UI you cannot easily restyle and are not skills.
+2. **Pre-ship a11y gates in CI without a headless browser.** `front-a11y/scripts/lint_a11y.py` is a single-file, stdlib-only Python lint that runs in milliseconds in any minimal CI container. axe-core / Pa11y / Lighthouse are the right answer for runtime audits — and you should run both — but neither runs without a browser, and that is a real cost in a pre-commit hook.
+3. **Bilingual EN/FR (or EN/DE, EN/ES, EN/JA) documentation sites where typography and tone parity matter.** `front-publish` + `front-ui`'s plain-language rewriter + `i18n.md` route together. No single SSG ships this combination.
+
+## Where to pick something else
+
+Honest defaults for the categories where another tool wins outright:
+
+- **React / Vue / Svelte component-library workflow** → **[shadcn/ui](https://ui.shadcn.com)**. Same copy-paste philosophy as `front`, but framework-native, far larger audience, far more components. `front` deliberately refuses to emit framework code; if your team has picked React, fighting `front` is the wrong move.
+- **True zero-build story for content-driven sites** → **[HTMX](https://htmx.org) + a classless CSS framework (e.g. [Pico CSS](https://picocss.com), [Simple.css](https://simplecss.org))**. HTMX needs no build, classless CSS needs no build, the resulting HTML is the smallest realistic deliverable. `front` claims "zero build" only on the prototype path (Tailwind Play CDN); HTMX + Pico is zero build in production too.
+- **Large versioned documentation sites (100+ pages, per-release views)** → **[MkDocs Material](https://squidfunk.github.io/mkdocs-material/), [Hugo](https://gohugo.io), [Astro](https://astro.build), or [Docusaurus](https://docusaurus.io)**. `front-publish` is sized for ≤ 30 pages.
+- **Hosted top-quality alt-text** → **Claude vision, GPT-4o vision, Gemini Vision**. `front-a11y/scripts/alt_from_ollama.py` is the right pick when locality / cost / privacy matter; hosted models are noticeably better on the long tail.
+- **Live captions, sub-real-time turnaround** → **Deepgram, AssemblyAI**.
+
+Most other categories: there is a better tool if you specialise. The matrices below name it explicitly.
 
 ## Legend
 

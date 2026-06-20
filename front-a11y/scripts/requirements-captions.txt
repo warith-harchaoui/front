@@ -4,10 +4,13 @@
 #   pip install -r scripts/requirements-captions.txt
 #
 # Used for:
+#   - click        : CLI parser for captions_from_whisper.py; install_captions
+#                    keeps its bespoke flow.
 #   - pywhispercpp : Python binding for whisper.cpp; ships pre-compiled
 #                    wheels for macOS / Linux / Windows.
 #   - langdetect   : detect language from vocabulary source text so the
 #                    composed initial_prompt opener matches.
 
+click>=8.1
 pywhispercpp>=1.2.0
 langdetect>=1.0.9

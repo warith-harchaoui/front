@@ -52,7 +52,6 @@ Author
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import os
 import shutil
@@ -61,11 +60,13 @@ import sys
 from pathlib import Path as _PathHelper
 
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
-from _argparse import make_parser  # noqa: E402
+from _click import front_command, run_command  # noqa: E402
 import sys
 import tempfile
 from pathlib import Path
 from typing import Optional
+
+import click
 
 # Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))
@@ -564,109 +565,155 @@ def transcribe(
 
 # ── CLI entry point ───────────────────────────────────────────────────────
 
-def main() -> int:
-    """CLI entry point. Writes the output to a sibling file by default."""
-    p = make_parser(
-        prog="front-a11y-captions",
-        description="Generate WebVTT / SRT / plain-text captions or a transcript "
-                    "from an audio or video file via local pywhispercpp. "
-                    "Project-vocab biasing via --prompt / --vocab / --vocab-from "
-                    "/ --auto-project.",
-        epilog="Examples:\n"
-               "  front-a11y-captions talk.mp4\n"
-               "  front-a11y-captions podcast.mp3 --format text --lang en\n"
-               "  front-a11y-captions interview.wav --lang fr --format srt\n",
-    )
-    p.add_argument("source", type=Path, help="Audio or video file.")
-    p.add_argument(
-        "--format", choices=["vtt", "srt", "text"], default="vtt",
-        help="Output format (default: vtt).",
-    )
-    p.add_argument(
-        "--lang", default="",
-        help="Two-letter language code. Empty lets pywhispercpp autodetect.",
-    )
-    p.add_argument(
-        "--model", default=DEFAULT_MODEL,
-        help=f"Model alias (default: {DEFAULT_MODEL}).",
-    )
-    p.add_argument(
-        "--out", type=Path,
-        help="Output path. Default: sibling of the source with the format extension.",
-    )
-    p.add_argument(
-        "--no-cache", action="store_true",
-        help="Bypass the on-disk cache for this run.",
-    )
-    # Vocabulary biasing. ``--prompt`` wins outright; the other three are
-    # equivalent extraction sources whose extracted terms are composed into
-    # the script's initial_prompt template.
-    p.add_argument(
-        "--prompt", default="",
-        help="Verbatim text passed to whisper.cpp as initial_prompt.",
-    )
-    p.add_argument(
-        "--vocab", type=Path,
-        help="Glossary file; one term per line; '#' starts a comment.",
-    )
-    p.add_argument(
-        "--vocab-from", type=Path, dest="vocab_from",
-        help="File or directory whose text is mined for proper nouns and identifiers.",
-    )
-    p.add_argument(
-        "--auto-project", action="store_true",
-        help=(
-            "Walk upward from the source to find the project root, then "
-            "collect vocabulary from the whole tree."
-        ),
-    )
-    args = p.parse_args()
-    if args.no_cache:
+
+@front_command(
+    "front-a11y-captions",
+    help=(
+        "Generate WebVTT / SRT / plain-text captions or a transcript from "
+        "an audio or video file via local pywhispercpp. Project-vocab biasing "
+        "via --prompt / --vocab / --vocab-from / --auto-project."
+    ),
+    epilog=(
+        "Examples:\n"
+        "  front-a11y-captions talk.mp4\n"
+        "  front-a11y-captions podcast.mp3 --format text --lang en\n"
+        "  front-a11y-captions interview.wav --lang fr --format srt\n"
+    ),
+)
+@click.argument("source", type=click.Path(path_type=Path))
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["vtt", "srt", "text"]),
+    default="vtt",
+    show_default=True,
+    help="Output format.",
+)
+@click.option(
+    "--lang",
+    default="",
+    help="Two-letter language code. Empty lets pywhispercpp autodetect.",
+)
+@click.option(
+    "--model",
+    default=DEFAULT_MODEL,
+    show_default=True,
+    help="Model alias.",
+)
+@click.option(
+    "--out",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Output path. Default: sibling of the source with the format extension.",
+)
+@click.option(
+    "--no-cache",
+    "no_cache",
+    is_flag=True,
+    default=False,
+    help="Bypass the on-disk cache for this run.",
+)
+# Vocabulary biasing. ``--prompt`` wins outright; the other three are
+# equivalent extraction sources whose extracted terms are composed into
+# the script's initial_prompt template.
+@click.option(
+    "--prompt",
+    default="",
+    help="Verbatim text passed to whisper.cpp as initial_prompt.",
+)
+@click.option(
+    "--vocab",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Glossary file; one term per line; '#' starts a comment.",
+)
+@click.option(
+    "--vocab-from",
+    "vocab_from",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="File or directory whose text is mined for proper nouns and identifiers.",
+)
+@click.option(
+    "--auto-project",
+    "auto_project",
+    is_flag=True,
+    default=False,
+    help=(
+        "Walk upward from the source to find the project root, then "
+        "collect vocabulary from the whole tree."
+    ),
+)
+def _cli(
+    source: Path,
+    fmt: str,
+    lang: str,
+    model: str,
+    out: Optional[Path],
+    no_cache: bool,
+    prompt: str,
+    vocab: Optional[Path],
+    vocab_from: Optional[Path],
+    auto_project: bool,
+) -> int:
+    """Click command body for ``captions_from_whisper``; returns an int code.
+
+    Writes the transcript to a sibling file by default (or to ``--out``
+    when supplied), prints the destination path to stdout, and exits ``1``
+    when the source is missing. Behaviour is identical to the prior
+    argparse-driven ``main``.
+    """
+    if no_cache:
         global NO_CACHE
         NO_CACHE = True
 
-    if not args.source.is_file():
-        sys.stderr.write(f"No such file: {args.source}\n")
+    if not source.is_file():
+        click.echo(f"No such file: {source}", err=True)
         return 1
 
     # Language for the opener: explicit --lang wins. Otherwise sniff the
     # vocabulary sources for a language signal before falling back to "en".
-    vocab_lang: str = args.lang
+    vocab_lang: str = lang
     if not vocab_lang:
         sniff: str = ""
-        if args.vocab_from is not None and args.vocab_from.is_file():
-            sniff = args.vocab_from.read_text(encoding="utf-8", errors="ignore")[:4000]
-        elif args.vocab is not None and args.vocab.is_file():
-            sniff = args.vocab.read_text(encoding="utf-8", errors="ignore")[:4000]
+        if vocab_from is not None and vocab_from.is_file():
+            sniff = vocab_from.read_text(encoding="utf-8", errors="ignore")[:4000]
+        elif vocab is not None and vocab.is_file():
+            sniff = vocab.read_text(encoding="utf-8", errors="ignore")[:4000]
         if sniff:
             vocab_lang = detect_text_language(sniff, fallback="en")
         else:
             vocab_lang = "en"
 
     initial_prompt: str = resolve_vocab(
-        args.source,
-        prompt=args.prompt,
-        vocab_file=args.vocab,
-        vocab_from=args.vocab_from,
-        auto_project=args.auto_project,
+        source,
+        prompt=prompt,
+        vocab_file=vocab,
+        vocab_from=vocab_from,
+        auto_project=auto_project,
         lang=vocab_lang,
     )
 
     text = transcribe(
-        args.source,
-        model=args.model,
-        lang=args.lang,
-        fmt=args.format,
+        source,
+        model=model,
+        lang=lang,
+        fmt=fmt,
         initial_prompt=initial_prompt,
     )
 
     # Resolve a sibling output path.
-    ext: str = "txt" if args.format == "text" else args.format
-    out_path: Path = args.out or args.source.with_suffix(f".{ext}")
+    ext: str = "txt" if fmt == "text" else fmt
+    out_path: Path = out or source.with_suffix(f".{ext}")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(text, encoding="utf-8")
-    print(f"→ Wrote {out_path}")
+    click.echo(f"→ Wrote {out_path}")
     return 0
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    """CLI entry point. Writes the output to a sibling file by default."""
+    return run_command(_cli, argv)
 
 
 if __name__ == "__main__":

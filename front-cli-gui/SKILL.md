@@ -5,6 +5,7 @@ license: Unlicense
 metadata:
   author: Warith Harchaoui
   version: 0.2.0
+  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
 # front-cli-gui — CLI → web GUI
@@ -78,11 +79,21 @@ For full rules, see `front-ui/SKILL.md` and `front-ui/references/`.
 
 ## Choosing a CLI parser (for new tools)
 
+**This skill works with any parser.** The inventory step reads
+`tool --help` and the README — not your source. argparse, Click, Typer,
+docopt, fire (Python), clap (Rust), commander (Node), cobra (Go) — all
+of them produce a `--help` the skill consumes. The flow at step 1 does
+not care which one you picked.
+
+> **If you have an existing CLI, do not migrate parsers just to use this
+> skill.** The pitch is "you have a working CLI; we wrap it." A forced
+> migration breaks that pitch. Migrate only if a *different* benefit
+> justifies it.
+
 When the user is starting a **new** CLI that they know will be wrapped
-in a GUI later, the parser choice matters for two reasons: it shapes
-the quality of `--help` (the primary source the skill reads at step 1)
-and it determines how easily the skill can introspect the command tree
-at step 4. Order, by recommendation:
+in a GUI later, the parser choice does shape two things: the quality
+of `--help` (the primary source at step 1) and how easily the skill
+can introspect the command tree at step 4. **Soft default**, in order:
 
 1. **[Click](https://click.palletsprojects.com/)** — the safe default.
    Decorator-based, BSD-3, stable since 2014. Generates a clean
@@ -102,9 +113,20 @@ at step 4. Order, by recommendation:
    programmatic introspection brittle.
 5. **Avoid [docopt](http://docopt.org/)** — effectively unmaintained.
 
-**Existing CLIs do not need to migrate.** The skill's input contract is
-`tool --help`; argparse, Click and Typer all satisfy it. Migrate only
-if a *different* benefit justifies it.
+For non-Python projects, the equivalents that work cleanly with this
+skill are **clap** (Rust), **commander** (Node), and **cobra** (Go) —
+all generate the introspectable `--help` the inventory step expects.
+
+## Changing the language pair
+
+`front-cli-gui` inherits **bilingual** defaults from `front-ui`
+(EN/FR by default — configurable via `lang_pair`). The token in
+`metadata.lang_pair` is informational here (the CLI → GUI scaffold
+itself does not localize strings on your behalf — it preserves the
+labels found in the CLI's `--help`), but mirroring the value across
+all four SKILL.md files keeps the install consistent for users who
+read all four skills. See `front-publish/SKILL.md` → "Changing the
+language pair" for the canonical recipe.
 
 ## When NOT to use this skill
 

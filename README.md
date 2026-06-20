@@ -29,13 +29,29 @@ The four skills:
 The companion skills inherit the front-ui stack rules. Install only the
 ones you need.
 
-## Audience
+## Who this is for
 
-Solo developers and small teams (≤ 5 people) shipping **internal tools** —
-dev dashboards, admin panels, ML / data-science demo apps, CLI wrappers,
-research showcases, docs sites for small projects. You don't have a
-designer, you don't want to fight a framework, and you want output that
-looks deliberate and survives a year without React-version churn.
+`front` is targeted at four concrete audiences. Each row is a stand-alone
+pitch — if any one of them matches you, the matching skill earns its
+keep on its own.
+
+1. **Solo devs without a designer.** Opinionated defaults so you stop
+   bikeshedding tokens — install `front-ui` and ship a usable UI from
+   the first commit. Tailwind tokens, dark-mode peers, focus rings, hit
+   areas, the lot.
+2. **Pentesters writing internal dashboards.** Single-file HTML output
+   that drops onto an internal box with no build chain. The a11y gates
+   (`front-a11y`) run in CI without a browser, so even one-off recon
+   tooling stays legible to teammates with assistive tech.
+3. **Data scientists wrapping CLIs.** Point `front-cli-gui` at your
+   `--help` — argparse, Click, Typer, clap, commander, cobra all
+   introspect cleanly — and get a working GUI mock-up. No Gradio
+   runtime, no React lock-in.
+4. **Bilingual docs sites (EN/FR by default; pair is configurable).**
+   `front-publish` keeps typography and tone in lock-step across two
+   languages, drafts meta tags + favicons + sitemap in one pass. Change
+   the pair (EN/DE, EN/JA, EN/ES, …) by editing one config token — see
+   each `SKILL.md` → "Changing the language pair".
 
 This is **not** the right pick for:
 
@@ -44,7 +60,8 @@ This is **not** the right pick for:
 - Apps where the team has chosen React / Vue / Svelte — use shadcn / Headless UI / Mantine instead.
 - Versioned docs sites with hundreds of pages — pick MkDocs Material, Hugo, or Astro.
 
-For alternatives in every category — and how to decide whether `front` is the right pick — see [LANDSCAPE.md](LANDSCAPE.md).
+For alternatives in every category — and how to decide whether `front`
+is the right pick — see [LANDSCAPE.md](LANDSCAPE.md).
 
 ## What the skills enforce
 
@@ -53,8 +70,8 @@ For alternatives in every category — and how to decide whether `front` is the 
 - Output uses **Montserrat** by default for marketing / prose surfaces, or **Inter** for dense developer / dashboard / data UI. If Montserrat is not the right call for your project (brand mismatch, language coverage, custom identity), drop a self-hosted family under `front-ui/assets/fonts/<family>/` (TTF or WOFF2 + license) and `front-ui` will swap to it. Every family is self-hosted (no Google Fonts CDN in production).
 - Output sets a `dark:` peer on every styled element, uses `<button>`/`<a>`/`<label>`/`<dialog>`/`<form>` first, exposes a visible focus ring, honors `prefers-reduced-motion` and meets a 44×44 px hit area.
 - Color choices map to the palettes in `front-ui/references/color-psychology.md` (source: <https://harchaoui.org/warith/colors/>).
-- Tailwind has a build step. The starter page uses the Play CDN, which is for prototyping only — see `front-ui/references/stack-tailwind.md` for the production swap (Tailwind CLI or Vite).
-- Bilingual-ready copy. Default English; switch on the user's language. The language pair is configurable per project (EN/FR, EN/DE, EN/ES, EN/JA, …) — see `front-publish/references/i18n.md`.
+- Skill output is **prototype-grade single-file HTML** by default — suitable for demos, mockups, internal tools and small landing pages. The starter page uses the Tailwind Play CDN, which Tailwind itself warns is for prototyping only. For production sites at scale, run **Tailwind CLI** or **Vite + Tailwind** over the emitted HTML before shipping; the class names are stable, so the same files survive the swap. See `front-ui/references/stack-tailwind.md`.
+- Bilingual-ready copy (EN/FR by default — configurable via `lang_pair`). Default English; switch on the user's language. Set the project-level pair in any skill's `metadata.lang_pair` frontmatter token (EN/FR, EN/DE, EN/ES, EN/JA, …) — see each `SKILL.md` → "Changing the language pair" and `front-publish/references/i18n.md`.
 
 ## Inputs → outputs
 
@@ -83,17 +100,28 @@ The skills follow the [Anthropic skill specification](https://resources.anthropi
 
 ### Claude Code
 
+Install from a tagged GitHub release. This pins a version, verifies the
+checksum, and gives you a stable rule-set that won't drift under you
+between updates.
+
 ```bash
-git clone https://github.com/warith-harchaoui/front.git
+# 1. Download a tagged release
+VERSION=0.3.0
+curl -L -o front-skills.tar.gz \
+    https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
+curl -L -o SHA256SUMS \
+    https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/SHA256SUMS
+
+# 2. Verify checksum (macOS: shasum; Linux: sha256sum)
+shasum -a 256 -c SHA256SUMS    # or: sha256sum -c SHA256SUMS
+
+# 3. Extract and install the ones you need
+tar xzf front-skills.tar.gz
 mkdir -p ~/.claude/skills
-
-# Always:
-cp -r front/front-ui      ~/.claude/skills/front-ui
-
-# Pick what you need:
-cp -r front/front-cli-gui ~/.claude/skills/front-cli-gui
-cp -r front/front-publish ~/.claude/skills/front-publish
-cp -r front/front-a11y    ~/.claude/skills/front-a11y
+cp -r front-ui      ~/.claude/skills/   # always
+cp -r front-cli-gui ~/.claude/skills/   # only if you wrap CLIs
+cp -r front-publish ~/.claude/skills/   # only if you ship docs sites
+cp -r front-a11y    ~/.claude/skills/   # only if you need a11y gates
 ```
 
 Verify:
@@ -102,18 +130,35 @@ Verify:
 ls ~/.claude/skills/front-ui/SKILL.md
 ```
 
-Claude Code reads each skill's frontmatter description and applies it when a user message matches its trigger phrases.
+If you only need a single skill, download its per-skill tarball instead
+of the bundle (e.g. `front-a11y-${VERSION}.tar.gz`). Each release also
+ships per-skill tarballs alongside the bundle and the same `SHA256SUMS`
+covers all of them.
+
+Claude Code reads each skill's frontmatter description and applies it
+when a user message matches its trigger phrases.
 
 ### OpenCode
 
-[OpenCode](https://opencode.ai) is an open-source terminal coding agent that supports Claude, GPT and local models behind the same UX.
+[OpenCode](https://opencode.ai) is an open-source terminal coding agent
+that supports Claude, GPT and local models behind the same UX. The
+release-based flow above works the same — extract the bundle, then:
 
 ```bash
 mkdir -p ~/.opencode/skills
-cp -r front/front-* ~/.opencode/skills/
+cp -r front-* ~/.opencode/skills/
 ```
 
-Use OpenCode when you want skill behavior without provider lock-in, or when you're already running OpenCode as your daily driver.
+Use OpenCode when you want skill behavior without provider lock-in, or
+when you're already running OpenCode as your daily driver.
+
+### Upgrading
+
+To upgrade, repeat the steps with a newer `VERSION`. The on-disk
+skill folder name is stable, so `cp -r front-ui ~/.claude/skills/`
+overwrites the previous install in place. The `SHA256SUMS` for each
+release is the source of truth — if the checksum check fails, do not
+install the artifact.
 
 ## CLI → GUI flagship
 
@@ -181,3 +226,8 @@ We also drew on the [Apple Human Interface Guidelines](https://developer.apple.c
 ## License
 
 **The Unlicense** — released into the public domain, no copyright, no restrictions. Use, modify, redistribute, sell — without permission, attribution, or fee. See `LICENSE.md` for the canonical text. The bundled Montserrat font remains under the SIL Open Font License (`front-ui/assets/fonts/montserrat/OFL.txt`); the public-domain dedication doesn't change that.
+
+**License vs. attribution.** Code is released under the Unlicense
+(public domain — no permission needed to use, fork, modify, or rebrand).
+Author credits in the docs are voluntary acknowledgement, not a license
+requirement. You are free to remove or replace them in your fork.

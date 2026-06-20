@@ -5,6 +5,7 @@ license: Unlicense
 metadata:
   author: Warith Harchaoui
   version: 0.2.0
+  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
 # front-ui — vanilla JS + Tailwind UI generation
@@ -42,23 +43,47 @@ The companion skills assume the same stack rules below.
 ## Hard rules
 
 1. **No framework imports.** Output never contains `react`, `vue`, `svelte`, `solid-js`, `next`, `nuxt`, `angular`. If asked, refuse and offer the vanilla equivalent.
-2. **Tailwind utility classes only**, never inline `style="…"`. The single allowed exception is a one-off CSS custom property whose value is computed (e.g. `style="--accent: var(--brand-blue)"`). **Never** put a raw hex literal in markup — even inside `style="--accent: #007AFF"`. Define the token in CSS and reference it.
+2. **Tailwind utility classes only**, never inline `style="…"`. The single allowed exception is a one-off CSS custom property whose value references an existing token (e.g. `style="--accent: var(--brand-blue)"`). **Never** put a raw hex literal in markup — even inside `style="--accent: #007AFF"`. If a new accent is needed, add the token to `tailwind.config.js` (`theme.extend.colors.brand`) and reference it via `var(--brand-…)` or a Tailwind class. This keeps rule 7 (no raw hex) and rule 2 in lockstep.
 3. **Montserrat by default; Inter as the documented alternate; user-supplied custom family if a folder is provided.** Use Montserrat for marketing surfaces, prose-heavy pages, landing pages. Use Inter when the surface is dense (dashboards, admin panels, dev tools, data tables, monospace-adjacent UI) — Inter's larger x-height and hinting work better at small sizes. Montserrat is not always the perfect choice: if the project ships a folder under `assets/fonts/<family>/` with TTF / WOFF2 files (and an `OFL.txt` or equivalent license), Claude swaps the `fontFamily.sans` token to that family, updates the `@font-face` block to point at the supplied files, and keeps every other rule unchanged. In every case: self-host (no Google Fonts CDN, no jsDelivr GH proxy in production builds), and document the chosen family in the project README so a future maintainer knows why the page renders the way it does.
 4. **Semantic HTML first.** `<button>`, `<a href>`, `<label for>`, `<dialog>`, `<form>`. ARIA only when no semantic element fits.
 5. **Both color schemes.** Every styled element gets a `dark:` peer.
 6. **Accessibility is shipping-required.** See `references/ui-guidelines/foundations/accessibility.md`.
 7. **No raw hex** in markup — use semantic Tailwind tokens (`bg-brand-blue`, `text-label-primary`).
-8. **Bilingual-ready copy.** Default to English. Switch to the user's language when they write in it. Project-level pair is configurable — see `references/i18n.md` for setting up EN/FR, EN/DE, EN/ES, EN/JA, etc. (the previous EN/FR-only default has been dropped).
+8. **Bilingual-ready copy** (EN/FR by default — configurable via `lang_pair`). Default to English. Switch to the user's language when they write in it. The project-level pair is set in this SKILL.md's frontmatter `metadata.lang_pair` token and is consumed by every place the skill currently talks about EN/FR — see **Changing the language pair** below and `front-publish/references/i18n.md` for the full configuration recipe.
 9. **No third-party trademarks** in defaults (logos, product names, OS branding). Use generic, neutral language.
+
+## Changing the language pair
+
+`front-ui` is **bilingual** (EN/FR by default — configurable via
+`lang_pair`). The pair lives in this file's frontmatter, under
+`metadata.lang_pair`, as two comma-separated BCP-47 base tags. To use a
+different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
+
+1. Edit `metadata.lang_pair` in `SKILL.md` (this file).
+2. Mirror the same value in any companion skill you install
+   (`front-publish/SKILL.md`, `front-a11y/SKILL.md`).
+3. The skill uses the pair everywhere it currently uses EN/FR — the
+   alt-text language line (`alt_from_ollama.py --lang`), the captions
+   language hint (`captions_from_whisper.py --lang`), the meta-tag
+   `og:locale_alternate`, the docs site's `<link rel="alternate"
+   hreflang>` pairs.
+
+The wider i18n model (URL strategy, `Intl.*`, plurals, RTL,
+non-Latin fonts) is in `front-publish/references/i18n.md`. The
+`lang_pair` token is a project-level default for the **two main
+languages** the skill maintains in lock-step; it is not the full
+supported-locale list. Sites that ship in three or more languages
+should keep `lang_pair` as the two anchored languages and use the
+i18n reference's `supported` list for the rest.
 
 ## Build vs prototype
 
-Tailwind has a build step. Two paths:
+Tailwind has a build step. The skill emits **prototype-grade single-file deliverables** by default — fine for demos, mockups, internal tools and small landing pages, **not** for production sites at scale. Two paths:
 
-- **Prototype** (single-file demo, internal POC, throwaway): use the Tailwind Play CDN as shipped in `assets/starter-page.html`. Tailwind itself warns this is for prototyping only; do not ship it to production.
-- **Production**: swap to **Tailwind CLI** (single command, no JS framework needed) or **Vite + Tailwind** if the project already uses Vite. See `references/stack-tailwind.md`.
+- **Prototype** (single-file demo, internal POC, throwaway, small landing): use the Tailwind Play CDN as shipped in `assets/starter-page.html`. Tailwind itself warns this is for prototyping only. The class names emitted by the skill are stable, so the same HTML works under the production path below.
+- **Production**: run **Tailwind CLI** (single command, no JS framework needed) or **Vite + Tailwind** over the emitted HTML before shipping. See `references/stack-tailwind.md`.
 
-The "zero build, drop into Nginx" pitch only holds for the prototype path. State which path you are on in the project README.
+The "zero build, drop into Nginx / S3 / Pages" pitch only holds for the prototype path. A real production site needs the build step. State which path you are on in the project README so the next maintainer knows whether the CDN tag is intentional or a leftover.
 
 ## Workflow — every task
 
@@ -193,7 +218,7 @@ Load these only when needed.
 
 ## Assets
 
-- `assets/starter-page.html` — single-file bootstrap (Tailwind Play CDN — prototype only).
+- `assets/starter-page.html` — single-file bootstrap (Tailwind Play CDN — prototype-grade; swap to Tailwind CLI / Vite before shipping a real production site).
 - `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`.
 - `assets/components/chart-bar.json`, `chart-line.json` — Vega-Lite specs.
 - `assets/fonts/montserrat/` — Montserrat WOFF2 + OFL + `fonts.css`.

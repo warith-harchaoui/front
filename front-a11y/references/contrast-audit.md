@@ -2,6 +2,12 @@
 
 Audit every (foreground, background) pair in a palette against the WCAG contrast ratio thresholds, and propose the nearest accessible alternative for failing pairs. Deterministic, stdlib-only, no model.
 
+## What this tool is — and isn't
+
+This tool **flags WCAG contrast failures** on every (foreground, background) pair in a palette and **proposes a minimal-edit nudge** along the OKLCH lightness axis. The proposed fix preserves the WCAG ratio at the cost of moving along the L axis only — same hue, same chroma, brighter or darker. That is a useful starting suggestion when nothing else is on the line; it is **not** a designer-approved replacement.
+
+Brand-critical colours (the primary CTA, accent colours that carry semantic meaning across the product, anything tied to a logo) should be reviewed by a designer. A neighbour that passes 4.5:1 can still violate brand identity, tonal hierarchy, or the relationship between sibling tokens. Treat `--fix` as a flagged failure with a proposed minimum edit — not as the final swatch.
+
 ## Why it matters
 
 WCAG 2.x contrast thresholds:
@@ -106,5 +112,5 @@ The audit's exit code is the gating signal — non-zero on any failing pair.
 
 - [ ] Audit at AA body (4.5:1) before shipping any new palette.
 - [ ] Audit at AAA (7:1) for any long-form reading surface.
-- [ ] When a fix is suggested, prefer it over hand-picking — the OKLCH neighbour is the closest visual match.
+- [ ] When a fix is suggested, treat it as a starting point — the OKLCH neighbour is the closest visual match on the L axis, but a designer still picks the final swatch for any brand-critical colour.
 - [ ] Re-audit after every palette tweak.

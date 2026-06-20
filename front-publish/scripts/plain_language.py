@@ -57,16 +57,16 @@ Author
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _argparse import make_parser  # noqa: E402
+from _click import front_command, run_command  # noqa: E402
 from typing import Optional
 
+import click
 import requests
 
 # Shared Ollama helpers live in _ollama.py inside this skill folder so
@@ -329,49 +329,102 @@ def rewrite(
 
 # ── CLI ─────────────────────────────────────────────────────────────────────
 
-def _build_argparser() -> argparse.ArgumentParser:
-    """
-    Construct the CLI ``ArgumentParser``.
 
-    Returns
-    -------
-    argparse.ArgumentParser
-        Parser with all flags registered.
+@front_command(
+    "front-publish-plain",
+    help=(
+        "Rewrite UI copy at a target reading level via a local Ollama "
+        "model. Preserves meaning, strips marketing voice; output length "
+        "≤ 1.1× original."
+    ),
+    epilog=(
+        "Examples:\n"
+        "  cat draft.md | front-publish-plain --target-grade 8 --lang en\n"
+        "  front-publish-plain --input copy.md --preserve 'Front,Tailwind' > out.md\n"
+    ),
+)
+@click.option(
+    "--input", "-i",
+    "input_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Read from this file instead of stdin.",
+)
+@click.option(
+    "--target-grade", "-g",
+    "target_grade",
+    type=int,
+    default=8,
+    show_default=True,
+    help="Reading grade level.",
+)
+@click.option(
+    "--lang", "-l",
+    default=None,
+    help="BCP-47 base tag (en, fr, es, …). Default: detect from environment.",
+)
+@click.option(
+    "--preserve",
+    default="",
+    help="Comma-separated tokens to keep verbatim (brand names, identifiers).",
+)
+@click.option(
+    "--model",
+    default=None,
+    help="Override the Ollama model tag.",
+)
+@click.option(
+    "--no-cache",
+    "no_cache",
+    is_flag=True,
+    default=False,
+    help="Bypass the on-disk cache for this run.",
+)
+def _cli(
+    input_path: Optional[Path],
+    target_grade: int,
+    lang: Optional[str],
+    preserve: str,
+    model: Optional[str],
+    no_cache: bool,
+) -> int:
+    """Click command body for ``plain_language``; returns an int exit code.
+
+    Behaviour is identical to the prior argparse-driven ``main``: reads
+    from ``--input`` or stdin, writes the rewrite to stdout, and exits ``1``
+    when invoked with neither a file nor a pipe.
     """
-    p = make_parser(
-        prog="front-publish-plain",
-        description="Rewrite UI copy at a target reading level via a local Ollama "
-                    "model. Preserves meaning, strips marketing voice; output length "
-                    "≤ 1.1× original.",
-        epilog="Examples:\n"
-               "  cat draft.md | front-publish-plain --target-grade 8 --lang en\n"
-               "  front-publish-plain --input copy.md --preserve 'Front,Tailwind' > out.md\n",
+    global NO_CACHE
+    if no_cache:
+        NO_CACHE = True
+
+    # Read the source either from a file or from stdin so the tool slots
+    # cleanly into pipelines (`cat copy.md | plain_language.py`).
+    if input_path:
+        text: str = input_path.read_text(encoding="utf-8")
+    else:
+        if sys.stdin.isatty():
+            click.echo(
+                "No input. Pass --input <file> or pipe text to stdin.",
+                err=True,
+            )
+            return 1
+        text = sys.stdin.read()
+
+    preserve_list: list[str] = [t.strip() for t in preserve.split(",") if t.strip()]
+
+    out = rewrite(
+        text,
+        target_grade=target_grade,
+        lang=lang,
+        preserve=preserve_list,
+        model=model,
     )
-    p.add_argument(
-        "--input", "-i", type=Path,
-        help="Read from this file instead of stdin.",
-    )
-    p.add_argument(
-        "--target-grade", "-g", type=int, default=8,
-        help="Reading grade level (default: 8).",
-    )
-    p.add_argument(
-        "--lang", "-l",
-        help="BCP-47 base tag (en, fr, es, …). Default: detect from environment.",
-    )
-    p.add_argument(
-        "--preserve", default="",
-        help="Comma-separated tokens to keep verbatim (brand names, identifiers).",
-    )
-    p.add_argument(
-        "--model",
-        help="Override the Ollama model tag.",
-    )
-    p.add_argument(
-        "--no-cache", action="store_true",
-        help="Bypass the on-disk cache for this run.",
-    )
-    return p
+
+    sys.stdout.write(out)
+    if not out.endswith("\n"):
+        sys.stdout.write("\n")
+    return 0
 
 
 def main(argv: Optional[list[str]] = None) -> int:
@@ -384,37 +437,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         Process exit code. ``0`` on success; the script delegates other
         codes to the underlying helpers (``2`` for connectivity issues).
     """
-    global NO_CACHE
-    args = _build_argparser().parse_args(argv)
-    if args.no_cache:
-        NO_CACHE = True
-
-    # Read the source either from a file or from stdin so the tool slots
-    # cleanly into pipelines (`cat copy.md | plain_language.py`).
-    if args.input:
-        text: str = args.input.read_text(encoding="utf-8")
-    else:
-        if sys.stdin.isatty():
-            sys.stderr.write(
-                "No input. Pass --input <file> or pipe text to stdin.\n"
-            )
-            return 1
-        text = sys.stdin.read()
-
-    preserve: list[str] = [t.strip() for t in args.preserve.split(",") if t.strip()]
-
-    out = rewrite(
-        text,
-        target_grade=args.target_grade,
-        lang=args.lang,
-        preserve=preserve,
-        model=args.model,
-    )
-
-    sys.stdout.write(out)
-    if not out.endswith("\n"):
-        sys.stdout.write("\n")
-    return 0
+    return run_command(_cli, argv)
 
 
 if __name__ == "__main__":

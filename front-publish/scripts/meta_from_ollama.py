@@ -69,7 +69,6 @@ Author
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import os
@@ -78,11 +77,12 @@ import sys
 from pathlib import Path as _PathHelper
 
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
-from _argparse import make_parser  # noqa: E402
+from _click import front_command, run_command  # noqa: E402
 import urllib.request
 from pathlib import Path
 from typing import Optional
 
+import click
 import requests
 
 # Shared Ollama helpers live in _ollama.py inside this skill folder so
@@ -358,9 +358,64 @@ def extract_json(text: str) -> dict:
 
 # ── CLI entry point ─────────────────────────────────────────────────────────
 
-def main() -> int:
-    """
-    CLI entry point.
+
+@front_command(
+    "front-publish-meta",
+    help=(
+        "Draft per-page meta tags (title, description, Open Graph, Twitter "
+        "Card, Schema.org @type) via a local Ollama model. Returns a strict "
+        "JSON object on stdout."
+    ),
+    epilog=(
+        "Examples:\n"
+        "  front-publish-meta page.html --site-name 'Acme'\n"
+        "  front-publish-meta --goal 'Landing page for an ML lab' --lang en\n"
+    ),
+)
+@click.argument("source", required=False, default=None)
+@click.option(
+    "--goal",
+    default="",
+    help="Free-text page goal.",
+)
+@click.option(
+    "--site-name",
+    "site_name",
+    default="",
+    help="Brand or site name.",
+)
+@click.option(
+    "--canonical",
+    default="",
+    help="Canonical absolute URL. Echoed straight into the JSON output.",
+)
+@click.option(
+    "--lang",
+    default=None,
+    help="BCP-47 base tag (en, fr, es, …).",
+)
+@click.option(
+    "--model",
+    default=None,
+    help="Override the Ollama model tag.",
+)
+@click.option(
+    "--no-cache",
+    "no_cache",
+    is_flag=True,
+    default=False,
+    help="Bypass the on-disk cache for this run.",
+)
+def _cli(
+    source: Optional[str],
+    goal: str,
+    site_name: str,
+    canonical: str,
+    lang: Optional[str],
+    model: Optional[str],
+    no_cache: bool,
+) -> int:
+    """Click command body for ``meta_from_ollama``; returns an int exit code.
 
     Returns
     -------
@@ -368,93 +423,55 @@ def main() -> int:
         Process exit code: ``0`` on success, ``1`` on a JSON parse failure,
         ``2`` on Ollama connectivity failure.
     """
-    ap = make_parser(
-        prog="front-publish-meta",
-        description="Draft per-page meta tags (title, description, Open Graph, "
-                    "Twitter Card, Schema.org @type) via a local Ollama model. "
-                    "Returns a strict JSON object on stdout.",
-        epilog="Examples:\n"
-               "  front-publish-meta page.html --site-name 'Acme'\n"
-               "  front-publish-meta --goal 'Landing page for an ML lab' --lang en\n",
-    )
-    ap.add_argument(
-        "source", nargs="?",
-        help="HTML file path, URL, or empty if --goal is enough.",
-    )
-    ap.add_argument(
-        "--goal", default="",
-        help="Free-text page goal.",
-    )
-    ap.add_argument(
-        "--site-name", default="",
-        help="Brand or site name.",
-    )
-    ap.add_argument(
-        "--canonical", default="",
-        help="Canonical absolute URL. Echoed straight into the JSON output.",
-    )
-    ap.add_argument(
-        "--lang", default=None,
-        help="BCP-47 base tag (en, fr, es, …).",
-    )
-    ap.add_argument(
-        "--model", default=None,
-        help="Override the Ollama model tag.",
-    )
-    ap.add_argument(
-        "--no-cache", action="store_true",
-        help="Bypass the on-disk cache for this run.",
-    )
-    args = ap.parse_args()
-
-    # The cache flag is module-level; flipping it after parsing keeps the
-    # control flow in this function instead of leaking into argparse.
-    if args.no_cache:
+    # The cache flag is module-level; flipping it inside the command keeps
+    # the control flow in this function instead of leaking into Click.
+    if no_cache:
         global NO_CACHE
         NO_CACHE = True
 
     # Either a source or a goal must be present; otherwise the model has
-    # nothing to work from.
-    if not args.source and not args.goal:
-        ap.error("Provide a source (HTML path or URL) or --goal.")
+    # nothing to work from. ``UsageError`` mirrors the prior argparse
+    # ``parser.error`` path so ``main()`` still raises ``SystemExit(2)``.
+    if not source and not goal:
+        raise click.UsageError("Provide a source (HTML path or URL) or --goal.")
 
     # Pull the page text first so the cache key incorporates the actual content.
     page_text: str = ""
-    if args.source:
-        if re.match(r"^https?://", args.source, re.I):
-            page_text = extract_text(fetch_url(args.source))
+    if source:
+        if re.match(r"^https?://", source, re.I):
+            page_text = extract_text(fetch_url(source))
         else:
             page_text = extract_text(
-                Path(args.source).read_text(encoding="utf-8", errors="ignore")
+                Path(source).read_text(encoding="utf-8", errors="ignore")
             )
 
     # Language: explicit --lang wins. Otherwise prefer langdetect against
     # the extracted page text, falling back to env-derived locale.
-    if args.lang:
-        lang: str = args.lang.lower()[:2]
+    if lang:
+        resolved_lang: str = lang.lower()[:2]
     elif page_text:
-        lang = detect_text_language(page_text, fallback=detect_lang())
+        resolved_lang = detect_text_language(page_text, fallback=detect_lang())
     else:
-        lang = detect_lang()
-    model: str = args.model or pick_default_model()
+        resolved_lang = detect_lang()
+    resolved_model: str = model or pick_default_model()
 
     # Cache check — fast path returns immediately when the inputs match a
     # previous run.
-    cache_k = _cache_key(args.goal, page_text, args.site_name, lang, model)
+    cache_k = _cache_key(goal, page_text, site_name, resolved_lang, resolved_model)
     cached = _cache_get(cache_k)
     if cached is not None:
         # The canonical URL is *not* part of the cache key (it does not affect
         # the model's output), so it is layered on at print time.
-        if args.canonical:
-            cached["canonical"] = args.canonical
+        if canonical:
+            cached["canonical"] = canonical
         json.dump(cached, sys.stdout, indent=2, ensure_ascii=False)
         sys.stdout.write("\n")
         return 0
 
-    prompt = build_prompt(args.goal, page_text, args.site_name, lang)
+    prompt = build_prompt(goal, page_text, site_name, resolved_lang)
 
     payload: dict = {
-        "model": model,
+        "model": resolved_model,
         "prompt": prompt,
         "stream": False,
         # ``format=json`` enables Ollama's JSON-mode constraint decoding.
@@ -469,9 +486,10 @@ def main() -> int:
         resp = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=180)
         resp.raise_for_status()
     except requests.exceptions.ConnectionError:
-        sys.stderr.write(
+        click.echo(
             f"Cannot reach Ollama at {OLLAMA_URL}. "
-            f"Run `python front-a11y/scripts/install_alt_ai.py` or `ollama serve`.\n"
+            f"Run `python front-a11y/scripts/install_alt_ai.py` or `ollama serve`.",
+            err=True,
         )
         return 2
 
@@ -482,15 +500,20 @@ def main() -> int:
     except Exception as e:
         # The model failed to produce parseable JSON. Surface the raw output
         # so the user can debug the prompt instead of getting a cryptic trace.
-        sys.stderr.write(f"{e}\n")
+        click.echo(str(e), err=True)
         return 1
 
     _cache_set(cache_k, parsed)
-    if args.canonical:
-        parsed["canonical"] = args.canonical
+    if canonical:
+        parsed["canonical"] = canonical
     json.dump(parsed, sys.stdout, indent=2, ensure_ascii=False)
     sys.stdout.write("\n")
     return 0
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    """CLI entry point. Delegates to the Click command; see :func:`_cli`."""
+    return run_command(_cli, argv)
 
 
 if __name__ == "__main__":

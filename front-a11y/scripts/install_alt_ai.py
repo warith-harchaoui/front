@@ -48,8 +48,9 @@ After this finishes:
 
 Notes
 -----
-* Python 3.9+, stdlib only (``subprocess``, ``urllib``, ``shutil``).
-* No third-party dependencies for the installer itself.
+* Python 3.9+. ``click`` is the only runtime dependency, used solely to
+  back the ``-h`` / ``--help`` / ``--model`` flags; the install /
+  daemon / pull logic is stdlib (``subprocess``, ``urllib``, ``shutil``).
 * On Linux the official installer is downloaded and piped to ``sh`` via
   an intermediate string, which avoids the standard ``curl | sh`` security
   caveat while still being one command.
@@ -68,6 +69,13 @@ import subprocess
 import sys
 import time
 import urllib.request
+from pathlib import Path as _PathHelper
+from typing import Optional
+
+sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
+from _click import front_command, run_command  # noqa: E402
+
+import click
 
 
 # ── Module-level configuration ────────────────────────────────────────────────
@@ -299,17 +307,42 @@ def pull_model(tag: str) -> None:
 
 # ── CLI entry point ────────────────────────────────────────────────────────
 
-def main() -> int:
-    """
-    Run the install / start / pull pipeline end-to-end.
 
-    Returns
-    -------
-    int
-        Process exit code. ``0`` on success; other return paths exit via
-        :func:`sys.exit` with a context-specific code.
+@front_command(
+    "front-a11y-install-alt-ai",
+    help=(
+        "Install Ollama (Homebrew / official installer / winget), start its "
+        "daemon, and pull the vision model used by `front a11y alt`.\n\n"
+        "Environment variables (override before running):\n"
+        "  OLLAMA_MODEL       Exact model tag to pull (wins outright).\n"
+        "  OLLAMA_MODEL_BASE  Base tag; '-mlx' is auto-appended on Apple Silicon.\n"
+        "                     Default: gemma4:e2b.\n"
+        "  OLLAMA_URL         Daemon endpoint (default: http://localhost:11434)."
+    ),
+    epilog=(
+        "Examples:\n"
+        "  front-a11y-install-alt-ai\n"
+        "  front-a11y-install-alt-ai --model gemma3n:e2b\n"
+        "  OLLAMA_MODEL_BASE=llava python install_alt_ai.py\n"
+    ),
+)
+@click.option(
+    "--model",
+    "model_override",
+    default=None,
+    help=(
+        "Ollama model tag to pull. Overrides OLLAMA_MODEL and the platform "
+        "auto-detection (Apple-Silicon '-mlx' suffix)."
+    ),
+)
+def _cli(model_override: Optional[str]) -> int:
+    """Click command body for ``install_alt_ai``; returns an int exit code.
+
+    Behaviour is identical to the previous parser-less ``main`` — the
+    only addition is a ``-h`` / ``--help`` flag (and the optional
+    ``--model`` override, equivalent to ``OLLAMA_MODEL=<tag>``).
     """
-    model: str = pick_model()
+    model: str = model_override or pick_model()
     print(f"→ Platform: {platform.system()} {platform.machine()}")
     print(f"→ Target model: {model}")
 
@@ -320,6 +353,25 @@ def main() -> int:
     print("\n→ Ready. Test with:")
     print("    python scripts/alt_from_ollama.py /path/to/image.jpg")
     return 0
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    """
+    Run the install / start / pull pipeline end-to-end.
+
+    Parameters
+    ----------
+    argv : list of str or None, optional
+        Argument vector excluding ``argv[0]``. ``None`` (default) reads
+        from ``sys.argv``.
+
+    Returns
+    -------
+    int
+        Process exit code. ``0`` on success; other return paths exit via
+        :func:`sys.exit` with a context-specific code.
+    """
+    return run_command(_cli, argv)
 
 
 if __name__ == "__main__":

@@ -14,4 +14,12 @@ pytest>=8.0.0
 # These tests need a running Ollama daemon and are marked with
 # ``@pytest.mark.eval`` so they are NOT collected in the default run.
 # Enable with: pytest -m eval
+#
+# Each eval test loads its own optional dependency via
+# ``pytest.importorskip`` so a missing package skips the test cleanly
+# rather than crashing the suite.
 deepeval>=1.0.0
+# textstat — Flesch-Kincaid grade scoring for plain-language eval.
+textstat>=0.7.0
+# jiwer — Word Error Rate for the captions eval.
+jiwer>=3.0.0

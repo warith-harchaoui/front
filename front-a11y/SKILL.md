@@ -5,6 +5,7 @@ license: Unlicense
 metadata:
   author: Warith Harchaoui
   version: 0.2.0
+  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
 # front-a11y — accessibility audits and content tooling
@@ -69,6 +70,21 @@ python scripts/simulate_cvd.py screenshot.png --grid     # CVD pass
 ```
 
 Then pair with a runtime audit (axe-core / Pa11y / Lighthouse) before shipping.
+
+## Changing the language pair
+
+`front-a11y` inherits **bilingual** defaults (EN/FR by default —
+configurable via `lang_pair`). The pair lives in this file's
+frontmatter under `metadata.lang_pair` as two comma-separated BCP-47
+base tags. It controls the default `--lang` for `alt_from_ollama.py`
+and `captions_from_whisper.py`, and is mirrored in
+`front-ui/SKILL.md` and `front-publish/SKILL.md` so the three skills
+stay in lock-step. To switch (Berlin → `en,de`; Tokyo → `en,ja`;
+Madrid → `en,es`), edit the value in all three files. The full
+recipe — including meta tags, sitemap `hreflang`, and the
+plain-language rewriter — lives in
+`front-publish/SKILL.md` → "Changing the language pair" and
+`front-publish/references/i18n.md`.
 
 ## When NOT to use this skill
 

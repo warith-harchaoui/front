@@ -36,13 +36,30 @@ N'installez que ceux dont vous avez besoin.
 
 ## À qui ça s'adresse
 
-Aux développeurs en solo et aux petites équipes (≤ 5 personnes) qui
-livrent des **outils internes** : tableaux de bord internes, panneaux
-d'administration, démos ML / data, scripts CLI emballés, sites de
-recherche, sites de doc pour petits projets. Vous n'avez pas de
-designer dédié, vous ne voulez pas vous battre avec un framework, et
-vous voulez du code qui a l'air pensé et qui tient un an sans courir
-après les versions de React.
+`front` vise quatre publics concrets. Chaque ligne est un argumentaire
+autonome : si l'un d'eux correspond à votre situation, le skill
+associé se justifie déjà à lui seul.
+
+1. **Développeurs en solo sans designer.** Des choix par défaut
+   assumés pour arrêter de tergiverser sur les tokens — installez
+   `front-ui` et livrez une UI utilisable dès le premier commit.
+   Tokens Tailwind, variantes `dark:`, anneaux de focus, zones
+   tactiles : tout est cadré.
+2. **Pentesters qui écrivent des tableaux de bord internes.** Sortie
+   HTML mono-fichier qui se dépose telle quelle sur une machine
+   interne, sans chaîne de build. Les portes a11y (`front-a11y`)
+   tournent en CI sans navigateur, donc même un outil de recon jetable
+   reste lisible pour les coéquipiers sous techno d'assistance.
+3. **Data scientists qui habillent des CLI.** Pointez `front-cli-gui`
+   sur votre `--help` — argparse, Click, Typer, clap, commander, cobra
+   se laissent introspecter — et vous obtenez une maquette d'IHM
+   fonctionnelle. Pas de runtime Gradio, pas de prison React.
+4. **Sites de documentation bilingues (EN/FR par défaut ; la paire
+   est configurable).** `front-publish` garde la typographie et la
+   tonalité alignées sur deux langues, et produit en une passe meta
+   tags + favicons + sitemap. Changez la paire (EN/DE, EN/JA, EN/ES,
+   …) en éditant un seul token de configuration — voir, dans chaque
+   `SKILL.md`, la section « Changing the language pair ».
 
 Ce **n'est pas** le bon choix pour :
 
@@ -79,13 +96,19 @@ que `front` est le bon outil ? », voir [LANDSCAPE.md](LANDSCAPE.md).
 - Les choix de couleur renvoient aux palettes de
   `front-ui/references/color-psychology.md` (source :
   <https://harchaoui.org/warith/colors/>).
-- Tailwind a une étape de build. La page d'amorçage utilise le Play
-  CDN, à réserver au prototypage — voir
-  `front-ui/references/stack-tailwind.md` pour le bascule production
-  (Tailwind CLI ou Vite).
-- Copy bilingue par défaut : anglais en sortie, bascule sur la langue
-  de l'utilisateur. La paire de langues est configurable par projet
-  (EN/FR, EN/DE, EN/ES, EN/JA, …) — voir
+- La sortie du skill est **du HTML mono-fichier de niveau prototype**
+  par défaut — adaptée aux démos, maquettes, outils internes et
+  petites landings. La page d'amorçage utilise le CDN Play de
+  Tailwind, que Tailwind lui-même réserve au prototypage. Pour un site
+  de production à l'échelle, faites passer **Tailwind CLI** ou
+  **Vite + Tailwind** sur le HTML émis avant déploiement ; les noms de
+  classes sont stables, donc les mêmes fichiers survivent à la
+  bascule. Voir `front-ui/references/stack-tailwind.md`.
+- Copy bilingue (EN/FR par défaut — configurable via `lang_pair`).
+  Anglais en sortie, bascule sur la langue de l'utilisateur. La paire
+  par projet se règle dans le token `metadata.lang_pair` du frontmatter
+  de n'importe quel skill (EN/FR, EN/DE, EN/ES, EN/JA, …) — voir
+  chaque `SKILL.md` → « Changing the language pair » et
   `front-publish/references/i18n.md`.
 
 ## Entrées → sorties
@@ -119,17 +142,28 @@ que ceux qui vous servent.
 
 ### Claude Code
 
+Installation depuis une release GitHub taguée. Cela épingle une
+version, vérifie la somme de contrôle et garantit un jeu de règles
+stable qui ne dérive pas entre deux mises à jour.
+
 ```bash
-git clone https://github.com/warith-harchaoui/front.git
+# 1. Téléchargez une release taguée
+VERSION=0.3.0
+curl -L -o front-skills.tar.gz \
+    https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
+curl -L -o SHA256SUMS \
+    https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/SHA256SUMS
+
+# 2. Vérifiez la somme de contrôle (macOS : shasum ; Linux : sha256sum)
+shasum -a 256 -c SHA256SUMS    # ou : sha256sum -c SHA256SUMS
+
+# 3. Extrayez et installez ceux dont vous avez besoin
+tar xzf front-skills.tar.gz
 mkdir -p ~/.claude/skills
-
-# Toujours :
-cp -r front/front-ui      ~/.claude/skills/front-ui
-
-# Selon vos besoins :
-cp -r front/front-cli-gui ~/.claude/skills/front-cli-gui
-cp -r front/front-publish ~/.claude/skills/front-publish
-cp -r front/front-a11y    ~/.claude/skills/front-a11y
+cp -r front-ui      ~/.claude/skills/   # toujours
+cp -r front-cli-gui ~/.claude/skills/   # uniquement si vous habillez des CLI
+cp -r front-publish ~/.claude/skills/   # uniquement pour les sites de doc
+cp -r front-a11y    ~/.claude/skills/   # uniquement pour les portes a11y
 ```
 
 Vérification :
@@ -138,6 +172,11 @@ Vérification :
 ls ~/.claude/skills/front-ui/SKILL.md
 ```
 
+Si vous n'avez besoin que d'un seul skill, téléchargez sa tarball
+unitaire (par exemple `front-a11y-${VERSION}.tar.gz`) plutôt que le
+bundle. Chaque release publie les tarballs unitaires en plus du
+bundle, et le même `SHA256SUMS` couvre l'ensemble.
+
 Claude Code lit la description du frontmatter de chaque skill et active
 le bon dès qu'un message correspond à ses phrases déclencheuses.
 
@@ -145,15 +184,24 @@ le bon dès qu'un message correspond à ses phrases déclencheuses.
 
 [OpenCode](https://opencode.ai) est un agent de code en terminal, open
 source, qui sait piloter Claude, GPT et des modèles locaux derrière la
-même expérience.
+même expérience. Le flux ci-dessus s'applique tel quel — extrayez le
+bundle, puis :
 
 ```bash
 mkdir -p ~/.opencode/skills
-cp -r front/front-* ~/.opencode/skills/
+cp -r front-* ~/.opencode/skills/
 ```
 
 À privilégier si vous voulez l'expérience des skills sans dépendance à
 un fournisseur unique, ou si OpenCode est déjà votre outil quotidien.
+
+### Mise à jour
+
+Pour mettre à jour, recommencez la procédure avec une `VERSION` plus
+récente. Le nom du dossier installé est stable, donc
+`cp -r front-ui ~/.claude/skills/` écrase l'install précédente sur
+place. Le `SHA256SUMS` de chaque release fait foi : si la vérification
+échoue, n'installez pas l'artefact.
 
 ## CLI → IHM, le cas d'usage phare
 
@@ -247,3 +295,10 @@ Voir `LICENSE.md` pour le texte canonique. La police Montserrat reste
 sous SIL Open Font License
 (`front-ui/assets/fonts/montserrat/OFL.txt`) — la dédicace au domaine
 public ne change pas ce point.
+
+**Licence vs. attribution.** Le code est publié sous l'Unlicense
+(domaine public — aucune autorisation requise pour l'utiliser, le
+forker, le modifier ou le re-marquer). Les crédits d'auteur dans la
+documentation sont une reconnaissance volontaire, pas une exigence de
+licence. Vous êtes libre de les retirer ou de les remplacer dans votre
+fork.
