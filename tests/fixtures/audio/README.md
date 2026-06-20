@@ -18,7 +18,7 @@ single contributor dominates. Languages currently wired in the test:
 
 ## Layout
 
-```
+```text
 tests/fixtures/audio/
 ├── README.md                              this file
 ├── extract_cv_subset.py                   reusable extractor (stdlib + ffmpeg)

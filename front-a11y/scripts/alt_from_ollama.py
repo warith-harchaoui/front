@@ -191,13 +191,39 @@ def _cache_set(key: str, text: str) -> None:
 
 # ── Model + language helpers ────────────────────────────────────────────────
 
+def _model_has_vision(model: str) -> bool:
+    """
+    Ask Ollama whether ``model``'s manifest advertises the ``vision``
+    capability. Returns ``True`` on any error so a flaky daemon never
+    silently degrades us to the non-MLX fallback.
+
+    Why this exists: as of Ollama 0.30, some ``-mlx`` quantisations of
+    multimodal models (notably ``gemma4:e2b-mlx``) ship without the
+    ``vision`` capability — the API accepts an ``images`` payload and
+    silently discards it, returning generic prose like *"Please provide
+    the image you are referring to."* The non-MLX variant of the same
+    base model still has vision; we prefer it when MLX doesn't.
+    """
+    try:
+        import requests  # local import — not all callers want the dep
+        resp = requests.post(f"{OLLAMA_URL}/api/show", json={"name": model}, timeout=3)
+        if resp.status_code != 200:
+            return True
+        return "vision" in (resp.json().get("capabilities") or [])
+    except Exception:
+        return True
+
+
 def pick_default_model() -> str:
     """
     Pick the model tag for the current hardware.
 
-    On Apple-Silicon-class arm64 macOS, the MLX-optimized variant
-    (``<base>-mlx``) is preferred — its first-token latency is materially
-    lower. Everywhere else the base tag is used.
+    On Apple-Silicon-class arm64 macOS we prefer the MLX-optimised
+    variant (``<base>-mlx``) for its lower first-token latency — but
+    only when the MLX manifest actually advertises the ``vision``
+    capability. When it doesn't (e.g. ``gemma4:e2b-mlx`` on Ollama
+    0.30), we fall back to the non-MLX variant so images are not
+    silently dropped.
 
     Returns
     -------
@@ -211,7 +237,12 @@ def pick_default_model() -> str:
     # some Linux ARM hosts; both run MLX (the former natively, the latter not,
     # but Ollama silently downgrades the request if the tag is unsupported).
     mlx_capable = platform.system() == "Darwin" and platform.machine() in {"arm64", "aarch64"}
-    return f"{DEFAULT_BASE}-mlx" if mlx_capable else DEFAULT_BASE
+    if mlx_capable:
+        mlx_tag = f"{DEFAULT_BASE}-mlx"
+        if _model_has_vision(mlx_tag):
+            return mlx_tag
+        # MLX variant exists but is vision-less; fall through to the base tag.
+    return DEFAULT_BASE
 
 
 #: Per-language phrases that the model must NOT begin its output with. W3C is
