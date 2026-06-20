@@ -75,7 +75,7 @@ is the right pick — see [LANDSCAPE.md](LANDSCAPE.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.3.1`. The four skill folders are stable; the only WiP area is **audio captions**.
+A snapshot of where each surface stands at `v0.3.2`. The four skill folders are stable; the only WiP area is **audio captions**.
 
 | Area | Status | Notes |
 |---|---|---|
@@ -122,7 +122,7 @@ between updates.
 
 ```bash
 # 1. Download a tagged release
-VERSION=0.3.1
+VERSION=0.3.2
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \

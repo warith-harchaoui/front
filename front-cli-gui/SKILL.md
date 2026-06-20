@@ -4,7 +4,7 @@ description: Wrap an existing command-line tool in a single-page vanilla-JavaScr
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.3.1
+  version: 0.3.2
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -154,7 +154,7 @@ python server.py
 
 ## References
 
-- `references/cli-gui-workflow.md` — Long-form workflow notes, host-adapter patterns (Tauri / FastAPI / Express / stdlib proxy), streaming output, error states, repeated-flag editors.
+- `references/hardening.md` — Production-readiness checklist for the host (auth, rate-limit, subprocess sandbox, CORS, TLS posture). Keep the demo demo; this is what you apply when the surface stops being loopback-only.
 
 ## Companion skills
 

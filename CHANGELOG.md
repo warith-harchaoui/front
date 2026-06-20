@@ -18,6 +18,90 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.3.2] — 2026-06-21
+
+Cosmetic / hygiene patch release. Closes three of the five roadmap
+items from 0.3.1: LISEZMOI parity, `references/` reshape
+re-assessment, and `front-cli-gui` production-hardening notes. No
+behaviour change for any script.
+
+### Added — `front-cli-gui/references/hardening.md`
+
+- New reference, ~250 lines, eight sections: loopback binding,
+  bearer-token auth on `/run`, command + flag allow-list with
+  path-traversal guard, subprocess sandbox (`shell=False`, `cwd`,
+  scrubbed `env`, `start_new_session=True`, wall-clock timeout via
+  `os.killpg`), per-token rate limit (in-memory sliding window), CORS
+  posture (single pinned origin, no `*` with credentials), logging
+  hygiene (cmd / exit / duration only — no argv, no token, no body),
+  TLS terminated at a reverse proxy. Ends with a 10-line
+  "before-promotion" checklist and a "when to outgrow the stdlib host"
+  trigger list (multi-worker, schema validation, SSE reconnects,
+  Tauri sidecar).
+- Snippets follow the project's Python style — module imports,
+  numpy-style docstrings on the non-trivial helpers (`validate`,
+  `run_sandboxed`, `rate_limited`), full typing, dict over class.
+- Wired into `front-cli-gui/SKILL.md` § References (the stale link to
+  the never-shipped `cli-gui-workflow.md` was removed in the same
+  pass).
+
+### Changed — `LISEZMOI.md` brought back to parity
+
+- New section "**État d'avancement**" mirrors the EN README "Status"
+  table (eight rows, audio flagged WiP, version reference at 0.3.2).
+- Audio row of "Entrées → sorties" flagged **WiP** with a back-link to
+  the new section, matching the EN row.
+- Install snippet bumped from `VERSION=0.3.0` to `VERSION=0.3.2`.
+
+### Changed — `references/` reshape re-assessed
+
+- The 0.3.1 roadmap item *"split teaching prose from rules
+  (`<name>-rules.md` + `<name>-guide.md`)"* is **retired** rather than
+  shipped. Audit showed the prose-trim pass on 2026-06-19 already
+  addressed `o.md` § 7: `ux-psychology.md` (175 → 87 LOC),
+  `material-design.md` (155 → 128 LOC), `color-psychology.md`
+  (90 → 84 LOC). Remaining reference files are rule-shaped enough
+  that a structural split would add friction without value.
+  Documenting the decision here so the next reader doesn't re-litigate
+  it.
+
+### Changed — version bumps
+
+- All four `SKILL.md` files bumped `0.3.1 → 0.3.2`. README + LISEZMOI
+  install snippets bumped to `VERSION=0.3.2`. Status snapshot
+  reference bumped to `v0.3.2`.
+
+### Fixed
+
+- **`front-cli-gui/SKILL.md` referenced a non-existent file**
+  (`references/cli-gui-workflow.md`). Replaced with the real
+  `references/hardening.md` link.
+
+## Roadmap
+
+Open threads carried into 0.4.0. Both remaining items are paused on
+explicit user signal — do not restart without one.
+
+1. **Captions WER baselines + `vocab-biasing-clip.wav`.** User has
+   deferred audio fixture work pending dataset acquisition (Common
+   Voice 26.0 tarballs are 25–88 GB per language). When they signal:
+   run `tests/fixtures/audio/extract_cv_subset.py` per language,
+   commit MANIFEST + STATS + transcripts, publish median WER in
+   `front-a11y/references/captions-ai.md`.
+2. **Real end-to-end application example.** User has deferred. Scope
+   pre-decided: wrap `md2star` (user's own CLI) with a Tauri shell
+   that invokes it as a sidecar — not another mock SSE proxy. The
+   `cli-gui-demo` stays as the scaffold reference; the Tauri example
+   becomes the production reference.
+
+Adoption-side milestones (user-driven; not engineering work):
+
+- Real Claude Code session against the four skills to verify trigger
+  phrasing fires on "wrap my CLI", "captions for this video", "audit
+  my palette". Refine descriptions if under-triggers.
+- 5 real users — the only signal that says whether anything else on
+  this list is worth doing.
+
 ## [0.3.1] — 2026-06-20
 
 Patch release. Documents the current status of each surface, marks
@@ -64,49 +148,6 @@ quantizations. No behaviour change for the stable scripts.
   `/api/show` and falls back to the non-MLX tag when the manifest
   reports no `vision` capability. Defensive: returns `True` on any
   request error so a flaky daemon doesn't silently downgrade.
-
-## Roadmap
-
-Open threads being carried into the next minor release. Listed in
-priority order; each line is the smallest deliverable that lets the
-item be retired.
-
-1. **Captions WER baselines.** Run `tests/fixtures/audio/
-   extract_cv_subset.py` against Common Voice 26.0 for `en` / `fr` /
-   `es`, record the per-language median WER, commit
-   `MANIFEST.json` + `STATS.json` + `clip-*.txt` for each, then
-   publish the median numbers in `front-a11y/references/captions-ai.md`
-   so users have an honest expectation of accuracy on each language.
-   Blocking the captions WiP → Stable transition.
-2. **`vocab-biasing-clip.wav` reference recording.** A 10-second clip
-   speaking at least one term from `tests/fixtures/vocab/glossary.txt`
-   (`pywhispercpp`, `VisionCell`, …). Owner-recorded; not redrawable
-   from Common Voice. Lands together with the transcript update in
-   `tests/fixtures/audio/vocab-biasing-clip.txt`.
-3. **`LISEZMOI.md` parity pass.** French README has drifted since the
-   0.2.0 restructure. Translate the new "Status", "Who this is for",
-   "What the skills enforce", and updated "Inputs → outputs" rows.
-   Single-PR translation, no semantic change.
-4. **`references/` reshape pass.** Split teaching prose from rules
-   where the boundary is clear (`<name>-rules.md` + `<name>-guide.md`).
-   Deferred from 0.2.0 and 0.3.0; pick the two most prose-heavy files
-   (`color-psychology.md`, `stack-tailwind.md`) and do them first as
-   the pattern.
-5. **`front-cli-gui` hardening notes.** Add a short production-readiness
-   reference (`front-cli-gui/references/hardening.md`): auth on the
-   SSE proxy, per-route rate limit, subprocess sandbox (`shell=False`,
-   timeout, cwd), CORS posture. Keeps the demo's "scaffolds the GUI,
-   you wire the host" honesty while giving the host wiring an
-   opinionated checklist.
-
-Not in scope for 0.4.0 (kept here for visibility):
-
-- Realtime / streaming captions — out of scope. Pointer to Deepgram /
-  AssemblyAI in `front-a11y/SKILL.md` § "When NOT to use this skill"
-  stands.
-- Provider-hosted vision (Claude vision / GPT-4o) as a primary path —
-  out of scope. The local-only Ollama path is a deliberate design
-  decision; hosted is an alternative in `LANDSCAPE.md`.
 
 ## [0.3.0] — 2026-06-20
 

@@ -4,7 +4,7 @@ description: Pre-commit accessibility tooling for vanilla-JS + Tailwind output â
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.3.1
+  version: 0.3.2
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

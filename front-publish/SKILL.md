@@ -4,7 +4,7 @@ description: Turn a folder of Markdown files (README + docs/ + blog/) into a sta
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.3.1
+  version: 0.3.2
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

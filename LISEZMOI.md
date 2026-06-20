@@ -115,6 +115,24 @@ que `front` est le bon outil ? », voir [LANDSCAPE.md](LANDSCAPE.md).
   la première entrée devient le `--lang` par défaut des scripts
   Ollama quand aucun drapeau n'est passé.
 
+## État d'avancement
+
+Photographie de l'état de chaque surface à `v0.3.2`. Les quatre dossiers
+de skills sont stables ; la seule zone en travaux est l'**audio /
+sous-titres**.
+
+| Domaine | État | Notes |
+|---|---|---|
+| `front-ui` (règles de pile, tokens, composants, dataviz, checklist) | Stable | Les 9 règles dures documentées ; `validate.py` stdlib uniquement ; couvert par `tests/test_validate.py`. |
+| `front-cli` (pilote `front` unifié, complétion shell) | Stable | Basé sur Click ; transmission du `--help` corrigée en 0.3.0 (test de non-régression en 0.3.1). |
+| `front-cli-gui` (CLI → IHM, phare) | Stable (skill + démo exécutable) | `assets/examples/cli-gui-demo/` tourne de bout en bout. Durcissement production (auth, rate-limit, sandbox) délibérément laissé à l'hôte. |
+| `front-publish` (site Markdown, meta, favicons, indexes, langage clair) | Stable | 4 scripts, 18 tests déterministes, suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
+| `front-a11y` — lint, contraste, daltonisme, texte alternatif | Stable | Lint 14 règles, correcteur OKLCH, daltonisme Machado, éval texte alternatif sur fixtures Wikipedia. Auto-détection de la capacité vision MLX en 0.3.1. |
+| `front-a11y` — **sous-titres / transcriptions** | **WiP / TODO** | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées) et le clip utilisateur `vocab-biasing-clip.wav`. Voir [Roadmap](CHANGELOG.md#roadmap). |
+| `LISEZMOI.md` (README français) | Mise à parité 0.3.1 | Aligné sur l'EN après la passe 0.3.1. |
+
+Pour le détail par release (et la suite prévue), voir [`CHANGELOG.md`](CHANGELOG.md).
+
 ## Entrées → sorties
 
 Ce que vous donnez à l'agent et ce qu'il vous renvoie. Chaque ligne
@@ -129,7 +147,7 @@ reste.
 | Un jeu de données (CSV, JSON, quelques lignes collées) | « Trace ça » / « Tableau de bord pour X » | `front-ui` | Spec Vega-Lite v5 JSON + wrapper `<figure>`. Style maison, palette de `color-psychology.md`, axes avec polarité, `role="img"`. |
 | Une page HTML existante ou une capture d'écran | « Audite » / « Vérif WCAG » / « Rends ça moins IA » | `front-ui` (anti-patterns, ergonomie) + `front-a11y` (lint, contraste, daltonisme) | Constats au regard des 8 critères ergonomiques + catalogue d'anti-patterns ; diffs concrets ; checklist pré-livraison ; sorties `lint_a11y` + `audit_contrast` + `simulate_cvd`. |
 | Une image (`*.png`, `*.jpg`, …) | « Texte alternatif pour cette image » | `front-a11y` | Texte alternatif conforme W3C dans la bonne catégorie (informatif / décoratif / fonctionnel / texte / complexe / groupe), rédigé dans la langue de la page, marqué `data-alt-source="ai"`. |
-| Un fichier audio ou vidéo (`.mp4`, `.wav`, `.mp3`, …) | « Sous-titres / transcription » | `front-a11y` | Sous-titres WebVTT / SRT / texte brut depuis Whisper local, avec biais de vocabulaire issu du projet. Extrait `<video>` + `<track kind="captions">` à coller. |
+| Un fichier audio ou vidéo (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | « Sous-titres / transcription » | `front-a11y` *(en travaux)* | Sous-titres WebVTT / SRT / texte brut depuis whisper.cpp local, avec biais de vocabulaire issu du projet. Extrait `<video>` + `<track kind="captions">` à coller. Le script et les tests sont là aujourd'hui ; les baselines WER par langue et le clip de référence pour le biais de vocabulaire sont encore à collecter — voir [État d'avancement](#état-davancement). |
 | Un logo (`logo.png` / `.svg`) | « Jeu de favicons » / « Icônes PWA » | `front-publish` | `favicon.svg` + `.ico` + lot de PNG + `apple-touch-icon.png` + icône PWA masquable + `site.webmanifest` + extrait `head.html`. |
 | Une description d'objectif ou une page HTML | « Meta tags » / « SEO » / « OG card » | `front-publish` | Titre + description + Open Graph + Twitter Card + JSON-LD Schema.org. JSON sur stdout. |
 | Du copy d'IHM brut | « Langage clair » / « Réécris au niveau 6e » | `front-publish` | Même sens, voix marketing retirée, longueur de sortie ≤ 1,1× l'original. |
@@ -152,7 +170,7 @@ stable qui ne dérive pas entre deux mises à jour.
 
 ```bash
 # 1. Téléchargez une release taguée
-VERSION=0.3.0
+VERSION=0.3.2
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
