@@ -54,3 +54,31 @@ def test_ui_validate_runs_against_repo() -> None:
         f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
     )
     assert "PASS — skill is shippable." in result.stdout
+
+
+def test_leaf_help_forwards_to_wrapped_script() -> None:
+    """
+    Regression test: ``front a11y alt --help`` must show the wrapped
+    script's actual options (``--kind``, ``--lang``, ``--longdesc``, …),
+    not Click's one-line driver stub.
+
+    The bug — fixed by setting ``add_help_option=False`` on every leaf
+    command — was that the driver intercepted ``--help`` at its own
+    wrapper level instead of forwarding it through the subprocess. Users
+    typing ``front a11y alt --help`` saw nothing useful.
+    """
+    env = os.environ.copy()
+    env["FRONT_SKILLS_PATH"] = str(REPO_ROOT)
+    result = subprocess.run(
+        [sys.executable, "-m", "front_cli", "a11y", "alt", "--help"],
+        capture_output=True, text=True, env=env,
+    )
+    assert result.returncode == 0, (
+        f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+    )
+    # Markers that prove the wrapped script's help fired, not Click's stub.
+    for marker in ("--kind", "--lang", "--longdesc", "informative"):
+        assert marker in result.stdout, (
+            f"{marker!r} missing from `front a11y alt --help` output — "
+            f"driver may be intercepting --help again.\nstdout:\n{result.stdout}"
+        )
