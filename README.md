@@ -73,6 +73,22 @@ is the right pick — see [LANDSCAPE.md](LANDSCAPE.md).
 - Skill output is **prototype-grade single-file HTML** by default — suitable for demos, mockups, internal tools and small landing pages. The starter page uses the Tailwind Play CDN, which Tailwind itself warns is for prototyping only. For production sites at scale, run **Tailwind CLI** or **Vite + Tailwind** over the emitted HTML before shipping; the class names are stable, so the same files survive the swap. See `front-ui/references/stack-tailwind.md`.
 - Bilingual-ready copy (EN/FR by default — configurable via `lang_pair`). Default English; switch on the user's language. Set the project-level pair in any skill's `metadata.lang_pair` frontmatter token (EN/FR, EN/DE, EN/ES, EN/JA, …) — see each `SKILL.md` → "Changing the language pair" and `front-publish/references/i18n.md`. For an ad-hoc shell override use the `FRONT_LANG_PAIR` env var (e.g. `export FRONT_LANG_PAIR="en,fr"`); its first comma-split entry becomes the default `--lang` for the Ollama-backed scripts when no flag is passed.
 
+## Status
+
+A snapshot of where each surface stands at `v0.3.1`. The four skill folders are stable; the only WiP area is **audio captions**.
+
+| Area | Status | Notes |
+|---|---|---|
+| `front-ui` (stack rules, tokens, components, dataviz, checklist) | Stable | All 9 hard rules documented; `validate.py` stdlib-only; covered by `tests/test_validate.py`. |
+| `front-cli` (unified `front` driver, shell completion) | Stable | Click-based; leaf-command `--help` forwarding fixed in 0.3.0 (regression test in 0.3.1). |
+| `front-cli-gui` (CLI → GUI flagship) | Stable (skill + runnable demo) | `assets/examples/cli-gui-demo/` runs end-to-end. Production hardening (auth, rate-limit, sandbox) deliberately left to the host. |
+| `front-publish` (Markdown site, meta tags, favicons, indexes, plain language) | Stable | 4 scripts, 18 deterministic tests, eval suite for meta + plain-language. `FRONT_LANG_PAIR` runtime override wired. |
+| `front-a11y` — lint, contrast, CVD, alt text | Stable | 14-rule lint, OKLCH contrast fixer, Machado CVD, Wikipedia-fixture alt-text eval. MLX vision-capability auto-detection added in 0.3.1. |
+| `front-a11y` — **captions / transcripts** | **WiP / TODO** | `captions_from_whisper.py` is functional; what's missing is per-language WER baselines (`en` / `fr` / `es` extractor wired but baselines not yet published) and the user-supplied `vocab-biasing-clip.wav`. See [Roadmap](CHANGELOG.md#roadmap). |
+| `LISEZMOI.md` (French README) | Stale | Not yet brought to parity with this README after 0.2.0+. Translation pass scheduled — see [Roadmap](CHANGELOG.md#roadmap). |
+
+For the per-release detail (and what's planned next), see [`CHANGELOG.md`](CHANGELOG.md).
+
 ## Inputs → outputs
 
 What you give the agent and what comes back. Each row is a self-contained flow — pick one, ignore the rest.
@@ -85,7 +101,7 @@ What you give the agent and what comes back. Each row is a self-contained flow �
 | A data shape (CSV, JSON, a few rows) | "Chart this" / "Dashboard for X" | `front-ui` | Vega-Lite v5 JSON spec + `<figure>` wrapper. House style, palette from `color-psychology.md`, polarity-tagged axes, `role="img"`. |
 | An existing HTML page or screenshot | "Audit this" / "WCAG check" / "Make it look less AI" | `front-ui` (anti-patterns, ergonomics) + `front-a11y` (lint, contrast, CVD) | Findings against the 8 ergonomic criteria + anti-patterns catalogue; concrete diffs; pre-ship checklist run; `lint_a11y` + `audit_contrast` + `simulate_cvd` output. |
 | An image file (`*.png`, `*.jpg`, …) | "Alt text for this image" | `front-a11y` | W3C-compliant alt text for the right purpose category (informative / decorative / functional / text / complex / group), in the page's language, tagged `data-alt-source="ai"`. |
-| An audio or video file (`.mp4`, `.wav`, `.mp3`, …) | "Captions / transcript" | `front-a11y` | WebVTT / SRT / plain-text captions from local Whisper, with project-vocab biasing. `<video>` + `<track kind="captions">` snippet. |
+| An audio or video file (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | "Captions / transcript" | `front-a11y` *(work in progress)* | WebVTT / SRT / plain-text captions from local whisper.cpp, with project-vocab biasing. `<video>` + `<track kind="captions">` snippet. Script + tests ship today; per-language WER baselines and the vocab-biasing reference clip are still being collected — see [Status](#status). |
 | A logo (`logo.png` / `.svg`) | "Favicon set" / "PWA icons" | `front-publish` | `favicon.svg` + `.ico` + PNG set + `apple-touch-icon.png` + maskable PWA icon + `site.webmanifest` + a `head.html` snippet. |
 | A goal description or an HTML page | "Meta tags" / "SEO" / "OG card" | `front-publish` | Title + description + Open Graph + Twitter Card + Schema.org JSON-LD. JSON on stdout. |
 | Draft UI copy | "Plain language" / "Rewrite at grade 8" | `front-publish` | Same meaning, marketing voice stripped, output length ≤ 1.1× original. |
