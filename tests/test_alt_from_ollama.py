@@ -79,7 +79,18 @@ class TestPickDefaultModel:
         monkeypatch.delenv("OLLAMA_MODEL", raising=False)
         monkeypatch.setattr(alt.platform, "system", lambda: "Darwin")
         monkeypatch.setattr(alt.platform, "machine", lambda: "arm64")
+        # _model_has_vision queries the live Ollama daemon; pin to True so
+        # this test exercises the platform branch, not the daemon state.
+        monkeypatch.setattr(alt, "_model_has_vision", lambda _tag: True)
         assert alt.pick_default_model().endswith("-mlx")
+
+    def test_mlx_falls_back_when_vision_missing(self, monkeypatch):
+        monkeypatch.delenv("OLLAMA_MODEL", raising=False)
+        monkeypatch.setattr(alt.platform, "system", lambda: "Darwin")
+        monkeypatch.setattr(alt.platform, "machine", lambda: "arm64")
+        # Simulate Ollama 0.30 MLX quantisation without vision capability.
+        monkeypatch.setattr(alt, "_model_has_vision", lambda _tag: False)
+        assert alt.pick_default_model() == alt.DEFAULT_BASE
 
     def test_no_suffix_on_linux_x86(self, monkeypatch):
         monkeypatch.delenv("OLLAMA_MODEL", raising=False)
