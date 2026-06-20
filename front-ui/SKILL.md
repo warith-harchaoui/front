@@ -4,7 +4,7 @@ description: Generate vanilla JavaScript + Tailwind CSS UI code — components, 
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.2.0
+  version: 0.3.1
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

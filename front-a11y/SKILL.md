@@ -4,7 +4,7 @@ description: Pre-commit accessibility tooling for vanilla-JS + Tailwind output �
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.2.0
+  version: 0.3.1
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -29,7 +29,7 @@ This skill is **not** a substitute for runtime DOM testing. Pair it with axe-cor
 | `scripts/audit_contrast.py` | palette JSON | WCAG ratio violations on (label × surface) pairs in both light + dark schemes; suggests nearest OKLCH-neighbour fix | does not verify that the suggested fix preserves brand identity or tonal hierarchy. The auto-fix is a **starting point** for a designer, not a finished decision. |
 | `scripts/simulate_cvd.py` | image transform | how the surface looks to a protanope / deuteranope / tritanope (Machado et al. matrices). Catches red/green pairing before ship. | does not test motion sensitivity, low-vision blur, or contrast sensitivity beyond color. |
 | `scripts/alt_from_ollama.py` | local AI | W3C-compliant alt for informative / decorative / functional / text / complex / group purposes, biased by surrounding page text | model-quality drafts — verify each draft before committing. Top-tier hosted vision (Claude vision, GPT-4o vision, Gemini) is more accurate. |
-| `scripts/captions_from_whisper.py` | local AI | WebVTT / SRT / plain-text captions via whisper.cpp; project-vocab biasing | not real-time; hosted services (Deepgram, AssemblyAI) are better for live captions. |
+| `scripts/captions_from_whisper.py` *(WiP)* | local AI | WebVTT / SRT / plain-text captions via whisper.cpp; project-vocab biasing | not real-time; hosted services (Deepgram, AssemblyAI) are better for live captions. **WiP gaps**: per-language WER baselines (en / fr / es extractor wired, baselines not yet published); the `vocab-biasing-clip.wav` is user-supplied. Track shape via `tests/fixtures/audio/README.md`. |
 
 State this when reporting results, especially `lint_a11y` — "passed the static gate" ≠ "WCAG-compliant".
 
@@ -41,7 +41,7 @@ State this when reporting results, especially `lint_a11y` — "passed the static
 | "contrast audit" / "WCAG ratio" / "is my palette accessible" | `audit_contrast.py` | `python scripts/audit_contrast.py [--palette p.json] [--target 4.5\|7\|3] [--fix]` — walks every (label, surface) pair, suggests OKLCH-neighbour fix |
 | "color blind preview" / "CVD check" / "how does this look to a deuteranope" | `simulate_cvd.py` | `python scripts/simulate_cvd.py <image> [--grid]` — renders protanopia / deuteranopia / tritanopia |
 | "alt text" / `<img>` with no `alt` / "describe this image" | `alt_from_ollama.py` | Match W3C image-purpose decision tree → `python scripts/alt_from_ollama.py [--kind informative\|decorative\|functional\|text\|complex\|group] [--lang fr] [--in DOC] [--vocab-from DIR] <src>`. Tag drafts with `data-alt-source="ai"`. |
-| "captions" / "transcribe video" / "transcribe audio" | `captions_from_whisper.py` | `python scripts/install_captions.py` then `python scripts/captions_from_whisper.py <audio-or-video> [--format vtt\|srt\|text] [--lang fr] [--vocab-from DIR] [--auto-project]`. Always emit `<track kind="captions">` on `<video>` / `<audio>`. |
+| "captions" / "transcribe video" / "transcribe audio" *(WiP — see below)* | `captions_from_whisper.py` | `python scripts/install_captions.py` then `python scripts/captions_from_whisper.py <audio-or-video> [--format vtt\|srt\|text] [--lang fr] [--vocab-from DIR] [--auto-project]`. Always emit `<track kind="captions">` on `<video>` / `<audio>`. |
 
 ## Tool composition (take initiative)
 
@@ -123,7 +123,7 @@ first entry → langdetect on available text → POSIX locale fallback.
 | `scripts/simulate_cvd.py` | `pip install -r scripts/requirements-cvd.txt` | Protanopia / deuteranopia / tritanopia rendering (Machado matrices). |
 | `scripts/alt_from_ollama.py` | `pip install -r scripts/requirements-alt-text.txt` + Ollama | W3C-compliant alt text via local vision model. |
 | `scripts/install_alt_ai.py` | subprocess | Installs Ollama + pulls vision model. |
-| `scripts/captions_from_whisper.py` | `pip install -r scripts/requirements-captions.txt` | WebVTT / SRT / plain-text captions via local whisper.cpp. |
+| `scripts/captions_from_whisper.py` *(WiP)* | `pip install -r scripts/requirements-captions.txt` | WebVTT / SRT / plain-text captions via local whisper.cpp. Script works today; per-language WER baselines + vocab-biasing reference clip still being collected. |
 | `scripts/install_captions.py` | subprocess | Installs pywhispercpp + downloads model. |
 | `scripts/_lang.py`, `scripts/_vocab.py`, `scripts/_ollama.py` | (internal helpers) | Language detection, project-vocab biasing, shared Ollama client. |
 

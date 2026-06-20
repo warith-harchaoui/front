@@ -122,7 +122,7 @@ between updates.
 
 ```bash
 # 1. Download a tagged release
-VERSION=0.3.0
+VERSION=0.3.1
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
