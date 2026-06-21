@@ -76,7 +76,9 @@ from pathlib import Path as _PathHelper
 
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
 from _argparse import make_parser  # noqa: E402
+import json
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from email.utils import format_datetime
 from pathlib import Path
 from typing import Iterable, Optional
@@ -87,6 +89,112 @@ from urllib.parse import urljoin
 
 #: Directories at the project root that may contain static HTML output.
 WEB_OUTPUT_DIRS: tuple[str, ...] = ("public", "dist", "site", "_site", "build", "out")
+
+
+# ── Audio enclosure plumbing ──────────────────────────────────────────────
+
+
+@dataclass(frozen=True)
+class AudioEntry:
+    """
+    One ``<enclosure>`` row's worth of information about a narration.
+
+    Attributes
+    ----------
+    path : str
+        Relative path of the audio file (from site root), e.g.
+        ``audio/2026-06-21-hello.wav``.
+    mime_type : str
+        Media type, e.g. ``audio/wav`` or ``audio/mpeg``. RSS
+        readers use this to pick a player.
+    length_bytes : int
+        File size in bytes. The RSS 2.0 spec requires ``length`` on
+        every enclosure; we fall back to 0 when the file isn't
+        reachable.
+    """
+
+    path: str
+    mime_type: str
+    length_bytes: int
+
+
+#: Map audio file extensions to RFC 2046 media types. Narration
+#: typically lands as WAV (lossless, what the engines produce) or
+#: MP3 (after the user re-encodes for distribution).
+_AUDIO_MIME: dict[str, str] = {
+    ".wav":  "audio/wav",
+    ".mp3":  "audio/mpeg",
+    ".m4a":  "audio/mp4",
+    ".aac":  "audio/aac",
+    ".ogg":  "audio/ogg",
+    ".opus": "audio/ogg",
+    ".flac": "audio/flac",
+}
+
+
+def load_audio_manifest(
+    manifest_path: Path,
+    audio_root: Path | None = None,
+) -> dict[str, AudioEntry]:
+    """
+    Read ``out/audio/manifest.json`` and return a feed-ready mapping.
+
+    The narration manifest is keyed by the **source Markdown path**;
+    the feed renderers look up by **post HTML stem** (the relative
+    URL without ``.html``). This helper normalises the key by
+    stripping the source extension so the renderer's lookup works
+    on both ``posts/foo.md → posts/foo``.
+
+    Parameters
+    ----------
+    manifest_path : Path
+        Path to the JSON manifest written by ``narrate_post.py``.
+        Missing / unreadable files yield an empty mapping; this is
+        a soft feature and should never crash feed generation.
+    audio_root : Path or None, optional
+        Directory the audio paths in the manifest are relative to.
+        When set, the renderer stats each audio file to populate
+        ``length_bytes``; when None, lengths default to 0.
+
+    Returns
+    -------
+    dict
+        ``{post_stem: AudioEntry}`` ready to pass to
+        :func:`render_rss` / :func:`render_atom`.
+    """
+    if not manifest_path.is_file():
+        return {}
+    try:
+        rows = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    if not isinstance(rows, list):
+        return {}
+
+    out: dict[str, AudioEntry] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        source: str = str(row.get("source", "")).strip()
+        audio: str = str(row.get("audio", "")).strip()
+        if not source or not audio:
+            continue
+        # Strip the source extension to get the stem used by feeds.
+        stem: str = Path(source).with_suffix("").as_posix()
+        # Detect media type from extension; fall back to a generic
+        # value rather than skipping the row.
+        ext: str = Path(audio).suffix.lower()
+        mime: str = _AUDIO_MIME.get(ext, "application/octet-stream")
+        # File size is only known when we can resolve the audio path.
+        length_bytes: int = 0
+        if audio_root is not None:
+            candidate: Path = (audio_root / audio).resolve()
+            if candidate.is_file():
+                length_bytes = candidate.stat().st_size
+        out[stem] = AudioEntry(
+            path=audio, mime_type=mime, length_bytes=length_bytes,
+        )
+    return out
 
 #: Names recognized as a default blog folder when ``--feed-from`` is absent.
 DEFAULT_BLOG_DIRS: tuple[str, ...] = ("posts", "blog", "articles")
@@ -350,6 +458,7 @@ def render_atom(
     feed_id: str,
     feed_title: str,
     posts: list[tuple[Path, str, str, str]],
+    audio_entries: dict[str, "AudioEntry"] | None = None,
 ) -> str:
     """
     Render an Atom 1.0 feed per RFC 4287.
@@ -365,6 +474,11 @@ def render_atom(
     posts : list of (Path, str, str, str)
         ``(relative_path, title, updated_iso, summary)`` per post, in
         reverse-chronological order.
+    audio_entries : dict or None, optional
+        Mapping of *post stem* (the relative HTML path without
+        ``.html``) → :class:`AudioEntry`. When present, each matching
+        post gets a ``<link rel="enclosure">`` so podcast apps see
+        the narration as an audio item.
 
     Returns
     -------
@@ -401,6 +515,15 @@ def render_atom(
         ET.SubElement(entry, f"{{{ATOM_NS}}}updated").text = updated
         if summary:
             ET.SubElement(entry, f"{{{ATOM_NS}}}summary").text = summary
+        # Optional audio enclosure for podcast-app consumption.
+        audio = (audio_entries or {}).get(rel.with_suffix("").as_posix())
+        if audio is not None:
+            audio_link = ET.SubElement(entry, f"{{{ATOM_NS}}}link")
+            audio_link.set("rel", "enclosure")
+            audio_link.set("type", audio.mime_type)
+            audio_link.set("href", _format_url(base_url, Path(audio.path)))
+            if audio.length_bytes > 0:
+                audio_link.set("length", str(audio.length_bytes))
 
     return ET.tostring(feed, encoding="unicode", xml_declaration=True).rstrip() + "\n"
 
@@ -412,6 +535,7 @@ def render_rss(
     feed_title: str,
     feed_description: str,
     posts: list[tuple[Path, str, str, str]],
+    audio_entries: dict[str, "AudioEntry"] | None = None,
 ) -> str:
     """
     Render an RSS 2.0 feed.
@@ -426,6 +550,11 @@ def render_rss(
         Channel description.
     posts : list of (Path, str, str, str)
         ``(relative_path, title, updated_iso, summary)`` per post.
+    audio_entries : dict or None, optional
+        Mapping of *post stem* (the relative HTML path without
+        ``.html``) → :class:`AudioEntry`. When present, each matching
+        post gets an ``<enclosure>`` row — the feed becomes a valid
+        podcast feed automatically consumable in any podcast app.
 
     Returns
     -------
@@ -459,6 +588,16 @@ def render_rss(
             ET.SubElement(item, "pubDate").text = format_datetime(dt)
         except ValueError:
             pass
+        # Optional audio enclosure for podcast-app consumption. The
+        # ``length`` attribute is required by the RSS spec; we use 0
+        # when the audio file isn't reachable so the feed still parses.
+        audio = (audio_entries or {}).get(rel.with_suffix("").as_posix())
+        if audio is not None:
+            ET.SubElement(item, "enclosure", {
+                "url": _format_url(base_url, Path(audio.path)),
+                "length": str(audio.length_bytes),
+                "type": audio.mime_type,
+            })
 
     return ET.tostring(rss, encoding="unicode", xml_declaration=True).rstrip() + "\n"
 
@@ -640,6 +779,18 @@ def main() -> int:
         "--summary", default="",
         help="Site summary used in llms.txt blockquote.",
     )
+    p.add_argument(
+        "--audio-manifest", type=Path, default=None, dest="audio_manifest",
+        help="Path to out/audio/manifest.json (from narrate_post.py). "
+             "When passed, feed entries gain <enclosure> rows so the "
+             "blog feed doubles as a podcast feed.",
+    )
+    p.add_argument(
+        "--audio-root", type=Path, default=None, dest="audio_root",
+        help="Directory the audio paths in --audio-manifest are relative "
+             "to. When set, the renderer stats each file to populate the "
+             "enclosure 'length' attribute. Defaults to --root.",
+    )
     args = p.parse_args()
 
     root: Path = args.root.resolve()
@@ -693,12 +844,21 @@ def main() -> int:
     if feed_dir is not None:
         posts = discover_posts(feed_dir)
         if posts:
+            # Optional audio manifest → podcast enclosures in the feed.
+            audio_entries: dict[str, AudioEntry] = (
+                load_audio_manifest(
+                    args.audio_manifest,
+                    audio_root=(args.audio_root or root),
+                )
+                if args.audio_manifest else {}
+            )
             if args.rss:
                 body = render_rss(
                     base_url,
                     feed_title=project_name,
                     feed_description=args.summary or f"{project_name} feed",
                     posts=posts,
+                    audio_entries=audio_entries,
                 )
                 feed_path = out_dir / "rss.xml"
             else:
@@ -708,10 +868,18 @@ def main() -> int:
                     feed_id=feed_id,
                     feed_title=project_name,
                     posts=posts,
+                    audio_entries=audio_entries,
                 )
                 feed_path = out_dir / "feed.atom"
             feed_path.write_text(body, encoding="utf-8")
-            print(f"→ Wrote {feed_path} ({len(posts)} post(s))")
+            n_audio: int = sum(
+                1 for p, _, _, _ in posts
+                if p.with_suffix("").as_posix() in audio_entries
+            )
+            audio_note: str = (
+                f", {n_audio} with audio enclosure" if audio_entries else ""
+            )
+            print(f"→ Wrote {feed_path} ({len(posts)} post(s){audio_note})")
         else:
             print(f"→ No posts found in {feed_dir}; skipping feed.")
 

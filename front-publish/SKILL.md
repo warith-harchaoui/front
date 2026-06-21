@@ -126,6 +126,25 @@ plain_language.py  # optional: simplify draft copy
 
 Then run `front-a11y/scripts/lint_a11y.py` over the output and `front-a11y/scripts/audit_contrast.py` over the palette before declaring "done".
 
+**Optional editorial step** — audio narration per post:
+
+```text
+narrate_post.py            # one MP3 per Markdown post (opt-in)
+↓
+site_indexes.py            # re-run with --audio-manifest to inject
+                           # <enclosure> rows → RSS feed = podcast feed
+```
+
+The narration pipeline is **not WCAG-required** (screen readers cover
+text accessibility); it's an editorial choice for multitasking
+audience / podcast positioning / cognitive-accessibility alternative
+formats. Triggered by "narrate this post", "audio version of the
+blog", "podcast feed from posts", "TTS this article". See
+`references/audio-narration.md` for the placement rules (player
+top-of-article), engine matrix (OpenVoice v2 + ChatterboxTTS, both
+MIT for code AND weights), voice cloning ethics, and Schema.org /
+OpenGraph metadata.
+
 ## When NOT to use this skill
 
 - Versioned docs (semantic versioning, side-by-side per-release docs) → Hugo / MkDocs Material / Docusaurus.
@@ -137,6 +156,7 @@ Then run `front-a11y/scripts/lint_a11y.py` over the output and `front-a11y/scrip
 - `references/meta-tags.md` — `<meta>` tags per W3C / WHATWG + Open Graph + Twitter Cards + Schema.org JSON-LD.
 - `references/site-indexes.md` — robots.txt, sitemap.xml, llms.txt, Atom / RSS, humans.txt.
 - `references/plain-language.md` — rewrite copy at a target reading level; preserves meaning.
+- `references/audio-narration.md` — *(optional editorial enhancement, not WCAG-required)* turn a Markdown post into a narrated WAV/MP3 via OpenVoice v2 or ChatterboxTTS (both MIT for code AND weights). Structural narration hints from headings / lists / blockquotes / emoji, optional LLM enrichment via the same local Ollama daemon already used for alt-text, voice cloning from a 6-30 s designer-supplied sample, RSS enclosure injection turns the blog feed into a podcast feed.
 - `references/i18n.md` — multilingual frontend (URL strategy, `Intl.*`, plurals, RTL, persisted choice). Default language pair is configurable per project (EN/FR, EN/DE, EN/ES, EN/JA, …).
 
 ## Scripts
@@ -147,7 +167,11 @@ Then run `front-a11y/scripts/lint_a11y.py` over the output and `front-a11y/scrip
 | `scripts/meta_from_ollama.py` | `pip install -r scripts/requirements-meta-tags.txt` + Ollama | Drafts title / description / OG / Twitter / JSON-LD from a goal or HTML page |
 | `scripts/site_indexes.py` | stdlib only | robots.txt + sitemap.xml + llms.txt + Atom / RSS + humans.txt |
 | `scripts/plain_language.py` | `pip install -r scripts/requirements-plain-language.txt` + Ollama | Rewrites copy at a target grade; strips marketing voice |
-| `scripts/_lang.py`, `scripts/_ollama.py` | (internal helpers) | Language detection + Ollama client shared by other scripts |
+| `scripts/narrate_post.py` *(optional)* | `pip install -r scripts/requirements-narrate-{openvoice\|chatterbox}.txt` + `install_narrate.py` | Narrate a Markdown post via local OSS TTS. Engine-agnostic orchestrator; default off. Editorial enhancement, not WCAG-required. |
+| `scripts/narrate_openvoice.py` / `narrate_chatterbox.py` *(optional)* | as above | Engine wrappers invoked as subprocesses by `narrate_post.py`. |
+| `scripts/pick_voice.py` *(optional)* | as above | Lists engine voices + generates per-voice demo clips so the designer chooses by listening. |
+| `scripts/install_narrate.py` *(optional)* | subprocess | Downloads OpenVoice v2 checkpoints + sets up the ChatterboxTTS voice library directory. |
+| `scripts/_lang.py`, `scripts/_ollama.py`, `scripts/_narrate.py` | (internal helpers) | Language detection + Ollama client + narration segment extractor shared by other scripts |
 
 ## Companion skills
 
