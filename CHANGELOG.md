@@ -18,6 +18,178 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.5.0] — 2026-06-21
+
+Minor release. New optional editorial feature in `front-publish`:
+**audio narration of long-form posts** via two MIT-licensed local TTS
+engines (OpenVoice v2 + ChatterboxTTS — both shipping MIT licences
+on code AND model weights, no licensing trap). Structural narration
+hints derived from the Markdown tree; optional enrichment via the
+same local Ollama daemon already used for alt-text and meta tags;
+voice cloning from a 6-30 s designer-supplied sample. RSS feed
+auto-becomes a podcast feed.
+
+**Honest framing**: pre-recorded audio for long-form text is **not a
+WCAG 2.x requirement** (screen readers already cover that case). The
+feature targets multitasking audience, podcast positioning, and the
+"alternative format" direction of WAI-COGA / WCAG 3.0 drafts. The
+narration scripts live in `front-publish`, not `front-a11y`, to keep
+this distinction visible.
+
+### Added — narration pipeline
+
+- **`front-publish/scripts/_narrate.py`** — shared helper. Parses a
+  Markdown post into a list of `Segment` dicts (one per heading /
+  paragraph / list item / blockquote), each carrying narration
+  hints derived from Markdown structure: heading-level → pause
+  length (H1: 1500 ms, H2: 1000 ms, H3+: 700 ms), list-item
+  enumeration cue, blockquote wrapped with "Quote: ... End quote."
+  + lower intensity, emoji-driven emotion baseline (30+ common
+  emojis mapped), inline `[emotion: cheerful]` / `[emotion: default]`
+  author overrides, frontmatter `narration.tone` + `narration.pace`
+  baselines. Manifest cache keyed on
+  `(source_sha256, engine, voice)` so re-runs short-circuit on
+  unchanged posts. Pure-Python — no ML deps in the test path.
+- **`front-publish/scripts/narrate_post.py`** — orchestrator. Reads
+  the post, extracts segments, applies pronunciation overrides
+  (`pronunciation.yaml` per-post or project-root), optionally
+  enriches each segment via Ollama (`--ai-hints`, off by default,
+  fail-soft when the daemon is down), dispatches to the chosen
+  engine wrapper via subprocess, writes audio + manifest entry.
+  Engine wrappers are subprocesses so the orchestrator's import
+  graph stays light and the deterministic test path never sees
+  torch.
+- **`front-publish/scripts/narrate_openvoice.py`** — OpenVoice v2
+  engine wrapper. Built-in voices (`base-en-default`,
+  `base-en-friendly`, `base-en-cheerful`, `base-en-sad`,
+  `base-en-whispering`, `base-es-default`, `base-fr-default`) plus
+  zero-shot voice cloning from `--voice-sample <wav>`. Strength:
+  cross-lingual — an English reference clone speaks French text
+  with the cloned voice. Emotion mapped onto OpenVoice's native
+  category set.
+- **`front-publish/scripts/narrate_chatterbox.py`** — ChatterboxTTS
+  engine wrapper. Continuous `exaggeration` (0.0–2.0) and
+  `cfg_weight` (0.0–1.0) dials. Project hint mapping:
+  emotion + intensity → exaggeration (neutral=0.5, cheerful=0.8,
+  enthusiastic=1.0, angry=1.2, whispering=0.2, etc.; clamped to
+  the engine's valid range). Strength: more expressive than
+  OpenVoice; better for opinion / essay / mood-swing writing.
+- **`front-publish/scripts/pick_voice.py`** — voice picker for the
+  designer. Lists built-in voices per installed engine, optionally
+  generates a one-sentence demo clip per voice
+  (`--sample [--text "..."]`) into `out/voice-samples/<engine>/`.
+  Designer listens, picks the one that fits, then uses
+  `--voice <name>` on `narrate_post.py`.
+- **`front-publish/scripts/install_narrate.py`** — install helper
+  (mirrors `install_alt_ai.py` / `install_captions.py` from
+  front-a11y). Downloads OpenVoice v2 checkpoints into
+  `~/.cache/front-skill/openvoice/`; triggers ChatterboxTTS' lazy
+  weight pull into `~/.cache/huggingface/` and creates the voices
+  library directory. Does not auto-install the heavy Python
+  packages — pip is the canonical channel via the per-engine
+  requirements files.
+- **`requirements-narrate-openvoice.txt`** + **`-chatterbox.txt`**
+  — per-engine deps, install one or both. Engine wrappers
+  fail-soft via `--check` mode so the orchestrator detects missing
+  installs without crashing.
+
+### Added — LLM enrichment hook
+
+- Per-segment classification via Ollama (`--ai-hints`, default off).
+  Default model `gemma4:e2b` — same as `alt_from_ollama.py`, so the
+  user only needs one model pulled. The model receives the
+  segment + adjacent segments + kind + baseline as context and
+  returns strict JSON: emotion / intensity / pace /
+  pause_before_ms / pause_after_ms / emphasis_word. Output is
+  clamped to safe bounds and merged with structural baselines —
+  structure is the source of truth, LLM overrides on specifics.
+- `--ai-hints-only` flag prints the enriched segment list as JSON
+  and exits without invoking the TTS engine. Lets the author
+  review the LLM's calls before paying GPU/CPU time.
+- Fail-soft: Ollama unreachable → narration continues on
+  structural defaults. The deterministic test suite never depends
+  on the daemon.
+
+### Added — RSS / Atom audio enclosure
+
+- **`front-publish/scripts/site_indexes.py`** gained an
+  `--audio-manifest` flag. When passed, every post that has a
+  matching narration manifest entry receives an `<enclosure>` row
+  (RSS) or `<link rel="enclosure">` (Atom). The blog feed becomes
+  a podcast feed any app can subscribe to with zero extra hosting.
+- New `AudioEntry` dataclass + `load_audio_manifest()` helper
+  normalise the narration manifest into a feed-ready
+  `{post_stem: AudioEntry}` mapping. MIME type derived from the
+  audio extension (`.wav` → `audio/wav`, `.mp3` → `audio/mpeg`,
+  etc.); `length_bytes` populated from the on-disk file when
+  `--audio-root` resolves to the public directory.
+
+### Added — reference doc
+
+- **`front-publish/references/audio-narration.md`** — full
+  long-form reference: quick-start, voice-cloning ethics
+  (GDPR Article 9 biometric data, BIPA, right-of-publicity in CA
+  / NY / TN), engine matrix (with the explicit reason F5-TTS and
+  XTTS-v2 are excluded — non-commercial weights), placement rule
+  (audio player top-of-article with duration estimate, download
+  link, `preload="none"`), RSS enclosure pattern, Schema.org
+  `Article.audio` → `AudioObject`, OpenGraph `og:audio` snippet,
+  inline `[emotion: X]` author convention, "when to outgrow this
+  pipeline" honesty (memoir / streaming TTS / multi-voice dialogue
+  → out of scope).
+
+### Added — tests
+
+- **`tests/test_narrate.py`** — 39 deterministic tests.
+  Coverage: segment extraction (10 cases — heading levels,
+  lists, blockquotes, inline markup, images, HTML tags,
+  frontmatter tone, emoji emotion, inline `[emotion: X]` markers,
+  heading reset of sticky emotion), pronunciation overrides
+  (4 cases — whole-word, longest-token-wins, empty-overrides
+  noop, per-post then project-root lookup), `source_sha256`
+  + manifest round-trip + corrupt-input soft-failure (4 cases),
+  `merge_llm_hint` clamping + key preservation (5 cases),
+  ChatterboxTTS emotion → exaggeration mapping (4 cases),
+  `site_indexes.load_audio_manifest` + `render_rss` /
+  `render_atom` enclosure injection (6 cases), and an end-to-end
+  cache short-circuit assertion that exercises the orchestrator
+  without installing an engine. Pure stdlib + PyYAML — no torch,
+  no Ollama, no network. **Total deterministic suite: 423 tests
+  (up from 384).**
+
+### Changed — `front-publish/SKILL.md`
+
+- New row in the "What it does" trigger table for narration
+  (clearly marked **optional editorial enhancement**).
+- New "Optional editorial step" workflow block in "Tool
+  composition" showing `narrate_post.py` → `site_indexes.py
+  --audio-manifest` chain.
+- Reference list gains `references/audio-narration.md`.
+- Scripts table gains `narrate_post.py`, `narrate_openvoice.py`,
+  `narrate_chatterbox.py`, `pick_voice.py`, `install_narrate.py`.
+
+### Changed — version bumps
+
+- All four `SKILL.md` files bumped `0.4.1 → 0.5.0` (minor — new
+  user-facing feature in `front-publish`).
+
+### Honest gaps deliberately not addressed
+
+- **Engine wrappers not exercised in CI.** Each requires
+  ~1 GB of model weights and minutes of CPU/GPU per post.
+  The wrappers ship a `--check` mode so the orchestrator can
+  detect missing installs; the orchestration logic itself is
+  covered by mock-subprocess tests.
+- **No automatic audio embedding in HTML output.** The
+  reference doc documents the `<audio>` + Schema.org +
+  OpenGraph pattern; the `meta_from_ollama.py` script does not
+  yet auto-inject these tags from a manifest. Deferred —
+  current rendering is editorial.
+- **No automatic MP3 transcoding.** Engine wrappers produce
+  WAV (lossless). For distribution-size MP3, run `ffmpeg
+  -i in.wav -b:a 96k out.mp3` separately. Documented in
+  the reference, not yet automated.
+
 ## [0.4.1] — 2026-06-21
 
 Hardening release. Closes a critical correctness gap audit found in

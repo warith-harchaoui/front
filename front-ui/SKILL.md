@@ -14,7 +14,7 @@ description: >-
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.4.1
+  version: 0.5.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
