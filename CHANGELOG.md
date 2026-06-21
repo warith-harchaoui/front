@@ -18,6 +18,111 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.4.1] — 2026-06-21
+
+Hardening release. Closes a critical correctness gap audit found in
+the validation layer, plus a doc lie. **All four `SKILL.md`
+frontmatters were silently YAML-invalid for every release through
+0.4.0** — `yaml.safe_load` rejected them with
+`mapping values are not allowed here` because of unquoted `:`
+characters in `description` (`Trigger phrases: "..."`). The regex
+frontmatter check in `front-ui/scripts/validate.py` saw the
+`---...---` delimiters and reported PASS, so CI never noticed.
+Claude / OpenCode runtimes call a real YAML parser; depending on the
+client this either reduced the skill to a bare slug or rejected it
+outright. No behaviour change in any shipped script.
+
+### Fixed — SKILL.md YAML frontmatters
+
+- Rewrote `description:` in every `SKILL.md` as a folded block scalar
+  (`>-`) so the `:` characters inside the value are no longer parsed
+  as map separators. Verified with `yaml.safe_load` on each. Lengths:
+  709 (front-ui), 754 (front-cli-gui), 889 (front-publish), 870
+  (front-a11y) — all within the Anthropic 50–1024 char cap. Body
+  unchanged.
+- Fixed `SECURITY.md` claim "no signed release, no checksum file" —
+  releases have shipped `SHA256SUMS` since v0.3.0. New text states
+  the integrity-vs-authenticity distinction honestly: checksums yes,
+  GPG signature no.
+
+### Added — real validator + negative tests
+
+- **`scripts/validate_skill.py`** — stdlib + PyYAML, parses each
+  `SKILL.md` frontmatter with `yaml.safe_load` and checks: name
+  present + matches folder, description present + 50–1024 chars, body
+  non-empty, no `TODO`/`TBD`/`FIXME`/`XXX` placeholders. Importable
+  as `validate_skill(Path) -> list[str]` or callable as a CLI.
+- **`scripts/validate_all.py`** — repo-wide orchestrator. Runs the
+  strict YAML validator across all four skills, then runs the
+  existing `front-ui/scripts/validate.py` content gate (framework
+  imports, trademarks, marketing voice, INDEX.md path resolution).
+  One exit code; one CI step.
+- **`tests/test_validate_skill.py`** — 17 tests:
+  - Each shipped skill passes (parametrised, 4 tests).
+  - Negative cases under `tmp_path`: missing SKILL.md, invalid YAML
+    (the exact bug above), missing/empty name, missing/empty
+    description, name ≠ folder, no frontmatter at all, empty body,
+    description too short, description too long, placeholder in
+    SKILL.md. 10 tests.
+  - CLI contract: exit zero on all-pass, non-zero on broken YAML,
+    `validate_all.py` exits zero on the shipped repo. 3 tests.
+- **`PyYAML>=6.0`** added to `requirements-dev.txt`.
+
+### Added — release packaging smoke test
+
+- **`tests/test_release_packaging.py`** — 19 tests, run end-to-end:
+  builds the tarballs via `scripts/release.sh 0.0.0-test` into a
+  module-scoped `tmp_path`, then verifies:
+  - five tarballs + `SHA256SUMS` (no extras, no missing),
+  - every declared SHA-256 matches the artifact on disk,
+  - each per-skill tarball extracts to the expected folder,
+  - the extracted `SKILL.md` re-passes the strict validator,
+  - no banned paths (`__pycache__`, `.DS_Store`, `.git/`,
+    `__MACOSX`, `.pytest_cache`, `.mypy_cache`, `.ruff_cache`) ride
+    along,
+  - every `scripts/...` / `references/...` / `assets/...` backticked
+    path in `SKILL.md` exists in the archive (caught the
+    `assets/fonts/inter/` reference that wasn't a real directory),
+  - bundle tarball contains every skill,
+  - per-skill tarball ≤ 10 MB (catches accidental model / fixture
+    inclusion).
+
+### Added — front-ui `assets/fonts/inter/`
+
+- New folder with a `README.md` documenting the Inter swap recipe
+  (same instructions as `references/stack-tailwind.md`, now landed at
+  the path the SKILL.md actually points at). Inter WOFF2 files
+  remain user-supplied — the folder is the landing pad. Resolves the
+  dangling reference caught by the new packaging smoke test.
+
+### Changed — CI gates the YAML validator
+
+- `.github/workflows/ci.yml` now runs `python scripts/validate_all.py`
+  in addition to the existing front-ui content gate, on the existing
+  Python 3.10 / 3.11 / 3.12 matrix. A PR that breaks any SKILL.md's
+  YAML fails CI even if the deterministic test suite somehow doesn't.
+
+### Changed — docs aligned with reality
+
+- **README + LISEZMOI** "Install" section: added an explicit
+  `python3 scripts/validate_all.py` verification step after the
+  on-disk install, and a new "Install from source" subsection
+  walking the clone / pip / pytest / validate / cp flow for
+  contributors. New "Trust model" / "Modèle de confiance" subsection
+  states the SHA-256-yes / GPG-no posture and points at
+  `SECURITY.md`.
+- **`SECURITY.md`** Supply-chain notes rewritten: two install paths
+  documented honestly (release + git-clone), what we sign vs don't,
+  upstream registries named, validators and pytest as the local
+  trust-but-verify path.
+
+### Notes
+
+- No version bump for the shipped scripts themselves — behaviour is
+  unchanged.
+- SKILL.md `metadata.version` bumped `0.4.0 → 0.4.1` in all four
+  files to align the on-disk skill version with this release tag.
+
 ## [0.4.0] — 2026-06-21
 
 Minor release. Adds the three-state colour-scheme toggle component
