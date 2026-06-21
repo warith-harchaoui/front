@@ -95,6 +95,14 @@ Pour des sites réels déjà livrés sur cette pile, voir
   privilégie `<button>` / `<a>` / `<label>` / `<dialog>` / `<form>`,
   expose un anneau de focus visible, respecte `prefers-reduced-motion`,
   et garantit une cible tactile d'au moins 44 × 44 px.
+- Le code expose un **toggle 🌞 Light / 🌚 Dark / 🌗 Auto**
+  (placement canonique : haut-droite du header sticky → coin
+  bas-droite du footer → ancrage fixed bottom-right quand il n'y a
+  pas de header). **Auto est le défaut**, pour qu'un visiteur frais
+  hérite du choix de son OS et ne soit jamais surpris par un thème
+  forcé. Composant :
+  `front-ui/assets/components/theme-toggle.html`. Câblage :
+  `front-ui/references/stack-vanilla-js.md` § « Theme switching ».
 - Les choix de couleur renvoient aux palettes de
   `front-ui/references/color-psychology.md` (source :
   <https://harchaoui.org/warith/colors/>).
