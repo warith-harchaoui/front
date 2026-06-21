@@ -1,6 +1,18 @@
 ---
 name: front-publish
-description: Turn a folder of Markdown files (README + docs/ + blog/) into a static website, draft per-page meta tags (title + description + Open Graph + Twitter Card + Schema.org JSON-LD), generate the full favicon / app-icon / PWA-icon set from a single logo, emit robots.txt + sitemap.xml + llms.txt + Atom or RSS feed + humans.txt, and rewrite UI copy in plain language at a target reading level. For solo developers and small teams who have content (Markdown, a logo, draft copy) and need a deployable site without standing up Hugo, Astro, Docusaurus or Next. Trigger phrases: "turn these markdown files into a website", "meta tags", "OG card", "favicons", "app icons", "PWA icons", "robots.txt", "sitemap", "llms.txt", "Atom feed", "RSS", "plain language", "rewrite at grade N", "simplify this copy". Output follows the front-ui stack rules — install front-ui alongside for full design tokens.
+description: >-
+  Turn a folder of Markdown files (README + docs/ + blog/) into a static
+  website, draft per-page meta tags (title + description + Open Graph +
+  Twitter Card + Schema.org JSON-LD), generate the full favicon / app-icon /
+  PWA-icon set from a single logo, emit robots.txt + sitemap.xml + llms.txt +
+  Atom or RSS feed + humans.txt, and rewrite UI copy in plain language at a
+  target reading level. For solo developers and small teams who have content
+  (Markdown, a logo, draft copy) and need a deployable site without standing
+  up Hugo, Astro, Docusaurus or Next. Trigger phrases: "turn these markdown
+  files into a website", "meta tags", "OG card", "favicons", "app icons", "PWA
+  icons", "robots.txt", "sitemap", "llms.txt", "Atom feed", "RSS", "plain
+  language", "rewrite at grade N", "simplify this copy". Output follows the
+  front-ui stack rules — install front-ui alongside for full design tokens.
 license: Unlicense
 metadata:
   author: Warith Harchaoui

@@ -142,10 +142,18 @@ cp -r front-publish ~/.claude/skills/   # only if you ship docs sites
 cp -r front-a11y    ~/.claude/skills/   # only if you need a11y gates
 ```
 
-Verify:
+Verify the install on disk:
 
 ```bash
 ls ~/.claude/skills/front-ui/SKILL.md
+```
+
+Verify the SKILL.md is well-formed (real YAML, name matches folder,
+description in the Anthropic 50–1024 char range):
+
+```bash
+# Run once from a clone of this repo (the validator is stdlib + PyYAML)
+python3 scripts/validate_all.py
 ```
 
 If you only need a single skill, download its per-skill tarball instead
@@ -170,13 +178,45 @@ cp -r front-* ~/.opencode/skills/
 Use OpenCode when you want skill behavior without provider lock-in, or
 when you're already running OpenCode as your daily driver.
 
+### Install from source (contributor / developer path)
+
+If you want to iterate on the skills themselves, or pin to a specific
+commit that hasn't been tagged, clone and copy directly. No checksum
+step here — you're responsible for verifying you cloned the commit you
+intended.
+
+```bash
+git clone https://github.com/warith-harchaoui/front.git
+cd front
+python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
+python3 -m pytest                                # 360+ deterministic tests
+python3 scripts/validate_all.py                  # 4 skills × YAML + content
+mkdir -p ~/.claude/skills
+cp -r front-ui      ~/.claude/skills/            # always
+cp -r front-a11y    ~/.claude/skills/            # optional companions
+```
+
+`CONTRIBUTING.md` walks the same flow at the contributor level.
+
 ### Upgrading
 
-To upgrade, repeat the steps with a newer `VERSION`. The on-disk
-skill folder name is stable, so `cp -r front-ui ~/.claude/skills/`
+To upgrade, repeat the release-based steps with a newer `VERSION`. The
+on-disk skill folder name is stable, so `cp -r front-ui ~/.claude/skills/`
 overwrites the previous install in place. The `SHA256SUMS` for each
 release is the source of truth — if the checksum check fails, do not
 install the artifact.
+
+### Trust model
+
+Short version: the repo ships text and Python scripts you can read
+top-to-bottom in under an hour. **Tagged releases carry SHA-256
+checksums** (integrity-against-corruption); they are **not
+GPG-signed** or Sigstore-attested today. If you need authenticity
+beyond a transport-integrity check, build from a tagged commit you've
+reviewed yourself — `scripts/release.sh` is in-tree and reproducible,
+and the `release.yml` workflow does nothing the script can't do
+locally. See [`SECURITY.md`](SECURITY.md) for the full supply-chain
+note.
 
 ### Shell completion
 

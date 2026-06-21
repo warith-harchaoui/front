@@ -56,6 +56,32 @@ problem so users can act on the same information.
   you need reproducibility.
 - Bundled fonts ship under their own license
   (Montserrat: SIL OFL). See `LICENSE.md` for the carve-out.
-- Distribution today is `git clone` + `cp -r`. There is no signed
-  release, no checksum file. Treat the repo like any other
-  public-domain source: read what you copy.
+- **Distribution channels.** Two supported install paths:
+  1. **Tagged GitHub release** (recommended). Each release ships
+     per-skill tarballs, a four-skill bundle tarball, and a single
+     `SHA256SUMS` file built by `scripts/release.sh` and published by
+     the `release.yml` workflow on every `v*.*.*` tag push. Users
+     verify with `shasum -a 256 -c SHA256SUMS` (or `sha256sum -c`)
+     before extracting — README's *Install* section walks the full
+     flow.
+  2. **`git clone` + `cp -r`** (developer / contributor path). No
+     verification step beyond `git fsck`. Documented in
+     `CONTRIBUTING.md`.
+- **What we don't sign yet.** Release artifacts carry SHA-256 checksums
+  but are **not GPG-signed** and are **not Sigstore-attested**.
+  Treat the checksum as integrity proof against transport corruption,
+  not as authenticity proof of the maintainer. If you need
+  authenticity, build from a tagged commit you've reviewed yourself
+  (the `release.yml` workflow is in-tree and reproducible).
+- **What lives in the supply chain.** Direct upstream registries:
+  PyPI (`pip install -r requirements-dev.txt`), the Ollama registry
+  (model pulls), Hugging Face mirrors (whisper.cpp model files), the
+  jsDelivr `gh` proxy (Tailwind Play CDN in prototype mode). No
+  vendored binaries, no auto-updaters.
+- **Trust model — short version.** This repo ships text and Python
+  scripts you can read top-to-bottom in under an hour. Read what you
+  install. The validators (`scripts/validate_all.py`,
+  `front-ui/scripts/validate.py`) and the deterministic test suite
+  (`pytest`) run with stdlib + PyYAML only and never touch the
+  network; running them locally is a cheap way to confirm an install
+  is what it claims to be.

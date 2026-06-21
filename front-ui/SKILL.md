@@ -1,6 +1,16 @@
 ---
 name: front-ui
-description: Generate vanilla JavaScript + Tailwind CSS UI code — components, pages, forms, dialogs, dashboards — for solo developers and small teams shipping internal tools without a designer. Default typeface Montserrat (swap to Inter for dense dev UI). Output is semantic HTML + Tailwind utility classes + vanilla ES modules with dark-mode peers, focus rings, reduced-motion guards. Use it for "build a UI", "create a component", "design a page", "make a form / modal / button / nav", "scaffold a landing", "build a web app", "audit this UI". Companion skills: front-cli-gui (wrap a CLI in a GUI), front-publish (Markdown → website + meta tags + favicons), front-a11y (a11y lint, contrast audit, alt text, captions).
+description: >-
+  Generate vanilla JavaScript + Tailwind CSS UI code — components, pages,
+  forms, dialogs, dashboards — for solo developers and small teams shipping
+  internal tools without a designer. Default typeface Montserrat (swap to
+  Inter for dense dev UI). Output is semantic HTML + Tailwind utility classes
+  + vanilla ES modules with dark-mode peers, focus rings, reduced-motion
+  guards. Use it for "build a UI", "create a component", "design a page",
+  "make a form / modal / button / nav", "scaffold a landing", "build a web
+  app", "audit this UI". Companion skills: front-cli-gui (wrap a CLI in a
+  GUI), front-publish (Markdown → website + meta tags + favicons), front-a11y
+  (a11y lint, contrast audit, alt text, captions).
 license: Unlicense
 metadata:
   author: Warith Harchaoui

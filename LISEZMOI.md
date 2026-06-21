@@ -198,10 +198,18 @@ cp -r front-publish ~/.claude/skills/   # uniquement pour les sites de doc
 cp -r front-a11y    ~/.claude/skills/   # uniquement pour les portes a11y
 ```
 
-Vérification :
+Vérifier l'installation sur disque :
 
 ```bash
 ls ~/.claude/skills/front-ui/SKILL.md
+```
+
+Vérifier que les SKILL.md sont valides (vrai YAML, `name` aligné sur
+le dossier, description dans la plage Anthropic 50–1024 caractères) :
+
+```bash
+# À lancer une fois depuis un clone du dépôt (stdlib + PyYAML)
+python3 scripts/validate_all.py
 ```
 
 Si vous n'avez besoin que d'un seul skill, téléchargez sa tarball
@@ -227,13 +235,46 @@ cp -r front-* ~/.opencode/skills/
 À privilégier si vous voulez l'expérience des skills sans dépendance à
 un fournisseur unique, ou si OpenCode est déjà votre outil quotidien.
 
+### Installation depuis les sources (contributeur / développeur)
+
+Pour itérer sur les skills eux-mêmes, ou pour épingler un commit qui
+n'est pas encore tagué, clonez et copiez directement. Pas de
+vérification de somme de contrôle ici — c'est à vous de garantir que
+vous avez bien cloné le commit voulu.
+
+```bash
+git clone https://github.com/warith-harchaoui/front.git
+cd front
+python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
+python3 -m pytest                                # 360+ tests déterministes
+python3 scripts/validate_all.py                  # 4 skills × YAML + contenu
+mkdir -p ~/.claude/skills
+cp -r front-ui      ~/.claude/skills/            # toujours
+cp -r front-a11y    ~/.claude/skills/            # compagnons optionnels
+```
+
+`CONTRIBUTING.md` reprend le même flux côté contributeur.
+
 ### Mise à jour
 
-Pour mettre à jour, recommencez la procédure avec une `VERSION` plus
-récente. Le nom du dossier installé est stable, donc
+Pour mettre à jour, recommencez la procédure release avec une
+`VERSION` plus récente. Le nom du dossier installé est stable, donc
 `cp -r front-ui ~/.claude/skills/` écrase l'install précédente sur
 place. Le `SHA256SUMS` de chaque release fait foi : si la vérification
 échoue, n'installez pas l'artefact.
+
+### Modèle de confiance
+
+En bref : le dépôt livre du texte et des scripts Python qui se lisent
+de haut en bas en moins d'une heure. **Les releases taguées portent
+des sommes de contrôle SHA-256** (intégrité contre la corruption en
+transit) ; elles ne sont **pas signées GPG** ni attestées Sigstore
+aujourd'hui. Si vous avez besoin d'authenticité au-delà d'une preuve
+d'intégrité, construisez à partir d'un commit tagué que vous avez
+relu vous-même — `scripts/release.sh` est dans l'arbre et reproductible,
+et le workflow `release.yml` ne fait rien que le script ne fasse en
+local. Voir [`SECURITY.md`](SECURITY.md) pour la note complète
+chaîne d'approvisionnement.
 
 ### Complétion shell
 

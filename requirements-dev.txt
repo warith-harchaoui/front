@@ -10,6 +10,11 @@
 # Fast deterministic test suite under tests/
 pytest>=8.0.0
 
+# Real YAML parser for SKILL.md frontmatter validation.
+# Used by scripts/validate_skill.py + tests/test_validate_skill.py;
+# the regex-only frontmatter check is no longer trusted as the gate.
+PyYAML>=6.0
+
 # Optional: LLM-output quality assertions under tests/eval/.
 # These tests need a running Ollama daemon and are marked with
 # ``@pytest.mark.eval`` so they are NOT collected in the default run.

@@ -33,6 +33,10 @@ SKILL_SCRIPTS_DIRS = (
 for d in SKILL_SCRIPTS_DIRS:
     sys.path.insert(0, str(d))
 
+# Repo-root scripts/ holds the shared validators (validate_skill,
+# validate_all) and the packaging helpers; expose them to the test suite.
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
 
 @pytest.fixture(autouse=True)
 def isolate_cache(tmp_path, monkeypatch):

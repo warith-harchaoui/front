@@ -1,6 +1,18 @@
 ---
 name: front-a11y
-description: Pre-commit accessibility tooling for vanilla-JS + Tailwind output — static a11y lint over HTML files (14 rules, no browser), WCAG contrast audit with OKLCH-neighbour fix suggestions, color-vision-deficiency (protanopia / deuteranopia / tritanopia) simulation, W3C-compliant alt-text drafting via a local Ollama vision model, and WebVTT / SRT captions from a local whisper.cpp. For solo developers and small teams who need a fast, deterministic, CI-friendly gate before shipping — NOT a replacement for axe-core / Pa11y / Lighthouse (runtime DOM audits catch what a static parser cannot). Trigger phrases: "a11y lint", "WCAG check", "contrast audit", "is my palette accessible", "alt text for this image", "describe this image", "captions", "transcript", "colorblind preview", "deuteranope", "CVD". Output is JSON / stdout / exit codes suitable for pre-commit and CI.
+description: >-
+  Pre-commit accessibility tooling for vanilla-JS + Tailwind output — static
+  a11y lint over HTML files (14 rules, no browser), WCAG contrast audit with
+  OKLCH-neighbour fix suggestions, color-vision-deficiency (protanopia /
+  deuteranopia / tritanopia) simulation, W3C-compliant alt-text drafting via a
+  local Ollama vision model, and WebVTT / SRT captions from a local
+  whisper.cpp. For solo developers and small teams who need a fast,
+  deterministic, CI-friendly gate before shipping — NOT a replacement for axe-
+  core / Pa11y / Lighthouse (runtime DOM audits catch what a static parser
+  cannot). Trigger phrases: "a11y lint", "WCAG check", "contrast audit", "is
+  my palette accessible", "alt text for this image", "describe this image",
+  "captions", "transcript", "colorblind preview", "deuteranope", "CVD". Output
+  is JSON / stdout / exit codes suitable for pre-commit and CI.
 license: Unlicense
 metadata:
   author: Warith Harchaoui

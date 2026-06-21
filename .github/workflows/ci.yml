@@ -46,10 +46,20 @@ jobs:
           pip install ./front-cli
 
       - name: Run deterministic test suite
+        # Includes tests/test_validate_skill.py (real YAML check on every
+        # SKILL.md + negative cases) and tests/test_release_packaging.py
+        # (build the tarballs into a tmp dir, verify SHA256SUMS, extract,
+        # re-validate each skill). Both run with stdlib + PyYAML and
+        # never touch the network — they belong in the default lane.
         run: python -m pytest -q
 
-      - name: Validate front-ui assets
-        run: python front-ui/scripts/validate.py
+      - name: Validate every skill (YAML + content gate)
+        # Strict YAML frontmatter check on the four shipped skills
+        # (scripts/validate_skill.py) followed by the front-ui content
+        # quality gate (forbidden framework imports, trademarks,
+        # marketing voice). A PR that breaks any SKILL.md's YAML fails
+        # here even if pytest somehow does not.
+        run: python scripts/validate_all.py
 
       - name: Collect eval suite (do not run)
         # The eval marker is deselected in pytest.ini; `--collect-only` plus
