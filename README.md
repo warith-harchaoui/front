@@ -77,7 +77,7 @@ already shipped on the stack, see [GALLERY.md](GALLERY.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.4.0`. The four skill folders are stable; the only WiP area is **audio captions**.
+A snapshot of where each surface stands at `v0.4.1`. The four skill folders are stable; the only WiP area is **audio captions**.
 
 | Area | Status | Notes |
 |---|---|---|
@@ -124,7 +124,7 @@ between updates.
 
 ```bash
 # 1. Download a tagged release
-VERSION=0.4.0
+VERSION=0.4.1
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
