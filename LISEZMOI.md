@@ -134,7 +134,7 @@ Pour des sites réels déjà livrés sur cette pile, voir
 
 ## État d'avancement
 
-Photographie de l'état de chaque surface à `v0.6.1`. Les quatre dossiers
+Photographie de l'état de chaque surface à `v0.6.2`. Les quatre dossiers
 de skills sont stables ; la seule zone en travaux est l'**audio /
 sous-titres** (front-a11y, vidéo → texte). La nouvelle **narration
 audio** (front-publish, texte → audio) est stable et explicitement
@@ -169,7 +169,7 @@ reste.
 | Une image (`*.png`, `*.jpg`, …) | « Texte alternatif pour cette image » | `front-a11y` | Texte alternatif conforme W3C dans la bonne catégorie (informatif / décoratif / fonctionnel / texte / complexe / groupe), rédigé dans la langue de la page, marqué `data-alt-source="ai"`. |
 | Un fichier audio ou vidéo (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | « Sous-titres / transcription » | `front-a11y` *(en travaux)* | Sous-titres WebVTT / SRT / texte brut depuis whisper.cpp local, avec biais de vocabulaire issu du projet. Extrait `<video>` + `<track kind="captions">` à coller. Le script et les tests sont là aujourd'hui ; les baselines WER par langue et le clip de référence pour le biais de vocabulaire sont encore à collecter — voir [État d'avancement](#état-davancement). |
 | Un logo (`logo.png` / `.svg`) | « Jeu de favicons » / « Icônes PWA » | `front-publish` | `favicon.svg` + `.ico` + lot de PNG + `apple-touch-icon.png` + icône PWA masquable + `site.webmanifest` + extrait `head.html`. |
-| Une description d'objectif ou une page HTML | « Meta tags » / « SEO » / « OG card » | `front-publish` | Titre + description + Open Graph + Twitter Card + JSON-LD Schema.org. JSON sur stdout. |
+| Une description d'objectif ou une page HTML | « Meta tags » / « SEO » / « OG card » / « GEO » / « llms.txt » / « AI Overview » | `front-publish` | **Pour le SEO :** titre + description + Open Graph + Twitter Card + JSON-LD Schema.org (JSON sur stdout) — voir [les trois piliers de Google Search Essentials](https://developers.google.com/search/docs/essentials) appliqués dans `front-publish/references/seo-essentials.md`. **Pour le GEO** (Generative Engine Optimization — surfaces de réponses AI Overview / Gemini / ChatGPT) : `llms.txt` est émis par `scripts/site_indexes.py` aux côtés de `robots.txt` + `sitemap.xml` + Atom/RSS, donc le site embarque un résumé Markdown lisible par les LLM dès qu'une commande « transforme ce dossier en site » se termine. Mêmes robots, mêmes permissions dans `robots.txt` — aucune balise meta « AI » n'existe ; toute affirmation contraire est fausse. |
 | Du copy d'IHM brut | « Langage clair » / « Réécris au niveau 6e » | `front-publish` | Même sens, voix marketing retirée, longueur de sortie ≤ 1,1× l'original. |
 | Une palette JSON | « Audit de contraste » / « Ma palette est-elle accessible ? » | `front-a11y` | Chaque paire `(label, surface)` parcourue, échecs listés avec la correction OKLCH voisine la plus proche. Sortie 1 sur échec. |
 | Une page finalisée / capture d'écran | « Vérif pré-livraison » | `front-ui` + `front-a11y` | La porte `checklist.md` exécutée ; lint + contraste + daltonisme passent ; copy / animation / performance vérifiés. |
@@ -190,7 +190,7 @@ stable qui ne dérive pas entre deux mises à jour.
 
 ```bash
 # 1. Téléchargez une release taguée
-VERSION=0.6.1
+VERSION=0.6.2
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \

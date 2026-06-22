@@ -78,7 +78,7 @@ already shipped on the stack, see [GALLERY.md](GALLERY.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.6.1`. The four skill folders are stable; the only WiP area is **audio captions** (front-a11y, video → text). The new **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
+A snapshot of where each surface stands at `v0.6.2`. The four skill folders are stable; the only WiP area is **audio captions** (front-a11y, video → text). The new **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
 
 | Area | Status | Notes |
 |---|---|---|
@@ -106,7 +106,7 @@ What you give the agent and what comes back. Each row is a self-contained flow �
 | An image file (`*.png`, `*.jpg`, …) | "Alt text for this image" | `front-a11y` | W3C-compliant alt text for the right purpose category (informative / decorative / functional / text / complex / group), in the page's language, tagged `data-alt-source="ai"`. |
 | An audio or video file (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | "Captions / transcript" | `front-a11y` *(work in progress)* | WebVTT / SRT / plain-text captions from local whisper.cpp, with project-vocab biasing. `<video>` + `<track kind="captions">` snippet. Script + tests ship today; per-language WER baselines and the vocab-biasing reference clip are still being collected — see [Status](#status). |
 | A logo (`logo.png` / `.svg`) | "Favicon set" / "PWA icons" | `front-publish` | `favicon.svg` + `.ico` + PNG set + `apple-touch-icon.png` + maskable PWA icon + `site.webmanifest` + a `head.html` snippet. |
-| A goal description or an HTML page | "Meta tags" / "SEO" / "OG card" | `front-publish` | Title + description + Open Graph + Twitter Card + Schema.org JSON-LD. JSON on stdout. |
+| A goal description or an HTML page | "Meta tags" / "SEO" / "OG card" / "GEO" / "llms.txt" / "AI Overview" | `front-publish` | **For SEO:** title + description + Open Graph + Twitter Card + Schema.org JSON-LD (JSON on stdout) — see [Google's three Search Essentials pillars](https://developers.google.com/search/docs/essentials) applied in `front-publish/references/seo-essentials.md`. **For GEO** (Generative Engine Optimization — AI Overview / Gemini / ChatGPT answer surfaces): `llms.txt` is emitted by `scripts/site_indexes.py` alongside `robots.txt` + `sitemap.xml` + Atom/RSS, so the site ships an LLM-readable Markdown summary the moment any "turn this into a website" run completes. Same crawlers, same `robots.txt` permissions — no separate "AI" meta tag exists; anything claiming one is wrong. |
 | Draft UI copy | "Plain language" / "Rewrite at grade 8" | `front-publish` | Same meaning, marketing voice stripped, output length ≤ 1.1× original. |
 | A palette JSON | "Contrast audit" / "Is my palette accessible?" | `front-a11y` | Every `(label, surface)` pair walked, failures listed with the nearest OKLCH-neighbour fix. Exit 1 on any failure. |
 | A finished page / screenshot | "Pre-ship check" | `front-ui` + `front-a11y` | The `checklist.md` gate executed; lint + contrast + CVD passes; copy / motion / performance verified. |
@@ -125,7 +125,7 @@ between updates.
 
 ```bash
 # 1. Download a tagged release
-VERSION=0.6.1
+VERSION=0.6.2
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
@@ -283,9 +283,9 @@ front/                                  ← repo root
 
 [Warith Harchaoui, Ph.D.](https://www.linkedin.com/in/warith-harchaoui/)
 
-Four small Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, and the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono). Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
+Four Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, and the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono). Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
-Special thanks to **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**, **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** and **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)** for fruitful discussions.
+Special thanks to [Audrey Dejoux](https://www.behance.net/dreyadesign/projects), [Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/) and [Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/) for fruitful discussions.
 
 Color palettes from <https://harchaoui.org/warith/colors/>.
 

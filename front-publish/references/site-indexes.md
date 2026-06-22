@@ -7,6 +7,8 @@ Generate the standard set of site-index files for a project's web output, respec
 | File | Spec | When |
 |---|---|---|
 | `robots.txt` | [Google Search Central — robots.txt](https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt) | Always |
+<!-- For the rules each of these files enforces in the larger SEO context — Google's three Search Essentials pillars + the AI Optimization Guide's foundations — see `seo-essentials.md` in this folder. -->
+
 | `sitemap.xml` | [sitemaps.org 0.9](https://www.sitemaps.org/protocol.html) | Always |
 | `llms.txt` | [llmstxt.org](https://llmstxt.org/) | Always |
 | `feed.atom` | [Atom 1.0 (RFC 4287)](https://datatracker.ietf.org/doc/html/rfc4287) | When a blog directory is detected (`posts/`, `blog/`, `articles/`) |

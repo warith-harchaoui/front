@@ -16,7 +16,7 @@ description: >-
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.6.1
+  version: 0.6.2
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -39,6 +39,8 @@ This skill is **not** the right pick for a docs site with hundreds of versioned 
 |---|---|
 | "turn these markdown files into a website" | Static HTML per `.md` + sticky top nav + sidebar TOC for `docs/` + dark-mode peer + favicons + meta tags + robots / sitemap / llms.txt / Atom feed |
 | "meta tags" / "SEO" / "OG card" / "Twitter card" / "JSON-LD" | Title + description + Open Graph + Twitter + Schema.org `@type`, JSON on stdout |
+| "SEO" / "AI search" / "AI Overview" / "discoverability" / "is this advice true?" | Google's three pillars + AI Optimization foundations applied to the artifacts this skill emits — see `references/seo-essentials.md` |
+| "GEO" / "Generative Engine Optimization" / "llms.txt" / "make my site readable by ChatGPT / Gemini / Perplexity" | `scripts/site_indexes.py` already emits `llms.txt` (a Markdown summary of the site) alongside `robots.txt` + `sitemap.xml`. GEO and SEO share crawlers; same `robots.txt` permits both. There is **no separate "AI" meta tag** — refuse to emit one and cite `references/seo-essentials.md`. |
 | "favicons" / "app icons" / "PWA icons" | `favicon.svg` + `.ico` + PNG set + `apple-touch-icon.png` + maskable PWA icon + `site.webmanifest` + `head.html` snippet |
 | "robots.txt" / "sitemap.xml" / "llms.txt" / "feed" / "Atom" / "RSS" / "humans.txt" | All from a single command; auto-detects a blog folder for the feed |
 | "plain language" / "simplify this copy" / "rewrite at grade N" | Same meaning, marketing voice stripped, output length ≤ 1.1× original |
@@ -155,6 +157,7 @@ OpenGraph metadata.
 
 - `references/meta-tags.md` — `<meta>` tags per W3C / WHATWG + Open Graph + Twitter Cards + Schema.org JSON-LD.
 - `references/site-indexes.md` — robots.txt, sitemap.xml, llms.txt, Atom / RSS, humans.txt.
+- `references/seo-essentials.md` — Google's three Search Essentials pillars + the AI Optimization Guide's foundations, applied concretely to the artifacts this skill emits. Use it when the user asks about SEO / AI search / "is this third-party advice true?".
 - `references/plain-language.md` — rewrite copy at a target reading level; preserves meaning.
 - `references/audio-narration.md` — *(optional editorial enhancement, not WCAG-required)* turn a Markdown post into a narrated WAV/MP3 via OpenVoice v2 or ChatterboxTTS (both MIT for code AND weights). Structural narration hints from headings / lists / blockquotes / emoji, optional LLM enrichment via the same local Ollama daemon already used for alt-text, voice cloning from a 6-30 s designer-supplied sample, RSS enclosure injection turns the blog feed into a podcast feed.
 - `references/i18n.md` — multilingual frontend (URL strategy, `Intl.*`, plurals, RTL, persisted choice). Default language pair is configurable per project (EN/FR, EN/DE, EN/ES, EN/JA, …).

@@ -18,6 +18,64 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.6.2] — 2026-06-22 — SEO + GEO foundations from Google's official docs
+
+Minor release. New canonical reference adapting Google's
+search-foundations guidance to the artifacts `front-publish` already
+emits, plus explicit SEO / GEO routing in the SKILL decision tree.
+
+### Added
+
+- **`front-publish/references/seo-essentials.md`** — the canonical
+  adaptation of:
+  - [Google Search Essentials](https://developers.google.com/search/docs/essentials)
+    (technical requirements + spam policies + six key best practices)
+  - [Google AI Optimization Guide](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+    ("Apply foundations" section — same foundations as Search
+    Essentials for AI Overview / generative search; no new meta tag
+    for AI)
+  - [Google "Third-party SEO"](https://developers.google.com/search/docs/fundamentals/third-party-seo)
+    (how to recognize legitimate vs. questionable third-party
+    advice and tools)
+
+  Each of Google's six key best practices is mapped to the script
+  that already enforces it (`meta_from_ollama.py`, `site_indexes.py`,
+  `plain_language.py`, `alt_from_ollama.py`, `captions_from_whisper.py`,
+  `lint_markdown.py`, `lint_a11y.py`). A pre-ship checklist
+  consolidates the rules into a single gate.
+
+- **GEO vocabulary** (Generative Engine Optimization) made explicit.
+  `scripts/site_indexes.py` already emits `llms.txt` on every site
+  build alongside `robots.txt` + `sitemap.xml`; the new reference
+  documents that it is the GEO artifact most agents look for, that
+  GEO and SEO share crawlers, and that **no separate "AI" meta tag
+  exists** (the skill refuses to emit one and cites the AI
+  Optimization Guide).
+
+- **`LANDSCAPE.md` § 14** — new SEO + GEO guidance landscape table
+  comparing Google's three official docs, the llmstxt.org community
+  convention, Bing's guidelines, Schema.org, SEO-tool blogs, and
+  "Google-approved" SaaS badges (refused).
+
+### Changed
+
+- **`front-publish/SKILL.md`** — decision tree gained two routing
+  rows: "SEO / AI search / AI Overview / discoverability / is this
+  advice true?" → `seo-essentials.md`, and "GEO / llms.txt / make my
+  site readable by ChatGPT / Gemini / Perplexity" → same reference
+  with the GEO framing. References list updated.
+
+- **`README.md` + `LISEZMOI.md`** — the "Meta tags / SEO / OG card"
+  row in Inputs → outputs now explicitly covers SEO **and** GEO,
+  notes that `llms.txt` is already emitted by `site_indexes.py`,
+  and links the new reference for the full Google-foundations
+  rationale.
+
+- **`front-publish/references/meta-tags.md`** and **`site-indexes.md`**
+  — cross-linked to `seo-essentials.md` from their authoritative-
+  sources lists so the rule and the implementation point at each
+  other.
+
 ## [0.6.1] — 2026-06-22 — CI + release workflow fixes
 
 Patch release. No skill content changes. Repairs the two GitHub

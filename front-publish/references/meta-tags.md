@@ -8,6 +8,8 @@ Authoritative sources (no single standards body covers all of this):
 - **Schema.org** — structured data via JSON-LD for search engines. <https://schema.org/>
 - **Google Search Central** — canonical, robots, alternate hreflang. <https://developers.google.com/search/docs>
 
+For the larger "what makes a page indexable and helpful for AI search" picture — Google's three Search Essentials pillars, the AI Optimization Guide's foundations, and how to evaluate third-party SEO advice — see `seo-essentials.md` in this folder.
+
 Use this file when emitting any new HTML page or when the user asks to "fill in the meta tags".
 
 ## The base every page must have
