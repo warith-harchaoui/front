@@ -88,7 +88,7 @@ A snapshot of where each surface stands at `v0.6.3`. The four skill folders are 
 | `front-publish` (Markdown site, meta tags, favicons, indexes, plain language) | Stable | 4 scripts, 18 deterministic tests, eval suite for meta + plain-language. `FRONT_LANG_PAIR` runtime override wired. |
 | `front-a11y` — lint, contrast, CVD, alt text | Stable | 14-rule lint, OKLCH contrast fixer, Machado CVD, Wikipedia-fixture alt-text eval. MLX vision-capability auto-detection added in 0.3.1. |
 | `front-a11y` — **captions / transcripts** | **WiP / TODO** | `captions_from_whisper.py` is functional; what's missing is per-language WER baselines (`en` / `fr` / `es` extractor wired but baselines not yet published) and the user-supplied `vocab-biasing-clip.wav`. See [Roadmap](CHANGELOG.md#roadmap). |
-| `LISEZMOI.md` (French README) | Stable | At structural parity with this README (same section ordering, content kept in lock-step on every release — last refreshed in 0.6.0). |
+| `LISEZMOI.md` (French README) | Stable | At structural parity with this README — same section ordering, content kept in lock-step on every release. |
 
 For the per-release detail (and what's planned next), see [`CHANGELOG.md`](CHANGELOG.md).
 

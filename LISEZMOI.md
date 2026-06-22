@@ -149,7 +149,7 @@ WCAG.
 | `front-publish` (site Markdown, meta, favicons, indexes, langage clair) | Stable | 4 scripts, 18 tests déterministes, suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
 | `front-a11y` — lint, contraste, daltonisme, texte alternatif | Stable | Lint 14 règles, correcteur OKLCH, daltonisme Machado, éval texte alternatif sur fixtures Wikipedia. Auto-détection de la capacité vision MLX en 0.3.1. |
 | `front-a11y` — **sous-titres / transcriptions** | **WiP / TODO** | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées) et le clip utilisateur `vocab-biasing-clip.wav`. Voir [Roadmap](CHANGELOG.md#roadmap). |
-| `LISEZMOI.md` (README français) | Stable | À parité structurelle avec le README EN (même ordre des sections, contenu maintenu en synchronisation à chaque release — dernier rafraîchissement 0.6.0). |
+| `LISEZMOI.md` (README français) | Stable | À parité structurelle avec le README EN — même ordre des sections, contenu maintenu en synchronisation à chaque release. |
 
 Pour le détail par release (et la suite prévue), voir [`CHANGELOG.md`](CHANGELOG.md).
 
