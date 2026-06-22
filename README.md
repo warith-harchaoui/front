@@ -9,8 +9,9 @@
 ## What this is
 
 `front` is **four small Claude / OpenCode skills** that constrain the agent to
-one frontend stack — vanilla JavaScript, Tailwind CSS, Montserrat or Inter —
-and a curated design system. Asking the agent to "build a UI", "wrap this
+one frontend stack — vanilla JavaScript, Tailwind CSS, and the three-Roboto
+typography rule (Roboto / Roboto Serif / Roboto Mono) — and a curated design
+system. Asking the agent to "build a UI", "wrap this
 CLI in a GUI", "turn these markdown files into a website" or "audit this for
 a11y" routes to the right skill and produces output in the same stack:
 semantic HTML, dark-mode peers on every styled element, focus rings,
@@ -68,7 +69,7 @@ already shipped on the stack, see [GALLERY.md](GALLERY.md).
 
 - Output uses vanilla JS (ES modules, native `<dialog>`, custom elements when justified). No React, Vue, Svelte, Next.js, Nuxt, Angular, Solid.
 - Output uses Tailwind utility classes with semantic tokens (`bg-brand-blue`, `text-label-primary`). No raw hex literals in markup.
-- Output uses **Montserrat** by default for marketing / prose surfaces, or **Inter** for dense developer / dashboard / data UI. If Montserrat is not the right call for your project (brand mismatch, language coverage, custom identity), drop a self-hosted family under `front-ui/assets/fonts/<family>/` (TTF or WOFF2 + license) and `front-ui` will swap to it. Every family is self-hosted (no Google Fonts CDN in production).
+- Output enforces the **three-Roboto rule**: exactly three downloaded webfonts, all from the Roboto super-family — **Roboto** (sans / UI / body), **Roboto Serif** (editorial / longform / prose-heavy landings), **Roboto Mono** (`<code>`, `<pre>`, terminal panels, log output). No other downloaded family is allowed (no Inter, no Montserrat, no IBM Plex, no JetBrains Mono). The three siblings share metrics and x-height by design — prose-heavy and code-heavy surfaces stay typographically coherent. All three are self-hosted (no Google Fonts CDN in production); WOFF2 + OFL live under `front-ui/assets/fonts/roboto/`, `…/roboto-serif/`, `…/roboto-mono/`.
 - Output sets a `dark:` peer on every styled element, uses `<button>`/`<a>`/`<label>`/`<dialog>`/`<form>` first, exposes a visible focus ring, honors `prefers-reduced-motion` and meets a 44×44 px hit area.
 - Output exposes a **🌞 Light / 🌚 Dark / 🌗 Auto toggle** (canonical placement: top-right of sticky header → footer far-right → fixed bottom-right anchor when there is no header). **Auto is the default** so a fresh visitor inherits their OS choice and is never surprised by a hard-coded scheme. Component: `front-ui/assets/components/theme-toggle.html`. Wiring: `front-ui/references/stack-vanilla-js.md` § "Theme switching".
 - Color choices map to the palettes in `front-ui/references/color-psychology.md` (source: <https://harchaoui.org/warith/colors/>).
@@ -77,7 +78,7 @@ already shipped on the stack, see [GALLERY.md](GALLERY.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.5.0`. The four skill folders are stable; the only WiP area is **audio captions** (front-a11y, video → text). The new **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
+A snapshot of where each surface stands at `v0.6.0`. The four skill folders are stable; the only WiP area is **audio captions** (front-a11y, video → text). The new **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
 
 | Area | Status | Notes |
 |---|---|---|
@@ -97,7 +98,7 @@ What you give the agent and what comes back. Each row is a self-contained flow �
 
 | You provide | Phrase | Skill | Output |
 |---|---|---|---|
-| A working CLI (`tool --help`, source with `argparse` / `click` / `clap` / `commander` / `cobra`) | "Wrap this CLI in a GUI" + the project path | `front-cli-gui` | One-page `index.html` + `app.js` + Tailwind CSS, sub-commands mapped to forms / streams / tables, wired to your host (Tauri / Electron / FastAPI / Express / browser stub). Self-hosted Inter. |
+| A working CLI (`tool --help`, source with `argparse` / `click` / `clap` / `commander` / `cobra`) | "Wrap this CLI in a GUI" + the project path | `front-cli-gui` | One-page `index.html` + `app.js` + Tailwind CSS, sub-commands mapped to forms / streams / tables, wired to your host (Tauri / Electron / FastAPI / Express / browser stub). Self-hosted Roboto / Roboto Mono. |
 | A folder of Markdown files (README, `docs/**`, blog posts) | "Turn these markdown files into a website" | `front-publish` | Static site: one HTML page per `.md`, sticky top bar, sidebar TOC for `docs/`, dark-mode peer, favicons, `<meta>` tags, `robots.txt` + `sitemap.xml` + `llms.txt` + Atom feed. |
 | A free-form ask ("primary button", "confirm dialog", "settings page") | "Build a `<component>`" | `front-ui` | Semantic HTML + Tailwind + minimal vanilla JS, focus ring, `dark:` peer, 44×44 hit area, `Escape` close on dialogs, reduced-motion guard. |
 | A data shape (CSV, JSON, a few rows) | "Chart this" / "Dashboard for X" | `front-ui` | Vega-Lite v5 JSON spec + `<figure>` wrapper. House style, palette from `color-psychology.md`, polarity-tagged axes, `role="img"`. |
@@ -124,7 +125,7 @@ between updates.
 
 ```bash
 # 1. Download a tagged release
-VERSION=0.5.0
+VERSION=0.6.0
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
@@ -250,7 +251,7 @@ front/                                  ← repo root
 ├── LANDSCAPE.md                        ← comparison matrices vs alternatives
 ├── CHANGELOG.md                        ← release notes
 ├── CONTRIBUTING.md                     ← how to propose changes
-├── LICENSE.md                          ← The Unlicense (OFL carve-out for Montserrat + Inter)
+├── LICENSE.md                          ← The Unlicense (OFL carve-out for Roboto / Roboto Serif / Roboto Mono)
 ├── llms.txt                            ← https://llmstxt.org/ index for LLM consumers
 ├── pytest.ini, requirements-dev.txt    ← shared dev tooling
 ├── tests/                              ← shared pytest suite covers all four skills
@@ -260,7 +261,7 @@ front/                                  ← repo root
 │   ├── SKILL.md
 │   ├── references/                     ← color, stack, components, dataviz, design system, checklist
 │   ├── scripts/                        ← validate.py (stdlib only)
-│   └── assets/                         ← starter-page, components, Montserrat + Inter fonts
+│   └── assets/                         ← starter-page, components, the three Roboto families (sans / serif / mono)
 │
 ├── front-cli-gui/                      ← CLI → GUI skill (flagship)
 │   ├── SKILL.md
@@ -282,19 +283,19 @@ front/                                  ← repo root
 
 [Warith Harchaoui, Ph.D.](https://www.linkedin.com/in/warith-harchaoui/)
 
-Four small Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, Montserrat or Inter. Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
+Four small Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, and the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono). Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
 Special thanks to **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**, **[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** and **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)** for fruitful discussions.
 
 Color palettes from <https://harchaoui.org/warith/colors/>.
 
-The Montserrat font is bundled in `front-ui/assets/fonts/montserrat/` under the SIL Open Font License — see the bundled `OFL.txt`. Inter is referenced from [rsms.me/inter](https://rsms.me/inter/) (OFL); download the WOFF2 file separately for self-host.
+The three Roboto families are bundled in `front-ui/assets/fonts/roboto/`, `front-ui/assets/fonts/roboto-serif/`, and `front-ui/assets/fonts/roboto-mono/`, each under the SIL Open Font License — see the bundled `OFL.txt` in each folder.
 
 We also drew on the [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) and [Google Material Design](https://material.io/design).
 
 ## License
 
-**The Unlicense** — released into the public domain, no copyright, no restrictions. Use, modify, redistribute, sell — without permission, attribution, or fee. See `LICENSE.md` for the canonical text. The bundled Montserrat font remains under the SIL Open Font License (`front-ui/assets/fonts/montserrat/OFL.txt`); the public-domain dedication doesn't change that.
+**The Unlicense** — released into the public domain, no copyright, no restrictions. Use, modify, redistribute, sell — without permission, attribution, or fee. See `LICENSE.md` for the canonical text. The bundled Roboto / Roboto Serif / Roboto Mono fonts remain under the SIL Open Font License (see the `OFL.txt` bundled in each `front-ui/assets/fonts/roboto*/` folder); the public-domain dedication doesn't change that.
 
 **License vs. attribution.** Code is released under the Unlicense
 (public domain — no permission needed to use, fork, modify, or rebrand).

@@ -54,8 +54,8 @@ problem so users can act on the same information.
 - The skill pins no minor versions for the Python dependencies it
   declares (`requests`, `click`, `Pillow`, `numpy`). Pin yourself if
   you need reproducibility.
-- Bundled fonts ship under their own license
-  (Montserrat: SIL OFL). See `LICENSE.md` for the carve-out.
+- Bundled fonts ship under their own license (Roboto, Roboto Serif,
+  Roboto Mono: all SIL OFL). See `LICENSE.md` for the carve-out.
 - **Distribution channels.** Two supported install paths:
   1. **Tagged GitHub release** (recommended). Each release ships
      per-skill tarballs, a four-skill bundle tarball, and a single

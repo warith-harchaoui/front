@@ -15,7 +15,7 @@ description: >-
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.5.0
+  version: 0.6.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -73,7 +73,7 @@ When the user points to an existing CLI project and asks for a GUI:
    - **HTTP-served**: emit a tiny `fetch` wrapper assuming the CLI is wrapped by `python -m http.server`, `express`, `fastapi`, or the demo's stdlib SSE proxy.
    - **Browser-only mock**: stub execution with `console.log` and clearly mark TODOs.
 6. **Stream output** to a monospace `<pre>` panel; convert ANSI escapes to HTML if needed.
-7. **Emit a single `index.html` + `app.js` + Tailwind** that runs out of the box. Ship the Montserrat (or Inter) fonts in `./fonts/`.
+7. **Emit a single `index.html` + `app.js` + Tailwind** that runs out of the box. Ship the three Roboto families (Roboto / Roboto Serif / Roboto Mono) in `./fonts/roboto*/`.
 8. **Document** in the project's README how to launch the GUI alongside the CLI.
 
 ## Stack rules (inherited)
@@ -82,7 +82,7 @@ Output follows the front-ui stack rules. If front-ui is not installed in the sam
 
 - **Vanilla JS** (ES modules), no framework.
 - **Tailwind utility classes**, semantic tokens, dark-mode peer on every styled element.
-- **Montserrat** (default) or **Inter** (for dense dev UI). Self-hosted. The CLI → GUI flagship usually picks **Inter** because the surface is dense (forms, log panels, tables).
+- **Three-Roboto rule**: Roboto (sans / UI), Roboto Serif (editorial / longform), Roboto Mono (`<code>` / `<pre>` / log panels / terminal). Self-hosted, no Google Fonts CDN. The CLI → GUI flagship leans on **Roboto Mono** for the streaming log panel and **Roboto** everywhere else.
 - Semantic HTML, visible focus rings, 44 × 44 hit area, `prefers-reduced-motion` honored.
 - Both color schemes.
 

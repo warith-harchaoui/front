@@ -889,7 +889,7 @@ def main() -> int:
         site_meta: dict[str, str] = {
             "Language": "English",
             "Doctype": "HTML5",
-            "Components": "vanilla JavaScript, Tailwind CSS, Montserrat",
+            "Components": "vanilla JavaScript, Tailwind CSS, Roboto / Roboto Serif / Roboto Mono",
         }
         (out_dir / "humans.txt").write_text(
             render_humans(authors, site_meta),

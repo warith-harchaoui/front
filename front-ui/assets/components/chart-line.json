@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "House-style line + area chart — Montserrat type, rounded corners 10 px on marks, no top/right spines, no tick marks, colors from harchaoui.org/warith/colors. Polarity is contextual: replace the subtitle / axis tag below to match this dashboard's interpretation.",
+  "description": "House-style line + area chart — Roboto type, rounded corners 10 px on marks, no top/right spines, no tick marks, colors from harchaoui.org/warith/colors. Polarity is contextual: replace the subtitle / axis tag below to match this dashboard's interpretation.",
   "title": {
     "text":     "Weekly active users",
     "subtitle": "↑ higher is better — engagement metric (decide per dashboard)"
@@ -45,8 +45,8 @@
     "background": "transparent",
     "view": { "stroke": "transparent" },
     "axis": {
-      "labelFont": "Montserrat",
-      "titleFont": "Montserrat",
+      "labelFont": "Roboto",
+      "titleFont": "Roboto",
       "labelFontWeight": 400,
       "titleFontWeight": 600,
       "labelColor": "#3C3C43",
@@ -56,6 +56,6 @@
     },
     "axisX": { "domain": true, "ticks": false, "labelPadding": 6 },
     "axisY": { "domain": true, "ticks": false, "labelPadding": 6 },
-    "title":  { "font": "Montserrat", "fontWeight": 600, "color": "#000000" }
+    "title":  { "font": "Roboto", "fontWeight": 600, "color": "#000000" }
   }
 }

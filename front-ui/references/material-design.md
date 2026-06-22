@@ -32,7 +32,7 @@ Dynamic-colour generation: the skill ships static `DEFAULT` / `dark` / `light` v
 | Body large / medium / small | Body / Callout / Subhead | `text-[17px]` / `text-base` / `text-[15px]` |
 | Label large / medium / small | Footnote / Caption | `text-[13px]` / `text-xs` |
 
-Reference type: Material uses Roboto Flex. The skill defaults to Montserrat but accepts any self-hosted family declared in `front-ui/assets/fonts/<family>/` — see `ui-guidelines/foundations/typography.md`.
+Reference type: Material uses Roboto Flex. The skill ships the classic Roboto super-family (Roboto / Roboto Serif / Roboto Mono — the three-Roboto rule) under `front-ui/assets/fonts/roboto*/` — see `ui-guidelines/foundations/typography.md`.
 
 ## Shape → corner radius
 

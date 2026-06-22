@@ -31,12 +31,13 @@ For more information, please refer to <https://unlicense.org/>.
 The Unlicense above applies to the source of this repository. Bundled
 third-party assets retain their own licenses:
 
-- **Montserrat** (typeface) — bundled in `front/assets/fonts/montserrat/`
-  under the **SIL Open Font License (OFL)**. The full license and its
-  required copyright notice are in
-  `front/assets/fonts/montserrat/OFL.txt`. This is unaffected by the
-  public-domain dedication above; OFL is permissive but its terms apply
-  to the font files.
+- **Roboto / Roboto Serif / Roboto Mono** (typefaces) — bundled in
+  `front-ui/assets/fonts/roboto/`, `front-ui/assets/fonts/roboto-serif/`,
+  and `front-ui/assets/fonts/roboto-mono/` under the **SIL Open Font
+  License (OFL)** (the "three-Roboto rule"). The full license and its
+  required copyright notice are in the `OFL.txt` shipped in each of the
+  three folders. This is unaffected by the public-domain dedication
+  above; OFL is permissive but its terms apply to the font files.
 
 - **Common Voice audio clips** — extracted into
   `tests/fixtures/audio/cv/<lang>/` from Common Voice 26.0, obtained

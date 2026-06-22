@@ -18,6 +18,100 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.6.0] — 2026-06-22 — typography overhaul
+
+**The three-Roboto rule.** Replaced the previous Montserrat-default /
+Inter-alternate typography stack with a hard-coded three-family rule:
+**Roboto** (sans / UI / body), **Roboto Serif** (editorial / longform
+/ prose-heavy landings), **Roboto Mono** (`<code>`, `<pre>`, terminal
+panels, log output). No other downloaded webfont is allowed.
+
+**Reason.** A single super-family that shares metrics and x-height
+across sans / serif / mono keeps prose-heavy and code-heavy surfaces
+typographically coherent, makes the "which font do I lift here?"
+decision automatic, and trims the WOFF2 payload to ~290 KB total
+(latin subset, variable-axis, all three combined) versus ~830 KB for
+the prior Montserrat-only bundle. The previous "user can swap to
+Inter or any custom family" escape hatch is removed; if a project
+genuinely needs a fourth family for brand or accessibility reasons,
+that now requires an explicit project-README note rather than an
+in-skill swap.
+
+### Changed — bundled fonts
+
+- **Removed** `front-ui/assets/fonts/montserrat/` (Montserrat
+  variable + italic-variable + four static weights + OFL) and
+  `front-ui/assets/fonts/inter/` (the empty alternate folder).
+- **Added** `front-ui/assets/fonts/roboto/`,
+  `front-ui/assets/fonts/roboto-serif/`,
+  `front-ui/assets/fonts/roboto-mono/` — each shipping a
+  variable-axis upright WOFF2 + italic-variable WOFF2 + upstream
+  `OFL.txt` (all three families are SIL OFL 1.1).
+- **Added** `front-ui/assets/fonts/README.md` codifying the
+  three-Roboto rule and wiring instructions.
+- **Mirrored** the three folders into
+  `front-cli-gui/assets/examples/cli-gui-demo/public/fonts/` (the
+  flagship demo). Demo `index.html`, `manifest.json`, `README.md`,
+  and `favicon.svg` updated.
+
+### Changed — skill prompts
+
+- `front-ui/SKILL.md` — hard-rule 3 rewritten ("three-Roboto rule"
+  replaces "Montserrat by default; Inter as the documented
+  alternate"). Frontmatter `description`, chart-spec font name,
+  pre-ship checklist, references list, and assets list updated.
+- `front-ui/references/stack-tailwind.md` — typography section
+  rewritten; Tailwind `fontFamily` block now includes `sans`,
+  `serif`, `mono` per the three Roboto families; `app.css` `@import`
+  block expanded to all three.
+- `front-ui/references/ui-guidelines/foundations/typography.md` —
+  rewritten end-to-end; preload, type scale, concrete rules, and
+  checklist all updated. Added a `t-prose` editorial component class
+  that lifts Roboto Serif.
+- `front-ui/references/charts-vega.md` — every Vega-Lite font slot
+  (`labelFont`, `titleFont`, header / legend) now uses Roboto.
+- `front-ui/references/{checklist.md,material-design.md,ergonomics-criteria.md,stack-vanilla-js.md,ui-guidelines/INDEX.md}`
+  — single-line mentions updated.
+- `front-publish/SKILL.md` — typography line + emit-step rewritten.
+- `front-cli-gui/SKILL.md` — typography rule + step-7 ship list
+  rewritten to call out Roboto Mono for the streaming log panel.
+- `front-cli/src/front_cli/cli.py` — `publish md-to-html` help text
+  now says "three-Roboto + Tailwind shell".
+
+### Changed — emitted code
+
+- `front-publish/scripts/md_to_html.py` — Tailwind `fontFamily`
+  block in the page template now ships Roboto / Roboto Serif /
+  Roboto Mono with sensible system fallbacks (no JetBrains Mono).
+- `front-publish/scripts/site_indexes.py` — `humans.txt`
+  "Components" line updated.
+- `front-publish/references/i18n.md` — non-latin font-loading
+  example reframed around the three-Roboto bundle.
+- `front-ui/assets/starter-page.html` — `<link rel="preload">` +
+  `<link rel="stylesheet">` + Tailwind `fontFamily` config updated
+  to wire all three Roboto families. Hero kicker text updated.
+- `front-ui/assets/components/{chart-bar.json,chart-line.json}` —
+  Vega `labelFont` / `titleFont` swapped to Roboto.
+
+### Changed — docs + license
+
+- `README.md`, `LISEZMOI.md`, `LANDSCAPE.md` (typography section +
+  table reframed), `LICENSE.md` (OFL carve-out now covers the three
+  Roboto families), `SECURITY.md`, `CONTRIBUTING.md` (OFL template
+  reference) — all updated to the new rule.
+
+### Notes for upgraders
+
+- Any project that previously copied
+  `front-ui/assets/fonts/montserrat/` or `…/inter/` into its own
+  `public/fonts/` will need to copy the three new `roboto*/` folders
+  instead and update its Tailwind `fontFamily` block + `<link>`
+  preloads (see the migrated `front-ui/assets/starter-page.html` for
+  the canonical pattern).
+- Existing pages that hard-coded `font-family: Montserrat` in inline
+  CSS (rare — the skill forbids this) will fall through to the
+  system sans stack until the family name is updated to `Roboto`.
+
 ## [0.5.0] — 2026-06-21
 
 Minor release. New optional editorial feature in `front-publish`:

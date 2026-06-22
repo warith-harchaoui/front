@@ -4,15 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Front — starter</title>
-  <meta name="description" content="Starter page using vanilla JS, Tailwind, Montserrat, and the front skill design tokens.">
+  <meta name="description" content="Starter page using vanilla JS, Tailwind, the three Roboto families, and the front skill design tokens.">
   <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 
-  <!-- Montserrat, self-hosted. In production, copy assets/fonts/montserrat/ to /fonts/montserrat/ -->
-  <link rel="preload" href="./fonts/montserrat/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="./fonts/montserrat/fonts.css">
+  <!-- Three-Roboto rule, self-hosted. In production, copy assets/fonts/roboto*/ to /fonts/roboto*/ -->
+  <link rel="preload" href="./fonts/roboto/Roboto-Variable.woff2"           as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/roboto-mono/Roboto-Mono-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./fonts/roboto/fonts.css">
+  <link rel="stylesheet" href="./fonts/roboto-serif/fonts.css">
+  <link rel="stylesheet" href="./fonts/roboto-mono/fonts.css">
 
   <!-- Tailwind Play CDN — fine for prototyping. Swap to a built CSS for production. -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,8 +25,9 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Montserrat', 'sans-serif'],
-            mono: ['ui-monospace', 'monospace'],
+            sans:  ['Roboto', 'sans-serif'],
+            serif: ['Roboto Serif', 'serif'],
+            mono:  ['Roboto Mono', 'ui-monospace', 'monospace'],
           },
           colors: {
             brand: {
@@ -94,7 +98,7 @@
   <main id="main" class="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
 
     <section class="space-y-3">
-      <p class="text-[13px] font-semibold uppercase tracking-wider text-brand-blue">Vanilla JS · Tailwind · Montserrat</p>
+      <p class="text-[13px] font-semibold uppercase tracking-wider text-brand-blue">Vanilla JS · Tailwind · Roboto</p>
       <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">A frontend skill that respects your stack.</h1>
       <p class="max-w-prose text-[17px] leading-relaxed text-label-secondary dark:text-label-secondary-dark">
         Use Claude with the <code class="rounded bg-surface-secondary px-1.5 py-0.5 text-[15px] dark:bg-surface-secondary-dark">front</code> skill to generate production-grade pages, components, and design tokens — without React, Vue, or any framework.

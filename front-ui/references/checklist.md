@@ -8,7 +8,7 @@ Run this before returning any non-trivial UI code. Each item is a hard gate — 
 - [ ] All scripts are ES modules (`<script type="module">`).
 - [ ] No inline `onclick=` / `onsubmit=` in HTML — JS-side `addEventListener` only.
 - [ ] Tailwind classes only; no inline `style="…"` except CSS custom-property values.
-- [ ] Montserrat self-hosted; no third-party CDN for fonts.
+- [ ] Three-Roboto rule: only Roboto / Roboto Serif / Roboto Mono, all self-hosted; no third-party CDN for fonts.
 
 ## Semantics & accessibility
 

@@ -5,7 +5,8 @@ md_to_html
 
 Single-file Markdown → HTML converter that integrates the front skill's
 output rules: vanilla JS + Tailwind (Play CDN for the prototype path) +
-Inter typeface + dark-mode peer.
+the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono)
++ dark-mode peer.
 
 Three behaviours that distinguish this from a plain Markdown → HTML pipe:
 
@@ -84,9 +85,11 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       darkMode: ['class', '[data-color-scheme="dark"]'],
       theme: {{ extend: {{
         fontFamily: {{
-          sans: ['Inter Variable', 'Inter', '-apple-system', 'BlinkMacSystemFont',
-                 '"Segoe UI"', 'Roboto', 'system-ui', 'sans-serif'],
-          mono: ['JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+          sans:  ['Roboto', '-apple-system', 'BlinkMacSystemFont',
+                  '"Segoe UI"', 'system-ui', 'sans-serif'],
+          serif: ['Roboto Serif', 'Georgia', 'Cambria', 'serif'],
+          mono:  ['Roboto Mono', 'ui-monospace', 'SFMono-Regular',
+                  'Menlo', 'Consolas', 'monospace'],
         }},
         colors: {{
           'brand-blue': '#0A84FF',

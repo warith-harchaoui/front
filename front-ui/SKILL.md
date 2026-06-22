@@ -3,9 +3,10 @@ name: front-ui
 description: >-
   Generate vanilla JavaScript + Tailwind CSS UI code — components, pages,
   forms, dialogs, dashboards — for solo developers and small teams shipping
-  internal tools without a designer. Default typeface Montserrat (swap to
-  Inter for dense dev UI). Output is semantic HTML + Tailwind utility classes
-  + vanilla ES modules with dark-mode peers, focus rings, reduced-motion
+  internal tools without a designer. Three-Roboto typography rule: Roboto
+  (sans), Roboto Serif (serif), Roboto Mono (code/monospace); no other
+  downloaded webfont. Output is semantic HTML + Tailwind utility classes +
+  vanilla ES modules with dark-mode peers, focus rings, reduced-motion
   guards. Use it for "build a UI", "create a component", "design a page",
   "make a form / modal / button / nav", "scaffold a landing", "build a web
   app", "audit this UI". Companion skills: front-cli-gui (wrap a CLI in a
@@ -14,7 +15,7 @@ description: >-
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.5.0
+  version: 0.6.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -54,7 +55,7 @@ The companion skills assume the same stack rules below.
 
 1. **No framework imports.** Output never contains `react`, `vue`, `svelte`, `solid-js`, `next`, `nuxt`, `angular`. If asked, refuse and offer the vanilla equivalent.
 2. **Tailwind utility classes only**, never inline `style="…"`. The single allowed exception is a one-off CSS custom property whose value references an existing token (e.g. `style="--accent: var(--brand-blue)"`). **Never** put a raw hex literal in markup — even inside `style="--accent: #007AFF"`. If a new accent is needed, add the token to `tailwind.config.js` (`theme.extend.colors.brand`) and reference it via `var(--brand-…)` or a Tailwind class. This keeps rule 7 (no raw hex) and rule 2 in lockstep.
-3. **Montserrat by default; Inter as the documented alternate; user-supplied custom family if a folder is provided.** Use Montserrat for marketing surfaces, prose-heavy pages, landing pages. Use Inter when the surface is dense (dashboards, admin panels, dev tools, data tables, monospace-adjacent UI) — Inter's larger x-height and hinting work better at small sizes. Montserrat is not always the perfect choice: if the project ships a folder under `assets/fonts/<family>/` with TTF / WOFF2 files (and an `OFL.txt` or equivalent license), Claude swaps the `fontFamily.sans` token to that family, updates the `@font-face` block to point at the supplied files, and keeps every other rule unchanged. In every case: self-host (no Google Fonts CDN, no jsDelivr GH proxy in production builds), and document the chosen family in the project README so a future maintainer knows why the page renders the way it does.
+3. **The three-Roboto rule.** Exactly three downloaded webfonts, all from the Roboto super-family: **Roboto** for sans, **Roboto Serif** for serif, **Roboto Mono** for code / monospace. No other downloaded family is allowed — not Inter, not Montserrat, not IBM Plex, not JetBrains Mono. Use Roboto for body / UI text by default; lift Roboto Serif when a surface wants editorial weight (longform reading, quote pulls, prose-heavy landings); use Roboto Mono for `<code>`, `<pre>`, kbd / samp, terminal panels. If a project genuinely needs a *fourth* family for brand reasons, that requires an explicit project-README note — otherwise refuse and offer a Roboto-only equivalent. In every case: self-host (no Google Fonts CDN, no jsDelivr GH proxy in production builds), and system-font fallback stacks (`ui-monospace`, `system-ui`, `serif`, `sans-serif`) are fine and expected.
 4. **Semantic HTML first.** `<button>`, `<a href>`, `<label for>`, `<dialog>`, `<form>`. ARIA only when no semantic element fits.
 5. **Both color schemes.** Every styled element gets a `dark:` peer.
 6. **Accessibility is shipping-required.** See `references/ui-guidelines/foundations/accessibility.md`.
@@ -142,7 +143,7 @@ The "zero build, drop into Nginx / S3 / Pages" pitch only holds for the prototyp
 | "search" | `ui-guidelines/patterns/searching.md` | `<input type="search">` with debounced JS, results live region |
 | "onboarding" | `ui-guidelines/patterns/onboarding.md` | One idea per screen, ≤ 8-word headline, skippable |
 | "theme switch" | `ui-guidelines/foundations/dark-mode.md` | `data-color-scheme` attribute + persisted choice |
-| "chart" / "graph" / "dashboard tile" | `charts-vega.md` + `dataviz-chart-selection.md` + `dataviz-color-palettes.md` | Vega-Lite v5 JSON spec, Montserrat, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines. State polarity when well-defined (*↑ higher is better* / *↓ lower is better* / *target = N ± k*). |
+| "chart" / "graph" / "dashboard tile" | `charts-vega.md` + `dataviz-chart-selection.md` + `dataviz-color-palettes.md` | Vega-Lite v5 JSON spec, Roboto, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines. State polarity when well-defined (*↑ higher is better* / *↓ lower is better* / *target = N ± k*). |
 | "dashboard" / "BI" / "KPI summary" | `dashboard-ergonomics.md` (+ chart references above) | One question per tile, title as a question, polarity tag on every measurable tile, sticky filters, 12-column grid, skeleton tiles while loading. |
 | "map" / "choropleth" | `dataviz-maps.md` | Title states the message, ≤ 7 classes, locator inset, accessible text alternative below the map |
 | "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria: guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility |
@@ -155,7 +156,7 @@ The "zero build, drop into Nginx / S3 / Pages" pitch only holds for the prototyp
 Run `references/checklist.md` before returning code. Short version:
 
 - [ ] No framework imports.
-- [ ] Montserrat or Inter only; self-hosted.
+- [ ] Three-Roboto rule: only Roboto / Roboto Serif / Roboto Mono, all self-hosted.
 - [ ] Semantic HTML; ARIA only where no semantic fits.
 - [ ] Visible focus ring everywhere; `Escape` closes dialogs.
 - [ ] `dark:` peer set for every styled element.
@@ -223,7 +224,7 @@ Load these only when needed.
 **Stack & tokens**
 - `references/color-psychology.md` — Choice / Emotion / Concept / Psychology palettes.
 - `references/stack-vanilla-js.md` — Vanilla JS patterns.
-- `references/stack-tailwind.md` — Config tokens, plugins, dark-mode strategy, Inter swap.
+- `references/stack-tailwind.md` — Config tokens, plugins, dark-mode strategy, the three-Roboto typography rule.
 - `references/checklist.md` — Pre-ship quality gate.
 
 **Dataviz**
@@ -245,8 +246,10 @@ Load these only when needed.
 - `assets/starter-page.html` — single-file bootstrap (Tailwind Play CDN — prototype-grade; swap to Tailwind CLI / Vite before shipping a real production site).
 - `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`.
 - `assets/components/chart-bar.json`, `chart-line.json` — Vega-Lite specs.
-- `assets/fonts/montserrat/` — Montserrat WOFF2 + OFL + `fonts.css`.
-- `assets/fonts/inter/` — Inter WOFF2 + OFL + `fonts.css` (alternate font; bundle separately or point at official source).
+- `assets/fonts/roboto/` — Roboto WOFF2 + OFL + `fonts.css` (sans).
+- `assets/fonts/roboto-serif/` — Roboto Serif WOFF2 + OFL + `fonts.css` (serif).
+- `assets/fonts/roboto-mono/` — Roboto Mono WOFF2 + OFL + `fonts.css` (code / monospace).
+- `assets/fonts/README.md` — the three-Roboto rule + wiring instructions.
 
 ## Scripts
 

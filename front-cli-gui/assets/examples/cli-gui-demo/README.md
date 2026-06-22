@@ -1,6 +1,6 @@
 # cli-gui-demo
 
-Worked example of the **front** skill's flagship CLI → GUI workflow. A mock CLI (`imgconvert`) is wrapped in a single-page GUI built with vanilla JavaScript, Tailwind CSS, Montserrat, and a tiny Python proxy.
+Worked example of the **front** skill's flagship CLI → GUI workflow. A mock CLI (`imgconvert`) is wrapped in a single-page GUI built with vanilla JavaScript, Tailwind CSS, the Roboto family (sans / serif / mono), and a tiny Python proxy.
 
 ## What it shows
 
@@ -24,7 +24,7 @@ cd front-cli-gui/assets/examples/cli-gui-demo
 python server.py
 ```
 
-Open <http://localhost:8787>. No `pip install` is needed — the server uses only the Python standard library, and the GUI uses the Tailwind Play CDN (no build step). Montserrat is bundled under `public/fonts/montserrat/` and served by the same proxy.
+Open <http://localhost:8787>. No `pip install` is needed — the server uses only the Python standard library, and the GUI uses the Tailwind Play CDN (no build step). The three Roboto families are bundled under `public/fonts/roboto/`, `public/fonts/roboto-serif/`, and `public/fonts/roboto-mono/` and served by the same proxy.
 
 ## How it maps to the skill's CLI → GUI workflow
 
@@ -36,7 +36,7 @@ The eight steps from `SKILL.md` → "CLI → GUI workflow":
 4. **Map flags to form controls** — see the table above.
 5. **Wire execution** — `public/app.js` posts JSON to `/run` on the Python proxy; `server.py` spawns the CLI and streams stdout back via Server-Sent Events.
 6. **Stream output** — `app.js` consumes the SSE stream and appends each line to the `<pre>` log panel.
-7. **Emit a single page** — one HTML, one JS module, one CSS (Tailwind directives via the Play CDN), Montserrat self-hosted.
+7. **Emit a single page** — one HTML, one JS module, one CSS (Tailwind directives via the Play CDN), Roboto / Roboto Serif / Roboto Mono self-hosted.
 8. **Document launch** — this file.
 
 ## File structure
@@ -52,7 +52,10 @@ cli-gui-demo/
     ├── index.html                  GUI markup
     ├── app.js                      vanilla ES module
     ├── favicon.svg                 single-shape SVG icon
-    └── fonts/montserrat/           variable + italic-variable WOFF2 + OFL.txt
+    └── fonts/
+        ├── roboto/                 variable + italic-variable WOFF2 + OFL.txt (sans)
+        ├── roboto-serif/           variable + italic-variable WOFF2 + OFL.txt (serif)
+        └── roboto-mono/            variable + italic-variable WOFF2 + OFL.txt (mono)
 ```
 
 Total emitted lines (excluding fonts): ~700.
@@ -66,4 +69,4 @@ Total emitted lines (excluding fonts): ~700.
 
 ## License
 
-The demo is released under The Unlicense (see the repository root's `LICENSE.md`). Montserrat retains its SIL Open Font License — see `public/fonts/montserrat/OFL.txt`.
+The demo is released under The Unlicense (see the repository root's `LICENSE.md`). The Roboto, Roboto Serif, and Roboto Mono families retain their SIL Open Font License — see the `OFL.txt` bundled in each `public/fonts/roboto*/` folder.

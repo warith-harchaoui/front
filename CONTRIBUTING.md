@@ -57,7 +57,8 @@ PR is merged.
   `CHANGELOG.md`.
 - **Public-domain.** New files are released into the public domain. Do
   not include code copied from a license-restricted source without
-  documenting the carve-out (see Montserrat OFL as the template).
+  documenting the carve-out (see the Roboto / Roboto Serif / Roboto
+  Mono OFL bundle as the template).
 
 ## What we ship
 

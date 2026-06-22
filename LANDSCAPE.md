@@ -125,19 +125,36 @@ What kind of work are you doing? Find the row and the honest recommendation.
 
 ## 4. Typography (UI typeface)
 
+`front-ui` enforces the **three-Roboto rule**: exactly three downloaded
+webfonts, all from the Roboto super-family. The trio shares metrics,
+x-height, and visual rhythm by design, which keeps prose-heavy and
+code-heavy surfaces typographically coherent and trims the payload to
+~290 KB total (latin subset, all three combined, variable-axis WOFF2).
+
 | Font | Weights | Latin Ext. / Cyrillic | License | Variable | Cost | Skill alignment | Notes |
 |---|---|---|---|:---:|---|:---:|---|
-| **Montserrat** (used) | 100–900 + italics | both | OFL | ✓ | free | ✓ | Self-hosted in `assets/fonts/montserrat/`. |
-| [Inter](https://rsms.me/inter/) | 100–900 + italics | both | OFL | ✓ | free | ~ | Industry default for SaaS UI. |
-| [IBM Plex Sans](https://www.ibm.com/plex/) | 100–700 | both | OFL | ~ | free | ~ | Neutral corporate. |
-| [Roboto Flex](https://fonts.google.com/specimen/Roboto+Flex) | variable | both | Apache | ✓ | free | ~ | Material default. |
-| System UI stack | OS-dependent | OS-dependent | none | depends | free | ~ | Zero bytes, no brand. |
+| **Roboto** (used — sans)     | 100–900 + italics | both | OFL | ✓ | free | ✓ | Self-hosted in `front-ui/assets/fonts/roboto/`. Default UI + body. |
+| **Roboto Serif** (used — serif) | 100–900 + italics | both | OFL | ✓ | free | ✓ | Self-hosted in `front-ui/assets/fonts/roboto-serif/`. Editorial / longform. |
+| **Roboto Mono** (used — mono)   | 100–700 + italics | both | OFL | ✓ | free | ✓ | Self-hosted in `front-ui/assets/fonts/roboto-mono/`. `<code>` / `<pre>` / log panels. |
+| [Inter](https://rsms.me/inter/) | 100–900 + italics | both | OFL | ✓ | free | ✗ | Industry default for SaaS UI — out of scope under the three-Roboto rule. |
+| [Montserrat](https://fonts.google.com/specimen/Montserrat) | 100–900 + italics | both | OFL | ✓ | free | ✗ | Former default — replaced by Roboto in v0.6.0. |
+| [IBM Plex Sans](https://www.ibm.com/plex/) | 100–700 | both | OFL | ~ | free | ✗ | Neutral corporate — out of scope. |
+| [Roboto Flex](https://fonts.google.com/specimen/Roboto+Flex) | variable | both | Apache | ✓ | free | ~ | Material default — sibling of the bundled classic Roboto. |
+| System UI stack | OS-dependent | OS-dependent | none | depends | free | ~ | Zero bytes, no brand — used as fallback in the three Roboto stacks. |
 | [Geist](https://vercel.com/font) | 100–900 | Latin | OFL | ✓ | free | ✗ | Newer geometric sans (Vercel). |
 | [Satoshi](https://www.fontshare.com/fonts/satoshi) | 300–900 | Latin | proprietary (free) | ✓ | free | ✗ | Fontshare licence specifics differ. |
 | [Manrope](https://manrope.org) | 200–800 | Latin | OFL | ✓ | free | ✗ | Modern geometric. |
-| [Atkinson Hyperlegible](https://www.brailleinstitute.org/freefont/) | 4 weights | Latin | OFL | ✗ | free | ~ | Best for low-vision readers; pairs as accessibility font. |
+| [Atkinson Hyperlegible](https://www.brailleinstitute.org/freefont/) | 4 weights | Latin | OFL | ✗ | free | ~ | Best for low-vision readers; can be loaded as a project-level a11y override. |
 
-**Pick Montserrat** (the `front-ui` default) for marketing surfaces, landing pages and prose-heavy reading. **Pick Inter** (the documented alternate) for dense developer / dashboard / admin / data UI — better hinting at small sizes. **Pick Atkinson Hyperlegible** when accessibility is the explicit goal (low-vision readers, large-print modes). **Avoid Google-Fonts CDN** in production: self-host whichever you pick (the `front-ui` skill ships Montserrat as WOFF2; Inter installs the same way).
+**The skill default is the Roboto trio** for every surface. Lift Roboto
+Serif for editorial / longform reading; Roboto Mono is reserved for
+`<code>`, `<pre>`, terminal panels and log output. If a project
+genuinely requires a *fourth* family for brand or accessibility
+reasons (Atkinson Hyperlegible is the canonical example), that
+requires an explicit project-README note — otherwise the skill refuses
+and offers a Roboto-only equivalent. **Avoid Google-Fonts CDN** in
+production: self-host all three (the `front-ui` skill ships them as
+WOFF2 with bundled OFL licenses).
 
 ---
 
@@ -314,7 +331,7 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 
 | Slot | What it does | Skill alignment | Notes |
 |---|---|:---:|---|
-| **`front`** | Frontend (this skill) | ✓ | Vanilla JS + Tailwind + Montserrat + dataviz + a11y. |
+| **`front`** | Frontend (this skill) | ✓ | Vanilla JS + Tailwind + three-Roboto typography + dataviz + a11y. |
 | Claude Code built-in commands | `/init`, `/review`, `/security-review`, ultrareview | ✓ | Active alongside `front`; no conflict. |
 | Other Claude skills (marketplace) | Domain-specific tools | ~ | Layer with `front` when the domain is non-frontend. |
 | [OpenCode](https://opencode.ai) | Alternative runtime for the same skill format | ✓ | Named in `README.md` install path. |

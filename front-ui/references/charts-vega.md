@@ -24,7 +24,7 @@ For production, install via npm (`vega`, `vega-lite`, `vega-embed`) and bundle.
 
 1. **Rounded corners at 10 px** on every chart mark and on the chart container.
 2. **Colors from `color-psychology.md`** — no rainbow palettes, no Vega defaults.
-3. **Montserrat** for every text element (labels, titles, legends).
+3. **Roboto** for every text element (labels, titles, legends).
 4. **No top spine, no right spine** — keep only the bottom (x) and left (y) baselines.
 5. **No tick marks** on either axis — labels alone read fine and look cleaner.
 6. **No gridlines** unless explicitly needed.
@@ -123,8 +123,8 @@ Paste this `config` block into every spec.
     "background": "transparent",
     "view": { "stroke": "transparent" },
     "axis": {
-      "labelFont": "Montserrat",
-      "titleFont": "Montserrat",
+      "labelFont": "Roboto",
+      "titleFont": "Roboto",
       "labelFontWeight": 400,
       "titleFontWeight": 600,
       "labelColor": "#3C3C43",
@@ -134,9 +134,9 @@ Paste this `config` block into every spec.
     },
     "axisX": { "domain": true,  "ticks": false, "labelPadding": 6 },
     "axisY": { "domain": true,  "ticks": false, "labelPadding": 6 },
-    "title":  { "font": "Montserrat", "fontWeight": 600, "color": "#000000" },
-    "header": { "labelFont": "Montserrat", "titleFont": "Montserrat" },
-    "legend": { "labelFont": "Montserrat", "titleFont": "Montserrat", "labelColor": "#3C3C43", "titleColor": "#000000" },
+    "title":  { "font": "Roboto", "fontWeight": 600, "color": "#000000" },
+    "header": { "labelFont": "Roboto", "titleFont": "Roboto" },
+    "legend": { "labelFont": "Roboto", "titleFont": "Roboto", "labelColor": "#3C3C43", "titleColor": "#000000" },
     "range": {
       "category": ["#007AFF","#28CD41","#FF9500","#AF52DE","#FF2D55","#FFCC00","#79DBDC","#FF3B30"],
       "diverging": ["#FF3B30","#FFCC00","#28CD41"],

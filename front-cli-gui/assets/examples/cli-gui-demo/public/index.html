@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>imgconvert — front-skill CLI → GUI demo</title>
-  <meta name="description" content="Demo GUI for the imgconvert mock CLI, built with the front skill: vanilla JS + Tailwind + Montserrat.">
+  <meta name="description" content="Demo GUI for the imgconvert mock CLI, built with the front skill: vanilla JS + Tailwind + Roboto.">
   <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -17,8 +17,9 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Montserrat', 'sans-serif'],
-            mono: ['ui-monospace', 'monospace'],
+            sans:  ['Roboto', 'sans-serif'],
+            serif: ['Roboto Serif', 'serif'],
+            mono:  ['Roboto Mono', 'ui-monospace', 'monospace'],
           },
           colors: {
             brand: {
@@ -43,7 +44,9 @@
       },
     };
   </script>
-  <link rel="stylesheet" href="/fonts/montserrat/fonts.css">
+  <link rel="stylesheet" href="/fonts/roboto/fonts.css">
+  <link rel="stylesheet" href="/fonts/roboto-serif/fonts.css">
+  <link rel="stylesheet" href="/fonts/roboto-mono/fonts.css">
   <style>
     html { color-scheme: light dark; }
     @media (prefers-reduced-motion: reduce) {

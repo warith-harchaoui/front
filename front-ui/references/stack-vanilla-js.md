@@ -27,7 +27,7 @@ src/
 ├── index.html
 ├── styles/
 │   └── app.css                 # Tailwind directives + @import './fonts.css'
-├── fonts/                      # ship Montserrat here (mirror of assets/fonts/montserrat/)
+├── fonts/                      # ship the three Roboto families here (mirror of assets/fonts/roboto*/)
 ├── app.js                      # entry
 ├── ui/
 │   ├── dialog.js

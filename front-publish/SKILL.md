@@ -16,7 +16,7 @@ description: >-
 license: Unlicense
 metadata:
   author: Warith Harchaoui
-  version: 0.5.0
+  version: 0.6.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -102,13 +102,13 @@ When the user points to a Markdown-only project and asks for a website:
 6. **Wire meta tags per page** using `references/meta-tags.md` and (optional) `python scripts/meta_from_ollama.py path/to/page.html`.
 7. **Generate the favicon set** from the project's logo: `python scripts/favicons.py logo.png --out public --name "Project name"`. Drop the produced `head.html` snippet into the layout template.
 8. **Emit indexes**: `python scripts/site_indexes.py --root . --base-url https://example.com [--feed-from posts]` — produces robots.txt + sitemap.xml + llms.txt + optional Atom feed.
-9. **Emit pages + assets**. One `index.html` per page, one shared `app.js` (theme switcher, search if needed), one `styles.css` (Tailwind directives + Montserrat or Inter). Include the favicon set under `public/`. Add a small `README.md` to the output root explaining the build.
+9. **Emit pages + assets**. One `index.html` per page, one shared `app.js` (theme switcher, search if needed), one `styles.css` (Tailwind directives + the three Roboto families per the three-Roboto rule). Include the favicon set under `public/`. Add a small `README.md` to the output root explaining the build.
 
 Output is static HTML + CSS + a small `app.js`. For a small project (≤ 30 pages, prototype-grade) the Tailwind Play CDN keeps the deliverable build-free and it drops into GitHub Pages / Netlify / S3 / Nginx as-is. For anything you treat as production, run the Tailwind CLI / Vite build step from `front-ui/references/stack-tailwind.md` over the emitted HTML before deploying — the class names are stable, so the same files survive the swap.
 
 ## Stack rules (inherited)
 
-Output follows the front-ui stack rules — vanilla JS, Tailwind, Montserrat (default) or Inter (for dev / doc surfaces with dense prose like changelogs and reference tables). If front-ui is not installed, see `front-ui/SKILL.md` for the full ruleset.
+Output follows the front-ui stack rules — vanilla JS, Tailwind, and the three-Roboto rule (Roboto for sans / UI, Roboto Serif for editorial longform, Roboto Mono for code and log panels). If front-ui is not installed, see `front-ui/SKILL.md` for the full ruleset.
 
 ## Tool composition (take initiative)
 

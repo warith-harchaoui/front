@@ -219,7 +219,7 @@ def publish_lint_md(ctx: click.Context) -> None:
 
 
 @publish.command(name="md-to-html", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-                 help="Convert Markdown → HTML with local Mermaid PNG embed, KaTeX LaTeX, Inter + Tailwind shell.")
+                 help="Convert Markdown → HTML with local Mermaid PNG embed, KaTeX LaTeX, three-Roboto + Tailwind shell.")
 @click.pass_context
 def publish_md_to_html(ctx: click.Context) -> None:
     sys.exit(_run_script("front-publish", "md_to_html.py", tuple(ctx.args)))

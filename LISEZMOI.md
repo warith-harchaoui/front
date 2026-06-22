@@ -13,7 +13,9 @@
 
 `front`, c'est **quatre petits skills Claude / OpenCode** qui cadrent
 l'agent sur une seule pile frontend — JavaScript pur, Tailwind CSS,
-Montserrat ou Inter — et lui fournissent un système de design soigné.
+et la règle des trois Roboto (Roboto pour les sans-serif, Roboto Serif
+pour les serif, Roboto Mono pour le code) — et lui fournissent un
+système de design soigné.
 Demander à l'agent de « construire une UI », « habiller ce CLI d'une
 IHM », « transformer ce dossier de markdown en site » ou « auditer
 l'accessibilité » oriente vers le bon skill et produit du code dans
@@ -84,13 +86,18 @@ Pour des sites réels déjà livrés sur cette pile, voir
 - Le code utilise des classes utilitaires Tailwind avec des tokens
   sémantiques (`bg-brand-blue`, `text-label-primary`). Pas de couleur
   hexadécimale brute dans le balisage.
-- Le code utilise **Montserrat** par défaut pour les surfaces
-  marketing / texte long, ou **Inter** pour les UI denses
-  développeur / tableau de bord / data. Montserrat n'est pas toujours
-  le bon choix : si vous déposez une famille auto-hébergée sous
-  `front-ui/assets/fonts/<famille>/` (TTF ou WOFF2 + licence),
-  `front-ui` bascule vers cette famille. Toutes les polices sont
-  auto-hébergées (pas de CDN Google Fonts en production).
+- Le code applique la **règle des trois Roboto** : exactement trois
+  polices téléchargées, toutes issues de la super-famille Roboto —
+  **Roboto** (sans-serif / UI / texte courant), **Roboto Serif**
+  (longform éditorial / pages très textuelles), **Roboto Mono**
+  (`<code>`, `<pre>`, panneaux terminal, logs). Aucune autre famille
+  téléchargée n'est admise (ni Inter, ni Montserrat, ni IBM Plex, ni
+  JetBrains Mono). Les trois familles partagent par construction les
+  mêmes métriques et la même hauteur d'x — les surfaces mêlant prose
+  et code restent cohérentes typographiquement. Toutes sont
+  auto-hébergées (pas de CDN Google Fonts en production) ; les WOFF2
+  + OFL vivent sous `front-ui/assets/fonts/roboto/`, `…/roboto-serif/`
+  et `…/roboto-mono/`.
 - Le code pose une variante `dark:` sur chaque élément stylé,
   privilégie `<button>` / `<a>` / `<label>` / `<dialog>` / `<form>`,
   expose un anneau de focus visible, respecte `prefers-reduced-motion`,
@@ -127,7 +134,7 @@ Pour des sites réels déjà livrés sur cette pile, voir
 
 ## État d'avancement
 
-Photographie de l'état de chaque surface à `v0.5.0`. Les quatre dossiers
+Photographie de l'état de chaque surface à `v0.6.0`. Les quatre dossiers
 de skills sont stables ; la seule zone en travaux est l'**audio /
 sous-titres** (front-a11y, vidéo → texte). La nouvelle **narration
 audio** (front-publish, texte → audio) est stable et explicitement
@@ -154,7 +161,7 @@ reste.
 
 | Vous fournissez | Phrase | Skill | Sortie |
 |---|---|---|---|
-| Un CLI fonctionnel (`tool --help`, source avec `argparse` / `click` / `clap` / `commander` / `cobra`) | « Habille ce CLI d'une IHM » + chemin du projet | `front-cli-gui` | Page unique `index.html` + `app.js` + Tailwind CSS, sous-commandes mappées en formulaires / flux / tables, exécution câblée sur votre hôte (Tauri / Electron / FastAPI / Express / bouchon navigateur). Inter auto-hébergée. |
+| Un CLI fonctionnel (`tool --help`, source avec `argparse` / `click` / `clap` / `commander` / `cobra`) | « Habille ce CLI d'une IHM » + chemin du projet | `front-cli-gui` | Page unique `index.html` + `app.js` + Tailwind CSS, sous-commandes mappées en formulaires / flux / tables, exécution câblée sur votre hôte (Tauri / Electron / FastAPI / Express / bouchon navigateur). Roboto + Roboto Mono auto-hébergées. |
 | Un dossier de fichiers Markdown (README, `docs/**`, articles) | « Transforme ces fichiers markdown en site » | `front-publish` | Site statique : une page HTML par `.md`, barre supérieure collante, sommaire latéral pour `docs/`, mode sombre, favicons, balises `<meta>`, `robots.txt` + `sitemap.xml` + `llms.txt` + flux Atom. |
 | Une demande libre (« bouton primaire », « dialogue de confirmation », « page réglages ») | « Construis un `<composant>` » | `front-ui` | HTML sémantique + Tailwind + JS minimal, anneau de focus, variante `dark:`, zone tactile 44 × 44 px, fermeture par `Échap`, garde-fou `prefers-reduced-motion`. |
 | Un jeu de données (CSV, JSON, quelques lignes collées) | « Trace ça » / « Tableau de bord pour X » | `front-ui` | Spec Vega-Lite v5 JSON + wrapper `<figure>`. Style maison, palette de `color-psychology.md`, axes avec polarité, `role="img"`. |
@@ -183,7 +190,7 @@ stable qui ne dérive pas entre deux mises à jour.
 
 ```bash
 # 1. Téléchargez une release taguée
-VERSION=0.5.0
+VERSION=0.6.0
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
@@ -320,7 +327,7 @@ front/                                  ← racine du dépôt
 ├── LANDSCAPE.md                        ← matrices comparatives vs alternatives
 ├── CHANGELOG.md                        ← notes de version
 ├── CONTRIBUTING.md                     ← comment proposer des changements
-├── LICENSE.md                          ← The Unlicense (OFL pour Montserrat + Inter)
+├── LICENSE.md                          ← The Unlicense (OFL pour Roboto / Roboto Serif / Roboto Mono)
 ├── llms.txt                            ← index https://llmstxt.org/ pour les LLM
 ├── pytest.ini, requirements-dev.txt    ← outillage dev partagé
 ├── tests/                              ← suite pytest partagée pour les quatre skills
@@ -330,7 +337,7 @@ front/                                  ← racine du dépôt
 │   ├── SKILL.md
 │   ├── references/                     ← couleur, pile, composants, dataviz, design system, checklist
 │   ├── scripts/                        ← validate.py (stdlib uniquement)
-│   └── assets/                         ← starter-page, composants, polices Montserrat + Inter
+│   └── assets/                         ← starter-page, composants, les trois polices Roboto (sans / serif / mono)
 │
 ├── front-cli-gui/                      ← skill CLI → IHM (phare)
 │   ├── SKILL.md
@@ -353,8 +360,9 @@ front/                                  ← racine du dépôt
 [Warith Harchaoui, Ph.D.](https://www.linkedin.com/in/warith-harchaoui/)
 
 Quatre petits **skills** Claude / OpenCode pour une seule pile
-frontend : JavaScript pur, Tailwind CSS, Montserrat ou Inter. Conformes
-à la [spécification Anthropic des skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
+frontend : JavaScript pur, Tailwind CSS, et la règle des trois Roboto
+(Roboto / Roboto Serif / Roboto Mono). Conformes à la
+[spécification Anthropic des skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
 Un grand merci à
 **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**,
@@ -364,11 +372,10 @@ pour nos discussions fructueuses.
 
 Palettes de couleurs issues de <https://harchaoui.org/warith/colors/>.
 
-La police Montserrat est livrée dans
-`front-ui/assets/fonts/montserrat/` sous SIL Open Font License — voir
-le fichier `OFL.txt` joint. Inter est référencée depuis
-[rsms.me/inter](https://rsms.me/inter/) (OFL) ; téléchargez le fichier
-WOFF2 séparément pour l'auto-hébergement.
+Les trois familles Roboto sont livrées dans
+`front-ui/assets/fonts/roboto/`, `front-ui/assets/fonts/roboto-serif/`
+et `front-ui/assets/fonts/roboto-mono/`, chacune sous SIL Open Font
+License — voir le fichier `OFL.txt` joint dans chaque dossier.
 
 Le skill puise également des connaissances dans les
 [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
@@ -379,10 +386,11 @@ et [Google Material Design](https://material.io/design).
 **The Unlicense** — code publié dans le domaine public, sans
 copyright ni restrictions. Vous pouvez l'utiliser, le modifier, le
 redistribuer ou le vendre, sans permission, attribution ni redevance.
-Voir `LICENSE.md` pour le texte canonique. La police Montserrat reste
-sous SIL Open Font License
-(`front-ui/assets/fonts/montserrat/OFL.txt`) — la dédicace au domaine
-public ne change pas ce point.
+Voir `LICENSE.md` pour le texte canonique. Les trois familles Roboto
+(Roboto, Roboto Serif, Roboto Mono) restent sous SIL Open Font License
+(voir le `OFL.txt` joint dans chaque dossier
+`front-ui/assets/fonts/roboto*/`) — la dédicace au domaine public ne
+change pas ce point.
 
 **Licence vs. attribution.** Le code est publié sous l'Unlicense
 (domaine public — aucune autorisation requise pour l'utiliser, le

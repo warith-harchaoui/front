@@ -5,40 +5,39 @@ This skill emits Tailwind utility classes for all styling. Two valid setups:
 - **Play CDN** (`assets/starter-page.html` uses this) — zero-config, fine for prototypes.
 - **Built CSS via Tailwind CLI or Vite** — recommended for production.
 
-## Typography — default, alternate, and custom swap
+## Typography — the three-Roboto rule
 
-The `fontFamily.sans` token defaults to **Montserrat**. Montserrat is
-not always the perfect choice — language coverage, brand identity, and
-small-size legibility on dense UIs are real reasons to pick something
-else. Two supported escape hatches:
+Exactly three downloaded webfonts, all from the Roboto super-family:
 
-1. **Documented alternate — Inter.** Drop the WOFF2 files into
-   `assets/fonts/inter/` and set
-   `sans: ['Inter Variable', 'Inter', 'sans-serif']` in
-   `tailwind.config.js`. Inter has a larger x-height and stronger
-   hinting at 12–14 px, which fits dashboards, admin panels, dev tools
-   and data-heavy surfaces better than Montserrat.
+| Tailwind token   | Family       | Use                                                     |
+| ---------------- | ------------ | ------------------------------------------------------- |
+| `fontFamily.sans`  | Roboto       | Default UI + body                                       |
+| `fontFamily.serif` | Roboto Serif | Editorial / longform / quote pulls                      |
+| `fontFamily.mono`  | Roboto Mono  | `<code>`, `<pre>`, kbd / samp, terminals, log panels    |
 
-2. **User-supplied custom family.** Ship a folder under
-   `assets/fonts/<family>/` containing the TTF or WOFF2 files plus the
-   license (OFL.txt, license.txt, …). Then in three places:
+No other downloaded family is permitted — not Inter, not Montserrat,
+not IBM Plex, not JetBrains Mono. The three siblings share metrics,
+x-height, and visual rhythm by design, so prose-heavy and code-heavy
+surfaces stay typographically coherent. If a project genuinely needs a
+*fourth* family for brand reasons, that requires an explicit
+project-README note; otherwise refuse and offer a Roboto-only
+equivalent.
 
-   - `tailwind.config.js` — change `fontFamily.sans` to your family.
-   - `src/styles/app.css` — replace `@import` of the Montserrat CSS
-     with the equivalent `@font-face` block for your family (variable
-     axis preferred when available; otherwise the four static weights
-     400 / 500 / 600 / 700 with matching italic if relevant).
-   - Project README — record which family is in use and why, so a
-     future maintainer does not have to read the CSS to find out.
+The WOFF2 files live under:
 
-   Every other rule (semantic tokens, dark-mode peers, focus ring,
-   reduced-motion guard, 44 × 44 hit area) stays unchanged.
+- `assets/fonts/roboto/` (Variable + Italic-Variable + `OFL.txt` + `fonts.css`)
+- `assets/fonts/roboto-serif/` (idem)
+- `assets/fonts/roboto-mono/` (idem)
+
+Every other rule (semantic tokens, dark-mode peers, focus ring,
+reduced-motion guard, 44 × 44 hit area) stays unchanged regardless of
+which of the three families a surface uses.
 
 **Always self-host.** No Google Fonts CDN in production. The jsDelivr
 `gh` proxy is acceptable for a prototype with a self-hosted fallback;
-production builds should ship the WOFF2 / TTF files alongside the
-HTML. Run the validator (`front-ui/scripts/validate.py`) after any
-font swap — it does not check the family itself but it catches the
+production builds should ship the WOFF2 files alongside the HTML. Run
+the validator (`front-ui/scripts/validate.py`) after any typography
+change — it does not check the family itself but it catches the
 forbidden raw-hex / framework-import regressions a font swap can
 accidentally introduce.
 
@@ -52,8 +51,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'],
-        mono: ['ui-monospace', 'monospace'],
+        sans:  ['Roboto', 'sans-serif'],
+        serif: ['Roboto Serif', 'serif'],
+        mono:  ['Roboto Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
         brand: {
@@ -111,7 +111,9 @@ module.exports = {
 ## Base CSS (`src/styles/app.css`)
 
 ```css
-@import url('../fonts/montserrat/fonts.css');
+@import url('../fonts/roboto/fonts.css');
+@import url('../fonts/roboto-serif/fonts.css');
+@import url('../fonts/roboto-mono/fonts.css');
 
 @tailwind base;
 @tailwind components;

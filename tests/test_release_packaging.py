@@ -252,8 +252,10 @@ def test_skill_tarball_size_sanity(
     tarball: Path = built_release / f"{skill_name}-{TEST_VERSION}.tar.gz"
     size_mb: float = tarball.stat().st_size / 1_000_000
     # 10 MB is generous — the biggest shipped skill (front-ui with
-    # Montserrat WOFF2 fonts) is about 1 MB compressed. Anything over
-    # 10 MB is almost certainly a fixture / cache that slipped in.
+    # the three-Roboto WOFF2 bundle: Roboto + Roboto Serif + Roboto Mono,
+    # variable + italic-variable each, latin subset) is well under 1 MB
+    # compressed. Anything over 10 MB is almost certainly a fixture /
+    # cache that slipped in.
     assert size_mb < 10, (
         f"{tarball.name} is {size_mb:.1f} MB — almost certainly a "
         "fixture / cache / model file that slipped in"
