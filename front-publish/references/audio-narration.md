@@ -88,6 +88,39 @@ matters (essays with mood swings, opinion pieces). Both are
 acceptable defaults; the narration manifest records which one
 produced each clip so you can A/B.
 
+### Installation gotcha — OpenVoice package rename
+
+Between mid-2025 and mid-2026 the upstream `myshell-ai/OpenVoice`
+repo renamed the `pyproject.toml` package name from `openvoice` to
+`myshell-openvoice` without changing the import path. Modern pip
+rejects the mismatch:
+
+```
+Requested myshell-openvoice from git+https://github.com/myshell-ai/OpenVoice.git@main
+has inconsistent name: expected 'openvoice', but metadata has 'myshell-openvoice'.
+ERROR: No matching distribution found for openvoice (unavailable)
+```
+
+The pinned requirement in
+`front-publish/scripts/requirements-narrate-openvoice.txt` still uses
+the old name. Two workable fixes locally:
+
+1. **Pin a pre-rename commit.** Replace `@main` in the requirements
+   file with a commit SHA from before the rename (any commit on the
+   `main` branch tagged `v2.x.x` works). This is the reproducible
+   path — the SECURITY.md "Supply-chain notes" line about pinning
+   minor versions applies here too.
+2. **Use the upstream package name.** Edit the requirements file
+   line to `myshell-openvoice @ git+…@main`. Pip then accepts the
+   install. The import path inside `narrate_openvoice.py` (`import
+   openvoice` / `from openvoice import ...`) is unchanged.
+
+The skill's `install_narrate.py` script does **not** call pip — it
+only downloads the v2 checkpoint files into the expected layout, so
+it's unaffected. The pip-install step is on you (or your
+requirements pin) until the OpenVoice maintainers republish under a
+stable name.
+
 ## Hints derived from structure
 
 `_narrate.extract_segments` reads the Markdown tree and assigns
@@ -293,3 +326,14 @@ pronunciation overrides, manifest cache, RSS enclosure injection,
 emotion→engine-dial mapping). Engine wrappers are smoke-tested via
 the orchestrator's mock-subprocess path; actual synthesis is a local
 developer / production task.
+
+Concretely, `.github/workflows/ci.yml` installs every per-skill
+`requirements-*.txt` so the Ollama-backed scripts import cleanly
+during collection — **except**
+`requirements-narrate-openvoice.txt` and
+`requirements-narrate-chatterbox.txt`, which are skipped explicitly.
+Both engine wrappers use `importlib` for lazy imports inside the
+synthesis path, so collection succeeds without the heavy ML
+dependencies. Skipping them also avoids the upstream OpenVoice
+package-rename trap (see "Installation gotcha" above) blocking
+unrelated CI runs.

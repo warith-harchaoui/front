@@ -63,7 +63,11 @@ problem so users can act on the same information.
      the `release.yml` workflow on every `v*.*.*` tag push. Users
      verify with `shasum -a 256 -c SHA256SUMS` (or `sha256sum -c`)
      before extracting — README's *Install* section walks the full
-     flow.
+     flow. The publish step is **idempotent**: if the maintainer ran
+     `gh release create` locally before the workflow caught up, the
+     workflow detects the existing release and skips with success
+     rather than re-uploading and rewriting the already-published
+     `SHA256SUMS` (which would invalidate downloads in flight).
   2. **`git clone` + `cp -r`** (developer / contributor path). No
      verification step beyond `git fsck`. Documented in
      `CONTRIBUTING.md`.

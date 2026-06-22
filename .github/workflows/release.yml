@@ -44,6 +44,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
         run: |
+          # Idempotent publish. If a release already exists for this tag
+          # (e.g. the maintainer ran ``gh release create`` locally after
+          # ``scripts/release.sh`` while the tag-push workflow was still
+          # queueing) skip with success — don't re-upload here. Replacing
+          # already-published assets would invalidate any downloads in
+          # flight and rewrite SHA256SUMS for users who have already
+          # fetched it. The maintainer is responsible for verifying the
+          # locally built artifacts match what they want published.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "release $GITHUB_REF_NAME already exists — skipping create"
+            exit 0
+          fi
           # --generate-notes pulls from commits + PRs since the previous
           # tag; falls back gracefully on first tag. We attach every tarball
           # plus SHA256SUMS so users can verify offline.

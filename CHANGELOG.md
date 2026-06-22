@@ -18,6 +18,54 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.6.1] — 2026-06-22 — CI + release workflow fixes
+
+Patch release. No skill content changes. Repairs the two GitHub
+Actions workflows that broke during the v0.6.0 publish.
+
+### Fixed — `ci` workflow (failing since v0.5.0)
+
+`front-publish/scripts/requirements-narrate-openvoice.txt` pins
+`openvoice @ git+https://github.com/myshell-ai/OpenVoice.git@main`,
+but upstream renamed the package's `pyproject.toml` metadata name
+from `openvoice` to `myshell-openvoice` between v0.5.0 and v0.6.1.
+Modern pip rejects the mismatch with `Requested myshell-openvoice
+from git+… has inconsistent name: expected 'openvoice', but metadata
+has 'myshell-openvoice'`, which broke the install step on every push
+to `main` since the audio-narration feature landed.
+
+`narrate_openvoice.py` and `narrate_chatterbox.py` both `importlib`
+their backend lazily inside functions, so neither package is needed
+for `pytest` collection. `.github/workflows/ci.yml` now skips the two
+optional narration-engine requirements files explicitly. As a side
+benefit, every matrix job stops pulling ~2 GB of torch + torchaudio
+on every push.
+
+### Fixed — `release` workflow (failed on v0.6.0)
+
+When the maintainer publishes a tag manually (running
+`scripts/release.sh` + `gh release create` locally before the
+tag-push workflow caught up), the Actions workflow tried to create a
+release that already existed and exited 1 with `a release with the
+same tag name already exists`. The publish step is now idempotent:
+it checks `gh release view` and skips with success when the release
+already exists, instead of re-uploading and clobbering the
+maintainer's locally-built `SHA256SUMS`.
+
+### Documented
+
+- `front-publish/references/audio-narration.md` now carries a
+  short "Installation gotcha — OpenVoice package rename" note next
+  to the engine matrix so users hit by the same upstream rename know
+  the fix without having to read the CHANGELOG.
+- `SECURITY.md` "Supply-chain notes" clarifies that
+  `release.yml` is now idempotent (manual publish + workflow publish
+  don't fight).
+- `CONTRIBUTING.md` "Release process" gains a one-paragraph note
+  about the local-vs-Actions interplay: pushing the tag triggers the
+  workflow; if you want to publish manually first, the workflow now
+  no-ops cleanly.
+
 ## [0.6.0] — 2026-06-22 — typography overhaul
 
 **The three-Roboto rule.** Replaced the previous Montserrat-default /

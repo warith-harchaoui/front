@@ -77,6 +77,35 @@ PR is merged.
 - Auto-fix suggestions presented as final decisions for things that
   need a designer's eye (palette choices, typography pairings).
 
+## Release process (maintainer)
+
+Two equivalent paths; pick one per release and don't mix them.
+
+- **Tag-only** (recommended). Bump the version in the four
+  `SKILL.md` frontmatters + `README.md` / `LISEZMOI.md` install
+  snippets + a new `CHANGELOG.md` section, commit, then
+  `git tag -a v<version> -m "release v<version>" && git push origin
+  main v<version>`. The `release.yml` workflow runs
+  `scripts/release.sh` on the runner, publishes the GitHub release,
+  attaches the five tarballs + `SHA256SUMS`, and generates notes
+  from commits since the previous tag.
+
+- **Local-build, then tag-push**. Run `scripts/release.sh <version>`
+  to build into `dist/`, verify locally, then optionally publish
+  manually with `gh release create v<version> dist/*.tar.gz
+  dist/SHA256SUMS …`. The workflow still triggers on the tag push;
+  since v0.6.1 the publish step is idempotent — it detects the
+  existing release and skips with success rather than re-uploading
+  and rewriting `SHA256SUMS`. (Before v0.6.1, the workflow exited 1
+  with `a release with the same tag name already exists` whenever
+  the maintainer published locally first.)
+
+The artifacts the workflow uploads and the artifacts a local
+`scripts/release.sh` produces are **not byte-identical** (gzip /
+tar versions differ between macOS and the ubuntu-latest runner), so
+the SHA256SUMS the user fetches depends on which path produced the
+release. Either path is fine; pick one consciously.
+
 ## Reporting issues
 
 GitHub issues at <https://github.com/warith-harchaoui/front/issues>.

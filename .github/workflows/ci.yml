@@ -37,8 +37,23 @@ jobs:
           pip install -r requirements-dev.txt
           # Per-skill runtime deps so the Ollama-backed scripts import
           # cleanly during collection (they don't call the daemon — that's
-          # gated by the `eval` marker).
+          # gated by the `eval` marker). The two narration engines are
+          # skipped on purpose: ``narrate_openvoice.py`` and
+          # ``narrate_chatterbox.py`` lazy-import their backend via
+          # ``importlib`` inside functions, so neither is needed for
+          # collection. Installing them pulls torch + torchaudio (~2 GB)
+          # into every matrix job and — for OpenVoice — currently breaks
+          # CI because upstream's pyproject.toml package name was renamed
+          # to ``myshell-openvoice`` while the requirement still pins
+          # ``openvoice``. Smoke-testing the engines belongs in a
+          # dedicated optional job, not on every push.
           for req in front-a11y/scripts/requirements-*.txt front-publish/scripts/requirements-*.txt; do
+            case "$(basename "$req")" in
+              requirements-narrate-openvoice.txt|requirements-narrate-chatterbox.txt)
+                echo "skipping optional narration engine: $req"
+                continue
+                ;;
+            esac
             pip install -r "$req"
           done
           # The driver itself — installs the `front` console script so
