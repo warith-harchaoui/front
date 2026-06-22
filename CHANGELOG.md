@@ -18,6 +18,74 @@ section walks the full flow. To upgrade, repeat the steps with a newer
 place. If the checksum check fails, do not install the artifact.
 Release tarballs are produced by `scripts/release.sh <version>`.
 
+## [0.6.3] — 2026-06-22 — Anthropic skill-spec compliance audit
+
+Patch release. Audited the four skills against
+*The Complete Guide to Building Skills for Claude* (Anthropic) and
+brought everything into spec.
+
+### Fixed — README.md inside skill folders (spec violation)
+
+The spec is explicit: "Don't include README.md inside your skill
+folder. All documentation goes in SKILL.md or references/. Note: when
+distributing via GitHub, you'll still want a repo-level README for
+human visitors." The repo-level `README.md` and `LISEZMOI.md` are
+fine and required; the nested ones were not.
+
+- **Deleted** `front-ui/assets/fonts/README.md` (introduced in 0.6.0
+  during the typography migration). Its content — the three-Roboto
+  rule + wiring instructions — was redundant with
+  `front-ui/references/ui-guidelines/foundations/typography.md`,
+  which already documents Tailwind config, CSS variables, HTML
+  preload, and the per-folder `fonts.css` layout. `front-ui/SKILL.md`
+  assets list now points readers at the typography reference instead.
+- **Renamed** `front-cli-gui/assets/examples/cli-gui-demo/README.md`
+  → `RUNBOOK.md`. The cli-gui-demo is a runnable example, so a
+  runbook (how to launch, what to read, where things live) earns its
+  keep; we just can't call it `README.md` inside a skill folder. A
+  leading note in the renamed file explains the rule for any reader
+  who came in expecting a README.
+
+### Hardened — validators catch the violation now
+
+Both validators previously checked only the skill root, which is how
+the fonts README slipped past CI in 0.6.0.
+
+- `front-ui/scripts/validate.py` — Check 6 now uses `Path.rglob` to
+  walk the whole skill tree.
+- `scripts/validate_skill.py` — added Check 10 with the same
+  rule; the cross-skill validator now reports every nested README
+  with its path so the maintainer doesn't have to grep.
+- `tests/test_validate_skill.py` — two new regression tests
+  (`test_readme_at_skill_root_is_rejected`,
+  `test_readme_nested_is_rejected`) lock the rule in. Total
+  deterministic suite is now 425 tests.
+
+### Added — `compatibility` frontmatter field
+
+Optional per the spec, but recommended — declares the runtime
+environment each skill needs. All four SKILL.md frontmatters now
+carry a `compatibility:` block stating: which runtime hosts the skill
+targets (Claude.ai / Claude Code / OpenCode), what Python version (if
+any) the scripts need, which third-party deps each script needs, and
+whether network access is required. Shapes future tool discovery
+without expanding the description budget.
+
+### Audited — clean on every other rule
+
+- ✅ Folder names kebab-case (`front-ui`, `front-cli-gui`,
+  `front-publish`, `front-a11y`) and match each `name:` field.
+- ✅ `SKILL.md` filename exact (case-sensitive) on all four.
+- ✅ Description ≤ 1024 chars on all four (770 / 751 / 886 / 867).
+- ✅ Descriptions include both "what" and "when" with concrete
+  trigger phrases.
+- ✅ No XML angle brackets (`<` / `>`) in any description value.
+- ✅ No reserved words (`claude` / `anthropic`) in any skill name.
+- ✅ Every SKILL.md under 5 000 words (the spec's "large context"
+  threshold).
+- ✅ Python style (numpy-docstring module headers, full typing,
+  authorship line) consistent across every shipped script.
+
 ## [0.6.2] — 2026-06-22 — SEO + GEO foundations from Google's official docs
 
 Minor release. New canonical reference adapting Google's

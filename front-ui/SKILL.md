@@ -13,9 +13,14 @@ description: >-
   GUI), front-publish (Markdown → website + meta tags + favicons), front-a11y
   (a11y lint, contrast audit, alt text, captions).
 license: Unlicense
+compatibility: >-
+  Runtime: Claude.ai, Claude Code, OpenCode. No Python runtime required to use
+  the skill itself (output is HTML + CSS + vanilla JS). Optional validator
+  scripts/validate.py needs Python 3.9+ stdlib + PyYAML. Network access not
+  required.
 metadata:
   author: Warith Harchaoui
-  version: 0.6.2
+  version: 0.6.3
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -246,10 +251,10 @@ Load these only when needed.
 - `assets/starter-page.html` — single-file bootstrap (Tailwind Play CDN — prototype-grade; swap to Tailwind CLI / Vite before shipping a real production site).
 - `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`.
 - `assets/components/chart-bar.json`, `chart-line.json` — Vega-Lite specs.
-- `assets/fonts/roboto/` — Roboto WOFF2 + OFL + `fonts.css` (sans).
+- `assets/fonts/roboto/` — Roboto WOFF2 + OFL + `fonts.css` (sans). The `fonts.css` declares the `@font-face` blocks and also exposes the `--font-sans / --font-serif / --font-mono` custom properties and the base `html { font-family: var(--font-sans) }` / `code, pre, kbd, samp { font-family: var(--font-mono) }` wiring.
 - `assets/fonts/roboto-serif/` — Roboto Serif WOFF2 + OFL + `fonts.css` (serif).
 - `assets/fonts/roboto-mono/` — Roboto Mono WOFF2 + OFL + `fonts.css` (code / monospace).
-- `assets/fonts/README.md` — the three-Roboto rule + wiring instructions.
+- The three-Roboto rule itself + the full wiring recipe (Tailwind config, `@import` ordering, HTML preload, fallback stacks) lives in `references/ui-guidelines/foundations/typography.md` — no per-asset README, per the Anthropic skill spec.
 
 ## Scripts
 

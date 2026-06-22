@@ -199,6 +199,22 @@ def validate_skill(skill_dir: Path) -> list[str]:
             + "; ".join(placeholder_hits)
         )
 
+    # ── Check 10: no README.md anywhere inside the skill folder ────────
+    # The Anthropic skill spec explicitly forbids ``README.md`` *inside*
+    # the skill folder: "Don't include README.md inside your skill
+    # folder. All documentation goes in SKILL.md or references/." That
+    # rule covers nested paths too (e.g. ``assets/examples/.../README.md``),
+    # so we walk the whole tree, not just the top level. The repo-level
+    # README.md sitting *next to* the skill folder is fine and
+    # encouraged — it's the entry point for human visitors on GitHub.
+    nested_readmes: list[Path] = sorted(skill_dir.rglob("README.md"))
+    if nested_readmes:
+        errors.append(
+            f"{skill_name}: README.md found inside the skill folder "
+            f"(spec forbids it): "
+            + ", ".join(str(p.relative_to(skill_dir)) for p in nested_readmes)
+        )
+
     return errors
 
 

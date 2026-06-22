@@ -13,9 +13,15 @@ description: >-
   follows the front-ui stack rules — install front-ui alongside for full
   design tokens.
 license: Unlicense
+compatibility: >-
+  Runtime: Claude.ai, Claude Code, OpenCode. Output is one-page HTML + ES
+  modules + Tailwind that runs in any modern browser. Reads CLIs from any
+  argparse / Click / Typer / clap / commander / cobra source. Runnable demo
+  needs Python 3.9+ stdlib only; no third-party deps. Network access not
+  required.
 metadata:
   author: Warith Harchaoui
-  version: 0.6.2
+  version: 0.6.3
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

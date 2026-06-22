@@ -188,6 +188,28 @@ class TestNegativeCases:
         errors = validate_skill(skill)
         assert any("placeholder token" in e for e in errors)
 
+    def test_readme_at_skill_root_is_rejected(self, tmp_path: Path) -> None:
+        # The Anthropic spec forbids README.md anywhere inside a skill
+        # folder. The top-level case is the obvious one.
+        skill = _make_skill(tmp_path, "readme-top")
+        (skill / "README.md").write_text("# stray README\n", encoding="utf-8")
+        errors = validate_skill(skill)
+        assert any("README.md found inside" in e for e in errors)
+
+    def test_readme_nested_is_rejected(self, tmp_path: Path) -> None:
+        # The non-obvious case: a README hiding under
+        # ``assets/examples/.../`` is just as bad. The validator must
+        # walk the whole tree, not just the top level.
+        skill = _make_skill(tmp_path, "readme-nested")
+        nested: Path = skill / "assets" / "examples" / "demo"
+        nested.mkdir(parents=True)
+        (nested / "README.md").write_text("# stray nested\n", encoding="utf-8")
+        errors = validate_skill(skill)
+        assert any("README.md found inside" in e for e in errors)
+        # The error message should name the nested path so the
+        # maintainer doesn't have to grep for it.
+        assert any("assets/examples/demo/README.md" in e for e in errors)
+
 
 # ── CLI contract — exit codes ──────────────────────────────────────────────
 

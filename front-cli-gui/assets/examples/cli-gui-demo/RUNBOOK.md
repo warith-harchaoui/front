@@ -1,4 +1,9 @@
-# cli-gui-demo
+# cli-gui-demo — runbook
+
+This file is named `RUNBOOK.md` (not `README.md`) on purpose: the
+Anthropic skill spec forbids `README.md` anywhere inside a skill
+folder. The repo-level `README.md` and `LISEZMOI.md` cover the skill
+overview; this runbook covers how to launch and read the demo.
 
 Worked example of the **front** skill's flagship CLI → GUI workflow. A mock CLI (`imgconvert`) is wrapped in a single-page GUI built with vanilla JavaScript, Tailwind CSS, the Roboto family (sans / serif / mono), and a tiny Python proxy.
 

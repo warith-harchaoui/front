@@ -318,12 +318,22 @@ else:
     ok("No LLM-marketing phrases")
 
 
-# ── Check 6 — no README.md inside the skill folder ─────────────────────────
+# ── Check 6 — no README.md anywhere inside the skill folder ────────────────
 
-if (SKILL_ROOT / "README.md").is_file():
-    bad("README.md exists inside the skill folder (Anthropic spec forbids it)")
+# The Anthropic spec is explicit: "Don't include README.md inside your
+# skill folder. All documentation goes in SKILL.md or references/."
+# That covers nested paths too (e.g. ``assets/fonts/README.md``), so we
+# walk the whole tree, not just the top level. ``rglob`` is case-
+# sensitive on POSIX, which matches the spec's "case-sensitive" rule on
+# SKILL.md / README.md filenames.
+nested_readmes: list[Path] = sorted(SKILL_ROOT.rglob("README.md"))
+if nested_readmes:
+    bad(
+        "README.md exists inside the skill folder (Anthropic spec forbids it)",
+        [str(p.relative_to(SKILL_ROOT)) for p in nested_readmes],
+    )
 else:
-    ok("No README.md inside the skill folder")
+    ok("No README.md anywhere inside the skill folder")
 
 
 # ── Check 7 — every INDEX.md reference resolves ────────────────────────────

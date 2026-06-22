@@ -14,9 +14,16 @@ description: >-
   language", "rewrite at grade N", "simplify this copy". Output follows the
   front-ui stack rules — install front-ui alongside for full design tokens.
 license: Unlicense
+compatibility: >-
+  Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (favicons,
+  site_indexes, plain_language, meta_from_ollama, md_to_html, lint_markdown)
+  need Python 3.9+ with stdlib + Pillow + PyYAML; meta_from_ollama and
+  plain_language additionally need a running local Ollama daemon. Optional
+  audio narration (narrate_post + OpenVoice v2 or ChatterboxTTS) pulls
+  torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.6.2
+  version: 0.6.3
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

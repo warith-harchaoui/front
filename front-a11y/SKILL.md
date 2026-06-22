@@ -14,9 +14,16 @@ description: >-
   "captions", "transcript", "colorblind preview", "deuteranope", "CVD". Output
   is JSON / stdout / exit codes suitable for pre-commit and CI.
 license: Unlicense
+compatibility: >-
+  Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (lint_a11y,
+  audit_contrast, simulate_cvd) need Python 3.9+ stdlib + Pillow + numpy.
+  alt_from_ollama additionally needs a running local Ollama daemon with a
+  vision-capable model. captions_from_whisper needs a local whisper.cpp
+  build (install_captions wires it up). Network access not required after
+  the install scripts run once.
 metadata:
   author: Warith Harchaoui
-  version: 0.6.2
+  version: 0.6.3
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
