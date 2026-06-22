@@ -5,9 +5,11 @@ This skill emits Tailwind utility classes for all styling. Two valid setups:
 - **Play CDN** (`assets/starter-page.html` uses this) — zero-config, fine for prototypes.
 - **Built CSS via Tailwind CLI or Vite** — recommended for production.
 
-## Typography — the three-Roboto rule
+## Typography — the three-Roboto rule (generation default, not an audit rule)
 
-Exactly three downloaded webfonts, all from the Roboto super-family:
+When generating fresh UI / site output and the user has not specified a
+typeface, default to exactly three downloaded webfonts, all from the
+Roboto super-family:
 
 | Tailwind token   | Family       | Use                                                     |
 | ---------------- | ------------ | ------------------------------------------------------- |
@@ -15,13 +17,23 @@ Exactly three downloaded webfonts, all from the Roboto super-family:
 | `fontFamily.serif` | Roboto Serif | Editorial / longform / quote pulls                      |
 | `fontFamily.mono`  | Roboto Mono  | `<code>`, `<pre>`, kbd / samp, terminals, log panels    |
 
-No other downloaded family is permitted — not Inter, not Montserrat,
-not IBM Plex, not JetBrains Mono. The three siblings share metrics,
-x-height, and visual rhythm by design, so prose-heavy and code-heavy
-surfaces stay typographically coherent. If a project genuinely needs a
-*fourth* family for brand reasons, that requires an explicit
-project-README note; otherwise refuse and offer a Roboto-only
-equivalent.
+The three siblings share metrics, x-height, and visual rhythm by
+design, so prose-heavy and code-heavy surfaces stay typographically
+coherent. No other downloaded family is introduced by the skill on
+its own — not Inter, not Montserrat, not IBM Plex, not JetBrains
+Mono.
+
+**The rule is a default, not a hard constraint:**
+
+- **Auditing an existing site / UI**: respect the typefaces already
+  in use. Don't propose a font swap as part of an ergonomic / a11y /
+  anti-pattern review unless the user specifically asks about
+  typography — that would be scope creep.
+- **User names a typeface**: ("use Inter", "we ship IBM Plex",
+  "stick to system fonts") use what they ask for.
+- **User asks for a fourth family explicitly** for brand reasons:
+  carry it out and record the choice in the project README so a
+  future maintainer knows why.
 
 The WOFF2 files live under:
 

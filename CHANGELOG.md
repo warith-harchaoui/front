@@ -47,6 +47,44 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.6.4] — 2026-06-22 — three-Roboto rule carve-out for audits
+
+Patch release. Re-scopes the three-Roboto typography rule from "hard
+constraint" to "default for generation", so audits and user-specified
+fonts no longer get hijacked.
+
+### Changed — hard rule 3 in `front-ui/SKILL.md`
+
+The three-Roboto rule now applies **only** when generating fresh UI /
+site output **and the user has not specified a typeface**. It does NOT
+apply when:
+
+1. **Auditing an existing site / UI.** A user asking to "audit this",
+   "review this", "make it look less AI", or "WCAG check" should get
+   feedback on ergonomics, a11y, anti-patterns — **not** an unsolicited
+   font-swap recommendation. Respect the typefaces already in use.
+2. **The user names a typeface.** "Use Inter", "we ship IBM Plex",
+   "stick to system fonts" → use what they ask for.
+3. **The user asks for a fourth family explicitly** for brand
+   reasons → carry it out and record the choice in the project README
+   so a future maintainer knows why.
+
+This is a real behaviour change: before 0.6.4, an "audit this UI" run
+could (and arguably should have, per the wording) push back on the
+existing typeface as part of the review. Now it stays in its lane.
+
+### Also changed
+
+- **`front-ui/SKILL.md` decision tree** — the "audit / ergonomic
+  review / UX review" row now explicitly says "Respect the existing
+  typeface stack — do not propose a three-Roboto swap unless the user
+  explicitly asks about typography."
+- **`front-ui/references/ui-guidelines/foundations/typography.md`** —
+  the "The fonts" section opens with the carve-out and renames itself
+  to "the three-Roboto rule (generation-only default)".
+- **`front-ui/references/stack-tailwind.md`** — same carve-out at the
+  top of the typography section.
+
 ## [0.6.3] — 2026-06-22 — Anthropic skill-spec compliance audit
 
 Patch release. Audited the four skills against

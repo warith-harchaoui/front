@@ -6,13 +6,24 @@
 - Building a type scale
 - Auditing readability
 
-## The fonts: the three-Roboto rule
+## The fonts: the three-Roboto rule (generation-only default)
 
 This skill ships **exactly three downloaded webfonts**, all from the
-Roboto super-family. No other family is allowed — not Inter, not
-Montserrat, not IBM Plex, not JetBrains Mono. System-font fallback
-stacks (`ui-monospace`, `system-ui`, `serif`, `sans-serif`) are fine
-and expected.
+Roboto super-family. This is the **default for fresh generation** when
+the user has not specified a typeface — no other downloaded family is
+introduced by the skill on its own. System-font fallback stacks
+(`ui-monospace`, `system-ui`, `serif`, `sans-serif`) are fine and
+expected.
+
+**The rule does NOT apply to audits.** When the user asks to review,
+audit, redesign, or "make less AI" an *existing* page, respect the
+typefaces already in use. Don't propose a font swap as part of an
+ergonomic / a11y / anti-pattern review unless the user specifically
+asks about typography — that would be scope creep and would imply a
+rebrand they didn't ask for. The same goes when the user names a
+typeface ("use Inter", "we ship IBM Plex", "stick to system fonts"):
+use what they ask for and stop. The three-Roboto rule is a *default*,
+not a hard constraint.
 
 | Role             | Family         | When to lift it                                                |
 | ---------------- | -------------- | -------------------------------------------------------------- |

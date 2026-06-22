@@ -20,7 +20,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.6.3
+  version: 0.6.4
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -60,7 +60,7 @@ The companion skills assume the same stack rules below.
 
 1. **No framework imports.** Output never contains `react`, `vue`, `svelte`, `solid-js`, `next`, `nuxt`, `angular`. If asked, refuse and offer the vanilla equivalent.
 2. **Tailwind utility classes only**, never inline `style="…"`. The single allowed exception is a one-off CSS custom property whose value references an existing token (e.g. `style="--accent: var(--brand-blue)"`). **Never** put a raw hex literal in markup — even inside `style="--accent: #007AFF"`. If a new accent is needed, add the token to `tailwind.config.js` (`theme.extend.colors.brand`) and reference it via `var(--brand-…)` or a Tailwind class. This keeps rule 7 (no raw hex) and rule 2 in lockstep.
-3. **The three-Roboto rule.** Exactly three downloaded webfonts, all from the Roboto super-family: **Roboto** for sans, **Roboto Serif** for serif, **Roboto Mono** for code / monospace. No other downloaded family is allowed — not Inter, not Montserrat, not IBM Plex, not JetBrains Mono. Use Roboto for body / UI text by default; lift Roboto Serif when a surface wants editorial weight (longform reading, quote pulls, prose-heavy landings); use Roboto Mono for `<code>`, `<pre>`, kbd / samp, terminal panels. If a project genuinely needs a *fourth* family for brand reasons, that requires an explicit project-README note — otherwise refuse and offer a Roboto-only equivalent. In every case: self-host (no Google Fonts CDN, no jsDelivr GH proxy in production builds), and system-font fallback stacks (`ui-monospace`, `system-ui`, `serif`, `sans-serif`) are fine and expected.
+3. **The three-Roboto rule — for generation, not for audits.** **When generating fresh UI / site output and no typeface has been specified by the user**, ship exactly three downloaded webfonts, all from the Roboto super-family: **Roboto** for sans, **Roboto Serif** for serif, **Roboto Mono** for code / monospace. No other downloaded family is allowed by default — not Inter, not Montserrat, not IBM Plex, not JetBrains Mono. Use Roboto for body / UI text by default; lift Roboto Serif when a surface wants editorial weight (longform reading, quote pulls, prose-heavy landings); use Roboto Mono for `<code>`, `<pre>`, kbd / samp, terminal panels. Self-host always (no Google Fonts CDN, no jsDelivr GH proxy in production builds); system-font fallback stacks (`ui-monospace`, `system-ui`, `serif`, `sans-serif`) are fine and expected. **The rule does NOT apply when:** (a) **auditing an existing site / UI** — respect the existing fonts; don't propose a font swap unless the user specifically asks about typography; (b) **the user names a typeface** ("use Inter", "we ship IBM Plex", "stick to system fonts") — use what they ask for; (c) **the user asks for a fourth family explicitly for brand reasons** — carry it out and record the choice in the project README so a future maintainer knows why.
 4. **Semantic HTML first.** `<button>`, `<a href>`, `<label for>`, `<dialog>`, `<form>`. ARIA only when no semantic element fits.
 5. **Both color schemes.** Every styled element gets a `dark:` peer.
 6. **Accessibility is shipping-required.** See `references/ui-guidelines/foundations/accessibility.md`.
@@ -151,7 +151,7 @@ The "zero build, drop into Nginx / S3 / Pages" pitch only holds for the prototyp
 | "chart" / "graph" / "dashboard tile" | `charts-vega.md` + `dataviz-chart-selection.md` + `dataviz-color-palettes.md` | Vega-Lite v5 JSON spec, Roboto, 10 px rounded corners, palette from `color-psychology.md`, no top/right spines. State polarity when well-defined (*↑ higher is better* / *↓ lower is better* / *target = N ± k*). |
 | "dashboard" / "BI" / "KPI summary" | `dashboard-ergonomics.md` (+ chart references above) | One question per tile, title as a question, polarity tag on every measurable tile, sticky filters, 12-column grid, skeleton tiles while loading. |
 | "map" / "choropleth" | `dataviz-maps.md` | Title states the message, ≤ 7 classes, locator inset, accessible text alternative below the map |
-| "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria: guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility |
+| "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria: guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility. **Respect the existing typeface stack** — do not propose a three-Roboto swap unless the user explicitly asks about typography. |
 | "make it look less AI" / "designer review" | `anti-patterns.md` | Refuse gradient text, glassmorphism on body, side-stripe borders, "boost your productivity" copy, three-card grids |
 | "psychology" / "conversion" / "flow not working" | `ux-psychology.md` | Pick ONE applicable principle per screen — Hick / Anchoring / Default Bias / Peak-End / Goal Gradient — and apply concretely |
 | "material" / "Material 3" / "M3" | `material-design.md` | Map Material roles to skill tokens; emit plain HTML + Tailwind (no `mdc-*` classes) |
