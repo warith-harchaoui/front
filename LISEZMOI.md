@@ -149,7 +149,7 @@ WCAG.
 | `front-publish` (site Markdown, meta, favicons, indexes, langage clair) | Stable | 4 scripts, 18 tests déterministes, suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
 | `front-a11y` — lint, contraste, daltonisme, texte alternatif | Stable | Lint 14 règles, correcteur OKLCH, daltonisme Machado, éval texte alternatif sur fixtures Wikipedia. Auto-détection de la capacité vision MLX en 0.3.1. |
 | `front-a11y` — **sous-titres / transcriptions** | **WiP / TODO** | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées) et le clip utilisateur `vocab-biasing-clip.wav`. Voir [Roadmap](CHANGELOG.md#roadmap). |
-| `LISEZMOI.md` (README français) | Mise à parité 0.3.1 | Aligné sur l'EN après la passe 0.3.1. |
+| `LISEZMOI.md` (README français) | Stable | À parité structurelle avec le README EN (même ordre des sections, contenu maintenu en synchronisation à chaque release — dernier rafraîchissement 0.6.0). |
 
 Pour le détail par release (et la suite prévue), voir [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -256,7 +256,7 @@ vous avez bien cloné le commit voulu.
 git clone https://github.com/warith-harchaoui/front.git
 cd front
 python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
-python3 -m pytest                                # 360+ tests déterministes
+python3 -m pytest                                # 420+ tests déterministes
 python3 scripts/validate_all.py                  # 4 skills × YAML + contenu
 mkdir -p ~/.claude/skills
 cp -r front-ui      ~/.claude/skills/            # toujours
