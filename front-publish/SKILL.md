@@ -3,16 +3,18 @@ name: front-publish
 description: >-
   Turn a folder of Markdown files (README + docs/ + blog/) into a static
   website, draft per-page meta tags (title + description + Open Graph +
-  Twitter Card + Schema.org JSON-LD), generate the full favicon / app-icon /
-  PWA-icon set from a single logo, emit robots.txt + sitemap.xml + llms.txt +
-  Atom or RSS feed + humans.txt, and rewrite UI copy in plain language at a
-  target reading level. For solo developers and small teams who have content
-  (Markdown, a logo, draft copy) and need a deployable site without standing
-  up Hugo, Astro, Docusaurus or Next. Trigger phrases: "turn these markdown
-  files into a website", "meta tags", "OG card", "favicons", "app icons", "PWA
-  icons", "robots.txt", "sitemap", "llms.txt", "Atom feed", "RSS", "plain
-  language", "rewrite at grade N", "simplify this copy". Output follows the
-  front-ui stack rules — install front-ui alongside for full design tokens.
+  Twitter Card + Schema.org JSON-LD), generate the full favicon / app-icon
+  / PWA-icon set from a single logo, emit robots.txt + sitemap.xml +
+  llms.txt + Atom or RSS feed + humans.txt, rewrite UI copy in plain
+  language, and narrate posts to MP3 via local OSS TTS. Adapts Google's
+  SEO + AI Optimization (GEO) foundations to the emitted artifacts. For solo developers and
+  small teams with content who need a deployable site without standing up
+  an SSG. Trigger phrases: "turn these markdown files into a website",
+  "meta tags", "OG card", "SEO", "AI Overview", "GEO", "favicons", "app
+  icons", "PWA icons", "robots.txt", "sitemap", "llms.txt", "Atom feed",
+  "RSS", "plain language", "rewrite at grade N", "simplify this copy",
+  "narrate this post", "podcast my blog". Output follows the front-ui
+  stack rules — install front-ui alongside for full design tokens.
 license: Unlicense
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (favicons,
@@ -23,7 +25,7 @@ compatibility: >-
   torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.6.4
+  version: 0.6.5
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

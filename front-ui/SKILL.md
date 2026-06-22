@@ -3,15 +3,16 @@ name: front-ui
 description: >-
   Generate vanilla JavaScript + Tailwind CSS UI code — components, pages,
   forms, dialogs, dashboards — for solo developers and small teams shipping
-  internal tools without a designer. Three-Roboto typography rule: Roboto
-  (sans), Roboto Serif (serif), Roboto Mono (code/monospace); no other
-  downloaded webfont. Output is semantic HTML + Tailwind utility classes +
-  vanilla ES modules with dark-mode peers, focus rings, reduced-motion
-  guards. Use it for "build a UI", "create a component", "design a page",
-  "make a form / modal / button / nav", "scaffold a landing", "build a web
-  app", "audit this UI". Companion skills: front-cli-gui (wrap a CLI in a
-  GUI), front-publish (Markdown → website + meta tags + favicons), front-a11y
-  (a11y lint, contrast audit, alt text, captions).
+  internal tools without a designer. Default typography is the three-Roboto
+  rule (Roboto sans + Roboto Serif + Roboto Mono); honors user-specified
+  fonts and respects existing typefaces when auditing existing UI. Output
+  is semantic HTML + Tailwind utility classes + vanilla ES modules with
+  dark-mode peers, focus rings, reduced-motion guards. Use it for "build a
+  UI", "create a component", "design a page", "make a form / modal / button
+  / nav", "scaffold a landing", "build a web app", "audit this UI". Companion
+  skills: front-cli-gui (wrap a CLI in a GUI), front-publish (Markdown →
+  website + meta tags + favicons), front-a11y (a11y lint, contrast audit,
+  alt text, captions).
 license: Unlicense
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. No Python runtime required to use
@@ -20,7 +21,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.6.4
+  version: 0.6.5
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

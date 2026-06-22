@@ -134,7 +134,7 @@ Pour des sites réels déjà livrés sur cette pile, voir
 
 ## État d'avancement
 
-Photographie de l'état de chaque surface à `v0.6.4`. Les quatre dossiers
+Photographie de l'état de chaque surface à `v0.6.5`. Les quatre dossiers
 de skills sont stables ; la seule zone en travaux est l'**audio /
 sous-titres** (front-a11y, vidéo → texte). La nouvelle **narration
 audio** (front-publish, texte → audio) est stable et explicitement
@@ -146,7 +146,7 @@ WCAG.
 | `front-ui` (règles de pile, tokens, composants, dataviz, checklist) | Stable | Les 9 règles dures documentées ; `validate.py` stdlib uniquement ; couvert par `tests/test_validate.py`. |
 | `front-cli` (pilote `front` unifié, complétion shell) | Stable | Basé sur Click ; transmission du `--help` corrigée en 0.3.0 (test de non-régression en 0.3.1). |
 | `front-cli-gui` (CLI → IHM, phare) | Stable (skill + démo exécutable) | `assets/examples/cli-gui-demo/` tourne de bout en bout. Durcissement production (auth, rate-limit, sandbox) délibérément laissé à l'hôte. |
-| `front-publish` (site Markdown, meta, favicons, indexes, langage clair) | Stable | 4 scripts, 18 tests déterministes, suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
+| `front-publish` (site Markdown, meta, favicons, indexes, langage clair, narration audio) | Stable | 11 scripts publics couvrant les quatre artefacts cœur (favicons, meta, indexes, langage clair) + Markdown → HTML + lint Markdown + pipeline narration audio (orchestrateur, wrappers OpenVoice et Chatterbox, sélecteur de voix, installeur). Couverture déterministe large (favicons, site-indexes, meta, langage clair, lint, narration) ; suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
 | `front-a11y` — lint, contraste, daltonisme, texte alternatif | Stable | Lint 14 règles, correcteur OKLCH, daltonisme Machado, éval texte alternatif sur fixtures Wikipedia. Auto-détection de la capacité vision MLX en 0.3.1. |
 | `front-a11y` — **sous-titres / transcriptions** | **WiP / TODO** | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées) et le clip utilisateur `vocab-biasing-clip.wav`. Voir [Roadmap](CHANGELOG.md#roadmap). |
 | `LISEZMOI.md` (README français) | Stable | À parité structurelle avec le README EN — même ordre des sections, contenu maintenu en synchronisation à chaque release. |
@@ -190,7 +190,7 @@ stable qui ne dérive pas entre deux mises à jour.
 
 ```bash
 # 1. Téléchargez une release taguée
-VERSION=0.6.4
+VERSION=0.6.5
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \

@@ -47,6 +47,49 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.6.5] — 2026-06-23 — staleness sweep across SKILL descriptions + README status
+
+Patch release. Doc and frontmatter hygiene only — no script behaviour
+changes. Caught while sweeping the repo for decayed claims after the
+0.5.x → 0.6.x string.
+
+### Changed — `front-ui/SKILL.md` description
+
+Rewrote the typography sentence to match the 0.6.4 carve-out. Before:
+*"Three-Roboto typography rule: Roboto (sans), Roboto Serif (serif),
+Roboto Mono (code/monospace); no other downloaded webfont."* — that
+last clause is wrong post-0.6.4 (audits respect existing fonts;
+user-named typefaces are honored). Now: *"Default typography is the
+three-Roboto rule (Roboto sans + Roboto Serif + Roboto Mono); honors
+user-specified fonts and respects existing typefaces when auditing
+existing UI."*
+
+### Changed — `front-publish/SKILL.md` description
+
+The description had drifted behind the skill's actual scope. Now
+mentions:
+- **Audio narration** (added in 0.5.0 — was documented in the SKILL
+  body but missing from the description, so it didn't surface as a
+  trigger).
+- **SEO + GEO** (Google's Search Essentials + AI Optimization
+  foundations adapted in 0.6.2). Adds the trigger words "SEO",
+  "AI Overview", "GEO", "narrate this post", "podcast my blog" so
+  those queries actually route the skill.
+
+Total length 1018 / 1024 chars — well under the Anthropic spec cap.
+
+### Changed — README + LISEZMOI Status rows
+
+The `front-publish` row in the Status table claimed *"4 scripts, 18
+deterministic tests"*. Actual current state: 11 public scripts (4
+core artifacts + Markdown → HTML + Markdown linter + 4 audio-
+narration scripts + install helper) and broad deterministic coverage
+across `tests/test_favicons.py`, `…site_indexes.py`, `…meta_from_ollama.py`,
+`…plain_language.py`, `…lint_markdown.py`, `…narrate.py` (12 + 24 +
+21 + 16 + 5 + 39 = 117 tests, plus the eval suite). Numbers like "4
+scripts" decay every release; the rewritten row names the surfaces
+instead of pinning counts. Same fix mirrored in `LISEZMOI.md`.
+
 ## [0.6.4] — 2026-06-22 — three-Roboto rule carve-out for audits
 
 Patch release. Re-scopes the three-Roboto typography rule from "hard

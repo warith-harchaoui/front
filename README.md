@@ -78,14 +78,14 @@ already shipped on the stack, see [GALLERY.md](GALLERY.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.6.4`. The four skill folders are stable; the only WiP area is **audio captions** (front-a11y, video → text). The new **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
+A snapshot of where each surface stands at `v0.6.5`. The four skill folders are stable; the only WiP area is **audio captions** (front-a11y, video → text). The new **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
 
 | Area | Status | Notes |
 |---|---|---|
 | `front-ui` (stack rules, tokens, components, dataviz, checklist) | Stable | All 9 hard rules documented; `validate.py` stdlib-only; covered by `tests/test_validate.py`. |
 | `front-cli` (unified `front` driver, shell completion) | Stable | Click-based; leaf-command `--help` forwarding fixed in 0.3.0 (regression test in 0.3.1). |
 | `front-cli-gui` (CLI → GUI flagship) | Stable (skill + runnable demo) | `assets/examples/cli-gui-demo/` runs end-to-end. Production hardening (auth, rate-limit, sandbox) deliberately left to the host. |
-| `front-publish` (Markdown site, meta tags, favicons, indexes, plain language) | Stable | 4 scripts, 18 deterministic tests, eval suite for meta + plain-language. `FRONT_LANG_PAIR` runtime override wired. |
+| `front-publish` (Markdown site, meta tags, favicons, indexes, plain language, audio narration) | Stable | 11 public scripts spanning the four core artifacts (favicons, meta, indexes, plain-language) + Markdown → HTML + Markdown linter + the audio-narration pipeline (narrate orchestrator, OpenVoice and Chatterbox engine wrappers, voice picker, install helper). Broad deterministic test coverage (favicons, site-indexes, meta, plain-language, lint, narrate); eval suite for meta + plain-language. `FRONT_LANG_PAIR` runtime override wired. |
 | `front-a11y` — lint, contrast, CVD, alt text | Stable | 14-rule lint, OKLCH contrast fixer, Machado CVD, Wikipedia-fixture alt-text eval. MLX vision-capability auto-detection added in 0.3.1. |
 | `front-a11y` — **captions / transcripts** | **WiP / TODO** | `captions_from_whisper.py` is functional; what's missing is per-language WER baselines (`en` / `fr` / `es` extractor wired but baselines not yet published) and the user-supplied `vocab-biasing-clip.wav`. See [Roadmap](CHANGELOG.md#roadmap). |
 | `LISEZMOI.md` (French README) | Stable | At structural parity with this README — same section ordering, content kept in lock-step on every release. |
@@ -125,7 +125,7 @@ between updates.
 
 ```bash
 # 1. Download a tagged release
-VERSION=0.6.4
+VERSION=0.6.5
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
