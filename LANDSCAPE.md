@@ -125,20 +125,24 @@ What kind of work are you doing? Find the row and the honest recommendation.
 
 ## 4. Typography (UI typeface)
 
-`front-ui` enforces the **three-Roboto rule**: exactly three downloaded
+`front-ui` defaults to the **three-Roboto rule** when generating fresh
+UI and the user has not specified a typeface: three downloaded
 webfonts, all from the Roboto super-family. The trio shares metrics,
 x-height, and visual rhythm by design, which keeps prose-heavy and
 code-heavy surfaces typographically coherent and trims the payload to
 ~290 KB total (latin subset, all three combined, variable-axis WOFF2).
+**The rule is a default, not enforcement**: per `front-ui/SKILL.md`
+hard rule 3 (since v0.6.4), the skill respects existing typefaces
+when auditing existing UI and honors any typeface the user names.
 
 | Font | Weights | Latin Ext. / Cyrillic | License | Variable | Cost | Skill alignment | Notes |
 |---|---|---|---|:---:|---|:---:|---|
 | **Roboto** (used — sans)     | 100–900 + italics | both | OFL | ✓ | free | ✓ | Self-hosted in `front-ui/assets/fonts/roboto/`. Default UI + body. |
 | **Roboto Serif** (used — serif) | 100–900 + italics | both | OFL | ✓ | free | ✓ | Self-hosted in `front-ui/assets/fonts/roboto-serif/`. Editorial / longform. |
 | **Roboto Mono** (used — mono)   | 100–700 + italics | both | OFL | ✓ | free | ✓ | Self-hosted in `front-ui/assets/fonts/roboto-mono/`. `<code>` / `<pre>` / log panels. |
-| [Inter](https://rsms.me/inter/) | 100–900 + italics | both | OFL | ✓ | free | ✗ | Industry default for SaaS UI — out of scope under the three-Roboto rule. |
-| [Montserrat](https://fonts.google.com/specimen/Montserrat) | 100–900 + italics | both | OFL | ✓ | free | ✗ | Former default — replaced by Roboto in v0.6.0. |
-| [IBM Plex Sans](https://www.ibm.com/plex/) | 100–700 | both | OFL | ~ | free | ✗ | Neutral corporate — out of scope. |
+| [Inter](https://rsms.me/inter/) | 100–900 + italics | both | OFL | ✓ | free | ~ | Industry default for SaaS UI. Not the skill default, but honored if the user names it. |
+| [Montserrat](https://fonts.google.com/specimen/Montserrat) | 100–900 + italics | both | OFL | ✓ | free | ~ | Former default — replaced by Roboto in v0.6.0. Still honored if a project names it. |
+| [IBM Plex Sans](https://www.ibm.com/plex/) | 100–700 | both | OFL | ~ | free | ~ | Neutral corporate. Not the default; the skill carries it through if a project ships it. |
 | [Roboto Flex](https://fonts.google.com/specimen/Roboto+Flex) | variable | both | Apache | ✓ | free | ~ | Material default — sibling of the bundled classic Roboto. |
 | System UI stack | OS-dependent | OS-dependent | none | depends | free | ~ | Zero bytes, no brand — used as fallback in the three Roboto stacks. |
 | [Geist](https://vercel.com/font) | 100–900 | Latin | OFL | ✓ | free | ✗ | Newer geometric sans (Vercel). |
@@ -146,15 +150,19 @@ code-heavy surfaces typographically coherent and trims the payload to
 | [Manrope](https://manrope.org) | 200–800 | Latin | OFL | ✓ | free | ✗ | Modern geometric. |
 | [Atkinson Hyperlegible](https://www.brailleinstitute.org/freefont/) | 4 weights | Latin | OFL | ✗ | free | ~ | Best for low-vision readers; can be loaded as a project-level a11y override. |
 
-**The skill default is the Roboto trio** for every surface. Lift Roboto
-Serif for editorial / longform reading; Roboto Mono is reserved for
-`<code>`, `<pre>`, terminal panels and log output. If a project
-genuinely requires a *fourth* family for brand or accessibility
-reasons (Atkinson Hyperlegible is the canonical example), that
-requires an explicit project-README note — otherwise the skill refuses
-and offers a Roboto-only equivalent. **Avoid Google-Fonts CDN** in
-production: self-host all three (the `front-ui` skill ships them as
-WOFF2 with bundled OFL licenses).
+**The skill default is the Roboto trio** when generating fresh UI
+without a user-specified typeface. Lift Roboto Serif for editorial /
+longform reading; Roboto Mono is reserved for `<code>`, `<pre>`,
+terminal panels and log output. **When the rule does NOT apply** (per
+hard rule 3, v0.6.4): (1) auditing an existing site — respect the
+typefaces already in use, don't propose a font swap unless the user
+asks about typography; (2) the user names a typeface — use what they
+ask for; (3) a project requires a fourth family explicitly for brand
+or accessibility reasons (Atkinson Hyperlegible is the canonical
+example) — carry it out and record the choice in the project README.
+**Avoid Google-Fonts CDN** in production regardless of which family
+you pick: self-host always (the `front-ui` skill ships the three
+Roboto families as WOFF2 with bundled OFL licenses).
 
 ---
 
