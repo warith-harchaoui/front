@@ -29,6 +29,7 @@ SCRIPTS = [
     # front-colors
     REPO_ROOT / "front-colors"  / "scripts" / "audit_contrast.py",
     REPO_ROOT / "front-colors"  / "scripts" / "simulate_cvd.py",
+    REPO_ROOT / "front-colors"  / "scripts" / "palette_to_tailwind.py",
     # front-publish
     REPO_ROOT / "front-publish" / "scripts" / "favicons.py",
     REPO_ROOT / "front-publish" / "scripts" / "meta_from_ollama.py",

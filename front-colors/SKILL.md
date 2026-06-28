@@ -1,19 +1,20 @@
 ---
 name: front-colors
 description: >-
-  Pre-commit color tooling for vanilla-JS + Tailwind output — WCAG contrast
-  audit with OKLCH-neighbour fix suggestions, color-vision-deficiency
-  (protanopia / deuteranopia / tritanopia) simulation on screenshots, a
-  curated Apple-inspired palette with semantic projections (base, emotion,
-  concepts, psychology), perceptual lighten / darken on the OKLCH L axis,
-  and stdlib-only conversions (sRGB ↔ linear, hex ↔ RGB, OKLab / OKLCH).
-  Deterministic — no model, no network. For solo developers and small
-  teams who need a fast, CI-friendly color gate before shipping.
-  Trigger phrases: "WCAG check", "contrast audit", "is my palette
-  accessible", "colorblind preview", "deuteranope", "CVD", "lighten this
-  color", "perceptual palette", "OKLCH", "color name", "Apple palette",
-  "emotion color". Output is JSON / stdout / exit codes suitable for
-  pre-commit and CI.
+  Color tooling for vanilla-JS + Tailwind output, both make and audit —
+  WCAG contrast audit with OKLCH-neighbour fix suggestions,
+  color-vision-deficiency (protanopia / deuteranopia / tritanopia)
+  simulation on screenshots, a curated Apple-inspired palette CSV with
+  semantic projections (base, emotion, concepts, psychology), perceptual
+  lighten / darken on the OKLCH L axis, and a Tailwind theme.extend.colors
+  emitter that turns the canonical palette CSV into a drop-in
+  tailwind.config.js. Deterministic — no model, no network. Trigger
+  phrases: "WCAG check", "contrast audit", "is my palette accessible",
+  "colorblind preview", "deuteranope", "CVD", "lighten this color",
+  "OKLCH", "Apple palette", "emotion color", "palette to tailwind",
+  "regenerate brand tokens", "tailwind config from palette". Output is
+  JSON / stdout / generated config / exit codes suitable for pre-commit
+  and CI.
 license: Unlicense
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (audit_contrast,
@@ -59,6 +60,7 @@ your brand. Loop a designer in for the final call.
 | "color blind preview" / "CVD check" / "how does this look to a deuteranope" | `simulate_cvd.py` | `python scripts/simulate_cvd.py <image> [--grid]` — renders protanopia / deuteranopia / tritanopia |
 | "what's the hex for Red" / "give me an emotion color" / "Apple palette" | `_colors.py` accessors | `from _colors import name_to_hex, emotion_to_hex, concept_search, psychology_for, apple_palette` |
 | "lighten this color" / "darken" / "tint" / "shade" | `_colors.lighten` / `_colors.darken` | OKLCH L-axis shift; hue and chroma preserved (unlike a naïve RGB offset). |
+| "palette to tailwind" / "regenerate brand tokens" / "wire palette.csv into my Tailwind config" | `palette_to_tailwind.py` | `python scripts/palette_to_tailwind.py [--emit theme\|config] [--with-dark] [--include-neutrals] [--out tailwind.config.js]` — emits the canonical `brand: { ... }` block (or a complete config) from `references/palette.csv`. Single source of truth for brand colors across every front-* consumer. |
 
 ## The unified palette
 
@@ -108,11 +110,29 @@ brand.lighten(0.15).contrast_with("#FFFFFF")
 brand.meets_wcag("#FFFFFF", level="AA", size="normal")  # True
 ```
 
-## Tool composition
+## Single source of truth — make ↔ audit loop
+
+`references/palette.csv` is the **one canonical place** brand hexes
+live in the front-* ecosystem. Both halves of the loop read it:
+
+- **Audit:** `audit_contrast.py` walks every (label × surface) pair
+  against the CSV's hexes and emits an OKLCH-neighbour fix when
+  contrast fails.
+- **Make:** `palette_to_tailwind.py` emits the same hexes as a
+  Tailwind `theme.extend.colors` block (or a complete
+  `tailwind.config.js`). The block in
+  `front-ui/references/stack-tailwind.md` matches this output
+  exactly — running the script with no flags reproduces it. If they
+  ever drift, the CSV wins and the reference doc is regenerated.
 
 For a UI deliverable end-to-end:
 
 ```bash
+# Generate the Tailwind config from the canonical palette.
+python front-colors/scripts/palette_to_tailwind.py \\
+    --emit config --with-dark --out tailwind.config.js
+
+# Then audit the resulting palette.
 python front-colors/scripts/audit_contrast.py --palette palette.json --fix    # WCAG ratios
 python front-colors/scripts/simulate_cvd.py screenshot.png --grid             # CVD pass
 python front-accessibility/scripts/lint_a11y.py public/                                # static a11y gate
@@ -145,6 +165,7 @@ Pair with a runtime audit (axe-core / Pa11y / Lighthouse) before shipping.
 | `scripts/audit_contrast.py` | stdlib only | WCAG contrast audit + OKLCH-neighbour fix suggester. Hint to designer, not final decision. |
 | `scripts/simulate_cvd.py` | `pip install -r scripts/requirements-cvd.txt` (Pillow) | Protanopia / deuteranopia / tritanopia rendering (Machado matrices). |
 | `scripts/_colors.py` | stdlib only | Shared color primitives — sRGB ↔ linear, hex ↔ RGB, OKLab / OKLCH, WCAG, CVD matrices, perceptual lighten / darken, palette accessors, `Color` class. Internal helper; not invoked directly via the CLI router. |
+| `scripts/palette_to_tailwind.py` | stdlib only | Render `references/palette.csv` as a Tailwind v3+ `theme.extend.colors` block (`--emit theme`, default) or a complete `tailwind.config.js` (`--emit config`). Optional `--with-dark` for OKLCH-derived dark-mode variants; `--include-neutrals` opts in to Brown / Black / Gray / White. The make-side counterpart to `audit_contrast.py` — closes the CSV → emitted-config loop so brand tokens cannot drift. |
 
 ## Companion skills
 
