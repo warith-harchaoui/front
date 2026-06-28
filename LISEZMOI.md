@@ -330,6 +330,35 @@ mise en place en une ligne par shell. Le même motif marche pour les
 CLI par-script lancés directement (par exemple
 `_ALT_FROM_OLLAMA_COMPLETE=zsh_source alt_from_ollama.py`).
 
+## Hooks pre-commit
+
+Le dépôt fournit un manifeste `.pre-commit-hooks.yaml` à la racine,
+donc n'importe quel projet peut câbler les portes d'audit front-*
+dans [pre-commit](https://pre-commit.com/) avec un seul bloc `repo:`
+— sans chemins de scripts en dur, sans installation au-delà de
+`pre-commit install`.
+
+```yaml
+# .pre-commit-config.yaml — ajouter le dépôt en une entrée
+repos:
+  - repo: https://github.com/warith-harchaoui/front
+    rev: v0.12.0          # fixer une tag — bumper via renovate / dependabot
+    hooks:
+      - id: front-accessibility-lint
+      - id: front-ux-laws-audit
+      - id: front-publish-lint-markdown
+      - id: front-ui-validate-skill   # uniquement si vous livrez des skills
+      # Ajoutez --fix en hook arg pour activer les auto-correctifs sûrs
+      # ex. - id: front-ux-laws-audit
+      #        args: [--fix]
+```
+
+Les hooks sont stdlib-only côté Python (pre-commit installe chacun
+dans son propre venv isolé). Les deux hooks couleur déclarent Pillow
+via `additional_dependencies`. Chaque hook respecte le filtre de type
+de fichier transmis par pre-commit (HTML pour les hooks a11y + Laws
+of UX ; Markdown pour le hook publish).
+
 ## CLI → IHM, le cas d'usage phare
 
 Le skill `front-cli-gui` part d'un outil en ligne de commande existant

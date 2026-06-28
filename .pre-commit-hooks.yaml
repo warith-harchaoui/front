@@ -1,0 +1,89 @@
+# Pre-commit hooks manifest for the front-* skills.
+#
+# Consumers add the repo to their own ``.pre-commit-config.yaml``:
+#
+#   repos:
+#     - repo: https://github.com/warith-harchaoui/front
+#       rev: v0.12.0
+#       hooks:
+#         - id: front-accessibility-lint
+#         - id: front-ux-laws-audit
+#         - id: front-publish-lint-markdown
+#         - id: front-ui-validate-skill
+#
+# Every hook is stdlib-only. The two color hooks
+# (``front-colors-contrast`` and ``front-colors-cvd``) need Pillow;
+# they declare it via ``additional_dependencies`` so pre-commit
+# installs into its own isolated env.
+
+- id: front-accessibility-lint
+  name: front-accessibility — static HTML a11y lint
+  description: >-
+    14 stdlib-only static a11y rules over HTML files. Exits non-zero on
+    any finding; pre-commit gate, NOT a replacement for axe-core /
+    Pa11y / Lighthouse. Use --fix in your hook args for the five safe
+    auto-repairs (lang, redundant aria, tabindex, motion-reduce, etc.).
+  entry: python front-accessibility/scripts/lint_a11y.py
+  language: python
+  language_version: python3
+  files: '\.html?$'
+  types: [file]
+
+- id: front-ux-laws-audit
+  name: front-ux-laws — Laws-of-UX static audit
+  description: >-
+    Static audit of emitted HTML against the canonical Laws of UX
+    (Hick, Miller, Fitts, Jakob, Tesler, Aesthetic-Usability,
+    Selective-Attention, Choice-Overload). Add --fix in your hook
+    args for the four mechanical fixers. Hick + Jakob are errors;
+    everything else is a warning unless --strict is set.
+  entry: python front-ux-laws/scripts/audit_laws_of_ux.py
+  language: python
+  language_version: python3
+  files: '\.html?$'
+  types: [file]
+
+- id: front-publish-lint-markdown
+  name: front-publish — Markdown lint (heading order, code-fence languages, local links, LaTeX, Mermaid)
+  description: >-
+    Lints Markdown files for heading order (MD001), trailing
+    whitespace (MD009), code-fence languages (MD040), image alt text
+    (MD045), local link freshness (MD050), LaTeX balance and Mermaid
+    block syntax. Add --fix in your hook args for the safe
+    auto-repairs (trailing whitespace strip + Mermaid PNG insertions).
+  entry: python front-publish/scripts/lint_markdown.py
+  language: python
+  language_version: python3
+  files: '\.(md|mdx|mermaid|mmd)$'
+  types: [file]
+
+- id: front-ui-validate-skill
+  name: front-ui — SKILL.md spec gate
+  description: >-
+    Validates that each skill's SKILL.md frontmatter conforms to the
+    Anthropic skill spec (description under 1024 chars, no XML
+    brackets, no reserved name, kebab-case name) and that the skill
+    folder is free of forbidden framework imports, marketing voice,
+    or a recursive README.md. Pair with ``scripts/validate_all.py``
+    for the bundle-wide check.
+  entry: python scripts/validate_skill.py
+  language: python
+  language_version: python3
+  files: '/?SKILL\.md$'
+  pass_filenames: false
+  args: [front-ui, front-cli-gui, front-publish, front-accessibility, front-colors, front-vision, front-audio, front-ux-laws]
+
+- id: front-colors-contrast
+  name: front-colors — WCAG contrast audit
+  description: >-
+    Walk every (label × surface) pair in a JSON palette and flag
+    WCAG-AA contrast failures. Suggests OKLCH-neighbour fixes when
+    --fix is passed. Needs Pillow for the image-pair shortcut; the
+    palette-shape gate itself is stdlib only.
+  entry: python front-colors/scripts/audit_contrast.py
+  language: python
+  language_version: python3
+  files: '\.(json|css|scss)$'
+  types: [file]
+  additional_dependencies:
+    - Pillow>=10

@@ -266,6 +266,34 @@ one-line setup per shell. The same env-var pattern works for any of
 the per-script CLIs invoked directly (e.g.
 `_ALT_FROM_OLLAMA_COMPLETE=zsh_source alt_from_ollama.py`).
 
+## Pre-commit hooks
+
+The repo ships a `.pre-commit-hooks.yaml` manifest, so any project
+can wire the front-* audit gates into [pre-commit](https://pre-commit.com/)
+with a single `repo:` block — no manual script paths, no install
+beyond `pre-commit install`.
+
+```yaml
+# .pre-commit-config.yaml — add the repo as one entry
+repos:
+  - repo: https://github.com/warith-harchaoui/front
+    rev: v0.12.0          # pin a tag — bump with renovate / dependabot
+    hooks:
+      - id: front-accessibility-lint
+      - id: front-ux-laws-audit
+      - id: front-publish-lint-markdown
+      - id: front-ui-validate-skill   # only if you ship skills yourself
+      # Add --fix to any of the above as a hook arg to enable auto-repairs
+      # e.g. - id: front-ux-laws-audit
+      #        args: [--fix]
+```
+
+The hooks are stdlib-only on the Python side (pre-commit installs
+each into its own isolated env). The two color hooks declare Pillow
+via `additional_dependencies`. Each hook respects the file-type
+filter pre-commit hands it (HTML for the a11y + Laws-of-UX hooks;
+Markdown for the publish hook).
+
 ## CLI → GUI flagship
 
 The `front-cli-gui` skill takes an existing CLI and produces a single-page vanilla-JS + Tailwind GUI for it. It reads the argument parser, categorizes each command (one-shot / form / streaming / list), maps flags to form controls, and wires execution to the project's host (Tauri, Electron, FastAPI, Express, or a stdlib HTTP+SSE proxy).

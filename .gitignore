@@ -39,3 +39,4 @@ tests/fixtures/images/wiki/*.svg
 .*
 !.github/
 !.gitignore
+!.pre-commit-hooks.yaml
