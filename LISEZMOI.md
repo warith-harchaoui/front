@@ -50,7 +50,7 @@ reste en feuille de route.
 | Skill | Make (générer) | Audit (porte) |
 |---|---|---|
 | **front-ui** | `references/` + `assets/components/` — playbook de génération HTML / Tailwind / dataviz | `scripts/validate.py`, `references/checklist.md`, `anti-patterns.md`, `ergonomics-criteria.md` |
-| **front-cli-gui** | `assets/examples/cli-gui-demo/` (scaffold exécutable) | _(feuille de route — accouplez `front-accessibility` + `front-ux-laws` sur le HTML produit)_ |
+| **front-cli-gui** | `scripts/cli_to_gui.py` (émetteur argparse → HTML) + `assets/examples/cli-gui-demo/` (scaffold exécutable) | Accouplez `front-accessibility` + `front-ux-laws` sur le HTML produit (l'émetteur est son propre client — sa sortie passe les deux audits avec zéro finding). |
 | **front-publish** | `favicons.py`, `meta_from_ollama.py`, `site_indexes.py`, `plain_language.py`, `md_to_html.py`, `narrate.py` | `lint_markdown.py` |
 | **front-accessibility** | _(rien — voir `front-ui` pour les templates, `front-vision` pour les alt, `front-audio` pour les sous-titres)_ | `lint_a11y.py` (14 règles, stdlib seul) |
 | **front-colors** | `palette_to_tailwind.py` (CSV → tailwind.config.js) | `audit_contrast.py`, `simulate_cvd.py` |

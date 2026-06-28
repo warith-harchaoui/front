@@ -43,7 +43,7 @@ when to load each skill and what is still on the roadmap.
 | Skill | Make (generate) | Audit (gate) |
 |---|---|---|
 | **front-ui** | `references/` + `assets/components/` — generation playbook for HTML / Tailwind / dataviz | `scripts/validate.py`, `references/checklist.md`, `anti-patterns.md`, `ergonomics-criteria.md` |
-| **front-cli-gui** | `assets/examples/cli-gui-demo/` (worked scaffold) | _(roadmap — pair with `front-accessibility` + `front-ux-laws` on the emitted HTML)_ |
+| **front-cli-gui** | `scripts/cli_to_gui.py` (argparse → HTML emitter) + `assets/examples/cli-gui-demo/` (worked scaffold) | Pair with `front-accessibility` + `front-ux-laws` on the emitted HTML (the emitter is its own customer — its output passes both gates with zero findings). |
 | **front-publish** | `favicons.py`, `meta_from_ollama.py`, `site_indexes.py`, `plain_language.py`, `md_to_html.py`, `narrate.py` | `lint_markdown.py` |
 | **front-accessibility** | _(none — see `front-ui` templates, `front-vision` for alt text, `front-audio` for captions)_ | `lint_a11y.py` (14 rules, stdlib only) |
 | **front-colors** | `palette_to_tailwind.py` (CSV → tailwind.config.js) | `audit_contrast.py`, `simulate_cvd.py` |

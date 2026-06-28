@@ -39,6 +39,8 @@ SCRIPTS = [
     REPO_ROOT / "front-publish" / "scripts" / "md_to_html.py",
     # front-vision
     REPO_ROOT / "front-vision"  / "scripts" / "alt_from_ollama.py",
+    # front-cli-gui
+    REPO_ROOT / "front-cli-gui" / "scripts" / "cli_to_gui.py",
     # front-ux-laws
     REPO_ROOT / "front-ux-laws" / "scripts" / "audit_laws_of_ux.py",
 ]

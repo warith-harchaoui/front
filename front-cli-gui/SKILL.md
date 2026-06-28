@@ -55,16 +55,15 @@ Honest limitation: this skill **scaffolds** the GUI. You still need to wire exec
 
 ## Two modes — make and audit
 
-This skill is currently **make-heavy** in the front-* duality:
+This skill is **make-heavy** in the front-* duality: one executable
+make-side primary, plus a worked scaffold, plus referenced audit
+gates on the emitted HTML.
 
 | Mode | Tool | Purpose |
 |---|---|---|
-| **Make** — wrap a CLI in a GUI | `assets/examples/cli-gui-demo/` + the references | Worked scaffold: argparse / click / clap / cobra introspection → form / streaming-log UI; Tauri / FastAPI / Express host wirings. |
-| **Audit** — gate the emitted HTML | _(roadmap — pair with `front-accessibility/scripts/lint_a11y.py` and `front-ux-laws/scripts/audit_laws_of_ux.py` on the emitted output)_ | The emitted HTML inherits front-ui stack rules, so the a11y / Laws-of-UX auditors apply unmodified until a CLI-specific auditor lands. |
-
-The eventual argparse-introspection-to-HTML emitter
-(`cli_to_gui.py`) is captured as an open roadmap item — gitignored
-notes carry the ranking.
+| **Make** — argparse → HTML | `scripts/cli_to_gui.py` | Introspects a Python CLI's `argparse.ArgumentParser` and emits a single-page vanilla-JS + Tailwind GUI: one `<details>` per sub-command, form fields mapped per action type (str / int / float / choice / bool / file), required marker, default values pre-filled, a "Build command" button that constructs the CLI line locally. Output passes both `front-ux-laws` audit and `front-accessibility` lint with zero findings. |
+| **Make** — worked scaffold | `assets/examples/cli-gui-demo/` | End-to-end runnable demo (HTML + ES module + Python SSE proxy) showing the host-wiring step the emitter leaves to the user. |
+| **Audit** — gate the emitted HTML | Pair with `front-accessibility/scripts/lint_a11y.py` and `front-ux-laws/scripts/audit_laws_of_ux.py` on the emitted output. | The emitter's HTML inherits front-ui stack rules; both auditors apply unmodified. The emitter itself is its own customer — the test suite asserts the output passes both gates. |
 
 ## CLI → GUI workflow (the flagship)
 
