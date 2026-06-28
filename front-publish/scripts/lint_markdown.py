@@ -174,6 +174,47 @@ def lint_image_alt(path: Path, text: str) -> list[Finding]:
     return findings
 
 
+# ── Auto-fix helpers ─────────────────────────────────────────────────────
+
+
+def fix_trailing_whitespace(text: str) -> str:
+    """
+    Strip trailing spaces / tabs on every line, preserving the
+    intentional two-space line-break suffix (MD009).
+
+    Idempotent. The Markdown spec treats a line ending in ``"  "``
+    (two spaces) as an explicit ``<br>``; we keep that. Any other
+    trailing whitespace — single spaces, three-or-more spaces, tab
+    characters — is collapsed.
+
+    Parameters
+    ----------
+    text : str
+        Source Markdown.
+
+    Returns
+    -------
+    str
+        New Markdown with offending trailing whitespace removed. The
+        document's line count is preserved (a fully-blank line of
+        spaces becomes an empty line, not a removed line).
+    """
+    out_lines: list[str] = []
+    for line in text.splitlines():
+        if line.endswith("  ") and not line.endswith("   "):
+            # Exactly two trailing spaces — Markdown's intentional
+            # line break. Preserve.
+            out_lines.append(line)
+            continue
+        out_lines.append(line.rstrip(" \t"))
+    new: str = "\n".join(out_lines)
+    # ``splitlines`` drops the trailing newline; restore it if the
+    # original had one so the file does not gain / lose a final EOL.
+    if text.endswith("\n"):
+        new += "\n"
+    return new
+
+
 def lint_local_links(path: Path, text: str) -> list[Finding]:
     """MD050 — local link targets exist on disk."""
     findings: list[Finding] = []
@@ -459,6 +500,11 @@ def lint_file(
     mermaid_findings, new_text = process_mermaid_blocks(path, text, render_mermaid, out_dir)
     findings.extend(mermaid_findings)
 
+    # MD009 trailing-whitespace strip — only when ``--fix`` is set.
+    # Idempotent; preserves the intentional two-space line break.
+    if fix:
+        new_text = fix_trailing_whitespace(new_text)
+
     if fix and new_text != text:
         path.write_text(new_text, encoding="utf-8")
         text = new_text
@@ -545,8 +591,10 @@ def main() -> int:
     p.add_argument("--format", choices=["text", "json"], default="text",
                    help="Output format. Default: text.")
     p.add_argument("--fix", action="store_true",
-                   help="Apply safe rewrites (Mermaid PNG insertions on --render-mermaid). "
-                        "Never touches code or prose.")
+                   help="Apply safe mechanical fixes in place: MD009 strip trailing "
+                        "whitespace (preserves the intentional two-space line break); "
+                        "with --render-mermaid, also insert PNG sibling references. "
+                        "Idempotent. Never invents content.")
     p.add_argument("--render-mermaid", action="store_true", dest="render_mermaid",
                    help="Render each Mermaid block to a local PNG sibling.")
     p.add_argument("--out-dir", type=Path, dest="out_dir",
