@@ -47,6 +47,79 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.11.0] — 2026-06-28 — make ↔ audit discipline + palette emitter
+
+The front-* repo's design principle — every skill belongs to either
+the *make* side or the *audit* side of a single loop — is now
+codified in three places and enforced by tests.
+
+### New: repo-level make / audit matrix
+
+- `README.md` and `LISEZMOI.md` gain a "Two modes — make and audit"
+  table listing every shipped skill against both axes. Empty cells
+  are marked `_(roadmap)_` rather than omitted so the gaps are honest.
+- Every shipped `SKILL.md` (eight in total) carries a small
+  "Two modes — make and audit" subsection mapping its scripts /
+  assets / references to the side they live on.
+
+### New: `tests/test_two_modes_discipline.py`
+
+Enforces the convention on every commit:
+
+- Every shipped `SKILL.md` carries the canonical
+  `## Two modes — make and audit` header.
+- The subsection names both `Make` and `Audit` (case-insensitive).
+- `README.md` + `LISEZMOI.md` matrices list every shipped skill
+  exactly once.
+- Empty cells in the README matrix must be marked `(roadmap)` or
+  `(none — ...)`.
+
+### New: `front-colors/scripts/palette_to_tailwind.py`
+
+A make-side script that closes the CSV → Tailwind-config loop so
+brand tokens cannot drift between the canonical
+`front-colors/references/palette.csv` and the consumer projects:
+
+- `--emit theme` (default): the `colors: { brand: { … } }` block to
+  paste into an existing `tailwind.config.js`.
+- `--emit config`: a complete `module.exports = { … }` matching
+  `front-ui/references/stack-tailwind.md` (Roboto fontFamily, dark
+  mode strategy, the label / surface / separator tokens, rounded /
+  blur / motion extensions, plugins).
+- `--with-dark`: OKLCH-L-bumped dark variants derived in-script
+  (delta = 0.03). Honest about the derivation — comments in the
+  emitted file mark them as derived, not as exact Apple values.
+- `--include-neutrals`: opt-in for Brown / Black / Gray / White
+  (they normally live under surface / label, not brand).
+
+New `tests/test_palette_to_tailwind.py` covers all eight saturated
+bases, the include-neutrals opt-in, the full-config shape, the
+`--out` flag, the `--with-dark` derivation, and the CLI surface.
+
+### Repo color consistency
+
+- `front-colors/references/palette.csv` Purple `LightHex` was
+  `#FFDCF8` (CSV) versus `#EFDCF8` in two consumer docs
+  (`front-ui/references/stack-tailwind.md` and
+  `color-psychology.md`). The CSV was the outlier; aligned to
+  `#EFDCF8` so the emitter, the Tailwind reference, and the
+  color-psychology doc agree.
+- `front-ui/references/color-psychology.md` and
+  `front-ui/references/stack-tailwind.md` now both declare
+  `palette.csv` as the single source of truth and link to the
+  emitter for regeneration.
+- New "Curated default — user colors win" rule (mirror of the
+  three-Roboto carve-out): the CSV is the default; a user-supplied
+  palette wins.
+
+### Fixed: stale `light_variant` test
+
+`tests/test_colors_module.py::test_light_variant_for_neutral_is_none`
+expected `None` for `Black` / `Brown`, but the palette CSV now
+carries `LightHex` for every row (added in a prior commit).
+Renamed to `test_light_variant_for_neutral_returns_curated_hex` and
+updated assertions to the curated values.
+
 ## [0.10.0] — 2026-06-28 — new skill `front-ux-laws`
 
 A new skill that adds the canonical **Laws of UX** (Jon Yablonski,

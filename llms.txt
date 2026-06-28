@@ -12,6 +12,10 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [front-accessibility/SKILL.md](front-accessibility/SKILL.md): a11y lint, contrast audit, CVD simulation, alt text, captions.
 - [front-ux-laws/SKILL.md](front-ux-laws/SKILL.md): Apply the canonical Laws of UX (Jon Yablonski, lawsofux.com) — 30-law reference for make-time decisions plus a stdlib-only static auditor (Hick, Miller, Fitts, Jakob, Tesler, Aesthetic-Usability, Selective Attention, Doherty, Choice Overload).
 
+## Repo philosophy — make / audit duality
+
+Every shipped skill carries a "Two modes — make and audit" section in its SKILL.md. The repo's README.md and LISEZMOI.md hold a full per-skill matrix; the tests in `tests/test_two_modes_discipline.py` enforce it on every commit.
+
 ## front-ui core references
 
 - [color-psychology.md](front-ui/references/color-psychology.md): Curated palettes (Choice / Emotion / Concept / Psychology) and the semantic-color mapping.
@@ -71,6 +75,7 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [front-audio/scripts/captions_from_whisper.py](front-audio/scripts/captions_from_whisper.py): WebVTT / SRT captions via pywhispercpp.
 - [front-audio/scripts/install_captions.py](front-audio/scripts/install_captions.py): Installs pywhispercpp + model.
 - [front-ux-laws/scripts/audit_laws_of_ux.py](front-ux-laws/scripts/audit_laws_of_ux.py): Static auditor for the canonical Laws of UX. Stdlib only; HTML-aware findings via JSON or stdout; exit codes for pre-commit / CI; `--only` / `--ignore` / `--strict`.
+- [front-colors/scripts/palette_to_tailwind.py](front-colors/scripts/palette_to_tailwind.py): Make-side emitter — renders `front-colors/references/palette.csv` as a Tailwind `theme.extend.colors` block (default) or a full `tailwind.config.js` (`--emit config`). Optional `--with-dark` derives OKLCH-L-bumped dark variants. Single source of truth: the CSV.
 
 ## Assets
 
