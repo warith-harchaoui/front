@@ -61,6 +61,19 @@ Usage
     # Restrict to a subset of laws
     python scripts/audit_laws_of_ux.py --only hick,miller,jakob src/
 
+    # AUTO-FIX MODE — apply mechanical fixes in place
+    python scripts/audit_laws_of_ux.py --fix path/to/page.html
+    #   Fitts                → adds ``min-h-11`` to the element's class list
+    #   Aesthetic-Usability  → adds ``focus-visible:ring-2 …`` tokens
+    #   Miller               → chunks long digit runs with non-breaking spaces
+    #   Jakob                → rewrites <div role="button"> / <span> to <button>
+    # Idempotent: re-running on a fixed file applies zero edits.
+    # Hick / Choice-Overload / Tesler / Selective-Attention have no
+    # fixer because they need a design decision, not a text edit.
+
+    # PREVIEW MODE — show what --fix would change without writing
+    python scripts/audit_laws_of_ux.py --fix --dry-run path/to/page.html
+
 Notes
 -----
 * Python 3.9+, stdlib only. No ``beautifulsoup`` / no ``lxml``.
@@ -767,6 +780,277 @@ LAW_REGISTRY: dict[str, tuple[
 }
 
 
+# ── Auto-fix machinery ─────────────────────────────────────────────────────
+
+
+#: Token strings the Fitts fixer inserts. ``min-h-11`` is 44 px on the
+#: default Tailwind scale (the skill's house hit-area minimum).
+FITTS_FIX_TOKEN: str = "min-h-11"
+
+#: Token strings the Aesthetic-Usability fixer inserts. Mirrors the
+#: focus-ring snippet used in ``front-ui/assets/components/button.html``.
+AU_FIX_TOKENS: tuple[str, ...] = (
+    "focus:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-brand-blue",
+)
+
+#: Non-breaking-space character used by the Miller fixer to chunk a
+#: long digit run without breaking copy-paste round-trip in most
+#: browsers / form parsers (which treat NBSP as whitespace).
+NBSP: str = " "
+
+
+def _insert_class_tokens(line: str, tokens: list[str]) -> tuple[str, bool]:
+    """
+    Insert one or more class tokens into the first ``class="…"`` on a line.
+
+    Idempotent: tokens already present are not duplicated. Returns the
+    new line and ``True`` iff anything actually changed.
+
+    Parameters
+    ----------
+    line : str
+        Source line containing a ``class="…"`` attribute.
+    tokens : list of str
+        Tokens to ensure are present, in declaration order.
+
+    Returns
+    -------
+    (str, bool)
+        ``(new_line, mutated)``. When no ``class="…"`` is found, the
+        line is returned unchanged and ``mutated`` is ``False`` — the
+        caller is expected to surface this as a fix-not-applied warning.
+    """
+    # Match either single- or double-quoted attribute values. Capture
+    # the quote so the rewrite can reuse it (single-quoted ``class``
+    # attributes are valid HTML and appear in front-ui examples).
+    m = re.search(r'''class=(["'])((?:(?!\1).)*)\1''', line)
+    if not m:
+        return line, False
+    existing: list[str] = m.group(2).split()
+    missing: list[str] = [t for t in tokens if t not in existing]
+    if not missing:
+        return line, False
+    new_classes: str = " ".join(existing + missing)
+    return (
+        line[: m.start(2)] + new_classes + line[m.end(2) :],
+        True,
+    )
+
+
+def _fix_fitts(lines: list[str], finding: "Finding") -> bool:
+    """Add ``min-h-11`` to the offending element's class list."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    new_line, mutated = _insert_class_tokens(lines[idx], [FITTS_FIX_TOKEN])
+    if mutated:
+        lines[idx] = new_line
+    return mutated
+
+
+def _fix_aesthetic_usability(lines: list[str], finding: "Finding") -> bool:
+    """Add ``focus-visible:ring-*`` tokens to the offending element's class list."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    new_line, mutated = _insert_class_tokens(lines[idx], list(AU_FIX_TOKENS))
+    if mutated:
+        lines[idx] = new_line
+    return mutated
+
+
+def _chunk_digits(run: str, size: int = 4) -> str:
+    """Insert a non-breaking space every ``size`` chars (right-aligned chunks)."""
+    n: int = len(run)
+    # Right-align: e.g. a 13-char run with size=4 -> 1 / 4 / 4 / 4.
+    first: int = n % size
+    parts: list[str] = []
+    if first:
+        parts.append(run[:first])
+    for i in range(first, n, size):
+        parts.append(run[i : i + size])
+    return NBSP.join(parts)
+
+
+def _fix_miller(lines: list[str], finding: "Finding") -> bool:
+    """Replace the long digit-bearing run with an NBSP-chunked version."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    # Extract the run from the finding message: ``Long unbroken run '<RUN>'``.
+    m = re.search(r"'([A-Za-z0-9]+)'", finding.message)
+    if not m:
+        return False
+    run: str = m.group(1)
+    if run not in lines[idx]:
+        return False
+    chunked: str = _chunk_digits(run)
+    # ``replace`` is idempotent for our case: once the run has been
+    # replaced by ``chunked``, the raw run string no longer appears
+    # on the line, so a second pass is a no-op.
+    new_line: str = lines[idx].replace(run, chunked, 1)
+    if new_line == lines[idx]:
+        return False
+    lines[idx] = new_line
+    return True
+
+
+def _fix_jakob(lines: list[str], finding: "Finding") -> bool:
+    """
+    Rewrite a clickable ``<div>`` / ``<span>`` to a real ``<button>``.
+
+    Conservative — only handles the single-line case. Multi-line
+    elements are left for the maintainer; running the auditor again
+    after the fix will still flag them, which is the right behaviour.
+    """
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    line: str = lines[idx]
+    for src_tag in ("div", "span"):
+        # Track whether either path opened a tag rewrite — if so we
+        # need to rewrite the matching close tag on the same line.
+        opened: bool = False
+        # Path A: strip ``role="button"`` and rename the tag in one
+        # pass (handles ``<div role="button" class="…">``).
+        role_pat = re.compile(
+            rf'<{src_tag}\b([^>]*?)\s+role="button"([^>]*?)>'
+        )
+        new_line = role_pat.sub(r"<button\1\2>", line, count=1)
+        if new_line != line:
+            line = new_line
+            opened = True
+        # Path B: rename a bare ``<div onclick=…>`` /
+        # ``<div class="cursor-pointer">`` whose opening tag still
+        # carries the source tag name. Only run if Path A did not
+        # already convert this element (avoid double-rewrite).
+        if not opened and re.search(rf"<{src_tag}\b", line):
+            line = re.sub(rf"<{src_tag}\b", "<button", line, count=1)
+            opened = True
+        # Whichever path opened the tag, rewrite the matching close.
+        # We only ever rewrite ONE close tag per fixer invocation to
+        # keep the surgery local to the flagged element.
+        if opened and re.search(rf"</{src_tag}>", line):
+            line = re.sub(rf"</{src_tag}>", "</button>", line, count=1)
+    if line == lines[idx]:
+        return False
+    lines[idx] = line
+    return True
+
+
+#: Map of law → fixer. Laws absent from this map are reported but
+#: cannot be auto-fixed (Tesler, Selective-Attention, Choice-Overload,
+#: Hick — these need design decisions, not text edits).
+LAW_FIXERS: dict[str, "callable"] = {
+    "fitts": _fix_fitts,
+    "aesthetic-usability": _fix_aesthetic_usability,
+    "miller": _fix_miller,
+    "jakob": _fix_jakob,
+}
+
+
+#: Maximum number of fix→audit→fix passes per file. Pathological
+#: shapes (a fixer that re-introduces another finding) would otherwise
+#: loop forever; 5 covers every realistic case (Jakob rewriting <div>
+#: → <button> introduces Fitts + AU, which then fix in the next pass,
+#: and so on — at most three rounds in practice).
+MAX_FIX_ITERATIONS: int = 5
+
+
+def fix_file(
+    path: Path, laws: set[str], *, dry_run: bool = False
+) -> tuple[int, int, list[Finding]]:
+    """
+    Apply mechanical fixes to one HTML file and rewrite it in place.
+
+    Idempotent: a second invocation against a fixed file applies zero
+    edits. Laws not present in :data:`LAW_FIXERS` are passed through
+    untouched (they need design decisions, not text edits).
+
+    The function runs the audit→fix loop until either no fixer
+    matches a remaining finding or :data:`MAX_FIX_ITERATIONS` is
+    reached. Looping matters because some fixers (Jakob's
+    ``<div>``→``<button>`` rewrite) *introduce* new fixable findings
+    (the freshly-minted ``<button>`` will trigger Fitts + AU until
+    they too are patched).
+
+    Parameters
+    ----------
+    path : Path
+        File to repair.
+    laws : set of str
+        Subset of :data:`LAW_REGISTRY` keys to operate on. Laws not
+        present in :data:`LAW_FIXERS` are skipped silently.
+    dry_run : bool, default False
+        If ``True``, never write to disk — just report what *would*
+        be applied based on a single audit pass against the original
+        content.
+
+    Returns
+    -------
+    (int, int, list of Finding)
+        ``(applied, skipped, remaining)`` — total edits across all
+        iterations, count of findings for which no fixer exists
+        (counted once on the first pass), and the residual findings
+        observed after the final write.
+    """
+    raw: str = path.read_text(encoding="utf-8", errors="replace")
+    bare_lines: list[str] = raw.splitlines()
+    applied: int = 0
+    skipped: int = 0
+    # Dry-run: report what the FIRST pass would apply, without
+    # mutating disk and without running a second iteration.
+    if dry_run:
+        findings: list[Finding] = audit_file(path, laws)
+        for f in findings:
+            fixer = LAW_FIXERS.get(f.law)
+            if fixer is None:
+                skipped += 1
+                continue
+            # Apply against an in-memory copy to count, then discard.
+            shadow: list[str] = bare_lines[:]
+            if fixer(shadow, f):
+                applied += 1
+        return applied, skipped, findings
+
+    # Live fix loop. Re-audit after each round so fixers that create
+    # new findings (Jakob) reach a fixed point.
+    skipped_seen: bool = False
+    for _ in range(MAX_FIX_ITERATIONS):
+        # Write current state so the re-audit sees the latest text.
+        new_text: str = "\n".join(bare_lines)
+        if raw.endswith("\n"):
+            new_text += "\n"
+        path.write_text(new_text, encoding="utf-8")
+        findings = audit_file(path, laws)
+        round_applied: int = 0
+        round_skipped: int = 0
+        for f in findings:
+            fixer = LAW_FIXERS.get(f.law)
+            if fixer is None:
+                round_skipped += 1
+                continue
+            if fixer(bare_lines, f):
+                round_applied += 1
+        applied += round_applied
+        # Only count "unfixable" findings once (the first time round)
+        # — subsequent iterations re-see the same Hick/Tesler/etc.
+        if not skipped_seen:
+            skipped = round_skipped
+            skipped_seen = True
+        if round_applied == 0:
+            break
+    # Final write + final re-audit for the truthful remaining list.
+    new_text = "\n".join(bare_lines)
+    if raw.endswith("\n"):
+        new_text += "\n"
+    path.write_text(new_text, encoding="utf-8")
+    remaining: list[Finding] = audit_file(path, laws)
+    return applied, skipped, remaining
+
+
 def audit_file(path: Path, laws: set[str]) -> list[Finding]:
     """
     Run every requested law check against one HTML file.
@@ -911,6 +1195,26 @@ def main(argv: list[str] | None = None) -> int:
         default="",
         help="Comma-separated laws to skip.",
     )
+    parser.add_argument(
+        "--fix",
+        action="store_true",
+        help=(
+            "Apply mechanical fixes in place for the laws that have "
+            "a fixer (Fitts adds min-h-11; Aesthetic-Usability adds "
+            "focus-visible:ring-2; Miller chunks long digit runs with "
+            "NBSP; Jakob rewrites a clickable <div>/<span> to a real "
+            "<button>). Idempotent — running again on a fixed file "
+            "performs zero edits. Combine with --dry-run to preview."
+        ),
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help=(
+            "With --fix, print what would change without touching the "
+            "files. Implies --fix when used alone."
+        ),
+    )
     args: argparse.Namespace = parser.parse_args(argv)
 
     requested: set[str] = (
@@ -933,6 +1237,44 @@ def main(argv: list[str] | None = None) -> int:
         print("audit_laws_of_ux: no HTML files found.", file=sys.stderr)
         return 0
 
+    # ── Fix mode ───────────────────────────────────────────────────────
+    # ``--dry-run`` alone implies ``--fix`` (preview only). Plain
+    # invocation (neither flag) falls through to the auditor below.
+    if args.fix or args.dry_run:
+        total_applied: int = 0
+        total_skipped: int = 0
+        total_remaining: list[Finding] = []
+        for p in files:
+            applied, skipped, remaining = fix_file(
+                p, laws, dry_run=args.dry_run
+            )
+            total_applied += applied
+            total_skipped += skipped
+            total_remaining.extend(remaining)
+            verb: str = "would apply" if args.dry_run else "applied"
+            print(
+                f"{p}: {verb} {applied} fix(es); {skipped} unfixable "
+                f"finding(s); {len(remaining)} remaining.",
+                file=sys.stderr,
+            )
+        # After the fix pass, emit the remaining findings on stdout in
+        # the requested format so a CI pipeline can still gate on them.
+        out: str = (
+            format_json(total_remaining)
+            if args.json
+            else format_text(total_remaining)
+        )
+        sys.stdout.write(out)
+        # Dry-run is a preview, not a verdict — always exit 0 so the
+        # user can pipe it without failing their pre-commit hook.
+        # Live --fix follows the same exit-code policy as audit mode.
+        if args.dry_run:
+            return 0
+        if total_remaining:
+            return 1 if (args.strict or any(f.severity == "error" for f in total_remaining)) else 0
+        return 0
+
+    # ── Audit-only mode ────────────────────────────────────────────────
     findings: list[Finding] = []
     for p in files:
         findings.extend(audit_file(p, laws))

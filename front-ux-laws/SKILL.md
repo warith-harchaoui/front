@@ -58,6 +58,7 @@ of UX specifically:
 | Mode | Tool | When to load |
 |---|---|---|
 | **Make** — pick the right law for a screen | `references/laws-of-ux.md` | At generation time. The reference is structured for in-conversation lookup: trigger → action → Tailwind hook. Load it once per design surface; pick ONE law to apply, not five. |
+| **Make** — auto-fix mechanically-fixable violations | `scripts/audit_laws_of_ux.py --fix` | Closes the audit↔make loop: every violation that can be repaired by a one-line text edit is fixed in place (Fitts adds `min-h-11`; Aesthetic-Usability adds `focus-visible:ring-2`; Miller chunks long digit runs with NBSP; Jakob rewrites `<div>` / `<span>` to `<button>`). Iterates until convergence; idempotent. |
 | **Audit** — fail the build on detectable violations | `scripts/audit_laws_of_ux.py` | Pre-commit, pre-merge, CI. Static parser, no browser, no network. Findings come as `error` or `warning`; exit non-zero only when an `error` is found unless `--strict` is set. |
 
 ## Decision tree
@@ -68,6 +69,7 @@ of UX specifically:
 | "what does the Laws of UX say about this onboarding flow" | make | Load reference, walk the **Time** + **Memory** buckets. |
 | "is this a dark pattern" | make | Stop here, hand to `front-ui/references/anti-patterns.md`. |
 | "audit this page / component / dir for Laws of UX" | audit | `python scripts/audit_laws_of_ux.py <file-or-dir>` |
+| "auto-fix the easy ones" / "make my UI pass the Laws of UX" | make | `python scripts/audit_laws_of_ux.py --fix <file-or-dir>` — applies the four mechanical fixers (Fitts / Aesthetic-Usability / Miller / Jakob) in place. Add `--dry-run` to preview. |
 | "fail the build on Hick / Jakob violations" | audit | `python scripts/audit_laws_of_ux.py --only hick,jakob --strict <dir>` |
 | "JSON for CI" | audit | `python scripts/audit_laws_of_ux.py --json <dir>` |
 | "false positive on Tesler / Miller" | audit | `python scripts/audit_laws_of_ux.py --ignore tesler,miller <dir>` |

@@ -277,3 +277,154 @@ def test_registry_check_returns_iterable(tmp_path: Path, law: str) -> None:
     p: Path = _write(tmp_path, "empty.html", "<html><body></body></html>")
     out = audit_file(p, {law})
     assert isinstance(out, list)
+
+
+# ── --fix mode ─────────────────────────────────────────────────────────────
+
+
+def test_fix_fitts_inserts_min_h_11(tmp_path: Path) -> None:
+    """The Fitts fixer adds ``min-h-11`` to the offending element's class list."""
+    p: Path = _write(
+        tmp_path,
+        "btn.html",
+        '<button class="bg-brand-blue px-4 py-2 focus-visible:ring-2">Save</button>',
+    )
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix", "--only", "fitts", str(p)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    body: str = p.read_text(encoding="utf-8")
+    assert "min-h-11" in body
+
+
+def test_fix_aesthetic_usability_inserts_focus_ring(tmp_path: Path) -> None:
+    """The Aesthetic-Usability fixer adds the house focus-visible tokens."""
+    p: Path = _write(
+        tmp_path,
+        "btn.html",
+        '<button class="min-h-11 bg-brand-blue px-4 py-2">Save</button>',
+    )
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix",
+         "--only", "aesthetic-usability", str(p)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    body: str = p.read_text(encoding="utf-8")
+    assert "focus-visible:ring-2" in body
+    assert "focus-visible:ring-brand-blue" in body
+
+
+def test_fix_miller_chunks_long_digit_run(tmp_path: Path) -> None:
+    """The Miller fixer splits a long alphanumeric run with non-breaking spaces."""
+    p: Path = _write(
+        tmp_path, "iban.html", "<p>IBAN: FR7630006000011234567890189</p>"
+    )
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix", "--only", "miller", str(p)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    body: str = p.read_text(encoding="utf-8")
+    # The raw run must not survive, but each 4-char piece should.
+    assert "FR7630006000011234567890189" not in body
+    assert "FR7" in body and "6300" in body and "0189" in body
+    # The chunk separator is U+00A0 (NBSP) so layout does not break.
+    assert " " in body
+
+
+def test_fix_jakob_rewrites_div_to_button(tmp_path: Path) -> None:
+    """The Jakob fixer renames a clickable ``<div>`` to a real ``<button>``."""
+    p: Path = _write(
+        tmp_path,
+        "fake.html",
+        '<div role="button" class="cursor-pointer">Save</div>',
+    )
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix", "--only", "jakob", str(p)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    body: str = p.read_text(encoding="utf-8")
+    assert "<button" in body
+    assert "</button>" in body
+    assert "<div" not in body
+    assert "</div>" not in body
+    # Redundant role attribute must be stripped.
+    assert 'role="button"' not in body
+
+
+def test_fix_jakob_rewrites_span_with_onclick(tmp_path: Path) -> None:
+    """``<span onclick=…>`` is also rewritten to ``<button>``."""
+    p: Path = _write(
+        tmp_path,
+        "span.html",
+        '<span onclick="go()" class="cursor-pointer">Save</span>',
+    )
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix", "--only", "jakob", str(p)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    body: str = p.read_text(encoding="utf-8")
+    assert "<button" in body
+    assert "</button>" in body
+    assert "<span" not in body
+
+
+def test_fix_is_idempotent(tmp_path: Path) -> None:
+    """A second --fix pass on a fixed file performs zero edits."""
+    p: Path = _write(
+        tmp_path,
+        "all.html",
+        "<button class='bg-brand-blue px-2'>X</button>\n"
+        '<div role="button" class="cursor-pointer">Y</div>\n'
+        "<p>FR7630006000011234567890189</p>\n",
+    )
+    # First pass — applies edits.
+    subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix", str(p)],
+        capture_output=True, text=True,
+    )
+    first: str = p.read_text(encoding="utf-8")
+    # Second pass — must be a no-op on the body and emit zero
+    # remaining findings.
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix", str(p)],
+        capture_output=True, text=True,
+    )
+    second: str = p.read_text(encoding="utf-8")
+    assert first == second, "second --fix pass mutated the file"
+    assert "0 findings" in proc.stdout or "0 finding(s)" in proc.stdout
+
+
+def test_dry_run_does_not_write(tmp_path: Path) -> None:
+    """``--dry-run`` reports what would change without touching disk."""
+    src: str = (
+        '<div role="button" class="cursor-pointer">Save</div>'
+    )
+    p: Path = _write(tmp_path, "preview.html", src)
+    proc = subprocess.run(
+        [
+            sys.executable, str(SCRIPT),
+            "--fix", "--dry-run", "--only", "jakob", str(p),
+        ],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    assert p.read_text(encoding="utf-8") == src
+    # stderr carries the "would apply N fix(es)" line.
+    assert "would apply" in proc.stderr
+
+
+def test_fix_reports_unfixable_laws_separately(tmp_path: Path) -> None:
+    """Findings without a fixer increment the 'unfixable' counter."""
+    # Tesler has no fixer (it needs a design decision, not text).
+    p: Path = _write(tmp_path, "tz.html", "<p>Meeting at 14:30 tomorrow.</p>")
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--fix", "--only", "tesler", str(p)],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    assert "1 unfixable finding" in proc.stderr
