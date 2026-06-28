@@ -34,6 +34,27 @@ The skills:
 The companion skills inherit the front-ui stack rules. Install only the
 ones you need.
 
+## Two modes — make and audit
+
+Every front-* skill belongs to one or both halves of a single loop:
+**make** the artifact, **audit** the artifact. The matrix tells you
+when to load each skill and what is still on the roadmap.
+
+| Skill | Make (generate) | Audit (gate) |
+|---|---|---|
+| **front-ui** | `references/` + `assets/components/` — generation playbook for HTML / Tailwind / dataviz | `scripts/validate.py`, `references/checklist.md`, `anti-patterns.md`, `ergonomics-criteria.md` |
+| **front-cli-gui** | `assets/examples/cli-gui-demo/` (worked scaffold) | _(roadmap — pair with `front-accessibility` + `front-ux-laws` on the emitted HTML)_ |
+| **front-publish** | `favicons.py`, `meta_from_ollama.py`, `site_indexes.py`, `plain_language.py`, `md_to_html.py`, `narrate.py` | `lint_markdown.py` |
+| **front-accessibility** | _(none — see `front-ui` templates, `front-vision` for alt text, `front-audio` for captions)_ | `lint_a11y.py` (14 rules, stdlib only) |
+| **front-colors** | `palette_to_tailwind.py` (CSV → tailwind.config.js) | `audit_contrast.py`, `simulate_cvd.py` |
+| **front-vision** | `alt_from_ollama.py` (W3C alt text via local Ollama) | _(presence of `alt=` checked by `front-accessibility`)_ |
+| **front-audio** | `captions_from_whisper.py` (WebVTT / SRT via local whisper.cpp) | _(presence of `<track>` checked by `front-accessibility`)_ |
+| **front-ux-laws** | `references/laws-of-ux.md` (30-law Markdown playbook) | `audit_laws_of_ux.py` (Hick / Miller / Fitts / Jakob / Tesler / …) |
+
+The matrix is honest about gaps. Empty cells mark genuine roadmap
+items, not omissions — see `.private/todo.md` (gitignored) for the
+ranking.
+
 ## Who this is for
 
 `front` is targeted at four concrete audiences. Each row is a stand-alone

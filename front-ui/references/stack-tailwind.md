@@ -65,10 +65,10 @@ accidentally introduce.
 >
 > The emitter produces the eight saturated brand hues with their
 > CSV-canonical `DEFAULT` and `light` values. The `dark:` variants
-> below are **Apple-canonical and hand-tuned** — the emitter offers a
-> `--with-dark` flag that derives a close OKLCH-L-bumped neighbour
-> but does not reproduce these exact values. Treat the dark column as
-> a per-token override, not a derivation.
+> below are **hand-tuned by the project maintainer** — the emitter
+> offers a `--with-dark` flag that derives a close OKLCH-L-bumped
+> neighbour but does not reproduce these exact values. Treat the
+> dark column as a per-token override, not a derivation.
 
 ```js
 /** @type {import('tailwindcss').Config} */

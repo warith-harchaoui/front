@@ -1,6 +1,27 @@
 # Color Psychology — tokens and selection rules
 
-Source: <https://harchaoui.org/warith/colors/>. This file is the authoritative palette for `front`. Every colour decision maps back to a row in one of these tables. The UI guidelines define *how* colour is applied (contrast, dark mode, semantics); this file defines *which* hue is chosen and *why*.
+Source: <https://harchaoui.org/warith/colors/>. The machine-readable
+form lives at `front-colors/references/palette.csv` — that CSV is the
+**single source of truth for hexes** in the front-* ecosystem; this
+file mirrors the CSV's `Hexcode` + `LightHex` columns in human-readable
+table form, with the same rows in the same order. To regenerate the
+Tailwind `theme.extend.colors` block from the CSV run:
+
+```bash
+python front-colors/scripts/palette_to_tailwind.py --emit theme
+```
+
+If a row drifts between this file and the CSV, the **CSV wins** and
+this file is updated to match.
+
+**Curated default — user colors win.** When the user has supplied their
+own palette, use it. The curated set below is the default for fresh
+generation when no palette is in play. See rule 7 in
+`front-ui/SKILL.md` for the full carve-out.
+
+Every colour decision maps back to a row in one of these tables. The
+UI guidelines define *how* colour is applied (contrast, dark mode,
+semantics); this file defines *which* hue is chosen and *why*.
 
 ## Base palette
 

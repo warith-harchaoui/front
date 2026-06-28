@@ -263,10 +263,16 @@ class TestPalette:
     def test_light_variant_by_hex(self) -> None:
         assert light_variant("#FF3B30") == "#FFD8D6"
 
-    def test_light_variant_for_neutral_is_none(self) -> None:
-        # Black / Brown have no curated light variant in the palette.
-        assert light_variant("Black") is None
-        assert light_variant("Brown") is None
+    def test_light_variant_for_neutral_returns_curated_hex(self) -> None:
+        # Every CSV row carries a LightHex column since the curated
+        # palette covers neutrals too (Black / Brown / Gray / White).
+        # Asserting the actual values keeps the test in lock-step with
+        # ``front-colors/references/palette.csv`` — drift here means
+        # the CSV moved and the test should follow.
+        assert light_variant("Black") == "#CCCCCC"
+        assert light_variant("Brown") == "#EDD4D4"
+        assert light_variant("Gray") == "#E6E6E6"
+        assert light_variant("White") == "#FFFFFF"
 
     def test_emotion_to_hex(self) -> None:
         # Curated emotion mapping.
