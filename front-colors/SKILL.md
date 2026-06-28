@@ -110,10 +110,38 @@ brand.lighten(0.15).contrast_with("#FFFFFF")
 brand.meets_wcag("#FFFFFF", level="AA", size="normal")  # True
 ```
 
+## Curated default — user colors win
+
+`references/palette.csv` carries an **opinionated default** — the 8
+saturated Apple-system hues plus the four neutrals — chosen for
+balanced contrast, semantic projections that already exist (emotion,
+concepts, psychology), and OKLCH-derivable light/dark neighbours.
+
+**The default applies only when the user has not supplied colors.**
+Mirror of the three-Roboto rule in `front-ui/SKILL.md`:
+
+- **Generation, no user palette specified:** use the CSV's curated
+  set — `palette_to_tailwind.py` is the make-side primary.
+- **User names colors or supplies a palette** ("our brand is
+  #8B5CF6", "we already have a tailwind.config.js with our
+  tokens"): use theirs. Do not propose the CSV swap.
+- **Audit mode (existing project with established colors):** respect
+  the existing tokens; do not refactor the palette to the CSV
+  unless the user specifically asks. `audit_contrast.py` should
+  flag contrast failures against the user's palette, not against
+  ours.
+
+The carve-out exists so the skill is useful to the dataviz / startup /
+internal-tools shipper who has zero palette opinion (the CSV gives
+them a defensible starting point) **and** to the brand-conscious
+team that already owns a palette (the auditor still works, the
+emitter is just unused).
+
 ## Single source of truth — make ↔ audit loop
 
 `references/palette.csv` is the **one canonical place** brand hexes
-live in the front-* ecosystem. Both halves of the loop read it:
+live in the front-* ecosystem when the curated default is in play.
+Both halves of the loop read it:
 
 - **Audit:** `audit_contrast.py` walks every (label × surface) pair
   against the CSV's hexes and emits an OKLCH-neighbour fix when

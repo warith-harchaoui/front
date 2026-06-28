@@ -55,6 +55,21 @@ accidentally introduce.
 
 ## Tailwind config (drop into `tailwind.config.js`)
 
+> **Source of truth for brand hexes:**
+> `front-colors/references/palette.csv`. Regenerate this block at any
+> time with:
+>
+> ```bash
+> python front-colors/scripts/palette_to_tailwind.py --emit theme
+> ```
+>
+> The emitter produces the eight saturated brand hues with their
+> CSV-canonical `DEFAULT` and `light` values. The `dark:` variants
+> below are **Apple-canonical and hand-tuned** — the emitter offers a
+> `--with-dark` flag that derives a close OKLCH-L-bumped neighbour
+> but does not reproduce these exact values. Treat the dark column as
+> a per-token override, not a derivation.
+
 ```js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
