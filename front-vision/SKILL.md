@@ -49,6 +49,18 @@ hosted vision (Claude vision, GPT-4o vision, Gemini) is more accurate —
 use this skill when local-only matters or when the volume makes hosted
 costs unattractive.
 
+## Two modes — make and audit
+
+This skill is **make-only** in the front-* duality — by design:
+
+| Mode | Tool | Purpose |
+|---|---|---|
+| **Make** — draft accessible image text | `scripts/alt_from_ollama.py` + `scripts/install_alt_ai.py` | W3C-compliant alt text via local Ollama vision (default `gemma4:e4b`, `-mlx` auto-selected on Apple silicon). Per-purpose decision tree, surrounding-text + vocabulary biasing, on-disk cache. |
+| **Audit** — gate the presence of `alt=` | _(see `front-accessibility/scripts/lint_a11y.py`)_ | Static lint catches `<img>` without `alt` and `<img alt="">` on non-decorative images. |
+
+Pair with `front-accessibility` to close the loop: this skill drafts
+the text; the a11y lint verifies it lands on every `<img>`.
+
 ## Honest framing of what each tool covers
 
 | Tool | Catches | Misses |

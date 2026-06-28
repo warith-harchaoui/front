@@ -110,6 +110,18 @@ brand.lighten(0.15).contrast_with("#FFFFFF")
 brand.meets_wcag("#FFFFFF", level="AA", size="normal")  # True
 ```
 
+## Two modes — make and audit
+
+This skill is the most balanced front-* skill on color: one make-side
+emitter, two audit-side gates, all backed by the same CSV.
+
+| Mode | Tool | Purpose |
+|---|---|---|
+| **Make** — emit Tailwind config from the curated palette | `scripts/palette_to_tailwind.py` | Render `references/palette.csv` as a `theme.extend.colors` block (default) or a complete `tailwind.config.js`. |
+| **Audit** — gate before ship | `scripts/audit_contrast.py`, `scripts/simulate_cvd.py` | WCAG ratio audit with OKLCH-neighbour fix; CVD simulation (protanopia / deuteranopia / tritanopia). |
+
+The two halves agree on the source of truth — see the next section.
+
 ## Curated default — user colors win
 
 `references/palette.csv` carries an **opinionated default** — the 8

@@ -54,6 +54,20 @@ This skill is **not** the right pick for a docs site with hundreds of versioned 
 | "robots.txt" / "sitemap.xml" / "llms.txt" / "feed" / "Atom" / "RSS" / "humans.txt" | All from a single command; auto-detects a blog folder for the feed |
 | "plain language" / "simplify this copy" / "rewrite at grade N" | Same meaning, marketing voice stripped, output length ≤ 1.1× original |
 
+## Two modes — make and audit
+
+This skill is the most balanced front-* skill on the make/audit
+axis: ten make-side scripts paired with one audit-side gate.
+
+| Mode | Tool | Purpose |
+|---|---|---|
+| **Make** — generate site artifacts | `favicons.py`, `meta_from_ollama.py`, `site_indexes.py`, `plain_language.py`, `md_to_html.py`, `narrate.py`, `install_narrate.py` | Favicons + PWA, meta tags, robots / sitemap / llms.txt / Atom, plain-language rewrite, Markdown → HTML, optional MP3 narration. |
+| **Audit** — gate the emitted Markdown | `lint_markdown.py` | Markdown lint with project-aware rules (heading order, fenced-code language, link freshness). |
+
+Pair the emitted HTML with `front-accessibility/scripts/lint_a11y.py`
+(a11y) and `front-colors/scripts/audit_contrast.py` (contrast) to
+complete the audit side end-to-end.
+
 ## Changing the language pair
 
 `front-publish` is **bilingual** (EN/FR by default — configurable via

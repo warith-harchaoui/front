@@ -68,6 +68,18 @@ A future revision will integrate **``pdbms``** (per the maintainer) to
 improve the whisper.cpp integration. Track shape via
 ``tests/fixtures/audio/README.md``.
 
+## Two modes — make and audit
+
+This skill is **make-only** in the front-* duality — by design:
+
+| Mode | Tool | Purpose |
+|---|---|---|
+| **Make** — draft captions / transcripts | `scripts/captions_from_whisper.py` + `scripts/install_captions.py` | WebVTT / SRT / plain-text captions via local whisper.cpp, with project-vocab biasing. |
+| **Audit** — gate the presence of `<track>` | _(see `front-accessibility/scripts/lint_a11y.py`)_ | Static lint catches `<video>` / `<audio>` without a `<track kind="captions">` child. |
+
+Pair with `front-accessibility` to close the loop: this skill drafts
+the file; the a11y lint verifies a `<track>` element references it.
+
 ## Honest framing of what the tool covers
 
 | Tool | Catches | Misses |

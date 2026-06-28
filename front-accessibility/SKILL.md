@@ -46,6 +46,20 @@ portal mounts), and with manual screen-reader passes for the things
 only a human can verify (logical reading order, dynamic ARIA states
 changing, screen-reader announcement of live regions).
 
+## Two modes — make and audit
+
+This skill is **audit-only** in the front-* duality — by design:
+
+| Mode | Tool | Purpose |
+|---|---|---|
+| **Make** — generate accessible output | _(none — companions cover this)_ | `front-ui` ships semantic HTML + dark-mode peers + focus rings as defaults; `front-vision` drafts W3C alt text; `front-audio` drafts WebVTT / SRT captions. |
+| **Audit** — gate before ship | `scripts/lint_a11y.py` | 14 static rules over HTML (missing alt, unlabelled inputs, button-without-text, `div onclick`, missing dialog close, lang attr, bad heading order, color-only state, motion-reduce guards). Stdlib only, no browser. |
+
+For runtime DOM audits (post-JS, dynamic ARIA, focus traps after async)
+pair this skill with `axe-core` / `Pa11y` / `Lighthouse`. A green
+static lint is not WCAG compliance — it is the cheapest pre-commit
+gate that catches the static-decidable rules.
+
 ## What `lint_a11y.py` catches
 
 Fourteen rules decidable from the HTML source — no JavaScript

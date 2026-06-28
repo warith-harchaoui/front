@@ -53,6 +53,19 @@ What `front-cli-gui` does instead:
 
 Honest limitation: this skill **scaffolds** the GUI. You still need to wire execution to your CLI through the host of your choice. We provide a Python SSE proxy reference implementation in the demo; for production you'll harden it (auth, rate-limit, sandbox).
 
+## Two modes — make and audit
+
+This skill is currently **make-heavy** in the front-* duality:
+
+| Mode | Tool | Purpose |
+|---|---|---|
+| **Make** — wrap a CLI in a GUI | `assets/examples/cli-gui-demo/` + the references | Worked scaffold: argparse / click / clap / cobra introspection → form / streaming-log UI; Tauri / FastAPI / Express host wirings. |
+| **Audit** — gate the emitted HTML | _(roadmap — pair with `front-accessibility/scripts/lint_a11y.py` and `front-ux-laws/scripts/audit_laws_of_ux.py` on the emitted output)_ | The emitted HTML inherits front-ui stack rules, so the a11y / Laws-of-UX auditors apply unmodified until a CLI-specific auditor lands. |
+
+The eventual argparse-introspection-to-HTML emitter
+(`cli_to_gui.py`) is captured as an open roadmap item — gitignored
+notes carry the ranking.
+
 ## CLI → GUI workflow (the flagship)
 
 When the user points to an existing CLI project and asks for a GUI:

@@ -61,6 +61,18 @@ For other work, use the companion skills:
 
 The companion skills assume the same stack rules below.
 
+## Two modes — make and audit
+
+This skill ships both halves of the front-* loop:
+
+| Mode | Tool | Purpose |
+|---|---|---|
+| **Make** — generate UI | `references/` + `assets/components/*.html` + `assets/starter-page.html` + `assets/fonts/` | Generation playbook: token map, decision tree below, copy-and-adapt component shapes, three-Roboto webfonts. |
+| **Audit** — gate before ship | `scripts/validate.py` + `references/checklist.md` + `references/anti-patterns.md` + `references/ergonomics-criteria.md` | Skill-spec validator (stdlib only); pre-ship quality gate; eight-criteria ergonomic review; anti-pattern refusal list. |
+
+Pair with `front-ux-laws` for canonical-law audits and `front-colors`
+for contrast / CVD audits on the emitted output.
+
 ## Hard rules
 
 1. **No framework imports.** Output never contains `react`, `vue`, `svelte`, `solid-js`, `next`, `nuxt`, `angular`. If asked, refuse and offer the vanilla equivalent.
