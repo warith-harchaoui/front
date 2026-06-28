@@ -171,6 +171,7 @@ cp -r front-accessibility ~/.claude/skills/   # only if you need static a11y lin
 cp -r front-colors  ~/.claude/skills/   # only if you need WCAG contrast / CVD / curated palette
 cp -r front-vision  ~/.claude/skills/   # only if you need AI alt text from local vision model
 cp -r front-audio   ~/.claude/skills/   # only if you need AI captions / transcripts from audio / video
+cp -r front-ux-laws ~/.claude/skills/   # only if you want a shared vocabulary + pre-commit auditor for the Laws of UX
 ```
 
 Verify the install on disk:

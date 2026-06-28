@@ -47,7 +47,17 @@ jobs:
           # to ``myshell-openvoice`` while the requirement still pins
           # ``openvoice``. Smoke-testing the engines belongs in a
           # dedicated optional job, not on every push.
-          for req in front-a11y/scripts/requirements-*.txt front-publish/scripts/requirements-*.txt; do
+          # nullglob: an empty glob expands to nothing, not to the
+          # literal pattern. Without it CI fails noisily when a skill
+          # has no requirements file. The skill folders kept in the
+          # loop are the seven that currently ship Python scripts;
+          # front-ui and front-ux-laws are stdlib-only (no entries).
+          shopt -s nullglob
+          for req in front-accessibility/scripts/requirements-*.txt \
+                     front-audio/scripts/requirements-*.txt \
+                     front-colors/scripts/requirements-*.txt \
+                     front-publish/scripts/requirements-*.txt \
+                     front-vision/scripts/requirements-*.txt; do
             case "$(basename "$req")" in
               requirements-narrate-openvoice.txt|requirements-narrate-chatterbox.txt)
                 echo "skipping optional narration engine: $req"
@@ -69,7 +79,7 @@ jobs:
         run: python -m pytest -q
 
       - name: Validate every skill (YAML + content gate)
-        # Strict YAML frontmatter check on the four shipped skills
+        # Strict YAML frontmatter check on every shipped skill
         # (scripts/validate_skill.py) followed by the front-ui content
         # quality gate (forbidden framework imports, trademarks,
         # marketing voice). A PR that breaks any SKILL.md's YAML fails
