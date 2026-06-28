@@ -47,6 +47,102 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.12.0] — 2026-06-29 — make-side build-out + repo plumbing
+
+Investments executed against `.private/ASSESSMENT.md`'s ranked
+priorities. Four moves landed in one session.
+
+### CI repair
+
+`fix(ci): repoint per-skill requirements glob to post-rename folders`
+— `.github/workflows/ci.yml` still globbed `front-a11y/scripts/
+requirements-*.txt`, which has not existed since the 0.9.0 rename.
+Bash without `nullglob` expanded the empty glob to the literal
+pattern, pip choked, every push since the rename failed. Fix:
+`shopt -s nullglob` + a glob across the seven skill folders that
+ship requirements. CI is now green.
+
+### `SKILLS.txt` — single source of truth
+
+`refactor(skills): single SKILLS.txt manifest at repo root` — the
+shipped skill list lived in seven hand-maintained tuples
+(`release.sh`, `validate_all.py`, `conftest.py`,
+`test_validate_skill.py`, `test_release_packaging.py`,
+`test_two_modes_discipline.py`, `test_cli_help.py`). Adding skill
+#9 used to require seven identical edits. Now: one line in
+`SKILLS.txt`. New `scripts/skills_manifest.py` exposes
+`SHIPPED_SKILLS` to every Python consumer; the bash side reads the
+same file via a portable `while read` loop. New
+`tests/test_skills_manifest.py` (8 tests) guards against orphan
+folders, missing folders, malformed parses, AND a future refactor
+that "helpfully" re-introduces a hard-coded tuple.
+
+### `--fix` on two auditors
+
+`feat(front-ux-laws): add --fix mode with four mechanical fixers`
+
+- Fitts                → inserts `min-h-11` into the offending
+                         element's class list (44 px hit area).
+- Aesthetic-Usability  → inserts the house focus-visible tokens.
+- Miller               → replaces a long digit-bearing run with an
+                         NBSP-chunked version (4-char groups, right
+                         aligned).
+- Jakob                → rewrites a clickable `<div>` / `<span>` to
+                         a real `<button>`, strips the redundant
+                         role attribute, renames the close tag.
+
+`feat(front-accessibility): add --fix mode with five safe mechanical fixers`
+
+- `html-missing-lang`         → injects `lang="en"` (honours
+                                `FRONT_LANG_PAIR` for non-EN
+                                defaults: "fr,en" → `lang="fr"`).
+- `img-redundant-aria`        → strips redundant
+                                `role="presentation"` /
+                                `aria-hidden="true"` from
+                                `<img alt="">`.
+- `tabindex-positive`         → demotes `tabindex="N>0"` to `0`.
+- `aria-hidden-interactive`   → strips `aria-hidden` from interactive
+                                elements.
+- `motion-no-reduce-guard`    → appends
+                                `motion-reduce:transform-none`.
+
+Both modes are idempotent (fix→audit→fix loop converges in ≤5 passes;
+single-quoted attribute regex fix landed mid-session), both ship a
+`--dry-run` preview, both report unfixable laws / rules honestly via
+the `skipped` counter so users know which findings still need a
+human decision.
+
+### `cli_to_gui.py` — closes the last roadmap cell
+
+`feat(front-cli-gui): add cli_to_gui.py — argparse → HTML emitter`
+
+The front-cli-gui skill's roadmap-only make-side cell is now filled.
+`scripts/cli_to_gui.py` introspects a Python CLI's
+`argparse.ArgumentParser` and emits a single-page vanilla-JS +
+Tailwind GUI: one `<details>` per sub-command, form fields mapped
+per action kind, "Build command" button assembling the CLI line
+client-side. The emitter is its own customer — `tests/test_cli_to_gui.py`
+asserts the output passes both `front-ux-laws` and
+`front-accessibility` auditors with zero findings.
+
+### Description tightening
+
+Two skills had been creeping toward the Anthropic 1024-char
+description cap:
+
+- `front-publish`: 991 → 862 chars (129-char trim, comfortable
+  headroom).
+- `front-audio`: 930 → 788 chars (142-char trim, biggest headroom
+  in the set now).
+
+### Tests + spec
+
+346 tests pass. `scripts/validate_all.py` green on all eight
+skills. CI green on the post-fix commits. Every shipped skill
+carries a `## Two modes — make and audit` section + an entry in
+the README / LISEZMOI matrices; `tests/test_two_modes_discipline.py`
+enforces both on every commit.
+
 ## [0.11.0] — 2026-06-28 — make ↔ audit discipline + palette emitter
 
 The front-* repo's design principle — every skill belongs to either
