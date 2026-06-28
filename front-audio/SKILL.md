@@ -1,19 +1,18 @@
 ---
 name: front-audio
 description: >-
-  Local-AI captions and transcripts for video / audio. Generates W3C-compliant
-  WebVTT, SRT or plain-text captions from a local `whisper.cpp` build (via
-  ``pywhispercpp``) with project-vocabulary biasing so domain spellings are
-  not hallucinated. Bilingual output (EN/FR default, configurable via
-  ``lang_pair``). Deterministic, runs offline once installed, never sends
-  audio to a SaaS. For solo developers and small teams who want accessibility
-  captions drafted locally without a hosted transcription bill or data
-  exfiltration. **WiP**: per-language WER baselines (EN / FR / ES extractor
-  wired) and a vocab-biasing reference clip are still being collected.
-  Trigger phrases: "captions", "transcribe video", "transcribe audio",
-  "WebVTT", "SRT", "subtitle file", "VTT", "caption track". Output is a
-  captions file on disk + a ready-to-paste `<video>` / `<audio>` snippet on
-  stdout. Roadmap: improve the whisper.cpp integration via `pdbms`.
+  Local-AI captions and transcripts for video / audio. Generates
+  W3C-compliant WebVTT, SRT or plain-text captions from a local
+  whisper.cpp build (via pywhispercpp) with project-vocab biasing so
+  domain spellings are not hallucinated. Bilingual (EN/FR default,
+  configurable via lang_pair). Runs offline once installed, never sends
+  audio to a SaaS. For solo developers and small teams wanting captions
+  drafted locally without a hosted bill or data exfiltration. WiP:
+  per-language WER baselines (EN / FR / ES extractor wired) + a
+  vocab-biasing reference clip still being collected. Trigger phrases:
+  "captions", "transcribe video", "transcribe audio", "WebVTT", "SRT",
+  "subtitle file", "VTT", "caption track". Output is a captions file on
+  disk + a ready-to-paste video / audio snippet on stdout.
 license: Unlicense
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
