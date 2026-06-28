@@ -16,6 +16,7 @@
 #   front-colors-<version>.tar.gz
 #   front-vision-<version>.tar.gz
 #   front-audio-<version>.tar.gz
+#   front-ux-laws-<version>.tar.gz
 #   front-skills-<version>.tar.gz        ← bundle of every skill
 #   SHA256SUMS                           ← one file, one line per artifact
 #
@@ -59,7 +60,7 @@ cd "$REPO_ROOT"
 
 # ── Skill list ─────────────────────────────────────────────────────────────
 
-SKILLS=(front-ui front-cli-gui front-publish front-accessibility front-colors front-vision front-audio)
+SKILLS=(front-ui front-cli-gui front-publish front-accessibility front-colors front-vision front-audio front-ux-laws)
 
 for skill in "${SKILLS[@]}"; do
     if [[ ! -d "$skill" ]]; then

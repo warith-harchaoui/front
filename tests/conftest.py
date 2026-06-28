@@ -29,6 +29,7 @@ SKILL_SCRIPTS_DIRS = (
     REPO_ROOT / "front-publish" / "scripts",
     REPO_ROOT / "front-ui" / "scripts",
     REPO_ROOT / "front-vision" / "scripts",
+    REPO_ROOT / "front-ux-laws" / "scripts",
 )
 
 # Inject every scripts directory at the front of sys.path so its modules

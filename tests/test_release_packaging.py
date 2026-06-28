@@ -53,6 +53,7 @@ SKILLS: tuple[str, ...] = (
     "front-colors",
     "front-vision",
     "front-audio",
+    "front-ux-laws",
 )
 
 #: Patterns whose presence inside a packaged tarball is a regression.

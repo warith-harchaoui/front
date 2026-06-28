@@ -87,6 +87,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Iterable
 
+from _argparse import make_parser
+
 
 # ── Domain types ───────────────────────────────────────────────────────────
 
@@ -871,8 +873,8 @@ def main(argv: list[str] | None = None) -> int:
         ``0`` when no findings of severity ``error`` (or any severity in
         ``--strict``). ``1`` otherwise.
     """
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        prog="audit_laws_of_ux",
+    parser: argparse.ArgumentParser = make_parser(
+        prog="front-ux-laws-audit",
         description=(
             "Static auditor for the canonical Laws of UX "
             "(Jon Yablonski, lawsofux.com) against front-ui output."

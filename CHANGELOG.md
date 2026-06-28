@@ -47,6 +47,75 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.10.0] — 2026-06-28 — new skill `front-ux-laws`
+
+A new skill that adds the canonical **Laws of UX** (Jon Yablonski,
+[lawsofux.com](https://lawsofux.com/)) to the front-* ecosystem in
+both modes the repo already supports: **making** UI and **auditing**
+the result.
+
+### New skill: `front-ux-laws`
+
+- `SKILL.md` — frontmatter validates against the Anthropic skill spec
+  (kebab-case name, description under 1024 chars with explicit What +
+  When, no XML brackets, no reserved name, no `README.md` inside the
+  folder).
+- `references/laws-of-ux.md` — restates all **30** laws on the
+  canonical site (the curated set has grown beyond the original 21
+  — Paradox of Active User, Flow, Choice Overload, Complexity Bias
+  joined in the 2nd-edition book and the live index). Each entry is
+  one row: **trigger → action → Tailwind / HTML hook**. Definitions
+  and origins verified by recursive crawl of every `/<slug>/` page.
+  Postel's Law carries a "read this caveat first" subsection sourced
+  from the [Wikipedia *Robustness Principle* article](https://en.wikipedia.org/wiki/Robustness_principle)
+  (the Rose 2001 / Thomson & Schinazi RFC 9413 2023 critique that
+  UX writers often omit). The Aesthetic-Usability entry quotes
+  [NN/g (Moran & Whitenton, Feb 2024)](https://www.nngroup.com/articles/aesthetic-usability-effect/).
+- `scripts/audit_laws_of_ux.py` — Python 3.9+ stdlib-only static
+  auditor. Eight checks: Hick, Choice Overload, Miller, Jakob, Fitts,
+  Aesthetic-Usability, Selective Attention, Tesler. `--json`,
+  `--strict`, `--only LAW1,LAW2`, `--ignore LAW1,LAW2`. Exit codes
+  for pre-commit / CI. Heuristics tuned against
+  `front-ui/assets/components/`: Hick collapses radiogroups /
+  tablists to one logical choice; Miller requires at least one digit
+  in the run (so "collaborators" / "implementation" do not fire);
+  Tesler accepts a TZ token within a 40-char window.
+- `scripts/_argparse.py` — copied per the established per-skill
+  autonomy convention; provides `-V` / `--version`.
+
+### Companion-skill updates
+
+- `front-ui/SKILL.md`: companion-skills table + decision-tree row
+  added.
+- `front-ui/references/ux-psychology.md`: banner cross-link pointing
+  to the canonical set; the two files deliberately overlap.
+
+### Tests + tooling
+
+- New `tests/test_audit_laws_of_ux.py` — 24 tests covering the eight
+  checks, the false-positive suppressions, and the CLI surface
+  (`--version`, `--help`, `--json`, `--strict`, `--only`, `--ignore`,
+  unknown-law error).
+- `scripts/validate_all.py`, `scripts/release.sh`,
+  `tests/conftest.py`, `tests/test_validate_skill.py`,
+  `tests/test_release_packaging.py`, `tests/test_cli_help.py` all
+  extended for the new skill — the eight-skill repo now lights up
+  through every cross-skill validator.
+
+### Sources studied
+
+- lawsofux.com — full recursive crawl: homepage, all 30 law pages,
+  `/articles/` index, `/book/`, the *Onboarding for Active Users*
+  essay.
+- Two outside reads, picked deliberately: NN/g's article on the
+  Aesthetic-Usability Effect (because the effect itself warns the
+  rest of the auditor cannot be trusted as a substitute for user
+  observation); Wikipedia's Robustness Principle article (because
+  Postel's Law has a real dark side UX writers tend to skip).
+- Anthropic, *The Complete Guide to Building Skills for Claude*
+  (PDF, 2026) — the new skill's layout was checked against the
+  guide's frontmatter / folder / progressive-disclosure rules.
+
 ## [0.9.0] — 2026-06-28 — `front-audio` split + `front-a11y` renamed to `front-accessibility`
 
 After the v0.7.0 (`front-colors`) and v0.8.0 (`front-vision`) splits,

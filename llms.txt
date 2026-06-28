@@ -10,6 +10,7 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [front-cli-gui/SKILL.md](front-cli-gui/SKILL.md): Wrap an existing CLI in a single-page vanilla-JS + Tailwind GUI. Flagship.
 - [front-publish/SKILL.md](front-publish/SKILL.md): Markdown → website, meta tags, favicons, site indexes, plain language.
 - [front-accessibility/SKILL.md](front-accessibility/SKILL.md): a11y lint, contrast audit, CVD simulation, alt text, captions.
+- [front-ux-laws/SKILL.md](front-ux-laws/SKILL.md): Apply the canonical Laws of UX (Jon Yablonski, lawsofux.com) — 30-law reference for make-time decisions plus a stdlib-only static auditor (Hick, Miller, Fitts, Jakob, Tesler, Aesthetic-Usability, Selective Attention, Doherty, Choice Overload).
 
 ## front-ui core references
 
@@ -49,6 +50,10 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [alt-text-ai.md](front-accessibility/references/alt-text-ai.md): W3C-compliant alt text via local Ollama + Gemma vision.
 - [captions-ai.md](front-accessibility/references/captions-ai.md): WebVTT / SRT captions via local pywhispercpp.
 
+## front-ux-laws — Laws of UX (make + audit)
+
+- [laws-of-ux.md](front-ux-laws/references/laws-of-ux.md): The canonical Yablonski set (30 laws) restated as trigger → action → Tailwind hook. Make-time playbook + audit-time refusal list. Sources verified by recursive crawl of lawsofux.com plus NN/g (Aesthetic-Usability) and the Wikipedia Robustness Principle critique (Postel's Law).
+
 ## Scripts (Python, cross-platform)
 
 - [front-ui/scripts/validate.py](front-ui/scripts/validate.py): Pre-ship quality gate. Stdlib only.
@@ -65,6 +70,7 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [front-vision/scripts/install_alt_ai.py](front-vision/scripts/install_alt_ai.py): Installs Ollama + pulls the vision model.
 - [front-audio/scripts/captions_from_whisper.py](front-audio/scripts/captions_from_whisper.py): WebVTT / SRT captions via pywhispercpp.
 - [front-audio/scripts/install_captions.py](front-audio/scripts/install_captions.py): Installs pywhispercpp + model.
+- [front-ux-laws/scripts/audit_laws_of_ux.py](front-ux-laws/scripts/audit_laws_of_ux.py): Static auditor for the canonical Laws of UX. Stdlib only; HTML-aware findings via JSON or stdout; exit codes for pre-commit / CI; `--only` / `--ignore` / `--strict`.
 
 ## Assets
 

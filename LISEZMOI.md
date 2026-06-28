@@ -35,6 +35,7 @@ Les quatre skills :
 | **front-colors** | Vous auditez le contraste, simulez le daltonisme, ou voulez une palette curatée avec éclaircissement / assombrissement perceptuels. | « vérif WCAG », « audit de contraste », « ma palette est-elle accessible », « aperçu daltonien », « deutéranope », « CVD », « OKLCH », « éclaircis cette couleur ». |
 | **front-vision** | Vous draftez du texte alternatif conforme W3C depuis des images, en local (pas de SaaS). | « texte alternatif », « décris cette image », « draft alt », « description d'image », « img sans alt ». |
 | **front-audio** | Vous draftez des sous-titres WebVTT / SRT pour `<video>` / `<audio>` en local (pas de SaaS). | « sous-titres », « transcris cette vidéo », « transcris cet audio », « WebVTT », « SRT », « fichier de sous-titres », « VTT », « piste sous-titres ». |
+| **front-ux-laws** | Vous voulez un vocabulaire partagé pour vos décisions d'UI ET un auditeur pre-commit qui échoue sur les violations détectables des Laws of UX (Hick, Fitts, Miller, Jakob, Tesler, Aesthetic-Usability, Selective Attention, Doherty, Choice Overload). | « Laws of UX », « Hick / Fitts / Miller / Jakob / Tesler / Peak-End / Postel / Paradox of the Active User », « audite ma nav / mon formulaire / ma page de prix », « cet onboarding combat-il l'utilisateur actif ». |
 
 Les skills compagnons héritent des règles de pile de `front-ui`.
 N'installez que ceux dont vous avez besoin.

@@ -64,6 +64,7 @@ SKILLS: tuple[str, ...] = (
     "front-colors",
     "front-vision",
     "front-audio",
+    "front-ux-laws",
 )
 
 
