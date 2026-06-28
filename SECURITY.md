@@ -49,6 +49,28 @@ does not give the maintainer any standing to demand otherwise. If you
 publish first, please link the issue or commit that addresses the
 problem so users can act on the same information.
 
+## Local execution caveats
+
+A handful of scripts execute *code the user names on the command
+line*. These are intended for use against trusted local code only.
+
+- **`front-cli-gui/scripts/cli_to_gui.py`** loads the user's named
+  parser-factory by importing the target module. If the target's
+  top-level (or its factory) has side effects — opens files, prints
+  to a daemon socket, mutates the environment — those run at GUI
+  generation time. Treat the spec argument the same way you treat
+  `python -c '...'`: only point it at code you would already run.
+
+- **`front-publish/scripts/meta_from_ollama.py`** and
+  **`…/plain_language.py`** speak to a *local* Ollama daemon on
+  `localhost:11434`. They never send content over the public
+  internet, but they do hand the document to a model running on the
+  developer's machine. Do not run them against content you would
+  not show to the local model.
+
+Neither path opens a network port; neither auto-updates itself; both
+are stdlib + a single optional dependency (the SDK or the daemon).
+
 ## Supply-chain notes
 
 - The skill pins no minor versions for the Python dependencies it
