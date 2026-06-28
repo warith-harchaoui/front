@@ -1,20 +1,19 @@
 ---
 name: front-publish
 description: >-
-  Turn a folder of Markdown files (README + docs/ + blog/) into a static
-  website, draft per-page meta tags (title + description + Open Graph +
-  Twitter Card + Schema.org JSON-LD), generate the full favicon / app-icon
-  / PWA-icon set from a single logo, emit robots.txt + sitemap.xml +
-  llms.txt + Atom or RSS feed + humans.txt, rewrite UI copy in plain
-  language, and narrate posts to MP3 via local OSS TTS. Adapts Google's
-  SEO + AI Optimization (GEO) foundations to the emitted artifacts. For solo developers and
-  small teams with content who need a deployable site without standing up
-  an SSG. Trigger phrases: "turn these markdown files into a website",
-  "meta tags", "OG card", "SEO", "AI Overview", "GEO", "favicons", "app
-  icons", "PWA icons", "robots.txt", "sitemap", "llms.txt", "Atom feed",
-  "RSS", "plain language", "rewrite at grade N", "simplify this copy",
-  "narrate this post", "podcast my blog". Output follows the front-ui
-  stack rules — install front-ui alongside for full design tokens.
+  Turn a folder of Markdown (README + docs/ + blog/) into a static site
+  with per-page meta tags (Open Graph + Twitter Card + Schema.org
+  JSON-LD), a full favicon / app-icon / PWA-icon set from one logo,
+  robots.txt + sitemap.xml + llms.txt + Atom / RSS + humans.txt,
+  plain-language rewrites, and MP3 narration via local OSS TTS. Applies
+  Google's SEO + GEO (AI Optimization) foundations to the emitted
+  artifacts. For solo developers and small teams shipping a site without
+  an SSG. Trigger phrases: "markdown to website", "meta tags", "OG card",
+  "SEO", "AI Overview", "GEO", "favicons", "app icons", "PWA icons",
+  "robots.txt", "sitemap", "llms.txt", "Atom feed", "RSS", "plain
+  language", "rewrite at grade N", "simplify this copy", "narrate this
+  post", "podcast my blog". Output follows the front-ui stack rules —
+  install front-ui alongside for the full design tokens.
 license: Unlicense
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (favicons,
