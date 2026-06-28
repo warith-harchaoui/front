@@ -47,6 +47,124 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.13.0] — 2026-06-29 — make-side completion + user-activation surface
+
+Continues the autonomous overnight build-out that v0.12.0 opened.
+Four more moves: the third `--fix` mode, a real-user activation
+surface, a safety note for the new local-execution scripts, and the
+law-keyed snippet catalog that closes the make-side on front-ui.
+
+### `lint_markdown.py --fix` extended for MD009
+
+The existing `--fix` flag was scoped to Mermaid PNG insertions; it
+now also fixes MD009 (trailing whitespace). Preserves the canonical
+two-space Markdown `<br>`; idempotent; leaves prose untouched.
+
+This brings the markdown lint into the same audit↔make pattern as
+`front-ux-laws --fix` and `front-accessibility --fix`. New
+`tests/test_lint_markdown_fix.py` (11 tests) covers every shape
+the spec cares about plus a CLI integration test that confirms the
+re-lint shows zero MD009 findings after a single `--fix` pass.
+
+### `.pre-commit-hooks.yaml` — first real-user activation surface
+
+External projects can now wire all front-* audit gates with a
+single `repos:` block:
+
+```yaml
+repos:
+  - repo: https://github.com/warith-harchaoui/front
+    rev: v0.13.0
+    hooks:
+      - id: front-accessibility-lint
+      - id: front-ux-laws-audit
+      - id: front-publish-lint-markdown
+      - id: front-ui-validate-skill
+      - id: front-colors-contrast
+```
+
+`.gitignore` carried a blanket `.*` rule with only two exceptions
+(`.github/`, `.gitignore`); added `.pre-commit-hooks.yaml` to the
+allow-list so the manifest actually ships. New
+`tests/test_pre_commit_hooks.py` (19 tests) guards the manifest
+against drift: every entry's `entry` script must exist on disk;
+hook ids must be kebab-case + unique; every audit-side skill in
+`SKILLS.txt` must be referenced (front-vision / front-audio /
+front-cli-gui exempt with justification — make-only or covered
+indirectly).
+
+README + LISEZMOI gain a "Pre-commit hooks" section showing the
+canonical wiring with the `args: [--fix]` pattern for hooks that
+ship a fix mode.
+
+### `SECURITY.md` — local-execution caveats
+
+Two new scripts in this release run code the user names on the
+command line: `cli_to_gui.py` imports the target parser module
+(top-level side effects run at GUI-generation time); the
+Ollama-backed scripts hand content to a local daemon. Both are
+intentional design choices but a "should I trust this script"
+audit needs the surface called out explicitly.
+
+The new "Local execution caveats" subsection sits between the
+existing "Disclosure" and "Supply-chain notes" sections — says:
+treat `cli_to_gui`'s spec argument like `python -c '…'`; do not
+pipe the Ollama-backed scripts content you would not show to the
+local model.
+
+### Snippet catalog at `front-ui/assets/snippets/`
+
+The make-side gap front-ui still had after v0.12.0: references +
+component-shape primaries existed
+(`assets/components/{button,card,modal,form-field,nav}.html`)
+but there was no **law-keyed** catalog — no snippet the agent
+could load when the user said "IBAN field", "success screen",
+"loading skeleton", "settings page".
+
+Eight snippets, one per mechanically-implementable Law of UX:
+
+| Snippet | Law |
+|---|---|
+| `miller-iban-input.html` | Miller's Law |
+| `peak-end-success.html` | Peak-End Rule |
+| `goal-gradient-progress.html` | Goal-Gradient Effect |
+| `doherty-skeleton.html` | Doherty Threshold |
+| `von-restorff-cta.html` | Von Restorff Effect |
+| `jakob-native-controls.html` | Jakob's Law |
+| `chunking-settings.html` | Chunking |
+| `zeigarnik-resume.html` | Zeigarnik Effect |
+
+Every snippet ships dark-mode peers, focus-visible rings, 44 px
+hit areas and `prefers-reduced-motion` guards. The catalog is the
+make-side counterpart to `audit_laws_of_ux.py --fix`: the auditor
+repairs what the agent emits; the catalog gives the agent shapes
+worth emitting in the first place.
+
+New `front-ui/assets/snippets/INDEX.md` maps each file → the law
+it embodies → 2-4 trigger phrases for agent lookup. New
+`tests/test_snippet_catalog.py` (29 tests) parametrises every
+snippet through BOTH `front-ux-laws` audit AND `front-accessibility`
+lint, asserting zero findings from each — the catalog is its own
+customer. Also enforces INDEX.md ↔ disk symmetry and that every
+snippet opens with an explanatory HTML comment.
+
+`front-ui/SKILL.md`'s Assets section + Decision tree updated so
+the trigger phrases route to the INDEX.
+
+### Why only eight laws (not all 30)
+
+Of the 30 laws in `front-ux-laws/references/laws-of-ux.md` only
+eight have a self-contained HTML embodiment. The rest (Hick,
+Cognitive Load, Tesler, Postel, Aesthetic-Usability, Selective
+Attention, …) are *meta*-laws that constrain every surface rather
+than producing a discrete one. They live as audit rules + decision
+hooks in the reference, not as snippets here.
+
+### Tests + spec
+
+405 tests pass. `scripts/validate_all.py` green on all eight
+skills. CI green on every post-v0.12.0 push.
+
 ## [0.12.0] — 2026-06-29 — make-side build-out + repo plumbing
 
 Investments executed against `.private/ASSESSMENT.md`'s ranked
