@@ -172,6 +172,7 @@ The "zero build, drop into Nginx / S3 / Pages" pitch only holds for the prototyp
 | "make it look less AI" / "designer review" | `anti-patterns.md` | Refuse gradient text, glassmorphism on body, side-stripe borders, "boost your productivity" copy, three-card grids |
 | "psychology" / "conversion" / "flow not working" | `ux-psychology.md` | Pick ONE applicable principle per screen — Hick / Anchoring / Default Bias / Peak-End / Goal Gradient — and apply concretely |
 | "Laws of UX" / "Hick" / "Fitts" / "Miller" / "Jakob" / "Doherty" / "Tesler" / "Peak-End" / "Postel" / "Paradox of the Active User" | (see `front-ux-laws`) | Canonical Jon Yablonski set (30 laws). Reference: `front-ux-laws/references/laws-of-ux.md`. Auditor: `python front-ux-laws/scripts/audit_laws_of_ux.py <file-or-dir>`. |
+| "IBAN field" / "success screen" / "checkout progress" / "loading skeleton" / "primary CTA" / "settings page" / "resume onboarding" / "form fields" | `assets/snippets/INDEX.md` | Law-keyed snippet catalog. Pick the snippet whose trigger phrase matches, copy-and-adapt the strings. Each snippet already carries dark-mode peers + focus rings + reduced-motion guards. |
 | "material" / "Material 3" / "M3" | `material-design.md` | Map Material roles to skill tokens; emit plain HTML + Tailwind (no `mdc-*` classes) |
 
 ## Quality checklist (pre-ship)
@@ -267,8 +268,9 @@ Load these only when needed.
 ## Assets
 
 - `assets/starter-page.html` — single-file bootstrap (Tailwind Play CDN — prototype-grade; swap to Tailwind CLI / Vite before shipping a real production site).
-- `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html`.
+- `assets/components/button.html`, `card.html`, `modal.html`, `form-field.html`, `nav.html` — component-shape primaries (one file per generic UI surface).
 - `assets/components/chart-bar.json`, `chart-line.json` — Vega-Lite specs.
+- `assets/snippets/` — **law-keyed** snippet catalog (one file per mechanically-implementable Law of UX: Miller / Peak-End / Goal-Gradient / Doherty / Von Restorff / Jakob / Chunking / Zeigarnik). See `assets/snippets/INDEX.md` for the law ↔ snippet ↔ trigger-phrase mapping. Every snippet passes both `front-ux-laws` and `front-accessibility` auditors with zero findings — they are the make-side counterpart to `front-ux-laws/scripts/audit_laws_of_ux.py --fix`.
 - `assets/fonts/roboto/` — Roboto WOFF2 + OFL + `fonts.css` (sans). The `fonts.css` declares the `@font-face` blocks and also exposes the `--font-sans / --font-serif / --font-mono` custom properties and the base `html { font-family: var(--font-sans) }` / `code, pre, kbd, samp { font-family: var(--font-mono) }` wiring.
 - `assets/fonts/roboto-serif/` — Roboto Serif WOFF2 + OFL + `fonts.css` (serif).
 - `assets/fonts/roboto-mono/` — Roboto Mono WOFF2 + OFL + `fonts.css` (code / monospace).
