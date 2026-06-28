@@ -138,12 +138,11 @@ Pour des sites réels déjà livrés sur cette pile, voir
 
 ## État d'avancement
 
-Photographie de l'état de chaque surface à `v0.6.5`. Les quatre dossiers
+Photographie de l'état de chaque surface à `v0.9.0`. Les huit dossiers
 de skills sont stables ; la seule zone en travaux est l'**audio /
-sous-titres** (front-accessibility, vidéo → texte). La nouvelle **narration
-audio** (front-publish, texte → audio) est stable et explicitement
-encadrée comme amélioration éditoriale optionnelle, pas exigence
-WCAG.
+sous-titres** (front-audio, vidéo → texte). La **narration audio**
+(front-publish, texte → audio) est stable et explicitement encadrée
+comme amélioration éditoriale optionnelle, pas exigence WCAG.
 
 | Domaine | État | Notes |
 |---|---|---|

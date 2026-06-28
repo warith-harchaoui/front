@@ -82,7 +82,7 @@ already shipped on the stack, see [GALLERY.md](GALLERY.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.9.0`. The seven skill folders are stable; the only WiP area is **audio captions** (front-audio, video → text). The **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
+A snapshot of where each surface stands at `v0.9.0`. The eight skill folders are stable; the only WiP area is **audio captions** (front-audio, video → text). The **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
 
 | Area | Status | Notes |
 |---|---|---|
