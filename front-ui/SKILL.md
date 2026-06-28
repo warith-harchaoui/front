@@ -11,8 +11,8 @@ description: >-
   UI", "create a component", "design a page", "make a form / modal / button
   / nav", "scaffold a landing", "build a web app", "audit this UI". Companion
   skills: front-cli-gui (wrap a CLI in a GUI), front-publish (Markdown →
-  website + meta tags + favicons), front-a11y (a11y lint, contrast audit,
-  alt text, captions).
+  website + meta tags + favicons), front-accessibility (a11y lint), front-colors
+  (contrast audit, CVD), front-vision (alt text), front-audio (captions).
 license: Unlicense
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. No Python runtime required to use
@@ -53,7 +53,11 @@ For other work, use the companion skills:
 |---|---|
 | Wrap an existing CLI in a web GUI | `front-cli-gui` |
 | Turn a folder of Markdown into a website + meta tags + favicons + site indexes | `front-publish` |
-| Alt text, captions, contrast audit, CVD simulation, a11y lint | `front-a11y` |
+| Static HTML a11y lint | `front-accessibility` |
+| WCAG contrast audit, CVD simulation, curated palette | `front-colors` |
+| W3C alt text via local Ollama vision | `front-vision` |
+| WebVTT / SRT captions via local whisper.cpp | `front-audio` |
+| Apply / audit the canonical Laws of UX (Hick, Fitts, Miller, Jakob, Peak-End, …) on emitted HTML | `front-ux-laws` |
 
 The companion skills assume the same stack rules below.
 
@@ -78,7 +82,7 @@ different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
 
 1. Edit `metadata.lang_pair` in `SKILL.md` (this file).
 2. Mirror the same value in any companion skill you install
-   (`front-publish/SKILL.md`, `front-a11y/SKILL.md`).
+   (`front-publish/SKILL.md`, `front-accessibility/SKILL.md`).
 3. The skill uses the pair everywhere it currently uses EN/FR — the
    alt-text language line (`alt_from_ollama.py --lang`), the captions
    language hint (`captions_from_whisper.py --lang`), the meta-tag
@@ -93,7 +97,7 @@ entry as the default `--lang` when none is passed on the command line:
 
 ```bash
 export FRONT_LANG_PAIR="en,de"
-python front-a11y/scripts/alt_from_ollama.py photo.jpg   # → German alt text
+python front-vision/scripts/alt_from_ollama.py photo.jpg   # → German alt text
 ```
 
 Precedence (highest first): explicit `--lang` flag → `FRONT_LANG_PAIR`
@@ -155,6 +159,7 @@ The "zero build, drop into Nginx / S3 / Pages" pitch only holds for the prototyp
 | "audit" / "ergonomic review" / "UX review" | `ergonomics-criteria.md` | Walk the 8 criteria: guidance, workload, explicit control, adaptability, error management, consistency, label significance, compatibility. **Respect the existing typeface stack** — do not propose a three-Roboto swap unless the user explicitly asks about typography. |
 | "make it look less AI" / "designer review" | `anti-patterns.md` | Refuse gradient text, glassmorphism on body, side-stripe borders, "boost your productivity" copy, three-card grids |
 | "psychology" / "conversion" / "flow not working" | `ux-psychology.md` | Pick ONE applicable principle per screen — Hick / Anchoring / Default Bias / Peak-End / Goal Gradient — and apply concretely |
+| "Laws of UX" / "Hick" / "Fitts" / "Miller" / "Jakob" / "Doherty" / "Tesler" / "Peak-End" / "Postel" / "Paradox of the Active User" | (see `front-ux-laws`) | Canonical Jon Yablonski set (30 laws). Reference: `front-ux-laws/references/laws-of-ux.md`. Auditor: `python front-ux-laws/scripts/audit_laws_of_ux.py <file-or-dir>`. |
 | "material" / "Material 3" / "M3" | `material-design.md` | Map Material roles to skill tokens; emit plain HTML + Tailwind (no `mdc-*` classes) |
 
 ## Quality checklist (pre-ship)
@@ -173,7 +178,7 @@ Run `references/checklist.md` before returning code. Short version:
 - [ ] No raw hex in markup.
 - [ ] Copy is sentence case, verb-first on buttons, no "OK"/"please".
 
-Pair with `front-a11y` for `lint_a11y.py`, `audit_contrast.py`, `simulate_cvd.py` runs.
+Pair with `front-accessibility` for `lint_a11y.py` and `front-colors` for `audit_contrast.py` / `simulate_cvd.py` runs.
 
 ## Examples
 

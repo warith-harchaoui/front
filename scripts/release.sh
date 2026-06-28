@@ -12,8 +12,11 @@
 #   front-ui-<version>.tar.gz
 #   front-cli-gui-<version>.tar.gz
 #   front-publish-<version>.tar.gz
-#   front-a11y-<version>.tar.gz
-#   front-skills-<version>.tar.gz        ← bundle of all four
+#   front-accessibility-<version>.tar.gz
+#   front-colors-<version>.tar.gz
+#   front-vision-<version>.tar.gz
+#   front-audio-<version>.tar.gz
+#   front-skills-<version>.tar.gz        ← bundle of every skill
 #   SHA256SUMS                           ← one file, one line per artifact
 #
 # The tarballs each contain the skill folder at the top level (so
@@ -56,7 +59,7 @@ cd "$REPO_ROOT"
 
 # ── Skill list ─────────────────────────────────────────────────────────────
 
-SKILLS=(front-ui front-cli-gui front-publish front-a11y)
+SKILLS=(front-ui front-cli-gui front-publish front-accessibility front-colors front-vision front-audio)
 
 for skill in "${SKILLS[@]}"; do
     if [[ ! -d "$skill" ]]; then

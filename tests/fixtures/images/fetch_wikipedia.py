@@ -198,7 +198,7 @@ ENTRIES: list[dict] = [
         "alt_text": "",  # W3C decorative => empty alt by definition
         "caption": "Synthetic diagonal-stripe pattern (no semantic content).",
         "article_url": "",
-        "author": "front-a11y test fixtures (Pillow-generated)",
+        "author": "front-accessibility test fixtures (Pillow-generated)",
         "license_note": "Public domain (synthetic fixture)",
         "source_path": "tests/fixtures/images/decorative-pattern.png",
     },
@@ -212,7 +212,7 @@ ENTRIES: list[dict] = [
 # requests on some edge nodes. The contact URL lets ops reach the
 # project if our traffic ever becomes a problem.
 _USER_AGENT = (
-    "front-a11y-test-fixtures/1.0 "
+    "front-accessibility-test-fixtures/1.0 "
     "(+https://github.com/warithharchaoui/front; stdlib urllib)"
 )
 

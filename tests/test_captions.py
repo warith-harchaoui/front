@@ -1,5 +1,5 @@
 """
-test_captions — coverage for ``front-a11y/scripts/captions_from_whisper.py``.
+test_captions — coverage for ``front-accessibility/scripts/captions_from_whisper.py``.
 
 The whisper.cpp / pywhispercpp binding and ffmpeg subprocess are mocked
 out. Tests cover timestamp formatting, segment-to-format renderers, the

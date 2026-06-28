@@ -1,5 +1,5 @@
 """
-test_alt_from_ollama — coverage for ``front-a11y/scripts/alt_from_ollama.py``.
+test_alt_from_ollama — coverage for ``front-accessibility/scripts/alt_from_ollama.py``.
 
 The Ollama network call is mocked everywhere. The cache directory is
 redirected per-test via a monkeypatched module-level constant — the

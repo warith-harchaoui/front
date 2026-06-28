@@ -1,5 +1,5 @@
 """
-_click — shared Click decorators and helpers for front-a11y scripts.
+_click — shared Click decorators and helpers for front-accessibility scripts.
 
 Mirrors the ``_argparse.make_parser`` factory in shape and intent: every
 Click-based script in this skill is registered through
@@ -14,7 +14,7 @@ to confirm a help flag is wired up. The subclass below injects
 the argparse era keep passing under Click.
 
 Duplicated (intentionally) across front-ui/scripts/, front-publish/
-scripts/, front-a11y/scripts/ so each skill stays self-contained — same
+scripts/, front-accessibility/scripts/ so each skill stays self-contained — same
 policy as ``_argparse.py``.
 
 Author
@@ -68,7 +68,7 @@ def front_command(
     Parameters
     ----------
     name : str
-        Program name shown in ``--help`` (e.g. ``"front-a11y-alt"``).
+        Program name shown in ``--help`` (e.g. ``"front-accessibility-alt"``).
         Mirrors the ``prog=`` kwarg the argparse factory took.
     help : str
         One-paragraph description shown above the options table.

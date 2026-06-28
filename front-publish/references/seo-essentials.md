@@ -44,10 +44,10 @@ Each row maps Google's practice to the front-publish artifact + the script that 
 | Google's practice                       | How `front-publish` already does it                                                                                                  |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | Helpful, reliable, people-first content | `plain_language.py` rewrites at a target reading level, preserves meaning, strips marketing voice. Audience-fit is a content-author concern the skill surfaces but doesn't substitute for. |
-| Terms in titles / headings / alt / link text | `meta_from_ollama.py` proposes titles that match the page; `front-ui`'s semantic-HTML rule means real `<h1>`–`<h6>` carry the topic; `front-a11y/alt_from_ollama.py` drafts purposeful alt text; `lint_markdown.py` forbids bare-URL link text ("click here"). |
+| Terms in titles / headings / alt / link text | `meta_from_ollama.py` proposes titles that match the page; `front-ui`'s semantic-HTML rule means real `<h1>`–`<h6>` carry the topic; `front-accessibility/alt_from_ollama.py` drafts purposeful alt text; `lint_markdown.py` forbids bare-URL link text ("click here"). |
 | Crawlable links                         | `lint_markdown.py` rejects empty / nonsense link targets. `site_indexes.py` `sitemap.xml` lists every page so depth-2 surfaces aren't lost. |
 | Community engagement                    | Out of scope for the skill (you do it on Mastodon / LinkedIn / Bluesky / your newsletter). The skill emits Atom and RSS feeds so followers in those communities can subscribe without an algorithm. |
-| Media optimization                      | Images: `front-a11y/alt_from_ollama.py` ships W3C-purpose-correct alt text. Videos: `front-a11y/captions_from_whisper.py` ships WebVTT captions. Structured data: `meta_from_ollama.py` emits Schema.org JSON-LD per page. JavaScript: `front-ui`'s vanilla-JS rule keeps the runtime tiny and crawler-renderable. |
+| Media optimization                      | Images: `front-accessibility/alt_from_ollama.py` ships W3C-purpose-correct alt text. Videos: `front-accessibility/captions_from_whisper.py` ships WebVTT captions. Structured data: `meta_from_ollama.py` emits Schema.org JSON-LD per page. JavaScript: `front-ui`'s vanilla-JS rule keeps the runtime tiny and crawler-renderable. |
 | Feature enablement + control            | `meta_from_ollama.py` emits OpenGraph + Twitter Card + Schema.org so search and social previews render right; `robots.txt` supports per-path block patterns; `<meta name="robots" content="noindex">` is the per-page escape hatch when a single URL must not be indexed. |
 
 ## GEO (Generative Engine Optimization) — the AI-Overview vocabulary
@@ -111,11 +111,11 @@ Run before deploying any site emitted by `front-publish`:
 - [ ] Each page has a unique, descriptive `<title>` ≤ 70 chars and `<meta name="description">` ~120–155 chars (`meta_from_ollama.py`).
 - [ ] Each page has a canonical URL (`<link rel="canonical">`) — even on single-language sites, this prevents duplicate-content surprises.
 - [ ] Multi-language sites: `<link rel="alternate" hreflang="…">` between language variants (`references/i18n.md`).
-- [ ] Every `<img>` has purposeful alt text per the W3C decision tree (`front-a11y/references/alt-text-ai.md`).
-- [ ] Every `<video>` has captions (`front-a11y/scripts/captions_from_whisper.py` for the WebVTT track) and a transcript link.
+- [ ] Every `<img>` has purposeful alt text per the W3C decision tree (`front-accessibility/references/alt-text-ai.md`).
+- [ ] Every `<video>` has captions (`front-audio/scripts/captions_from_whisper.py` for the WebVTT track) and a transcript link.
 - [ ] Schema.org JSON-LD present where appropriate (`Article`, `BreadcrumbList`, `WebSite`, `Organization`, `Person`, `AudioObject` for narrated posts).
 - [ ] No `<meta name="keywords">`, no `<meta http-equiv="refresh">` for navigation, no "AI-approved" badges.
-- [ ] `lint_markdown.py` and `front-a11y/lint_a11y.py` both pass.
+- [ ] `lint_markdown.py` and `front-accessibility/lint_a11y.py` both pass.
 - [ ] HTTPS is enforced at the host (operator's responsibility — flag in the project README).
 
 ## What this file does not cover

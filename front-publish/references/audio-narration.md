@@ -17,7 +17,7 @@ baseline for long-form text. The cases where this earns its keep:
 - A WCAG 2.x requirement. SC 1.2.x covers text-for-media (captions,
   transcripts), not media-for-text.
 - A replacement for `<track>` elements on audio/video. The
-  captions pipeline (`front-a11y/scripts/captions_from_whisper.py`)
+  captions pipeline (`front-audio/scripts/captions_from_whisper.py`)
   is the WCAG-mandated direction.
 - A substitute for human-narrated content where the author's voice
   matters editorially (memoir, opinion, performance writing — record

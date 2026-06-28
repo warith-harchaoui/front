@@ -23,9 +23,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # Skill scripts live in one folder per skill since the 0.2.0 split. Tests
 # can import from any of them.
 SKILL_SCRIPTS_DIRS = (
-    REPO_ROOT / "front-a11y" / "scripts",
+    REPO_ROOT / "front-accessibility" / "scripts",
+    REPO_ROOT / "front-audio" / "scripts",
+    REPO_ROOT / "front-colors" / "scripts",
     REPO_ROOT / "front-publish" / "scripts",
     REPO_ROOT / "front-ui" / "scripts",
+    REPO_ROOT / "front-vision" / "scripts",
 )
 
 # Inject every scripts directory at the front of sys.path so its modules

@@ -165,7 +165,7 @@ def lint_image_alt(path: Path, text: str) -> list[Finding]:
         alt = m.group(1).strip()
         if alt == "":
             # Empty alt is *valid* for decorative images, but tag it as INFO so the
-            # author confirms it intentionally. See alt-text-ai.md in front-a11y.
+            # author confirms it intentionally. See alt-text-ai.md in front-accessibility.
             line = text[: m.start()].count("\n") + 1
             findings.append(Finding(
                 path, line, "MD045", INFO,

@@ -80,7 +80,7 @@ disables Mermaid.js.
 - **Offline.** CI in an air-gapped environment, a flight, a
   cafe-without-wifi — none of these break the rendering pipeline.
 - **Accessibility.** The PNG sibling is the right surface for an
-  alt-text helper. See `front-a11y/scripts/alt_from_ollama.py` —
+  alt-text helper. See `front-vision/scripts/alt_from_ollama.py` —
   the rendered PNG can be passed to it directly.
 
 ## LaTeX checks

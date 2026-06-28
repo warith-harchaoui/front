@@ -144,7 +144,7 @@ def ollama_available() -> dict:
         pytest.skip(
             "Ollama daemon not reachable at http://localhost:11434. "
             "Start it with `ollama serve` or "
-            "`python front-a11y/scripts/install_alt_ai.py`."
+            "`python front-accessibility/scripts/install_alt_ai.py`."
         )
     return tags
 

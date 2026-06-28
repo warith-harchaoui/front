@@ -39,7 +39,7 @@ Usage
 
     # Validate every skill in the repo (exit non-zero on any failure)
     python3 scripts/validate_skill.py front-ui/ front-cli-gui/ \\
-        front-publish/ front-a11y/
+        front-publish/ front-accessibility/
 
     # Programmatic use (returns a list of error strings; empty on PASS)
     from scripts.validate_skill import validate_skill
@@ -239,7 +239,7 @@ def parse_args() -> argparse.Namespace:
         "skills",
         nargs="+",
         type=Path,
-        help="One or more skill folders to validate (e.g. front-ui front-a11y).",
+        help="One or more skill folders to validate (e.g. front-ui front-accessibility).",
     )
     parser.add_argument(
         "-q", "--quiet",

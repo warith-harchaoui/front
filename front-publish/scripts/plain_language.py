@@ -298,7 +298,7 @@ def rewrite(
     except requests.exceptions.ConnectionError:
         sys.stderr.write(
             f"Cannot reach Ollama at {OLLAMA_URL}. "
-            f"Run `python front-a11y/scripts/install_alt_ai.py` or `ollama serve`.\n"
+            f"Run `python front-accessibility/scripts/install_alt_ai.py` or `ollama serve`.\n"
         )
         sys.exit(2)
     except requests.exceptions.HTTPError as e:

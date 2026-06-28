@@ -18,14 +18,17 @@ semantic HTML, dark-mode peers on every styled element, focus rings,
 reduced-motion guards, charts via Vega-Lite, alt text drafted to W3C / WAI
 guidance.
 
-The four skills:
+The skills:
 
 | Skill | When to install | Trigger phrases |
 |---|---|---|
 | **front-ui** | Always — it owns the stack rules and tokens. | "build a UI", "create a component", "design a page", "make a form / modal / button / nav", "dashboard", "audit this UI". |
 | **front-cli-gui** | You wrap CLI tools in web UIs. | "wrap this CLI in a GUI", "build a UI for my Python script", "argparse to web UI". |
 | **front-publish** | You ship docs sites, landing pages, meta-tags, favicons. | "turn these markdown files into a website", "meta tags", "favicons", "robots.txt", "sitemap", "llms.txt", "Atom feed", "plain language", "rewrite at grade 8". |
-| **front-a11y** | You need accessibility audits and content (alt text, captions). | "a11y lint", "WCAG check", "contrast audit", "alt text", "describe this image", "captions", "transcript", "colorblind preview". |
+| **front-accessibility** | You need static HTML a11y lint. | "a11y lint", "check this HTML for accessibility", "static a11y check", "WCAG-friendly lint", "a11y pre-commit". |
+| **front-colors** | You audit contrast, simulate color blindness, or want a curated palette with perceptual lighten / darken. | "WCAG check", "contrast audit", "is my palette accessible", "colorblind preview", "deuteranope", "CVD", "OKLCH", "lighten this color". |
+| **front-vision** | You draft W3C-compliant alt text from images locally (no SaaS). | "alt text", "alt text for this image", "describe this image", "draft alt", "image description", "img has no alt". |
+| **front-audio** | You draft WebVTT / SRT captions for `<video>` / `<audio>` locally (no SaaS). | "captions", "transcribe video", "transcribe audio", "WebVTT", "SRT", "subtitle file", "VTT", "caption track". |
 
 The companion skills inherit the front-ui stack rules. Install only the
 ones you need.
@@ -42,7 +45,7 @@ keep on its own.
    areas, the lot.
 2. **Pentesters writing internal dashboards.** Single-file HTML output
    that drops onto an internal box with no build chain. The a11y gates
-   (`front-a11y`) run in CI without a browser, so even one-off recon
+   (`front-accessibility`) run in CI without a browser, so even one-off recon
    tooling stays legible to teammates with assistive tech.
 3. **Data scientists wrapping CLIs.** Point `front-cli-gui` at your
    `--help` — argparse, Click, Typer, clap, commander, cobra all
@@ -78,7 +81,7 @@ already shipped on the stack, see [GALLERY.md](GALLERY.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.6.5`. The four skill folders are stable; the only WiP area is **audio captions** (front-a11y, video → text). The new **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
+A snapshot of where each surface stands at `v0.9.0`. The seven skill folders are stable; the only WiP area is **audio captions** (front-audio, video → text). The **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
 
 | Area | Status | Notes |
 |---|---|---|
@@ -86,8 +89,10 @@ A snapshot of where each surface stands at `v0.6.5`. The four skill folders are 
 | `front-cli` (unified `front` driver, shell completion) | Stable | Click-based; leaf-command `--help` forwarding fixed in 0.3.0 (regression test in 0.3.1). |
 | `front-cli-gui` (CLI → GUI flagship) | Stable (skill + runnable demo) | `assets/examples/cli-gui-demo/` runs end-to-end. Production hardening (auth, rate-limit, sandbox) deliberately left to the host. |
 | `front-publish` (Markdown site, meta tags, favicons, indexes, plain language, audio narration) | Stable | 11 public scripts spanning the four core artifacts (favicons, meta, indexes, plain-language) + Markdown → HTML + Markdown linter + the audio-narration pipeline (narrate orchestrator, OpenVoice and Chatterbox engine wrappers, voice picker, install helper). Broad deterministic test coverage (favicons, site-indexes, meta, plain-language, lint, narrate); eval suite for meta + plain-language. `FRONT_LANG_PAIR` runtime override wired. |
-| `front-a11y` — lint, contrast, CVD, alt text | Stable | 14-rule lint, OKLCH contrast fixer, Machado CVD, Wikipedia-fixture alt-text eval. MLX vision-capability auto-detection added in 0.3.1. |
-| `front-a11y` — **captions / transcripts** | **WiP / TODO** | `captions_from_whisper.py` is functional; what's missing is per-language WER baselines (`en` / `fr` / `es` extractor wired but baselines not yet published) and the user-supplied `vocab-biasing-clip.wav`. See [Roadmap](CHANGELOG.md#roadmap). |
+| `front-accessibility` — lint | Stable (renamed from `front-a11y` in 0.9.0) | 14-rule static a11y lint, stdlib only. Now narrowed to lint after the color / vision / audio splits. |
+| `front-colors` — contrast audit, CVD simulation, curated palette, perceptual lighten / darken | Stable (new in 0.7.0) | OKLCH-neighbour contrast fixer, Machado CVD matrices, unified palette CSV (Apple base + emotion / concept / psychology projections), stdlib-only `_colors` module, `Color` class. Split out of `front-accessibility` for clearer scope. |
+| `front-vision` — W3C alt text via local Ollama vision | Stable (new in 0.8.0) | Default model `gemma4:e4b` (`-mlx` auto-selected on Apple silicon). Per-purpose decision tree, surrounding-text + vocabulary biasing, on-disk cache. Split out of `front-accessibility` for clearer scope. Wikipedia-fixture alt-text eval. |
+| `front-audio` — **WebVTT / SRT captions via local whisper.cpp** | **WiP / TODO** (split out in 0.9.0) | `captions_from_whisper.py` is functional; what's missing is per-language WER baselines (`en` / `fr` / `es` extractor wired but baselines not yet published), the user-supplied `vocab-biasing-clip.wav`, and a planned `pdbms`-based revision of the whisper.cpp integration. See [Roadmap](CHANGELOG.md#roadmap). |
 | `LISEZMOI.md` (French README) | Stable | At structural parity with this README — same section ordering, content kept in lock-step on every release. |
 
 For the per-release detail (and what's planned next), see [`CHANGELOG.md`](CHANGELOG.md).
@@ -102,14 +107,14 @@ What you give the agent and what comes back. Each row is a self-contained flow �
 | A folder of Markdown files (README, `docs/**`, blog posts) | "Turn these markdown files into a website" | `front-publish` | Static site: one HTML page per `.md`, sticky top bar, sidebar TOC for `docs/`, dark-mode peer, favicons, `<meta>` tags, `robots.txt` + `sitemap.xml` + `llms.txt` + Atom feed. |
 | A free-form ask ("primary button", "confirm dialog", "settings page") | "Build a `<component>`" | `front-ui` | Semantic HTML + Tailwind + minimal vanilla JS, focus ring, `dark:` peer, 44×44 hit area, `Escape` close on dialogs, reduced-motion guard. |
 | A data shape (CSV, JSON, a few rows) | "Chart this" / "Dashboard for X" | `front-ui` | Vega-Lite v5 JSON spec + `<figure>` wrapper. House style, palette from `color-psychology.md`, polarity-tagged axes, `role="img"`. |
-| An existing HTML page or screenshot | "Audit this" / "WCAG check" / "Make it look less AI" | `front-ui` (anti-patterns, ergonomics) + `front-a11y` (lint, contrast, CVD) | Findings against the 8 ergonomic criteria + anti-patterns catalogue; concrete diffs; pre-ship checklist run; `lint_a11y` + `audit_contrast` + `simulate_cvd` output. |
-| An image file (`*.png`, `*.jpg`, …) | "Alt text for this image" | `front-a11y` | W3C-compliant alt text for the right purpose category (informative / decorative / functional / text / complex / group), in the page's language, tagged `data-alt-source="ai"`. |
-| An audio or video file (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | "Captions / transcript" | `front-a11y` *(work in progress)* | WebVTT / SRT / plain-text captions from local whisper.cpp, with project-vocab biasing. `<video>` + `<track kind="captions">` snippet. Script + tests ship today; per-language WER baselines and the vocab-biasing reference clip are still being collected — see [Status](#status). |
+| An existing HTML page or screenshot | "Audit this" / "WCAG check" / "Make it look less AI" | `front-ui` (anti-patterns, ergonomics) + `front-accessibility` (lint) + `front-colors` (contrast, CVD) | Findings against the 8 ergonomic criteria + anti-patterns catalogue; concrete diffs; pre-ship checklist run; `lint_a11y` + `audit_contrast` + `simulate_cvd` output. |
+| An image file (`*.png`, `*.jpg`, …) | "Alt text for this image" | `front-vision` | W3C-compliant alt text for the right purpose category (informative / decorative / functional / text / complex / group), in the page's language, tagged `data-alt-source="ai"`. |
+| An audio or video file (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | "Captions / transcript" | `front-audio` *(work in progress)* | WebVTT / SRT / plain-text captions from local whisper.cpp, with project-vocab biasing. `<video>` + `<track kind="captions">` snippet. Script + tests ship today; per-language WER baselines and the vocab-biasing reference clip are still being collected — see [Status](#status). |
 | A logo (`logo.png` / `.svg`) | "Favicon set" / "PWA icons" | `front-publish` | `favicon.svg` + `.ico` + PNG set + `apple-touch-icon.png` + maskable PWA icon + `site.webmanifest` + a `head.html` snippet. |
 | A goal description or an HTML page | "Meta tags" / "SEO" / "OG card" / "GEO" / "llms.txt" / "AI Overview" | `front-publish` | **For SEO:** title + description + Open Graph + Twitter Card + Schema.org JSON-LD (JSON on stdout) — see [Google's three Search Essentials pillars](https://developers.google.com/search/docs/essentials) applied in `front-publish/references/seo-essentials.md`. **For GEO** (Generative Engine Optimization — AI Overview / Gemini / ChatGPT answer surfaces): `llms.txt` is emitted by `scripts/site_indexes.py` alongside `robots.txt` + `sitemap.xml` + Atom/RSS, so the site ships an LLM-readable Markdown summary the moment any "turn this into a website" run completes. Same crawlers, same `robots.txt` permissions — no separate "AI" meta tag exists; anything claiming one is wrong. |
 | Draft UI copy | "Plain language" / "Rewrite at grade 8" | `front-publish` | Same meaning, marketing voice stripped, output length ≤ 1.1× original. |
-| A palette JSON | "Contrast audit" / "Is my palette accessible?" | `front-a11y` | Every `(label, surface)` pair walked, failures listed with the nearest OKLCH-neighbour fix. Exit 1 on any failure. |
-| A finished page / screenshot | "Pre-ship check" | `front-ui` + `front-a11y` | The `checklist.md` gate executed; lint + contrast + CVD passes; copy / motion / performance verified. |
+| A palette JSON | "Contrast audit" / "Is my palette accessible?" | `front-colors` | Every `(label, surface)` pair walked, failures listed with the nearest OKLCH-neighbour fix. Exit 1 on any failure. |
+| A finished page / screenshot | "Pre-ship check" | `front-ui` + `front-accessibility` + `front-colors` | The `checklist.md` gate executed; lint + contrast + CVD passes; copy / motion / performance verified. |
 
 > Not sure which row you're on? Describe the input in plain English. Each skill's `SKILL.md` decision tree maps phrasing → workflow.
 
@@ -140,7 +145,10 @@ mkdir -p ~/.claude/skills
 cp -r front-ui      ~/.claude/skills/   # always
 cp -r front-cli-gui ~/.claude/skills/   # only if you wrap CLIs
 cp -r front-publish ~/.claude/skills/   # only if you ship docs sites
-cp -r front-a11y    ~/.claude/skills/   # only if you need a11y gates
+cp -r front-accessibility ~/.claude/skills/   # only if you need static a11y lint
+cp -r front-colors  ~/.claude/skills/   # only if you need WCAG contrast / CVD / curated palette
+cp -r front-vision  ~/.claude/skills/   # only if you need AI alt text from local vision model
+cp -r front-audio   ~/.claude/skills/   # only if you need AI captions / transcripts from audio / video
 ```
 
 Verify the install on disk:
@@ -158,7 +166,7 @@ python3 scripts/validate_all.py
 ```
 
 If you only need a single skill, download its per-skill tarball instead
-of the bundle (e.g. `front-a11y-${VERSION}.tar.gz`). Each release also
+of the bundle (e.g. `front-accessibility-${VERSION}.tar.gz`). Each release also
 ships per-skill tarballs alongside the bundle and the same `SHA256SUMS`
 covers all of them.
 
@@ -190,11 +198,16 @@ intended.
 git clone https://github.com/warith-harchaoui/front.git
 cd front
 python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
-python3 -m pytest                                # 420+ deterministic tests
-python3 scripts/validate_all.py                  # 4 skills × YAML + content
+python3 -m pytest                                # 500+ deterministic tests
+python3 scripts/validate_all.py                  # 6 skills × YAML + content
 mkdir -p ~/.claude/skills
 cp -r front-ui      ~/.claude/skills/            # always
-cp -r front-a11y    ~/.claude/skills/            # optional companions
+cp -r front-accessibility ~/.claude/skills/            # optional companions
+cp -r front-colors  ~/.claude/skills/
+cp -r front-vision  ~/.claude/skills/
+cp -r front-audio   ~/.claude/skills/
+cp -r front-colors  ~/.claude/skills/
+cp -r front-vision  ~/.claude/skills/
 ```
 
 `CONTRIBUTING.md` walks the same flow at the contributor level.
@@ -254,7 +267,7 @@ front/                                  ← repo root
 ├── LICENSE.md                          ← The Unlicense (OFL carve-out for Roboto / Roboto Serif / Roboto Mono)
 ├── llms.txt                            ← https://llmstxt.org/ index for LLM consumers
 ├── pytest.ini, requirements-dev.txt    ← shared dev tooling
-├── tests/                              ← shared pytest suite covers all four skills
+├── tests/                              ← shared pytest suite covers every skill
 ├── assets/logo.png                     ← project logo
 │
 ├── front-ui/                           ← UI generation skill
@@ -273,10 +286,25 @@ front/                                  ← repo root
 │   ├── references/                     ← meta-tags, site-indexes, plain-language, i18n
 │   └── scripts/                        ← favicons.py, meta_from_ollama.py, site_indexes.py, plain_language.py
 │
-└── front-a11y/                         ← Accessibility audits + content tooling
+├── front-accessibility/                ← Static HTML a11y lint
+│   ├── SKILL.md
+│   ├── references/                     ← lint-a11y
+│   └── scripts/                        ← lint_a11y.py
+│
+├── front-colors/                       ← WCAG contrast audit + CVD simulation + curated palette
+│   ├── SKILL.md
+│   ├── references/                     ← contrast-audit, cvd-simulation, palette.csv
+│   └── scripts/                        ← audit_contrast.py, simulate_cvd.py, _colors.py
+│
+├── front-vision/                       ← W3C alt text via local Ollama vision
+│   ├── SKILL.md
+│   ├── references/                     ← alt-text-ai
+│   └── scripts/                        ← alt_from_ollama.py, install_alt_ai.py, prompts/
+│
+└── front-audio/                        ← WebVTT / SRT captions via local whisper.cpp
     ├── SKILL.md
-    ├── references/                     ← lint-a11y, contrast-audit, cvd-simulation, alt-text-ai, captions-ai
-    └── scripts/                        ← lint_a11y.py, audit_contrast.py, simulate_cvd.py, alt_from_ollama.py, install_alt_ai.py, captions_from_whisper.py, install_captions.py
+    ├── references/                     ← captions-ai
+    └── scripts/                        ← captions_from_whisper.py, install_captions.py
 ```
 
 ## Author
@@ -291,7 +319,7 @@ Color palettes from <https://harchaoui.org/warith/colors/>.
 
 The three Roboto families are bundled in `front-ui/assets/fonts/roboto/`, `front-ui/assets/fonts/roboto-serif/`, and `front-ui/assets/fonts/roboto-mono/`, each under the SIL Open Font License — see the bundled `OFL.txt` in each folder.
 
-We also drew on the [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) and [Google Material Design](https://material.io/design).
+We also drew on the [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/), [Google Material Design](https://material.io/design) and [Laws of UX](https://lawsofux.com/) 
 
 ## License
 

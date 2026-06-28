@@ -21,7 +21,7 @@ The script:
 
 3. Pulls the vision model used by :mod:`alt_from_ollama`:
 
-   * Default tag: ``gemma4:e2b``.
+   * Default tag: ``gemma4:e4b``.
    * On MLX-capable hardware (Darwin + arm64/aarch64), the ``-mlx``
      variant is selected automatically.
    * Override the tag with ``OLLAMA_MODEL=<tag>`` or change the base
@@ -82,7 +82,7 @@ import click
 
 #: Base model tag. The ``-mlx`` suffix is appended at runtime on MLX-capable
 #: hardware. Override with the ``OLLAMA_MODEL_BASE`` env var.
-BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e2b")
+BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e4b")
 
 
 # ── Hardware / model picking ────────────────────────────────────────────────
@@ -309,7 +309,7 @@ def pull_model(tag: str) -> None:
 
 
 @front_command(
-    "front-a11y-install-alt-ai",
+    "front-accessibility-install-alt-ai",
     help=(
         "Install Ollama (Homebrew / official installer / winget), start its "
         "daemon, and pull the vision model used by `front a11y alt`.\n\n"
@@ -321,8 +321,8 @@ def pull_model(tag: str) -> None:
     ),
     epilog=(
         "Examples:\n"
-        "  front-a11y-install-alt-ai\n"
-        "  front-a11y-install-alt-ai --model gemma3n:e2b\n"
+        "  front-accessibility-install-alt-ai\n"
+        "  front-accessibility-install-alt-ai --model gemma3n:e2b\n"
         "  OLLAMA_MODEL_BASE=llava python install_alt_ai.py\n"
     ),
 )

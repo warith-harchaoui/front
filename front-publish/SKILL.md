@@ -63,7 +63,7 @@ a different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
 
 1. Edit `metadata.lang_pair` in `SKILL.md` (this file).
 2. Mirror the same value in `front-ui/SKILL.md` and
-   `front-a11y/SKILL.md` so the three skills stay in lock-step.
+   `front-accessibility/SKILL.md` so the three skills stay in lock-step.
 3. The pair is consumed everywhere the skill currently uses EN/FR:
    - **Meta tags** (`scripts/meta_from_ollama.py`): `og:locale` defaults
      to the first tag, `og:locale_alternate` to the second.
@@ -72,8 +72,8 @@ a different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
    - **Plain-language rewriter** (`scripts/plain_language.py`): the
      `--lang` default falls back to the first tag if the environment
      locale isn't set.
-   - **Alt text** (`front-a11y/scripts/alt_from_ollama.py --lang`).
-   - **Captions** (`front-a11y/scripts/captions_from_whisper.py --lang`).
+   - **Alt text** (`front-vision/scripts/alt_from_ollama.py --lang`).
+   - **Captions** (`front-audio/scripts/captions_from_whisper.py --lang`).
 
 **Runtime override.** For ad-hoc shells, set the `FRONT_LANG_PAIR`
 environment variable instead of editing the frontmatter — the four
@@ -135,7 +135,7 @@ site_indexes.py    # robots, sitemap, llms.txt, feed
 plain_language.py  # optional: simplify draft copy
 ```
 
-Then run `front-a11y/scripts/lint_a11y.py` over the output and `front-a11y/scripts/audit_contrast.py` over the palette before declaring "done".
+Then run `front-accessibility/scripts/lint_a11y.py` over the output and `front-colors/scripts/audit_contrast.py` over the palette before declaring "done".
 
 **Optional editorial step** — audio narration per post:
 
@@ -190,5 +190,8 @@ OpenGraph metadata.
 | You also need… | Install |
 |---|---|
 | Full UI design tokens, components, dark mode, dataviz | `front-ui` |
-| a11y lint, contrast audit, alt text, captions | `front-a11y` |
+| a11y lint (static HTML) | `front-accessibility` |
+| WCAG contrast audit, CVD simulation, curated palette | `front-colors` |
+| W3C alt text via local Ollama vision | `front-vision` |
+| WebVTT / SRT captions via local whisper.cpp | `front-audio` |
 | Wrap a CLI in a GUI | `front-cli-gui` |

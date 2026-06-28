@@ -633,14 +633,14 @@ def main() -> int:
         ``0`` on no findings, ``1`` on any finding.
     """
     p = make_parser(
-        prog="front-a11y-lint",
+        prog="front-accessibility-lint",
         description="W3C/WAI accessibility linter for HTML emitted by the front skill. "
                     "14 rules, exit 1 on any finding. Pre-commit gate — pair with axe-core "
                     "or Pa11y for runtime DOM audits.",
         epilog="Examples:\n"
-               "  front-a11y-lint public/index.html\n"
-               "  front-a11y-lint --format json public/\n"
-               "  front-a11y-lint --ignore IMG_ALT,A_HREF dist/\n",
+               "  front-accessibility-lint public/index.html\n"
+               "  front-accessibility-lint --format json public/\n"
+               "  front-accessibility-lint --ignore IMG_ALT,A_HREF dist/\n",
     )
     p.add_argument(
         "target", type=Path,

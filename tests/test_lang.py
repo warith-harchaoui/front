@@ -1,5 +1,5 @@
 """
-test_lang — coverage for ``front-a11y/scripts/_lang.py``.
+test_lang — coverage for ``front-accessibility/scripts/_lang.py``.
 
 Asserts the language detector returns the right BCP-47 base tag for
 short samples in seven scripts, short-input fallback, and graceful

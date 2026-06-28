@@ -8,10 +8,10 @@ into `~/.claude/skills/`).
 
 ## Releases
 
-Each tagged release publishes five tarballs on GitHub Releases (one per
-skill plus a bundle of all four) and a single `SHA256SUMS` covering
-every artifact. Users download the bundle (or a per-skill tarball),
-run `shasum -a 256 -c SHA256SUMS` to verify it, extract, and copy the
+Each tagged release publishes one tarball per skill plus a bundle on
+GitHub Releases, and a single `SHA256SUMS` covering every artifact.
+Users download the bundle (or a per-skill tarball), run
+`shasum -a 256 -c SHA256SUMS` to verify it, extract, and copy the
 folders they need into `~/.claude/skills/`. The README's *Install*
 section walks the full flow. To upgrade, repeat the steps with a newer
 `VERSION` — the on-disk folder name is stable so the copy overwrites in
@@ -46,6 +46,298 @@ Adoption-side milestones (user-driven; not engineering work):
   my palette". Refine descriptions if under-triggers.
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
+
+## [0.9.0] — 2026-06-28 — `front-audio` split + `front-a11y` renamed to `front-accessibility`
+
+After the v0.7.0 (`front-colors`) and v0.8.0 (`front-vision`) splits,
+the remaining `front-a11y` skill was unbalanced: an HTML lint script
+plus a WIP whisper.cpp captions pipeline that has nothing to do with
+HTML. This release ships the final split and a long-overdue rename.
+
+### New skill: `front-audio`
+
+- `scripts/captions_from_whisper.py` — moved from
+  `front-a11y/scripts/`. Same CLI, new program name
+  `front-audio-captions`. WebVTT / SRT / plain-text captions via local
+  whisper.cpp with project-vocab biasing — semantics unchanged.
+- `scripts/install_captions.py` — moved from `front-a11y/scripts/`.
+  Same CLI, new program name `front-audio-install`. Installs
+  `pywhispercpp` and pre-downloads a GGML model.
+- `scripts/_argparse.py` / `_click.py` / `_lang.py` / `_vocab.py` —
+  copied (per the established per-skill autonomy convention).
+- `references/captions-ai.md` — moved from `front-a11y/references/`.
+
+The captions pipeline remains explicitly **WiP** for the same reasons
+as before (WER baselines pending, `vocab-biasing-clip.wav` pending),
+plus an upcoming improvement to the whisper.cpp integration via
+**`pdbms`** that the maintainer is preparing. Trackshape via
+`tests/fixtures/audio/README.md`.
+
+### Renamed skill: `front-a11y` → `front-accessibility`
+
+The `a11y` numeronym is community-fluent but trades discoverability
+for insiderness — ironic for an accessibility skill. The other front
+skills are immediately legible (`front-ui`, `front-publish`,
+`front-cli-gui`, `front-colors`, `front-vision`, `front-audio`); the
+new name brings `front-accessibility` in line.
+
+- Directory renamed: `front-a11y/` → `front-accessibility/`.
+- `SKILL.md` `name:` field updated.
+- All scripts' `prog=` strings updated (`front-a11y-lint` →
+  `front-accessibility-lint`).
+- Every path reference (`front-a11y/scripts/...`,
+  `front-a11y/references/...`) rewritten across every doc, every test,
+  every other SKILL.md.
+- CLI router: group renamed from `a11y` to `accessibility`. Old:
+  `front a11y lint`. New: `front accessibility lint`.
+- The lint script's filename stays `lint_a11y.py` — the term `a11y`
+  remains the right name for the *tool* (the script does an a11y lint
+  in the WAI/WCAG sense). The change is to the *skill folder* / *CLI
+  group*, where discoverability matters.
+
+`front-accessibility` is now narrowly scoped to one thing: 14-rule
+static HTML accessibility lint, stdlib only, no third-party deps, no
+browser, no network. `metadata.version` → `0.9.0`.
+
+### CLI
+
+- New group `front audio` with leaf commands `front audio captions`
+  and `front audio install`.
+- Removed `front a11y captions` and `front a11y install-captions`.
+- Renamed group `front a11y …` → `front accessibility …` for the
+  remaining `lint` command (and any future `accessibility-*` scripts).
+
+### Repo plumbing (now at 7 skills)
+
+- `scripts/release.sh` SKILLS array += `front-audio` and rewritten for
+  the new `front-accessibility` name.
+- `scripts/validate_all.py` SKILLS tuple updated.
+- `tests/conftest.py` adds `front-audio/scripts` and points to
+  `front-accessibility/scripts` (was `front-a11y/scripts`).
+- `tests/test_release_packaging.py`, `tests/test_validate_skill.py`,
+  `tests/test_cli_help.py` updated for the new skill set and the
+  renamed skill. The validator now asserts
+  `"PASS — all 7 skill(s)"`.
+
+### `front-accessibility/scripts/` pruning
+
+After moving the captions code out and the alt-text / Ollama code
+having been moved out in 0.8.0, several internal helpers
+(`_click.py`, `_lang.py`, `_ollama.py`, `_prompts.py`, `_vocab.py`)
+were no longer referenced by anything inside the skill. They're
+removed; `front-accessibility/scripts/` is now just `lint_a11y.py` +
+`_argparse.py`.
+
+### Documentation
+
+- `README.md` + `LISEZMOI.md` skill tables gain a seventh row for
+  `front-audio`. The `front-accessibility` row narrows to lint-only
+  triggers.
+- Every cross-skill mention rewritten (lang_pair lockstep lists,
+  decision-tree references, end-to-end deliverable examples, install
+  instructions).
+- `front-cli/README.md` CLI examples show `front accessibility lint`
+  / `front audio captions` / etc.
+
+### Why now
+
+- Three intents lived under one skill: HTML lint (decidable from
+  source), AI captions (whisper.cpp, audio→text), AI alt text
+  (Ollama, vision). The first is text-shaped, the second audio-shaped,
+  the third image-shaped. Sharing a skill folder under the
+  `front-a11y` name was historical, not architectural.
+- The 0.7.0 and 0.8.0 splits demonstrated the pattern: one skill, one
+  intent, autonomy via per-skill duplicated helpers. Finishing the
+  pattern by splitting `front-audio` was mechanical.
+- The rename to `front-accessibility` was overdue and removes the
+  accessibility-tooling-with-an-inaccessible-name irony.
+
+## [0.8.0] — 2026-06-28 — `front-vision` skill split out of `front-a11y`
+
+The AI alt-text path (Ollama vision model, per-purpose YAML prompts,
+surrounding-text + vocabulary biasing, on-disk cache) was always a
+distinct concern from static HTML accessibility linting and audio
+captions. This release ships the split, alongside a default-model bump.
+
+### New skill: `front-vision`
+
+- `scripts/alt_from_ollama.py` — moved from `front-a11y/scripts/`. Same
+  CLI, new program name `front-vision-alt`. Per-purpose decision tree
+  (informative / decorative / functional / text / complex / group),
+  surrounding-text + vocabulary biasing, on-disk cache, EN/FR default
+  (configurable via `lang_pair`) — all unchanged.
+- `scripts/install_alt_ai.py` — moved from `front-a11y/scripts/`. Same
+  CLI, new program name `front-vision-install`. Installs the Ollama
+  daemon (brew on macOS, official installer on Linux, winget on
+  Windows) and pulls the default vision model.
+- `scripts/prompts/*.yaml` — the nine per-purpose alt-text prompt
+  templates moved from `front-a11y/scripts/prompts/`.
+- `scripts/{_argparse,_click,_lang,_prompts,_vocab}.py` — copied (per the
+  established per-skill autonomy convention); the originals stay in
+  `front-a11y/scripts/` because `captions_from_whisper.py` still uses
+  them.
+- `references/alt-text-ai.md` — moved from `front-a11y/references/`.
+
+### Default model bumped: `gemma4:e2b` → `gemma4:e4b`
+
+The default vision model is now **`gemma4:e4b`** (the larger 4B-parameter
+edge variant), with the `-mlx` suffix still auto-appended on
+Apple-silicon Macs. Override paths are unchanged:
+
+1. `--model <tag>` on the command line.
+2. `OLLAMA_MODEL=<tag>` env var (full tag including any `-mlx`).
+3. `OLLAMA_MODEL_BASE=<base>` env var (skill appends `-mlx` on
+   MLX-capable hardware).
+4. The built-in default above.
+
+`install_alt_ai.py` pulls the new default on first run; existing users
+on `gemma4:e2b` keep working until they re-run the installer.
+
+### `front-a11y` further narrowed
+
+After the v0.7.0 split that took colour audits out, this release takes
+AI alt text out as well. `front-a11y` is now scoped strictly to:
+
+- `lint_a11y.py` — 14-rule static a11y lint (stdlib only).
+- `captions_from_whisper.py` (WiP) + `install_captions.py` — local
+  WebVTT / SRT captions via whisper.cpp.
+
+SKILL.md frontmatter (`description`, `compatibility`) updated; the
+"Tools" / "Decision tree" / "Tool composition" / "Scripts" / "References"
+sections all drop the alt-text rows. Companion-skills row added pointing
+to `front-vision`. `metadata.version` → `0.8.0`.
+
+### CLI
+
+- New group `front vision` with leaf commands `front vision alt` and
+  `front vision install`.
+- Removed `front a11y alt` and `front a11y install-alt-ai` (breaking —
+  but the scripts moved, the CLI follows).
+
+### Documentation
+
+- README + LISEZMOI skill tables gain a sixth row for `front-vision`.
+  `front-a11y` row narrows to lint + captions triggers.
+- `llms.txt` lists the new script paths and the default model.
+- Every reference to `front-a11y/scripts/alt_from_ollama.py` or
+  `front-a11y/scripts/install_alt_ai.py` across `front-publish/`,
+  `front-ui/`, `front-cli/README.md`, `LANDSCAPE.md` rewritten to
+  `front-vision/scripts/...`.
+
+### Repo plumbing
+
+- `scripts/release.sh` SKILLS array += `front-vision`.
+- `scripts/validate_all.py` SKILLS tuple += `front-vision`.
+- `tests/conftest.py` adds `front-vision/scripts` to the test sys.path.
+- `tests/test_release_packaging.py`, `tests/test_validate_skill.py`,
+  `tests/test_cli_help.py`, `tests/test_prompts.py` updated for the new
+  skill (the nine `alt_*` prompt rows now point at `front-vision`).
+
+### Why now
+
+- The trigger phrase set `"alt text"` / `"describe this image"` /
+  `"draft alt"` is a distinct user intent from `"a11y lint"` and from
+  `"captions"`. Three intents in one skill diluted both the trigger
+  match and the skill's description (≤1024 chars limit was getting
+  tight).
+- The alt-text path is the only place in the family that needs a vision
+  model on disk; isolating it makes the install footprint optional for
+  users who only want HTML lint.
+- The naming `front-vision` is honest about what the skill does (local
+  vision-model AI) and leaves room for future vision-only features
+  (image OCR, layout reasoning) without re-scoping.
+
+## [0.7.0] — 2026-06-28 — `front-colors` skill split out of `front-a11y`
+
+Color tooling (WCAG contrast audit, OKLCH-neighbour fix suggester, CVD
+simulation) was always a separate concern from accessibility lint and AI
+content drafting. This release ships the split, plus the curated palette
+that previously lived as an external Python library
+([`colors-helper`](https://github.com/warith-harchaoui/colors-helper)) —
+now archived in favour of the new skill.
+
+### New skill: `front-colors`
+
+- `scripts/audit_contrast.py` — moved from `front-a11y/scripts/`. Same CLI,
+  new program name `front-colors-contrast`. The fix suggester (OKLCH L-axis
+  walk) is unchanged.
+- `scripts/simulate_cvd.py` — moved from `front-a11y/scripts/`. Same CLI,
+  new program name `front-colors-cvd`. Machado et al. 2009 matrices
+  unchanged.
+- `scripts/_colors.py` — new internal helper consolidating sRGB ↔ linear,
+  hex parsing, WCAG luminance / contrast (`meets_wcag(fg, bg, level, size)`
+  added), OKLab / OKLCH conversions, perceptual `lighten` / `darken` on the
+  OKLCH L axis (replaces the naïve `+70` RGB offset from `colors-helper`),
+  CVD matrices, palette accessors (`apple_palette`, `name_to_hex`,
+  `name_to_rgb`, `light_variant`, `emotion_to_hex`, `concept_search`,
+  `psychology_for`), and a small `Color` ergonomic class.
+  Used by both `audit_contrast` and `simulate_cvd`, killing the
+  `srgb_to_linear` / `linear_to_srgb` duplication between them.
+- `references/palette.csv` — unified curated palette. **One row per
+  canonical color**, with semantic projections as columns:
+  `Hexcode, R, G, B, Base, LightHex, Emotion, Concepts,
+  PsychologyPositive, PsychologyNegative`. Twelve rows: the eight
+  saturated Apple system colors plus Brown / Black / Gray / White
+  (which carry psychology-only semantics). Replaces the four-CSV layout
+  on harchaoui.org/warith/colors/ that duplicated the same hex values
+  across files; the live page remains the public browseable view.
+
+### `front-a11y` narrowed
+
+- `audit_contrast.py`, `simulate_cvd.py`, `references/contrast-audit.md`
+  and `references/cvd-simulation.md` moved to `front-colors`.
+- `SKILL.md` description, decision tree, framing table, references list,
+  and scripts table all updated. New companion-skills row pointing to
+  `front-colors`.
+- `metadata.version` → `0.7.0`.
+
+### CLI
+
+- New group `front colors` with leaf commands `front colors contrast` and
+  `front colors cvd`.
+- Removed `front a11y contrast` and `front a11y cvd` (breaking — but the
+  scripts moved, the CLI follows). The new commands take the same flags.
+
+### Documentation
+
+- README + LISEZMOI skill tables get a fifth row for `front-colors`. The
+  `front-a11y` row loses its color triggers.
+- `llms.txt` lists the new scripts and the palette CSV.
+- `front-publish/SKILL.md` and `front-cli/README.md` updated to reference
+  the new locations.
+
+### Repo plumbing
+
+- `scripts/release.sh` SKILLS array += `front-colors`.
+- `scripts/validate_all.py` SKILLS tuple += `front-colors`.
+- `tests/conftest.py` adds `front-colors/scripts` to the test sys.path.
+- `tests/test_release_packaging.py`, `tests/test_validate_skill.py`,
+  `tests/test_cli_help.py` updated for the new skill.
+- `tests/test_colors_module.py` — 64 new tests covering hex parsing,
+  WCAG, OKLab/OKLCH round-trips, perceptual `lighten` / `darken` (with
+  a direct comparison against the naïve RGB +70 approach the new code
+  replaces), CVD matrices, palette accessors, and the `Color` class.
+
+### Why now
+
+- Triggers like `"WCAG check"`, `"contrast audit"`, `"colorblind preview"`
+  are distinct user intents from `"a11y lint"` and `"alt text"`. Two skills
+  with focused triggers serve those intents better than one umbrella skill.
+- Color math was already accumulating: contrast (audit_contrast),
+  CVD (simulate_cvd), and now palette curation + perceptual transforms
+  (from `colors-helper`). Co-locating them avoids cross-skill imports
+  (which skills don't do anyway) and gives the math a single home.
+- `front-a11y`'s name is more accurate now that it's HTML accessibility
+  lint + AI content drafting (alt text, captions), not "everything
+  accessibility-adjacent".
+
+### Acknowledgements
+
+The unified palette draws on:
+- Apple Human Interface Guidelines (macOS system colors)
+- maketintsandshades.com (curated light counterparts)
+- Color psychology associations from the user's published page
+  <https://harchaoui.org/warith/colors/>
 
 ## [0.6.5] — 2026-06-23 — staleness sweep across SKILL descriptions + README status
 

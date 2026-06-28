@@ -21,13 +21,14 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 SCRIPTS = [
-    # front-a11y
-    REPO_ROOT / "front-a11y"   / "scripts" / "lint_a11y.py",
-    REPO_ROOT / "front-a11y"   / "scripts" / "audit_contrast.py",
-    REPO_ROOT / "front-a11y"   / "scripts" / "simulate_cvd.py",
-    REPO_ROOT / "front-a11y"   / "scripts" / "install_captions.py",
-    REPO_ROOT / "front-a11y"   / "scripts" / "captions_from_whisper.py",
-    REPO_ROOT / "front-a11y"   / "scripts" / "alt_from_ollama.py",
+    # front-accessibility
+    REPO_ROOT / "front-accessibility"    / "scripts" / "lint_a11y.py",
+    # front-audio
+    REPO_ROOT / "front-audio"           / "scripts" / "install_captions.py",
+    REPO_ROOT / "front-audio"           / "scripts" / "captions_from_whisper.py",
+    # front-colors
+    REPO_ROOT / "front-colors"  / "scripts" / "audit_contrast.py",
+    REPO_ROOT / "front-colors"  / "scripts" / "simulate_cvd.py",
     # front-publish
     REPO_ROOT / "front-publish" / "scripts" / "favicons.py",
     REPO_ROOT / "front-publish" / "scripts" / "meta_from_ollama.py",
@@ -35,6 +36,8 @@ SCRIPTS = [
     REPO_ROOT / "front-publish" / "scripts" / "plain_language.py",
     REPO_ROOT / "front-publish" / "scripts" / "lint_markdown.py",
     REPO_ROOT / "front-publish" / "scripts" / "md_to_html.py",
+    # front-vision
+    REPO_ROOT / "front-vision"  / "scripts" / "alt_from_ollama.py",
 ]
 
 

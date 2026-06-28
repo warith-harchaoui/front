@@ -1,5 +1,5 @@
 """
-test_install_alt_ai — coverage for ``front-a11y/scripts/install_alt_ai.py``.
+test_install_alt_ai — coverage for ``front-accessibility/scripts/install_alt_ai.py``.
 
 Every shell-out is mocked. Covers the model picker, the three platform
 install paths (brew on Darwin, official installer on Linux, winget on

@@ -184,9 +184,9 @@ def download_model(name: str) -> Path:
 def main() -> int:
     """Run the pip-install + model-prefetch pipeline."""
     p = make_parser(
-        prog="front-a11y-install-captions",
+        prog="front-audio-install",
         description="Install pywhispercpp and pre-download a GGML caption model "
-                    "so `front-a11y-captions` runs offline.",
+                    "so `front-audio-captions` runs offline.",
     )
     p.add_argument(
         "--model", default=DEFAULT_MODEL, choices=list(SUPPORTED_MODELS),

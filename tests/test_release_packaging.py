@@ -44,12 +44,15 @@ from validate_skill import validate_skill
 #: release.sh rejects ``v``-prefixed inputs.
 TEST_VERSION: str = "0.0.0-test"
 
-#: The four shipped skills, in the same order release.sh packages them.
+#: The shipped skills, in the same order release.sh packages them.
 SKILLS: tuple[str, ...] = (
     "front-ui",
     "front-cli-gui",
     "front-publish",
-    "front-a11y",
+    "front-accessibility",
+    "front-colors",
+    "front-vision",
+    "front-audio",
 )
 
 #: Patterns whose presence inside a packaged tarball is a regression.

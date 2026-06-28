@@ -1,5 +1,5 @@
 """
-_click — shared Click decorators and helpers for front-publish scripts.
+_click — shared Click decorators and helpers for front-accessibility scripts.
 
 Mirrors the ``_argparse.make_parser`` factory in shape and intent: every
 Click-based script in this skill is registered through
@@ -68,7 +68,7 @@ def front_command(
     Parameters
     ----------
     name : str
-        Program name shown in ``--help`` (e.g. ``"front-publish-meta"``).
+        Program name shown in ``--help`` (e.g. ``"front-accessibility-alt"``).
         Mirrors the ``prog=`` kwarg the argparse factory took.
     help : str
         One-paragraph description shown above the options table.
@@ -97,8 +97,8 @@ def front_command(
         )(cmd)
         # Stash the canonical prog name so :func:`run_command` can pass it
         # to Click's ``main(prog_name=...)`` — otherwise the usage line
-        # shows the raw script filename (``meta_from_ollama.py``) instead
-        # of the kebab-cased name the user sees in docs.
+        # shows the raw script filename (``alt_from_ollama.py``) instead of
+        # the kebab-cased name the user sees in docs.
         cmd._front_prog_name = name  # type: ignore[attr-defined]
         return cmd
 

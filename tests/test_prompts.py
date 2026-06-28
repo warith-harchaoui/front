@@ -21,7 +21,7 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PUBLISH_SCRIPTS = REPO_ROOT / "front-publish" / "scripts"
-A11Y_SCRIPTS = REPO_ROOT / "front-a11y" / "scripts"
+A11Y_SCRIPTS = REPO_ROOT / "front-accessibility" / "scripts"
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -40,16 +40,16 @@ def _add_publish_scripts_to_path() -> None:
         ("front-publish", "latex_caption",           "Plain UTF-8 text"),
         ("front-publish", "plain_language_rewrite",  "Reply with the rewritten text only"),
         ("front-publish", "meta_tags_json",          "Return a single JSON object"),
-        # front-a11y alt-text prompts (short + long)
-        ("front-a11y",    "alt_short_default",       "Reply with the alt text only"),
-        ("front-a11y",    "alt_short_informative",   "informative image"),
-        ("front-a11y",    "alt_short_functional",    "action or destination"),
-        ("front-a11y",    "alt_short_text",          "verbatim"),
-        ("front-a11y",    "alt_short_complex",       "complex image"),
-        ("front-a11y",    "alt_short_group",         "group of images"),
-        ("front-a11y",    "alt_long_complex",        "Markdown"),
-        ("front-a11y",    "alt_long_group",          "group of related images"),
-        ("front-a11y",    "alt_long_default",        "long-form description"),
+        # front-vision alt-text prompts (short + long)
+        ("front-vision",  "alt_short_default",       "Reply with the alt text only"),
+        ("front-vision",  "alt_short_informative",   "informative image"),
+        ("front-vision",  "alt_short_functional",    "action or destination"),
+        ("front-vision",  "alt_short_text",          "verbatim"),
+        ("front-vision",  "alt_short_complex",       "complex image"),
+        ("front-vision",  "alt_short_group",         "group of images"),
+        ("front-vision",  "alt_long_complex",        "Markdown"),
+        ("front-vision",  "alt_long_group",          "group of related images"),
+        ("front-vision",  "alt_long_default",        "long-form description"),
     ],
 )
 def test_prompt_yaml_loads(skill: str, name: str, must_contain: str) -> None:

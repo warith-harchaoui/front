@@ -1,7 +1,7 @@
 # Short alt-text prompt — default (W3C purpose: informative, or anything that
 # does not match a more specific kind).
 #
-# Used by: front-a11y/scripts/alt_from_ollama.py (prompt_for, kind=informative
+# Used by: front-accessibility/scripts/alt_from_ollama.py (prompt_for, kind=informative
 # and the catch-all branch).
 #
 # Runtime substitutions:

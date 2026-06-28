@@ -4,6 +4,19 @@ Rules-only. Each principle is one line: **trigger → action**. Background and w
 
 Organised by the cognitive step a user is in.
 
+> **Canonical Laws of UX live in the `front-ux-laws` skill.** When
+> the user names one of Jon Yablonski's 30 laws explicitly (Hick,
+> Fitts, Miller, Jakob, Tesler, Doherty, Peak-End, Postel, Paradox
+> of the Active User, …), load
+> `front-ux-laws/references/laws-of-ux.md` instead — it gives the
+> trigger / action / Tailwind hook for each law and the static
+> auditor counterpart at
+> `front-ux-laws/scripts/audit_laws_of_ux.py`. The two files
+> deliberately overlap; this one is broader (Anchoring, Reciprocity,
+> Endowment, Default Bias, Banner Blindness, Curse of Knowledge, …),
+> the canonical file is more concrete on Tailwind hooks for the
+> named-by-the-user set.
+
 ## 1. Information — what the user lets in
 
 | Principle | Trigger | Action |

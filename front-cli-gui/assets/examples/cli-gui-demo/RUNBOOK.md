@@ -70,7 +70,7 @@ Total emitted lines (excluding fonts): ~700.
 - **Real image conversion** — the CLI writes a stub file. Adding Pillow would distract from the GUI-mapping demo.
 - **Authentication, persistence, multi-step wizards** — not relevant to this demo.
 - **A bundled Tailwind build** — the Play CDN keeps the demo zero-build. For production, the skill's `stack-tailwind.md` documents the Tailwind CLI / Vite swap.
-- **WCAG audit** — `python front-a11y/scripts/lint_a11y.py front-cli-gui/assets/examples/cli-gui-demo/public/` should pass; this demo is meant to be a clean baseline.
+- **WCAG audit** — `python front-accessibility/scripts/lint_a11y.py front-cli-gui/assets/examples/cli-gui-demo/public/` should pass; this demo is meant to be a clean baseline.
 
 ## License
 

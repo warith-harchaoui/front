@@ -9,7 +9,7 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [front-ui/SKILL.md](front-ui/SKILL.md): UI generation core — components, pages, dataviz, design system, dark mode. Always install.
 - [front-cli-gui/SKILL.md](front-cli-gui/SKILL.md): Wrap an existing CLI in a single-page vanilla-JS + Tailwind GUI. Flagship.
 - [front-publish/SKILL.md](front-publish/SKILL.md): Markdown → website, meta tags, favicons, site indexes, plain language.
-- [front-a11y/SKILL.md](front-a11y/SKILL.md): a11y lint, contrast audit, CVD simulation, alt text, captions.
+- [front-accessibility/SKILL.md](front-accessibility/SKILL.md): a11y lint, contrast audit, CVD simulation, alt text, captions.
 
 ## front-ui core references
 
@@ -41,13 +41,13 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [plain-language.md](front-publish/references/plain-language.md): Copy rewriting at a target grade.
 - [i18n.md](front-publish/references/i18n.md): Multilingual frontend — URL strategy, `Intl.*`, plurals, RTL. Language pair configurable.
 
-## front-a11y — accessibility audits and content
+## front-accessibility — accessibility audits and content
 
-- [lint-a11y.md](front-a11y/references/lint-a11y.md): 14-rule static a11y lint. Honest framing — pre-commit gate, not a replacement for axe-core.
-- [contrast-audit.md](front-a11y/references/contrast-audit.md): WCAG ratio audit + OKLCH-neighbour fix hint.
-- [cvd-simulation.md](front-a11y/references/cvd-simulation.md): Protanopia / deuteranopia / tritanopia rendering.
-- [alt-text-ai.md](front-a11y/references/alt-text-ai.md): W3C-compliant alt text via local Ollama + Gemma vision.
-- [captions-ai.md](front-a11y/references/captions-ai.md): WebVTT / SRT captions via local pywhispercpp.
+- [lint-a11y.md](front-accessibility/references/lint-a11y.md): 14-rule static a11y lint. Honest framing — pre-commit gate, not a replacement for axe-core.
+- [contrast-audit.md](front-accessibility/references/contrast-audit.md): WCAG ratio audit + OKLCH-neighbour fix hint.
+- [cvd-simulation.md](front-accessibility/references/cvd-simulation.md): Protanopia / deuteranopia / tritanopia rendering.
+- [alt-text-ai.md](front-accessibility/references/alt-text-ai.md): W3C-compliant alt text via local Ollama + Gemma vision.
+- [captions-ai.md](front-accessibility/references/captions-ai.md): WebVTT / SRT captions via local pywhispercpp.
 
 ## Scripts (Python, cross-platform)
 
@@ -56,13 +56,15 @@ This repository is a **bundle of four [Anthropic skills](https://resources.anthr
 - [front-publish/scripts/meta_from_ollama.py](front-publish/scripts/meta_from_ollama.py): Drafts page meta tags from a goal or HTML page.
 - [front-publish/scripts/site_indexes.py](front-publish/scripts/site_indexes.py): robots, sitemap, llms.txt, feed, humans.
 - [front-publish/scripts/plain_language.py](front-publish/scripts/plain_language.py): Rewrites UI copy at a target reading grade.
-- [front-a11y/scripts/lint_a11y.py](front-a11y/scripts/lint_a11y.py): 14-rule static a11y lint.
-- [front-a11y/scripts/audit_contrast.py](front-a11y/scripts/audit_contrast.py): WCAG contrast audit + OKLCH fix suggester.
-- [front-a11y/scripts/simulate_cvd.py](front-a11y/scripts/simulate_cvd.py): CVD image transforms.
-- [front-a11y/scripts/alt_from_ollama.py](front-a11y/scripts/alt_from_ollama.py): W3C alt text via local Ollama.
-- [front-a11y/scripts/install_alt_ai.py](front-a11y/scripts/install_alt_ai.py): Installs Ollama + Gemma vision.
-- [front-a11y/scripts/captions_from_whisper.py](front-a11y/scripts/captions_from_whisper.py): WebVTT / SRT captions via pywhispercpp.
-- [front-a11y/scripts/install_captions.py](front-a11y/scripts/install_captions.py): Installs pywhispercpp + model.
+- [front-accessibility/scripts/lint_a11y.py](front-accessibility/scripts/lint_a11y.py): 14-rule static a11y lint.
+- [front-colors/scripts/audit_contrast.py](front-colors/scripts/audit_contrast.py): WCAG contrast audit + OKLCH fix suggester.
+- [front-colors/scripts/simulate_cvd.py](front-colors/scripts/simulate_cvd.py): CVD image transforms.
+- [front-colors/scripts/_colors.py](front-colors/scripts/_colors.py): Shared color primitives (sRGB, WCAG, OKLab/OKLCH, CVD matrices, palette accessors, perceptual lighten/darken).
+- [front-colors/references/palette.csv](front-colors/references/palette.csv): Curated palette — one row per color, semantic projections (Base / Emotion / Concepts / Psychology±) as columns.
+- [front-vision/scripts/alt_from_ollama.py](front-vision/scripts/alt_from_ollama.py): W3C alt text via local Ollama vision (default `gemma4:e4b`, `-mlx` on Apple silicon).
+- [front-vision/scripts/install_alt_ai.py](front-vision/scripts/install_alt_ai.py): Installs Ollama + pulls the vision model.
+- [front-audio/scripts/captions_from_whisper.py](front-audio/scripts/captions_from_whisper.py): WebVTT / SRT captions via pywhispercpp.
+- [front-audio/scripts/install_captions.py](front-audio/scripts/install_captions.py): Installs pywhispercpp + model.
 
 ## Assets
 

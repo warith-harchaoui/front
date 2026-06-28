@@ -1,6 +1,6 @@
 # Landscape — alternatives to `front`
 
-`front` is one opinionated answer to a wide question: *how should an LLM produce frontend code?* This file maps the alternatives in every category the four skills touch as **matrices** — rows are tools, columns are characteristics you actually care about. Use it to choose with eyes open.
+`front` is one opinionated answer to a wide question: *how should an LLM produce frontend code?* This file maps the alternatives in every category the `front-*` skills touch as **matrices** — rows are tools, columns are characteristics you actually care about. Use it to choose with eyes open.
 
 ## A note on bias
 
@@ -8,10 +8,10 @@ This file is written by the author of `front`. The "Skill alignment" column is *
 
 ## Where `front` is genuinely the best pick
 
-Three concrete categories where the four skills together do something no other listed tool does in skill form:
+Three concrete categories where the `front-*` skills together do something no other listed tool does in skill form:
 
 1. **CLI → GUI mock-ups from `tool --help`.** `front-cli-gui` scaffolds a vanilla-JS + Tailwind GUI from a Python / Node / Go CLI's argument parser, in skill form, with no runtime framework. No other listed tool does this as a Claude / OpenCode skill — Gradio / Streamlit / Gooey produce a runtime UI you cannot easily restyle and are not skills.
-2. **Pre-ship a11y gates in CI without a headless browser.** `front-a11y/scripts/lint_a11y.py` is a single-file, stdlib-only Python lint that runs in milliseconds in any minimal CI container. axe-core / Pa11y / Lighthouse are the right answer for runtime audits — and you should run both — but neither runs without a browser, and that is a real cost in a pre-commit hook.
+2. **Pre-ship a11y gates in CI without a headless browser.** `front-accessibility/scripts/lint_a11y.py` is a single-file, stdlib-only Python lint that runs in milliseconds in any minimal CI container. axe-core / Pa11y / Lighthouse are the right answer for runtime audits — and you should run both — but neither runs without a browser, and that is a real cost in a pre-commit hook.
 3. **Bilingual EN/FR (or EN/DE, EN/ES, EN/JA) documentation sites where typography and tone parity matter.** `front-publish` + `front-ui`'s plain-language rewriter + `i18n.md` route together. No single SSG ships this combination.
 
 ## Where to pick something else
@@ -21,7 +21,7 @@ Honest defaults for the categories where another tool wins outright:
 - **React / Vue / Svelte component-library workflow** → **[shadcn/ui](https://ui.shadcn.com)**. Same copy-paste philosophy as `front`, but framework-native, far larger audience, far more components. `front` deliberately refuses to emit framework code; if your team has picked React, fighting `front` is the wrong move.
 - **True zero-build story for content-driven sites** → **[HTMX](https://htmx.org) + a classless CSS framework (e.g. [Pico CSS](https://picocss.com), [Simple.css](https://simplecss.org))**. HTMX needs no build, classless CSS needs no build, the resulting HTML is the smallest realistic deliverable. `front` claims "zero build" only on the prototype path (Tailwind Play CDN); HTMX + Pico is zero build in production too.
 - **Large versioned documentation sites (100+ pages, per-release views)** → **[MkDocs Material](https://squidfunk.github.io/mkdocs-material/), [Hugo](https://gohugo.io), [Astro](https://astro.build), or [Docusaurus](https://docusaurus.io)**. `front-publish` is sized for ≤ 30 pages.
-- **Hosted top-quality alt-text** → **Claude vision, GPT-4o vision, Gemini Vision**. `front-a11y/scripts/alt_from_ollama.py` is the right pick when locality / cost / privacy matter; hosted models are noticeably better on the long tail.
+- **Hosted top-quality alt-text** → **Claude vision, GPT-4o vision, Gemini Vision**. `front-vision/scripts/alt_from_ollama.py` is the right pick when locality / cost / privacy matter; hosted models are noticeably better on the long tail.
 - **Live captions, sub-real-time turnaround** → **Deepgram, AssemblyAI**.
 
 Most other categories: there is a better tool if you specialise. The matrices below name it explicitly.
@@ -50,9 +50,9 @@ What kind of work are you doing? Find the row and the honest recommendation.
 | Wrap a CLI as a native desktop app binary | `front-cli-gui` (UI) + Tauri (shell) | [Tauri](https://tauri.app) is the desktop shell; `front-cli-gui` emits what goes inside the web view. If you only need the desktop, Tauri's defaults are fine. |
 | Build a docs site from a small README + `docs/` | `front-publish` | For 100+ versioned pages or for a docs site with side-by-side per-release views: [MkDocs Material](https://squidfunk.github.io/mkdocs-material/), [Hugo](https://gohugo.io), [Astro](https://astro.build), [Docusaurus](https://docusaurus.io). `front-publish` is for small projects (< 30 pages). |
 | Declarative JSON charts with a house style | `front-ui` | For bespoke / 3D / scientific charts: [D3](https://d3js.org), [Plotly](https://plotly.com), [Three.js](https://threejs.org). `front-ui` ships Vega-Lite v5 specs. |
-| A11y lint in CI without a browser | `front-a11y` | This is a pre-commit gate. For runtime DOM audits (post-JS, dynamic ARIA, focus order after async): [axe-core](https://github.com/dequelabs/axe-core), [Pa11y](https://pa11y.org), Lighthouse. Pair both. |
-| Local-only alt-text drafting | `front-a11y` | For top-quality hosted alt-text: [Claude vision](https://docs.claude.com/en/docs/build-with-claude/vision), [GPT-4o vision](https://platform.openai.com/docs/guides/vision), [Gemini Vision](https://ai.google.dev/gemini-api/docs/vision). Hosted is more accurate; local is free and private. |
-| Local CPU-friendly captions | `front-a11y` | For real-time live captions: [Deepgram](https://deepgram.com), [AssemblyAI](https://www.assemblyai.com). `front-a11y` uses whisper.cpp — fast on CPU, not live. |
+| A11y lint in CI without a browser | `front-accessibility` | This is a pre-commit gate. For runtime DOM audits (post-JS, dynamic ARIA, focus order after async): [axe-core](https://github.com/dequelabs/axe-core), [Pa11y](https://pa11y.org), Lighthouse. Pair both. |
+| Local-only alt-text drafting | `front-accessibility` | For top-quality hosted alt-text: [Claude vision](https://docs.claude.com/en/docs/build-with-claude/vision), [GPT-4o vision](https://platform.openai.com/docs/guides/vision), [Gemini Vision](https://ai.google.dev/gemini-api/docs/vision). Hosted is more accurate; local is free and private. |
+| Local CPU-friendly captions | `front-accessibility` | For real-time live captions: [Deepgram](https://deepgram.com), [AssemblyAI](https://www.assemblyai.com). `front-accessibility` uses whisper.cpp — fast on CPU, not live. |
 | Marketing landing page | none | Webflow, Framer, or a design agency. `front` enforces a stack that's optimized for clarity, not brand differentiation. |
 | Custom visual identity for a consumer app | none | Hire a designer. `front` uses one palette family and two fonts on purpose. |
 
@@ -261,7 +261,7 @@ Roboto families as WOFF2 with bundled OFL licenses).
 
 Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser tests).
 
-**Pick `front-a11y/scripts/lint_a11y.py`** as a fast pre-commit gate that runs in a stdlib-only CI container — exit 1 on any finding. **Pick axe-core or Pa11y** for the dynamic checks: dynamic ARIA state, focus traps after `dialog.showModal()`, color contrast after a runtime theme switch, name/role/value after portal mounts. **Pick Lighthouse** when the a11y audit must come with the performance / SEO audit in the same report. The honest framing: a green static lint does not mean WCAG-compliant — it means the static rules pass.
+**Pick `front-accessibility/scripts/lint_a11y.py`** as a fast pre-commit gate that runs in a stdlib-only CI container — exit 1 on any finding. **Pick axe-core or Pa11y** for the dynamic checks: dynamic ARIA state, focus traps after `dialog.showModal()`, color contrast after a runtime theme switch, name/role/value after portal mounts. **Pick Lighthouse** when the a11y audit must come with the performance / SEO audit in the same report. The honest framing: a green static lint does not mean WCAG-compliant — it means the static rules pass.
 
 ---
 
@@ -269,8 +269,8 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 
 | Tool | Form | Live preview | CI-friendly | License | Skill alignment | Notes |
 |---|---|:---:|:---:|---|:---:|---|
-| **`scripts/audit_contrast.py`** (used) | CLI + OKLCH fix suggester | ✗ | ✓ | Unlicense | ✓ | Walks every label/surface pair. |
-| **`scripts/simulate_cvd.py`** (used) | CLI image transform | ✗ | ✓ | Unlicense | ✓ | Protanopia / deuteranopia / tritanopia. |
+| **`front-colors/scripts/audit_contrast.py`** (used) | CLI + OKLCH fix suggester | ✗ | ✓ | Unlicense | ✓ | Walks every label/surface pair. |
+| **`front-colors/scripts/simulate_cvd.py`** (used) | CLI image transform | ✗ | ✓ | Unlicense | ✓ | Protanopia / deuteranopia / tritanopia. |
 | [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) | hosted page | ✗ | ✗ | free | ~ | Canonical reference. |
 | [Stark](https://www.getstark.co) | Figma / Sketch plugin | ✓ | ✗ | freemium | ✗ | Designer workflow. |
 | [Sim Daltonism](https://michelf.ca/projects/sim-daltonism/) | macOS overlay | ✓ | ✗ | free | ~ | Live CVD preview. |
@@ -362,7 +362,7 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 | [OpenCode](https://opencode.ai) | Alternative runtime for the same skill format | ✓ | Named in `README.md` install path. |
 | Hand-prompting (no skill) | Whatever you write | ~ | Works for one-shots, drifts across sessions. |
 
-**Pick the four `front-*` skills** when you want repeatable frontend output, ergonomic gates and accessibility content baked into the agent's habits. **Pick Claude Code's built-in commands** (`/init`, `/review`, `/security-review`) for the general-purpose code workflows — they compose with `front-*` rather than compete with it. **Pick OpenCode** when you want the same skill format under a model-agnostic runtime. **Skip skills entirely** for one-shot prompts where the cost of installing a skill folder outweighs the saved typing.
+**Pick the `front-*` skills** when you want repeatable frontend output, ergonomic gates and accessibility content baked into the agent's habits. **Pick Claude Code's built-in commands** (`/init`, `/review`, `/security-review`) for the general-purpose code workflows — they compose with `front-*` rather than compete with it. **Pick OpenCode** when you want the same skill format under a model-agnostic runtime. **Skip skills entirely** for one-shot prompts where the cost of installing a skill folder outweighs the saved typing.
 
 ---
 

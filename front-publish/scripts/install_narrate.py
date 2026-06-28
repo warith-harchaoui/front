@@ -5,7 +5,7 @@ install_narrate
 
 One-stop install / model-pull helper for the narration engines
 (``openvoice``, ``chatterbox``). Mirrors the pattern of
-``install_alt_ai.py`` and ``install_captions.py`` from front-a11y:
+``install_alt_ai.py`` and ``install_captions.py`` from front-accessibility:
 the script does the boring downloads so the user does not have to
 read the upstream README.
 

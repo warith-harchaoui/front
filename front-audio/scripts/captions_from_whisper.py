@@ -567,7 +567,7 @@ def transcribe(
 
 
 @front_command(
-    "front-a11y-captions",
+    "front-audio-captions",
     help=(
         "Generate WebVTT / SRT / plain-text captions or a transcript from "
         "an audio or video file via local pywhispercpp. Project-vocab biasing "
@@ -575,9 +575,9 @@ def transcribe(
     ),
     epilog=(
         "Examples:\n"
-        "  front-a11y-captions talk.mp4\n"
-        "  front-a11y-captions podcast.mp3 --format text --lang en\n"
-        "  front-a11y-captions interview.wav --lang fr --format srt\n"
+        "  front-audio-captions talk.mp4\n"
+        "  front-audio-captions podcast.mp3 --format text --lang en\n"
+        "  front-audio-captions interview.wav --lang fr --format srt\n"
     ),
 )
 @click.argument("source", type=click.Path(path_type=Path))

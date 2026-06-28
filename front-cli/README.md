@@ -15,11 +15,11 @@ front --version
 
 front ui validate               # → python front-ui/scripts/validate.py
 
-front a11y lint public/         # → python front-a11y/scripts/lint_a11y.py public/
-front a11y contrast --palette palette.json
-front a11y cvd screenshot.png
-front a11y alt photo.jpg --kind informative --lang en
-front a11y captions video.mp4 --format vtt
+front accessibility lint public/  # → python front-accessibility/scripts/lint_a11y.py public/
+front colors contrast --palette palette.json
+front colors cvd screenshot.png
+front vision alt photo.jpg --kind informative --lang en
+front audio captions video.mp4 --format vtt
 
 front publish favicons logo.png --out public --name "Project"
 front publish meta page.html
@@ -48,7 +48,7 @@ install instructions.
 Before `front-cli`, users ran each script directly:
 
 ```bash
-python front-a11y/scripts/lint_a11y.py public/
+python front-accessibility/scripts/lint_a11y.py public/
 python front-publish/scripts/favicons.py logo.png --out public
 ```
 

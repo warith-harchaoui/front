@@ -11,7 +11,7 @@ expects:
 - A standard ``-V`` / ``--version`` option.
 
 Duplicated (intentionally) across front-ui/scripts/, front-publish/
-scripts/, front-a11y/scripts/ so each skill stays self-contained.
+scripts/, front-accessibility/scripts/ so each skill stays self-contained.
 
 Author
 ------

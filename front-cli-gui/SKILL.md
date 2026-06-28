@@ -141,8 +141,8 @@ all generate the introspectable `--help` the inventory step expects.
 `metadata.lang_pair` is informational here (the CLI → GUI scaffold
 itself does not localize strings on your behalf — it preserves the
 labels found in the CLI's `--help`), but mirroring the value across
-all four SKILL.md files keeps the install consistent for users who
-read all four skills. See `front-publish/SKILL.md` → "Changing the
+every front-* SKILL.md keeps the install consistent for users who
+read more than one skill. See `front-publish/SKILL.md` → "Changing the
 language pair" for the canonical recipe.
 
 ## When NOT to use this skill
@@ -178,5 +178,8 @@ python server.py
 | You also need… | Install |
 |---|---|
 | Full UI design tokens (color, typography, components, dark mode) | `front-ui` |
-| a11y lint + contrast audit on the emitted HTML | `front-a11y` |
+| a11y lint on the emitted HTML | `front-accessibility` |
+| WCAG contrast audit + CVD simulation on the emitted HTML | `front-colors` |
+| W3C alt text for the wrapping page's images (local Ollama vision) | `front-vision` |
+| Captions for any embedded `<video>` / `<audio>` (local whisper.cpp) | `front-audio` |
 | Favicon / meta / docs site for the wrapping page | `front-publish` |

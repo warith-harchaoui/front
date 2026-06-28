@@ -64,21 +64,21 @@ When the author has not supplied `alt`, the skill drafts it with a **local visio
 Install once (cross-platform):
 
 ```bash
-pip install -r front-a11y/scripts/requirements-alt-text.txt
-python front-a11y/scripts/install_alt_ai.py
+pip install -r front-vision/scripts/requirements-alt-text.txt
+python front-vision/scripts/install_alt_ai.py
 ```
 
 Generate alt for an image, per the W3C / WAI decision tree:
 
 ```bash
 # informative (default)
-python front-a11y/scripts/alt_from_ollama.py ./public/hero.jpg
+python front-vision/scripts/alt_from_ollama.py ./public/hero.jpg
 
 # functional (inside <a> or <button>)
-python front-a11y/scripts/alt_from_ollama.py --kind functional --context "Submit form" ./public/icons/check.png
+python front-vision/scripts/alt_from_ollama.py --kind functional --context "Submit form" ./public/icons/check.png
 
 # complex (chart, diagram) — pair with a long description in <figcaption>
-python front-a11y/scripts/alt_from_ollama.py --kind complex --context "Weekly active users" ./public/chart.png
+python front-vision/scripts/alt_from_ollama.py --kind complex --context "Weekly active users" ./public/chart.png
 ```
 
 Output is one line ≤ 150 characters at a word boundary (no trailing `…`). For decorative images, emit `alt=""` directly (the script returns empty when called with `--kind decorative`). Do **not** add `role="presentation"` or `aria-hidden="true"` — `alt=""` alone is the WAI-recommended signal.

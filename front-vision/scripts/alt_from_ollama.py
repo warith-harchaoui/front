@@ -43,8 +43,8 @@ Notes
 -----
 * Requires Python 3.9+, ``requests``. Pillow is opportunistic
   (used to downscale images before sending; if missing, the original is sent).
-* Default model: ``gemma4:e2b`` (the ``-mlx`` variant is selected automatically
-  on MLX-capable hardware). Override with ``OLLAMA_MODEL=<tag>`` or ``--model``.
+* Default model: ``gemma4:e4b`` (the ``-mlx`` variant is selected automatically
+  on Apple-silicon Macs). Override with ``OLLAMA_MODEL=<tag>`` or ``--model``.
 * Default Ollama endpoint: ``http://localhost:11434``. Override with ``OLLAMA_URL``.
 * On-disk cache lives under ``~/.cache/front-skill/alt/`` by default. Override
   with ``FRONT_CACHE_DIR``; disable globally with ``FRONT_NO_CACHE=1`` or for
@@ -103,7 +103,7 @@ OLLAMA_URL: str = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
 #: Base model tag. The "-mlx" variant is appended at runtime on MLX-capable
 #: hardware; both flavors are visible to Ollama as separate tags.
-DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e2b")
+DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e4b")
 
 #: Hard cap on output length. W3C does not mandate a fixed maximum, but ~150
 #: characters is the upper bound that stays comfortable for screen-reader users.
@@ -779,7 +779,7 @@ def describe(
 
 
 @front_command(
-    "front-a11y-alt",
+    "front-accessibility-alt",
     help=(
         "Generate W3C-compliant alt text for an image via a local Ollama "
         "vision model. Matches the WAI image-purpose decision tree "
@@ -787,9 +787,9 @@ def describe(
     ),
     epilog=(
         "Examples:\n"
-        "  front-a11y-alt --kind informative photo.jpg\n"
-        "  front-a11y-alt --kind functional --context 'Submit form' icon.png\n"
-        "  front-a11y-alt --kind complex --in docs/chart.md chart.png\n"
+        "  front-accessibility-alt --kind informative photo.jpg\n"
+        "  front-accessibility-alt --kind functional --context 'Submit form' icon.png\n"
+        "  front-accessibility-alt --kind complex --in docs/chart.md chart.png\n"
     ),
 )
 @click.argument("src")

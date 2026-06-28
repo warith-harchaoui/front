@@ -1,5 +1,5 @@
 """
-test_install_captions — coverage for ``front-a11y/scripts/install_captions.py``.
+test_install_captions — coverage for ``front-accessibility/scripts/install_captions.py``.
 
 Mocks ``importlib.util.find_spec`` for the install-status probe, the
 pip subprocess for the install step, and ``pywhispercpp.utils.download_model``

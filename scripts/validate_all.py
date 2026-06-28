@@ -10,7 +10,7 @@ What this runs
 --------------
 1. Strict YAML frontmatter validation (``validate_skill``) against the
    four shipped skills — ``front-ui``, ``front-cli-gui``,
-   ``front-publish``, ``front-a11y``. This is the cross-skill
+   ``front-publish``, ``front-accessibility``. This is the cross-skill
    foundation: if a SKILL.md has invalid YAML, the runtime silently
    rejects it.
 2. Content-quality gate (``front-ui/scripts/validate.py``). This adds
@@ -55,12 +55,15 @@ from validate_skill import validate_skill  # noqa: E402
 #: regardless of the caller's cwd.
 REPO_ROOT: Path = Path(__file__).resolve().parents[1]
 
-#: The four shipped skills. Adding a new skill is a one-line change.
+#: The shipped skills. Adding a new skill is a one-line change.
 SKILLS: tuple[str, ...] = (
     "front-ui",
     "front-cli-gui",
     "front-publish",
-    "front-a11y",
+    "front-accessibility",
+    "front-colors",
+    "front-vision",
+    "front-audio",
 )
 
 

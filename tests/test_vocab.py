@@ -1,5 +1,5 @@
 """
-test_vocab — coverage for ``front-a11y/scripts/_vocab.py``.
+test_vocab — coverage for ``front-accessibility/scripts/_vocab.py``.
 
 The vocabulary helpers feed both ``alt_from_ollama`` and
 ``captions_from_whisper``. Six functions are covered: ``extract_vocabulary``,

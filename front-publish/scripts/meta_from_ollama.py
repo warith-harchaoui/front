@@ -492,7 +492,7 @@ def _cli(
     except requests.exceptions.ConnectionError:
         click.echo(
             f"Cannot reach Ollama at {OLLAMA_URL}. "
-            f"Run `python front-a11y/scripts/install_alt_ai.py` or `ollama serve`.",
+            f"Run `python front-accessibility/scripts/install_alt_ai.py` or `ollama serve`.",
             err=True,
         )
         return 2

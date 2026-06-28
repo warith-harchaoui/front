@@ -89,7 +89,7 @@ CONTEXT_SETTINGS = {
     "ignore_unknown_options": True,
 }
 
-# Groups keep their own help handling so `front --help`, `front a11y --help`,
+# Groups keep their own help handling so `front --help`, `front accessibility --help`,
 # etc. show the driver's subcommand listing.
 GROUP_CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 
@@ -98,7 +98,7 @@ GROUP_CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 @click.version_option(__version__, "-V", "--version", prog_name="front")
 def cli() -> None:
     """
-    front — unified driver for the four front skills.
+    front — unified driver for the front-* skills.
 
     Each sub-command shells out to the matching script in the matching
     skill folder. Skills are discovered via $FRONT_SKILLS_PATH, the current
@@ -120,60 +120,81 @@ def ui_validate(ctx: click.Context) -> None:
     sys.exit(_run_script("front-ui", "validate.py", tuple(ctx.args)))
 
 
-# ── a11y ────────────────────────────────────────────────────────────────────
+# ── accessibility ───────────────────────────────────────────────────────────
 
-@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="Accessibility skill (front-a11y).")
-def a11y() -> None:
-    """front-a11y — pre-commit a11y gates and content tooling."""
+@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="Accessibility skill (front-accessibility).")
+def accessibility() -> None:
+    """front-accessibility — pre-commit a11y gates and content tooling."""
 
 
-@a11y.command(name="lint", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-              help="Static a11y lint over HTML files (14 rules).")
+@accessibility.command(name="lint", context_settings=CONTEXT_SETTINGS, add_help_option=False,
+                       help="Static a11y lint over HTML files (14 rules).")
 @click.pass_context
-def a11y_lint(ctx: click.Context) -> None:
-    sys.exit(_run_script("front-a11y", "lint_a11y.py", tuple(ctx.args)))
+def accessibility_lint(ctx: click.Context) -> None:
+    sys.exit(_run_script("front-accessibility", "lint_a11y.py", tuple(ctx.args)))
 
 
-@a11y.command(name="contrast", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-              help="WCAG contrast audit + OKLCH-neighbour fix hint.")
+# ── audio ───────────────────────────────────────────────────────────────────
+
+@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="Audio skill (front-audio): WebVTT / SRT captions via local whisper.cpp.")
+def audio() -> None:
+    """front-audio — local AI captions and transcripts for video / audio."""
+
+
+@audio.command(name="captions", context_settings=CONTEXT_SETTINGS, add_help_option=False,
+               help="WebVTT / SRT / plain-text captions via local whisper.cpp.")
 @click.pass_context
-def a11y_contrast(ctx: click.Context) -> None:
-    sys.exit(_run_script("front-a11y", "audit_contrast.py", tuple(ctx.args)))
+def audio_captions(ctx: click.Context) -> None:
+    sys.exit(_run_script("front-audio", "captions_from_whisper.py", tuple(ctx.args)))
 
 
-@a11y.command(name="cvd", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-              help="Color-vision-deficiency (protanopia / deuteranopia / tritanopia) rendering.")
+@audio.command(name="install", context_settings=CONTEXT_SETTINGS, add_help_option=False,
+               help="Install pywhispercpp and download the model used by `front audio captions`.")
 @click.pass_context
-def a11y_cvd(ctx: click.Context) -> None:
-    sys.exit(_run_script("front-a11y", "simulate_cvd.py", tuple(ctx.args)))
+def audio_install(ctx: click.Context) -> None:
+    sys.exit(_run_script("front-audio", "install_captions.py", tuple(ctx.args)))
 
 
-@a11y.command(name="alt", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-              help="W3C-compliant alt text via a local Ollama vision model.")
+# ── vision ──────────────────────────────────────────────────────────────────
+
+@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="Vision skill (front-vision): W3C-compliant alt text via a local vision model.")
+def vision() -> None:
+    """front-vision — W3C-compliant alt text via a local Ollama vision model."""
+
+
+@vision.command(name="alt", context_settings=CONTEXT_SETTINGS, add_help_option=False,
+                help="W3C-compliant alt text via a local Ollama vision model (default: gemma4:e4b, MLX variant on Apple silicon).")
 @click.pass_context
-def a11y_alt(ctx: click.Context) -> None:
-    sys.exit(_run_script("front-a11y", "alt_from_ollama.py", tuple(ctx.args)))
+def vision_alt(ctx: click.Context) -> None:
+    sys.exit(_run_script("front-vision", "alt_from_ollama.py", tuple(ctx.args)))
 
 
-@a11y.command(name="captions", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-              help="WebVTT / SRT / plain-text captions via local whisper.cpp.")
+@vision.command(name="install", context_settings=CONTEXT_SETTINGS, add_help_option=False,
+                help="Install Ollama and pull the vision model used by `front vision alt`.")
 @click.pass_context
-def a11y_captions(ctx: click.Context) -> None:
-    sys.exit(_run_script("front-a11y", "captions_from_whisper.py", tuple(ctx.args)))
+def vision_install(ctx: click.Context) -> None:
+    sys.exit(_run_script("front-vision", "install_alt_ai.py", tuple(ctx.args)))
 
 
-@a11y.command(name="install-alt-ai", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-              help="Install Ollama and pull the vision model used by `front a11y alt`.")
+# ── colors ──────────────────────────────────────────────────────────────────
+
+@cli.group(context_settings=GROUP_CONTEXT_SETTINGS, help="Color skill (front-colors): contrast, CVD, palette.")
+def colors() -> None:
+    """front-colors — palette curation, WCAG contrast, CVD simulation."""
+
+
+@colors.command(name="contrast", context_settings=CONTEXT_SETTINGS, add_help_option=False,
+                help="WCAG contrast audit + OKLCH-neighbour fix hint.")
 @click.pass_context
-def a11y_install_alt_ai(ctx: click.Context) -> None:
-    sys.exit(_run_script("front-a11y", "install_alt_ai.py", tuple(ctx.args)))
+def colors_contrast(ctx: click.Context) -> None:
+    sys.exit(_run_script("front-colors", "audit_contrast.py", tuple(ctx.args)))
 
 
-@a11y.command(name="install-captions", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-              help="Install pywhispercpp and download the model used by `front a11y captions`.")
+@colors.command(name="cvd", context_settings=CONTEXT_SETTINGS, add_help_option=False,
+                help="Color-vision-deficiency (protanopia / deuteranopia / tritanopia) rendering.")
 @click.pass_context
-def a11y_install_captions(ctx: click.Context) -> None:
-    sys.exit(_run_script("front-a11y", "install_captions.py", tuple(ctx.args)))
+def colors_cvd(ctx: click.Context) -> None:
+    sys.exit(_run_script("front-colors", "simulate_cvd.py", tuple(ctx.args)))
 
 
 # ── publish ─────────────────────────────────────────────────────────────────

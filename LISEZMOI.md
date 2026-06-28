@@ -31,7 +31,10 @@ Les quatre skills :
 | **front-ui** | Toujours — il porte les règles de pile et les tokens. | « construis une UI », « crée un composant », « conçois une page », « fais un formulaire / modal / bouton / nav », « tableau de bord », « audite cette UI ». |
 | **front-cli-gui** | Vous habillez des outils CLI d'une IHM web. | « habille ce CLI d'une IHM », « construis une UI pour mon script Python », « argparse vers IHM web ». |
 | **front-publish** | Vous livrez des sites de doc, des landings, des meta-tags, des favicons. | « transforme ce dossier markdown en site », « meta tags », « favicons », « robots.txt », « sitemap », « llms.txt », « flux Atom », « langage clair », « réécris au niveau 6e ». |
-| **front-a11y** | Vous avez besoin d'audits d'accessibilité et de contenu (texte alternatif, sous-titres). | « lint a11y », « vérif WCAG », « audit de contraste », « texte alternatif », « décris cette image », « sous-titres », « transcription », « aperçu daltonien ». |
+| **front-accessibility** | Vous avez besoin de lint a11y statique. | « lint a11y », « vérif accessibilité HTML », « contrôle a11y statique », « lint WCAG-friendly », « a11y pre-commit ». |
+| **front-colors** | Vous auditez le contraste, simulez le daltonisme, ou voulez une palette curatée avec éclaircissement / assombrissement perceptuels. | « vérif WCAG », « audit de contraste », « ma palette est-elle accessible », « aperçu daltonien », « deutéranope », « CVD », « OKLCH », « éclaircis cette couleur ». |
+| **front-vision** | Vous draftez du texte alternatif conforme W3C depuis des images, en local (pas de SaaS). | « texte alternatif », « décris cette image », « draft alt », « description d'image », « img sans alt ». |
+| **front-audio** | Vous draftez des sous-titres WebVTT / SRT pour `<video>` / `<audio>` en local (pas de SaaS). | « sous-titres », « transcris cette vidéo », « transcris cet audio », « WebVTT », « SRT », « fichier de sous-titres », « VTT », « piste sous-titres ». |
 
 Les skills compagnons héritent des règles de pile de `front-ui`.
 N'installez que ceux dont vous avez besoin.
@@ -49,7 +52,7 @@ associé se justifie déjà à lui seul.
    tactiles : tout est cadré.
 2. **Pentesters qui écrivent des tableaux de bord internes.** Sortie
    HTML mono-fichier qui se dépose telle quelle sur une machine
-   interne, sans chaîne de build. Les portes a11y (`front-a11y`)
+   interne, sans chaîne de build. Les portes a11y (`front-accessibility`)
    tournent en CI sans navigateur, donc même un outil de recon jetable
    reste lisible pour les coéquipiers sous techno d'assistance.
 3. **Data scientists qui habillent des CLI.** Pointez `front-cli-gui`
@@ -136,7 +139,7 @@ Pour des sites réels déjà livrés sur cette pile, voir
 
 Photographie de l'état de chaque surface à `v0.6.5`. Les quatre dossiers
 de skills sont stables ; la seule zone en travaux est l'**audio /
-sous-titres** (front-a11y, vidéo → texte). La nouvelle **narration
+sous-titres** (front-accessibility, vidéo → texte). La nouvelle **narration
 audio** (front-publish, texte → audio) est stable et explicitement
 encadrée comme amélioration éditoriale optionnelle, pas exigence
 WCAG.
@@ -147,8 +150,10 @@ WCAG.
 | `front-cli` (pilote `front` unifié, complétion shell) | Stable | Basé sur Click ; transmission du `--help` corrigée en 0.3.0 (test de non-régression en 0.3.1). |
 | `front-cli-gui` (CLI → IHM, phare) | Stable (skill + démo exécutable) | `assets/examples/cli-gui-demo/` tourne de bout en bout. Durcissement production (auth, rate-limit, sandbox) délibérément laissé à l'hôte. |
 | `front-publish` (site Markdown, meta, favicons, indexes, langage clair, narration audio) | Stable | 11 scripts publics couvrant les quatre artefacts cœur (favicons, meta, indexes, langage clair) + Markdown → HTML + lint Markdown + pipeline narration audio (orchestrateur, wrappers OpenVoice et Chatterbox, sélecteur de voix, installeur). Couverture déterministe large (favicons, site-indexes, meta, langage clair, lint, narration) ; suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
-| `front-a11y` — lint, contraste, daltonisme, texte alternatif | Stable | Lint 14 règles, correcteur OKLCH, daltonisme Machado, éval texte alternatif sur fixtures Wikipedia. Auto-détection de la capacité vision MLX en 0.3.1. |
-| `front-a11y` — **sous-titres / transcriptions** | **WiP / TODO** | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées) et le clip utilisateur `vocab-biasing-clip.wav`. Voir [Roadmap](CHANGELOG.md#roadmap). |
+| `front-accessibility` — lint | Stable (renommé depuis `front-a11y` en 0.9.0) | Lint a11y statique 14 règles, stdlib uniquement. Désormais resserré au lint après les sorties color / vision / audio. |
+| `front-colors` — audit contraste, simulation CVD, palette curatée, éclaircissement / assombrissement perceptuels | Stable (nouveau en 0.7.0) | Correcteur de contraste par voisin OKLCH, matrices CVD de Machado, CSV palette unifiée (base Apple + projections émotion / concept / psychologie), module `_colors` stdlib uniquement, classe `Color`. Sorti de `front-accessibility` pour un périmètre plus clair. |
+| `front-vision` — texte alternatif W3C via vision Ollama locale | Stable (nouveau en 0.8.0) | Modèle par défaut `gemma4:e4b` (variante `-mlx` auto-sélectionnée sur Apple silicon). Arbre de décision par objectif, biais par texte environnant + vocabulaire projet, cache disque. Sorti de `front-accessibility` pour un périmètre plus clair. Éval texte alternatif sur fixtures Wikipedia. |
+| `front-audio` — **sous-titres WebVTT / SRT via whisper.cpp local** | **WiP / TODO** (sorti en 0.9.0) | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées), le clip utilisateur `vocab-biasing-clip.wav`, et une révision prévue de l'intégration whisper.cpp via `pdbms`. Voir [Roadmap](CHANGELOG.md#roadmap). |
 | `LISEZMOI.md` (README français) | Stable | À parité structurelle avec le README EN — même ordre des sections, contenu maintenu en synchronisation à chaque release. |
 
 Pour le détail par release (et la suite prévue), voir [`CHANGELOG.md`](CHANGELOG.md).
@@ -165,14 +170,14 @@ reste.
 | Un dossier de fichiers Markdown (README, `docs/**`, articles) | « Transforme ces fichiers markdown en site » | `front-publish` | Site statique : une page HTML par `.md`, barre supérieure collante, sommaire latéral pour `docs/`, mode sombre, favicons, balises `<meta>`, `robots.txt` + `sitemap.xml` + `llms.txt` + flux Atom. |
 | Une demande libre (« bouton primaire », « dialogue de confirmation », « page réglages ») | « Construis un `<composant>` » | `front-ui` | HTML sémantique + Tailwind + JS minimal, anneau de focus, variante `dark:`, zone tactile 44 × 44 px, fermeture par `Échap`, garde-fou `prefers-reduced-motion`. |
 | Un jeu de données (CSV, JSON, quelques lignes collées) | « Trace ça » / « Tableau de bord pour X » | `front-ui` | Spec Vega-Lite v5 JSON + wrapper `<figure>`. Style maison, palette de `color-psychology.md`, axes avec polarité, `role="img"`. |
-| Une page HTML existante ou une capture d'écran | « Audite » / « Vérif WCAG » / « Rends ça moins IA » | `front-ui` (anti-patterns, ergonomie) + `front-a11y` (lint, contraste, daltonisme) | Constats au regard des 8 critères ergonomiques + catalogue d'anti-patterns ; diffs concrets ; checklist pré-livraison ; sorties `lint_a11y` + `audit_contrast` + `simulate_cvd`. |
-| Une image (`*.png`, `*.jpg`, …) | « Texte alternatif pour cette image » | `front-a11y` | Texte alternatif conforme W3C dans la bonne catégorie (informatif / décoratif / fonctionnel / texte / complexe / groupe), rédigé dans la langue de la page, marqué `data-alt-source="ai"`. |
-| Un fichier audio ou vidéo (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | « Sous-titres / transcription » | `front-a11y` *(en travaux)* | Sous-titres WebVTT / SRT / texte brut depuis whisper.cpp local, avec biais de vocabulaire issu du projet. Extrait `<video>` + `<track kind="captions">` à coller. Le script et les tests sont là aujourd'hui ; les baselines WER par langue et le clip de référence pour le biais de vocabulaire sont encore à collecter — voir [État d'avancement](#état-davancement). |
+| Une page HTML existante ou une capture d'écran | « Audite » / « Vérif WCAG » / « Rends ça moins IA » | `front-ui` (anti-patterns, ergonomie) + `front-accessibility` (lint) + `front-colors` (contraste, daltonisme) | Constats au regard des 8 critères ergonomiques + catalogue d'anti-patterns ; diffs concrets ; checklist pré-livraison ; sorties `lint_a11y` + `audit_contrast` + `simulate_cvd`. |
+| Une image (`*.png`, `*.jpg`, …) | « Texte alternatif pour cette image » | `front-vision` | Texte alternatif conforme W3C dans la bonne catégorie (informatif / décoratif / fonctionnel / texte / complexe / groupe), rédigé dans la langue de la page, marqué `data-alt-source="ai"`. |
+| Un fichier audio ou vidéo (`.mp4`, `.wav`, `.mp3`, …) — **WiP** | « Sous-titres / transcription » | `front-audio` *(en travaux)* | Sous-titres WebVTT / SRT / texte brut depuis whisper.cpp local, avec biais de vocabulaire issu du projet. Extrait `<video>` + `<track kind="captions">` à coller. Le script et les tests sont là aujourd'hui ; les baselines WER par langue et le clip de référence pour le biais de vocabulaire sont encore à collecter — voir [État d'avancement](#état-davancement). |
 | Un logo (`logo.png` / `.svg`) | « Jeu de favicons » / « Icônes PWA » | `front-publish` | `favicon.svg` + `.ico` + lot de PNG + `apple-touch-icon.png` + icône PWA masquable + `site.webmanifest` + extrait `head.html`. |
 | Une description d'objectif ou une page HTML | « Meta tags » / « SEO » / « OG card » / « GEO » / « llms.txt » / « AI Overview » | `front-publish` | **Pour le SEO :** titre + description + Open Graph + Twitter Card + JSON-LD Schema.org (JSON sur stdout) — voir [les trois piliers de Google Search Essentials](https://developers.google.com/search/docs/essentials) appliqués dans `front-publish/references/seo-essentials.md`. **Pour le GEO** (Generative Engine Optimization — surfaces de réponses AI Overview / Gemini / ChatGPT) : `llms.txt` est émis par `scripts/site_indexes.py` aux côtés de `robots.txt` + `sitemap.xml` + Atom/RSS, donc le site embarque un résumé Markdown lisible par les LLM dès qu'une commande « transforme ce dossier en site » se termine. Mêmes robots, mêmes permissions dans `robots.txt` — aucune balise meta « AI » n'existe ; toute affirmation contraire est fausse. |
 | Du copy d'IHM brut | « Langage clair » / « Réécris au niveau 6e » | `front-publish` | Même sens, voix marketing retirée, longueur de sortie ≤ 1,1× l'original. |
-| Une palette JSON | « Audit de contraste » / « Ma palette est-elle accessible ? » | `front-a11y` | Chaque paire `(label, surface)` parcourue, échecs listés avec la correction OKLCH voisine la plus proche. Sortie 1 sur échec. |
-| Une page finalisée / capture d'écran | « Vérif pré-livraison » | `front-ui` + `front-a11y` | La porte `checklist.md` exécutée ; lint + contraste + daltonisme passent ; copy / animation / performance vérifiés. |
+| Une palette JSON | « Audit de contraste » / « Ma palette est-elle accessible ? » | `front-colors` | Chaque paire `(label, surface)` parcourue, échecs listés avec la correction OKLCH voisine la plus proche. Sortie 1 sur échec. |
+| Une page finalisée / capture d'écran | « Vérif pré-livraison » | `front-ui` + `front-accessibility` + `front-colors` | La porte `checklist.md` exécutée ; lint + contraste + daltonisme passent ; copy / animation / performance vérifiés. |
 
 > Pas sûr quelle ligne correspond ? Décrivez l'entrée en français courant. L'arbre de décision de chaque `SKILL.md` mappe les formulations vers les workflows.
 
@@ -205,7 +210,10 @@ mkdir -p ~/.claude/skills
 cp -r front-ui      ~/.claude/skills/   # toujours
 cp -r front-cli-gui ~/.claude/skills/   # uniquement si vous habillez des CLI
 cp -r front-publish ~/.claude/skills/   # uniquement pour les sites de doc
-cp -r front-a11y    ~/.claude/skills/   # uniquement pour les portes a11y
+cp -r front-accessibility ~/.claude/skills/   # uniquement pour lint a11y statique
+cp -r front-colors  ~/.claude/skills/   # uniquement pour contraste WCAG / CVD / palette curatée
+cp -r front-vision  ~/.claude/skills/   # uniquement pour texte alternatif via vision locale
+cp -r front-audio   ~/.claude/skills/   # uniquement pour sous-titres / transcriptions audio-vidéo
 ```
 
 Vérifier l'installation sur disque :
@@ -223,7 +231,7 @@ python3 scripts/validate_all.py
 ```
 
 Si vous n'avez besoin que d'un seul skill, téléchargez sa tarball
-unitaire (par exemple `front-a11y-${VERSION}.tar.gz`) plutôt que le
+unitaire (par exemple `front-accessibility-${VERSION}.tar.gz`) plutôt que le
 bundle. Chaque release publie les tarballs unitaires en plus du
 bundle, et le même `SHA256SUMS` couvre l'ensemble.
 
@@ -256,11 +264,14 @@ vous avez bien cloné le commit voulu.
 git clone https://github.com/warith-harchaoui/front.git
 cd front
 python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
-python3 -m pytest                                # 420+ tests déterministes
-python3 scripts/validate_all.py                  # 4 skills × YAML + contenu
+python3 -m pytest                                # 500+ tests déterministes
+python3 scripts/validate_all.py                  # 6 skills × YAML + contenu
 mkdir -p ~/.claude/skills
 cp -r front-ui      ~/.claude/skills/            # toujours
-cp -r front-a11y    ~/.claude/skills/            # compagnons optionnels
+cp -r front-accessibility ~/.claude/skills/            # compagnons optionnels
+cp -r front-colors  ~/.claude/skills/
+cp -r front-vision  ~/.claude/skills/
+cp -r front-audio   ~/.claude/skills/
 ```
 
 `CONTRIBUTING.md` reprend le même flux côté contributeur.
@@ -349,10 +360,25 @@ front/                                  ← racine du dépôt
 │   ├── references/                     ← meta-tags, site-indexes, plain-language, i18n
 │   └── scripts/                        ← favicons.py, meta_from_ollama.py, site_indexes.py, plain_language.py
 │
-└── front-a11y/                         ← audits d'accessibilité + outillage de contenu
+├── front-accessibility/                ← lint a11y HTML statique
+│   ├── SKILL.md
+│   ├── references/                     ← lint-a11y
+│   └── scripts/                        ← lint_a11y.py
+│
+├── front-colors/                       ← audit contraste + simulation CVD + palette curatée
+│   ├── SKILL.md
+│   ├── references/                     ← contrast-audit, cvd-simulation, palette.csv
+│   └── scripts/                        ← audit_contrast.py, simulate_cvd.py, _colors.py
+│
+├── front-vision/                       ← texte alternatif W3C via vision Ollama locale
+│   ├── SKILL.md
+│   ├── references/                     ← alt-text-ai
+│   └── scripts/                        ← alt_from_ollama.py, install_alt_ai.py, prompts/
+│
+└── front-audio/                        ← sous-titres WebVTT / SRT via whisper.cpp local
     ├── SKILL.md
-    ├── references/                     ← lint-a11y, contrast-audit, cvd-simulation, alt-text-ai, captions-ai
-    └── scripts/                        ← lint_a11y.py, audit_contrast.py, simulate_cvd.py, alt_from_ollama.py, install_alt_ai.py, captions_from_whisper.py, install_captions.py
+    ├── references/                     ← captions-ai
+    └── scripts/                        ← captions_from_whisper.py, install_captions.py
 ```
 
 ## Auteur

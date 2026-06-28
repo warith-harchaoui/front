@@ -98,7 +98,7 @@ def _make_skill(
 
 @pytest.mark.parametrize(
     "skill_name",
-    ["front-ui", "front-cli-gui", "front-publish", "front-a11y"],
+    ["front-ui", "front-cli-gui", "front-publish", "front-accessibility", "front-colors", "front-vision", "front-audio"],
 )
 def test_shipped_skill_passes(repo_root: Path, skill_name: str) -> None:
     """Every skill on ``main`` must validate green."""
@@ -224,7 +224,7 @@ class TestCLIContract:
                 *[
                     str(repo_root / s)
                     for s in ("front-ui", "front-cli-gui",
-                              "front-publish", "front-a11y")
+                              "front-publish", "front-accessibility", "front-colors", "front-vision", "front-audio")
                 ],
             ],
             capture_output=True,
@@ -270,4 +270,4 @@ def test_validate_all_passes_on_shipped_repo(repo_root: Path) -> None:
         f"validate_all.py exited {proc.returncode}\n"
         f"stdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
     )
-    assert "PASS — all 4 skill(s)" in proc.stdout
+    assert "PASS — all 7 skill(s)" in proc.stdout

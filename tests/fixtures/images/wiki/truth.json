@@ -13,7 +13,7 @@
   "decorative-pattern.png": {
     "alt_text": "",
     "article_url": "",
-    "author": "front-a11y test fixtures (Pillow-generated)",
+    "author": "front-accessibility test fixtures (Pillow-generated)",
     "caption": "Synthetic diagonal-stripe pattern (no semantic content).",
     "image_url": "",
     "kind": "decorative",
