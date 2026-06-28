@@ -48,12 +48,20 @@ changing, screen-reader announcement of live regions).
 
 ## Two modes — make and audit
 
-This skill is **audit-only** in the front-* duality — by design:
+This skill is primarily **audit** but ships a small make-side
+auto-fix mode for the rules whose violations have a one-line safe
+repair:
 
 | Mode | Tool | Purpose |
 |---|---|---|
-| **Make** — generate accessible output | _(none — companions cover this)_ | `front-ui` ships semantic HTML + dark-mode peers + focus rings as defaults; `front-vision` drafts W3C alt text; `front-audio` drafts WebVTT / SRT captions. |
+| **Make** — repair the mechanically-fixable rules | `scripts/lint_a11y.py --fix` | Adds `lang="en"` to `<html>` (honours `FRONT_LANG_PAIR`), strips redundant `role="presentation"` / `aria-hidden="true"` from decorative `<img alt="">`, demotes `tabindex="N>0"` to `tabindex="0"`, strips `aria-hidden` from interactive elements, appends `motion-reduce:transform-none` to animated elements. Idempotent. Use `--dry-run` to preview. |
 | **Audit** — gate before ship | `scripts/lint_a11y.py` | 14 static rules over HTML (missing alt, unlabelled inputs, button-without-text, `div onclick`, missing dialog close, lang attr, bad heading order, color-only state, motion-reduce guards). Stdlib only, no browser. |
+
+The unfixable rules (empty button, missing label, missing heading,
+color-only state, missing dialog close) are *passed through* by the
+auto-fix mode — those need a content decision the linter cannot make
+for the user. `front-vision` covers the alt-text drafting side;
+`front-ui` covers semantic HTML generation.
 
 For runtime DOM audits (post-JS, dynamic ARIA, focus traps after async)
 pair this skill with `axe-core` / `Pa11y` / `Lighthouse`. A green

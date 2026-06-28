@@ -79,6 +79,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path as _PathHelper
@@ -562,6 +563,208 @@ ALL_RULES: dict[str, callable] = {
 }
 
 
+# ── Auto-fix machinery ────────────────────────────────────────────────────
+
+
+#: Default lang attribute value for the ``html-missing-lang`` fixer.
+#: First comma-split entry of ``FRONT_LANG_PAIR`` when set, else "en".
+def _default_lang() -> str:
+    """
+    Resolve the lang code the fixer should drop into ``<html lang="…">``.
+
+    Honours the same ``FRONT_LANG_PAIR`` env var as the rest of the
+    front-* ecosystem (e.g. ``"en,de"`` → ``"en"``); falls back to
+    ``"en"`` when the env var is unset or malformed.
+    """
+    pair: str = os.environ.get("FRONT_LANG_PAIR", "").strip()
+    if not pair:
+        return "en"
+    first: str = pair.split(",", 1)[0].strip()
+    return first or "en"
+
+
+def _fix_html_missing_lang(lines: list[str], finding: "Finding") -> bool:
+    """Insert ``lang="en"`` into the ``<html …>`` opening tag."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    line: str = lines[idx]
+    # Only patch when the tag has no lang attr at all — re-running
+    # against a fixed file is a no-op.
+    if re.search(r"<html\b[^>]*\blang=", line, re.IGNORECASE):
+        return False
+    new_line: str = re.sub(
+        r"<html\b", f'<html lang="{_default_lang()}"', line, count=1,
+        flags=re.IGNORECASE,
+    )
+    if new_line == line:
+        return False
+    lines[idx] = new_line
+    return True
+
+
+def _fix_img_redundant_aria(lines: list[str], finding: "Finding") -> bool:
+    """Strip redundant ``role="presentation"`` / ``aria-hidden="true"`` from <img alt="">."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    line: str = lines[idx]
+    new_line: str = re.sub(
+        r'\s+role=["\']presentation["\']', "", line, count=1
+    )
+    new_line = re.sub(
+        r'\s+aria-hidden=["\']true["\']', "", new_line, count=1
+    )
+    if new_line == line:
+        return False
+    lines[idx] = new_line
+    return True
+
+
+def _fix_tabindex_positive(lines: list[str], finding: "Finding") -> bool:
+    """Demote ``tabindex="N>0"`` to ``tabindex="0"`` (preserves focusability)."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    line: str = lines[idx]
+    new_line: str = re.sub(
+        r'tabindex=(["\'])(?:[1-9]\d*)\1', r'tabindex=\g<1>0\1',
+        line, count=1,
+    )
+    if new_line == line:
+        return False
+    lines[idx] = new_line
+    return True
+
+
+def _fix_aria_hidden_interactive(lines: list[str], finding: "Finding") -> bool:
+    """Strip ``aria-hidden="true"`` from an interactive element."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    line: str = lines[idx]
+    new_line: str = re.sub(
+        r'\s+aria-hidden=["\']true["\']', "", line, count=1
+    )
+    if new_line == line:
+        return False
+    lines[idx] = new_line
+    return True
+
+
+def _fix_motion_reduce_guard(lines: list[str], finding: "Finding") -> bool:
+    """Append a ``motion-reduce:`` guard to the offending element's class list."""
+    idx: int = finding.line - 1
+    if not (0 <= idx < len(lines)):
+        return False
+    line: str = lines[idx]
+    m = re.search(r'''class=(["'])((?:(?!\1).)*)\1''', line)
+    if not m:
+        return False
+    existing: list[str] = m.group(2).split()
+    # Already has any motion-reduce token? No-op.
+    if any(c.startswith("motion-reduce:") for c in existing):
+        return False
+    new_classes: str = " ".join(existing + ["motion-reduce:transform-none"])
+    lines[idx] = line[: m.start(2)] + new_classes + line[m.end(2) :]
+    return True
+
+
+#: Mapping of rule id → fixer. Only rules whose violations have a
+#: single safe mechanical repair appear here. Empty links / empty
+#: buttons / missing labels / missing headings / color-only state
+#: are deliberately absent — those need a content decision the
+#: linter cannot make for the user.
+RULE_FIXERS: dict[str, "callable"] = {
+    "html-missing-lang": _fix_html_missing_lang,
+    "img-redundant-aria": _fix_img_redundant_aria,
+    "tabindex-positive": _fix_tabindex_positive,
+    "aria-hidden-interactive": _fix_aria_hidden_interactive,
+    "motion-no-reduce-guard": _fix_motion_reduce_guard,
+}
+
+
+#: Maximum fix→lint→fix passes per file. None of the current fixers
+#: introduces new findings (unlike Jakob in audit_laws_of_ux); a
+#: single pass is enough. The cap is here for symmetry and safety.
+MAX_FIX_ITERATIONS: int = 3
+
+
+def fix_file(
+    path: Path, ignored: set[str], *, dry_run: bool = False
+) -> tuple[int, int, list["Finding"]]:
+    """
+    Apply mechanical accessibility fixes to one HTML file in place.
+
+    Idempotent: a second invocation against a fixed file applies
+    zero edits. Iterates the lint→fix loop up to
+    :data:`MAX_FIX_ITERATIONS` times — no current fixer introduces
+    new findings, but the cap leaves headroom for future additions.
+
+    Parameters
+    ----------
+    path : Path
+        File to repair.
+    ignored : set of str
+        Rule ids to suppress (passed through to :func:`lint_file`).
+    dry_run : bool, default False
+        If ``True``, never write to disk — just compute and return
+        the would-be counts.
+
+    Returns
+    -------
+    (int, int, list of Finding)
+        ``(applied, skipped, remaining)`` — number of edits that
+        landed, count of findings with no fixer, and the residual
+        findings after the final write.
+    """
+    raw: str = path.read_text(encoding="utf-8", errors="ignore")
+    bare_lines: list[str] = raw.splitlines()
+    applied: int = 0
+    skipped: int = 0
+    skipped_seen: bool = False
+
+    if dry_run:
+        findings: list["Finding"] = lint_file(path, ignored)
+        for f in findings:
+            fixer = RULE_FIXERS.get(f.rule)
+            if fixer is None:
+                skipped += 1
+                continue
+            shadow: list[str] = bare_lines[:]
+            if fixer(shadow, f):
+                applied += 1
+        return applied, skipped, findings
+
+    for _ in range(MAX_FIX_ITERATIONS):
+        new_text: str = "\n".join(bare_lines)
+        if raw.endswith("\n"):
+            new_text += "\n"
+        path.write_text(new_text, encoding="utf-8")
+        findings = lint_file(path, ignored)
+        round_applied: int = 0
+        round_skipped: int = 0
+        for f in findings:
+            fixer = RULE_FIXERS.get(f.rule)
+            if fixer is None:
+                round_skipped += 1
+                continue
+            if fixer(bare_lines, f):
+                round_applied += 1
+        applied += round_applied
+        if not skipped_seen:
+            skipped = round_skipped
+            skipped_seen = True
+        if round_applied == 0:
+            break
+    new_text = "\n".join(bare_lines)
+    if raw.endswith("\n"):
+        new_text += "\n"
+    path.write_text(new_text, encoding="utf-8")
+    remaining: list["Finding"] = lint_file(path, ignored)
+    return applied, skipped, remaining
+
+
 # ── Orchestration ────────────────────────────────────────────────────────
 
 def lint_file(path: Path, ignored: set[str]) -> list[Finding]:
@@ -654,6 +857,25 @@ def main() -> int:
         "--ignore", default="",
         help="Comma-separated list of rule ids to skip.",
     )
+    p.add_argument(
+        "--fix", action="store_true",
+        help=(
+            "Apply safe mechanical fixes in place: add lang to <html>, "
+            "strip redundant role/aria-hidden from decorative <img alt=''>, "
+            "demote tabindex>0 to 0, strip aria-hidden from interactive "
+            "elements, append motion-reduce:transform-none to animated "
+            "elements. Rules without a fixer (empty button, missing "
+            "label, heading skip, etc.) are passed through honestly. "
+            "Idempotent."
+        ),
+    )
+    p.add_argument(
+        "--dry-run", action="store_true",
+        help=(
+            "With --fix, print what would change without touching the "
+            "files. Implies --fix when used alone. Always exits 0."
+        ),
+    )
     args = p.parse_args()
 
     ignored: set[str] = {r.strip() for r in args.ignore.split(",") if r.strip()}
@@ -662,6 +884,56 @@ def main() -> int:
         sys.stderr.write(f"No HTML files found under {args.target}\n")
         return 0
 
+    # ── Fix mode ──────────────────────────────────────────────────────
+    # ``--dry-run`` alone implies ``--fix`` (preview only). When the
+    # user runs ``--fix``, we apply the safe mechanical fixes in place,
+    # then emit the residual findings in the requested format so a CI
+    # pipeline can still gate on them.
+    if args.fix or args.dry_run:
+        total_applied: int = 0
+        total_skipped: int = 0
+        total_remaining: list[Finding] = []
+        for path in paths:
+            applied, skipped, remaining = fix_file(
+                path, ignored, dry_run=args.dry_run
+            )
+            total_applied += applied
+            total_skipped += skipped
+            total_remaining.extend(remaining)
+            verb: str = "would apply" if args.dry_run else "applied"
+            sys.stderr.write(
+                f"{path}: {verb} {applied} fix(es); "
+                f"{skipped} unfixable finding(s); "
+                f"{len(remaining)} remaining.\n"
+            )
+        if args.format == "json":
+            json.dump(
+                {
+                    "applied": total_applied,
+                    "skipped": total_skipped,
+                    "findings_total": len(total_remaining),
+                    "findings": [
+                        {"rule": f.rule, "line": f.line, "message": f.message}
+                        for f in total_remaining
+                    ],
+                },
+                sys.stdout, indent=2, ensure_ascii=False,
+            )
+            sys.stdout.write("\n")
+        else:
+            if total_remaining:
+                print(
+                    f"{len(total_remaining)} remaining finding(s) after "
+                    f"{'preview' if args.dry_run else 'fix'} pass."
+                )
+            else:
+                print("0 findings remaining.")
+        # Dry-run is a preview, not a verdict — always exit 0.
+        if args.dry_run:
+            return 0
+        return 0 if not total_remaining else 1
+
+    # ── Audit-only mode ───────────────────────────────────────────────
     total: int = 0
     failing_files: int = 0
     report: list[dict] = []
