@@ -45,16 +45,9 @@ from validate_skill import validate_skill
 TEST_VERSION: str = "0.0.0-test"
 
 #: The shipped skills, in the same order release.sh packages them.
-SKILLS: tuple[str, ...] = (
-    "front-ui",
-    "front-cli-gui",
-    "front-publish",
-    "front-accessibility",
-    "front-colors",
-    "front-vision",
-    "front-audio",
-    "front-ux-laws",
-)
+#: Sourced from ``SKILLS.txt`` via ``scripts/skills_manifest.py`` so
+#: this list cannot drift from the release script / the validator.
+from skills_manifest import SHIPPED_SKILLS as SKILLS  # noqa: E402
 
 #: Patterns whose presence inside a packaged tarball is a regression.
 #: Catches both the macOS Finder turds and the Python tooling caches.

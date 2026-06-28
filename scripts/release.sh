@@ -60,7 +60,22 @@ cd "$REPO_ROOT"
 
 # ── Skill list ─────────────────────────────────────────────────────────────
 
-SKILLS=(front-ui front-cli-gui front-publish front-accessibility front-colors front-vision front-audio front-ux-laws)
+# Read the canonical manifest at SKILLS.txt — single source of truth
+# across release.sh, scripts/validate_all.py and the test fixtures.
+# Comments and blank lines are stripped; everything else is one skill
+# folder name per line.
+SKILLS=()
+while IFS= read -r line; do
+    case "$line" in
+        ''|'#'*) continue ;;  # skip blank lines + comment lines
+    esac
+    SKILLS+=("$(echo "$line" | tr -d '[:space:]')")
+done < "$REPO_ROOT/SKILLS.txt"
+
+if [[ ${#SKILLS[@]} -eq 0 ]]; then
+    echo "error: SKILLS.txt is empty or missing at $REPO_ROOT" >&2
+    exit 1
+fi
 
 for skill in "${SKILLS[@]}"; do
     if [[ ! -d "$skill" ]]; then

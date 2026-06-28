@@ -55,17 +55,10 @@ from validate_skill import validate_skill  # noqa: E402
 #: regardless of the caller's cwd.
 REPO_ROOT: Path = Path(__file__).resolve().parents[1]
 
-#: The shipped skills. Adding a new skill is a one-line change.
-SKILLS: tuple[str, ...] = (
-    "front-ui",
-    "front-cli-gui",
-    "front-publish",
-    "front-accessibility",
-    "front-colors",
-    "front-vision",
-    "front-audio",
-    "front-ux-laws",
-)
+#: The shipped skills, sourced from ``SKILLS.txt`` at repo root — one
+#: source of truth across release.sh and the test fixtures. Adding a
+#: new skill is a one-line edit *there*, not here.
+from skills_manifest import SHIPPED_SKILLS as SKILLS  # noqa: E402
 
 
 # ── Stage runners ──────────────────────────────────────────────────────────

@@ -20,26 +20,28 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# Skill scripts live in one folder per skill since the 0.2.0 split. Tests
-# can import from any of them.
-SKILL_SCRIPTS_DIRS = (
-    REPO_ROOT / "front-accessibility" / "scripts",
-    REPO_ROOT / "front-audio" / "scripts",
-    REPO_ROOT / "front-colors" / "scripts",
-    REPO_ROOT / "front-publish" / "scripts",
-    REPO_ROOT / "front-ui" / "scripts",
-    REPO_ROOT / "front-vision" / "scripts",
-    REPO_ROOT / "front-ux-laws" / "scripts",
+# Repo-root scripts/ holds the shared validators (validate_skill,
+# validate_all) and the packaging helpers; expose them to the test suite
+# FIRST so ``skills_manifest`` resolves before per-skill imports run.
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+# Per-skill script directories — one folder per skill since the 0.2.0
+# split. Sourced from the canonical ``SKILLS.txt`` manifest at repo
+# root so adding skill #9 is a one-line edit there. front-cli-gui has
+# no Python scripts; it is skipped automatically because its
+# scripts/ folder does not exist.
+from skills_manifest import SHIPPED_SKILLS  # noqa: E402
+
+SKILL_SCRIPTS_DIRS = tuple(
+    REPO_ROOT / name / "scripts"
+    for name in SHIPPED_SKILLS
+    if (REPO_ROOT / name / "scripts").is_dir()
 )
 
 # Inject every scripts directory at the front of sys.path so its modules
 # resolve before any like-named package elsewhere in the environment.
 for d in SKILL_SCRIPTS_DIRS:
     sys.path.insert(0, str(d))
-
-# Repo-root scripts/ holds the shared validators (validate_skill,
-# validate_all) and the packaging helpers; expose them to the test suite.
-sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 
 @pytest.fixture(autouse=True)

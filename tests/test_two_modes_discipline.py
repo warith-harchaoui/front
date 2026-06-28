@@ -38,19 +38,10 @@ import pytest
 REPO_ROOT: Path = Path(__file__).resolve().parent.parent
 
 
-#: The eight shipped skills. Kept in sync with ``scripts/validate_all.py``
-#: ``SKILLS`` — a future single-source-of-truth manifest would let both
-#: read from the same place (open item in ``.private/todo.md``).
-SHIPPED_SKILLS: tuple[str, ...] = (
-    "front-ui",
-    "front-cli-gui",
-    "front-publish",
-    "front-accessibility",
-    "front-colors",
-    "front-vision",
-    "front-audio",
-    "front-ux-laws",
-)
+#: The shipped skills — sourced from the canonical ``SKILLS.txt``
+#: manifest at repo root so this test cannot drift from the release
+#: script / the validator.
+from skills_manifest import SHIPPED_SKILLS  # noqa: E402
 
 
 #: Regex matching the canonical "Two modes" section header. Permits the

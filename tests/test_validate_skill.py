@@ -98,7 +98,7 @@ def _make_skill(
 
 @pytest.mark.parametrize(
     "skill_name",
-    ["front-ui", "front-cli-gui", "front-publish", "front-accessibility", "front-colors", "front-vision", "front-audio", "front-ux-laws"],
+    list(__import__("skills_manifest").SHIPPED_SKILLS),
 )
 def test_shipped_skill_passes(repo_root: Path, skill_name: str) -> None:
     """Every skill on ``main`` must validate green."""
@@ -217,15 +217,13 @@ class TestCLIContract:
     """``python scripts/validate_skill.py …`` exit code matches result."""
 
     def test_exit_zero_on_all_pass(self, repo_root: Path) -> None:
+        from skills_manifest import SHIPPED_SKILLS
+
         proc = subprocess.run(
             [
                 sys.executable,
                 str(repo_root / "scripts" / "validate_skill.py"),
-                *[
-                    str(repo_root / s)
-                    for s in ("front-ui", "front-cli-gui",
-                              "front-publish", "front-accessibility", "front-colors", "front-vision", "front-audio", "front-ux-laws")
-                ],
+                *[str(repo_root / s) for s in SHIPPED_SKILLS],
             ],
             capture_output=True,
             text=True,
