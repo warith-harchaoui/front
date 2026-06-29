@@ -74,4 +74,4 @@ Total emitted lines (excluding fonts): ~700.
 
 ## License
 
-The demo is released under The Unlicense (see the repository root's `LICENSE.md`). The Roboto, Roboto Serif, and Roboto Mono families retain their SIL Open Font License — see the `OFL.txt` bundled in each `public/fonts/roboto*/` folder.
+The demo is released under the BSD-3-Clause license (see the repository root's `LICENSE.md`). The Roboto, Roboto Serif, and Roboto Mono families retain their SIL Open Font License — see the `OFL.txt` bundled in each `public/fonts/roboto*/` folder.
