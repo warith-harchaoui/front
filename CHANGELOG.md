@@ -47,6 +47,94 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.14.0] — 2026-06-29 — cli_to_gui shape protocol + BSD-3-Clause
+
+Two coherent moves landed since the v0.13.0 cut.
+
+### cli_to_gui — adapter protocol (argparse + Click + --from-help)
+
+The make-side emitter introduced in v0.12.0 was argparse-only.
+v0.14.0 generalises the introspection to a small shape-adapter
+protocol — the HTML renderer now consumes a canonical
+``ParserTree`` dict (``prog`` / ``description`` / ``actions`` /
+``sub_commands``) regardless of the source framework. Three
+adapters ship today:
+
+- **argparse** (stdlib, default; ``walk_parser``).
+- **Click** (opt-in, imported lazily; ``walk_click``). Typer apps
+  work via their underlying Click group. Bumps the deprecated
+  ``click.BaseCommand`` to ``click.Command`` for Click 9
+  compatibility. Click 8.2's ``Sentinel.UNSET`` default is
+  treated as "no default" so the HTML emitter does not stamp the
+  sentinel into ``value="…"``.
+- **``--from-help``** (subprocess + regex; ``walk_from_help``).
+  Runs ``<command> --help`` and parses the standard sections
+  (``Usage:`` / ``Options:`` / ``Commands:`` / ``Positional
+  arguments:``). Works on **any** CLI that emits a conventional
+  help block: argparse, Click, Typer, clap (Rust), cobra (Go),
+  commander (Node), hand-rolled shell scripts. Lower fidelity —
+  everything maps to ``"text"`` unless a recognised METAVAR
+  (``PATH`` / ``INT`` / ``FLOAT``), a ``[default: …]`` hint, or a
+  choice list is visible. The prog-name extractor walks past
+  common interpreters (``python3``, ``uvx``, ``node``, ``ruby``,
+  ``bash``, …) so ``python3 script.py`` resolves to ``script``.
+
+The public ``walk(obj)`` dispatches by type; adding a fourth
+adapter is a new function + the same dict — the renderer does not
+move.
+
+The emitter is its own customer across all three adapters: the test
+suite asserts the HTML emitted from each passes both the
+``front-ux-laws`` audit AND the ``front-accessibility`` lint with
+zero findings.
+
+Tests
+-----
+
+Eleven new tests in tests/test_cli_to_gui.py:
+
+- Click adapter: dispatch, every parameter kind, HTML passes both
+  audits, walk() rejects unsupported objects, argparse↔Click tree
+  shape parity.
+- ``--from-help``: argparse fixture, choice metadata preserved,
+  HTML passes both audits, prog wrapper-stripping, the
+  ``--from-help`` CLI flag, ``--help`` advertises the flag.
+
+The argparse fixture now ships ``if __name__ == "__main__":
+make_parser().parse_args()`` so ``--help`` actually reaches stdout
+on the subprocess path.
+
+### License switch — BSD-3-Clause
+
+The repo moves from The Unlicense to **BSD-3-Clause** (same license
+as scikit-learn). Permissive (use, modify, redistribute, sell, ship
+in commercial products) with three explicit conditions: copyright
+notice in source, in binary distribution docs, no
+endorsement-without-permission. Stronger fit for users who need a
+recognised SPDX identifier — BSD-3-Clause is universally accepted;
+Unlicense often trips procurement / code-import audits.
+
+Files touched (17): LICENSE.md, all eight SKILL.md frontmatters,
+front-cli/pyproject.toml, README + LISEZMOI license sections,
+CONTRIBUTING vendoring policy, SECURITY opening, LANDSCAPE
+per-script table cells, llms.txt header + LICENSE.md row.
+
+The Roboto / Roboto Serif / Roboto Mono OFL carve-out and the
+Common Voice CC0 fixture carve-out are unchanged — they apply to
+the bundled assets themselves regardless of repo license.
+
+### Thanks
+
+The Click adapter that opened this whole shape-protocol direction
+came from a conversation with [Auguste
+Baum](https://www.linkedin.com/in/auguste-baum/). README + LISEZMOI
+"Special thanks" now include the credit.
+
+### Tests + spec
+
+427 tests pass. ``scripts/validate_all.py`` green on all eight
+skills. CI green on every push.
+
 ## [0.13.0] — 2026-06-29 — make-side completion + user-activation surface
 
 Continues the autonomous overnight build-out that v0.12.0 opened.
