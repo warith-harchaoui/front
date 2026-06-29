@@ -14,7 +14,7 @@ description: >-
   accessibility", "static a11y check", "WCAG-friendly lint", "a11y
   pre-commit". Output is JSON / stdout / exit codes suitable for pre-commit
   and CI.
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The lint_a11y script needs
   Python 3.9+ stdlib only — no third-party deps, no browser, no network.

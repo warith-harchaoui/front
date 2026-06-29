@@ -251,7 +251,7 @@ Roboto families as WOFF2 with bundled OFL licenses).
 
 | Tool | Layer | Browser required | Stack | Rules | License | Skill alignment | Notes |
 |---|---|:---:|---|---|---|:---:|---|
-| **`scripts/lint_a11y.py`** (used) | static source | ✗ | Python stdlib | 14 | Unlicense | ✓ | Pre-commit gate. |
+| **`scripts/lint_a11y.py`** (used) | static source | ✗ | Python stdlib | 14 | BSD-3-Clause | ✓ | Pre-commit gate. |
 | [axe-core](https://github.com/dequelabs/axe-core) | runtime DOM | ✓ | JS | 100+ | MPL-2 | ~ | Industry standard. |
 | [Pa11y](https://pa11y.org) | runtime + CI | ✓ | Node | wraps axe / HTML_CodeSniffer | LGPL | ~ | Headless runs. |
 | [Lighthouse](https://developer.chrome.com/docs/lighthouse) | runtime + perf | ✓ | Node | a11y category + perf | Apache | ~ | DevTools bundled. |
@@ -270,8 +270,8 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 
 | Tool | Form | Live preview | CI-friendly | License | Skill alignment | Notes |
 |---|---|:---:|:---:|---|:---:|---|
-| **`front-colors/scripts/audit_contrast.py`** (used) | CLI + OKLCH fix suggester | ✗ | ✓ | Unlicense | ✓ | Walks every label/surface pair. |
-| **`front-colors/scripts/simulate_cvd.py`** (used) | CLI image transform | ✗ | ✓ | Unlicense | ✓ | Protanopia / deuteranopia / tritanopia. |
+| **`front-colors/scripts/audit_contrast.py`** (used) | CLI + OKLCH fix suggester | ✗ | ✓ | BSD-3-Clause | ✓ | Walks every label/surface pair. |
+| **`front-colors/scripts/simulate_cvd.py`** (used) | CLI image transform | ✗ | ✓ | BSD-3-Clause | ✓ | Protanopia / deuteranopia / tritanopia. |
 | [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) | hosted page | ✗ | ✗ | free | ~ | Canonical reference. |
 | [Stark](https://www.getstark.co) | Figma / Sketch plugin | ✓ | ✗ | freemium | ✗ | Designer workflow. |
 | [Sim Daltonism](https://michelf.ca/projects/sim-daltonism/) | macOS overlay | ✓ | ✗ | free | ~ | Live CVD preview. |
@@ -287,7 +287,7 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 
 | Helper | Run location | Model | Lang control | Cost / call | License | Skill alignment | Notes |
 |---|---|---|---|---|---|:---:|---|
-| **`scripts/alt_from_ollama.py`** (used) | local CPU/GPU | Gemma 4 vision (~e2b) via Ollama | `--lang` + project doc | $0 | Unlicense | ✓ | Offline, predictable. |
+| **`scripts/alt_from_ollama.py`** (used) | local CPU/GPU | Gemma 4 vision (~e2b) via Ollama | `--lang` + project doc | $0 | BSD-3-Clause | ✓ | Offline, predictable. |
 | [Claude vision API](https://docs.claude.com/en/docs/build-with-claude/vision) | hosted | Claude | prompt | paid | proprietary | ~ | Top quality, hosted. |
 | [GPT-4o vision](https://platform.openai.com/docs/guides/vision) | hosted | OpenAI | prompt | paid | proprietary | ✗ | Top quality, hosted. |
 | [Gemini Vision](https://ai.google.dev/gemini-api/docs/vision) | hosted | Google | prompt | paid | proprietary | ✗ | Top quality, hosted. |
@@ -305,7 +305,7 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 
 | Tool | Run location | Model | Speed (CPU, p95) | Live | Vocabulary biasing | License | Skill alignment | Notes |
 |---|---|---|---|:---:|:---:|---|:---:|---|
-| **`scripts/captions_from_whisper.py`** (used) | local | `large-v3-turbo` via pywhispercpp | fast | ✗ | ✓ | Unlicense | ✓ | Auto-picks vocab from project. |
+| **`scripts/captions_from_whisper.py`** (used) | local | `large-v3-turbo` via pywhispercpp | fast | ✗ | ✓ | BSD-3-Clause | ✓ | Auto-picks vocab from project. |
 | [OpenAI Whisper](https://github.com/openai/whisper) | local | many sizes | slow on CPU | ✗ | ~ | MIT | ~ | Reference impl. |
 | [faster-whisper](https://github.com/SYSTRAN/faster-whisper) | local | CTranslate2 | 4–8× faster | ✗ | ~ | MIT | ~ | Same models, faster engine. |
 | [whisper.cpp](https://github.com/ggml-org/whisper.cpp) | local | GGML | fastest C++ | ✗ | ~ | MIT | ~ | Engine under pywhispercpp. |
@@ -324,7 +324,7 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 
 | Tool | Outputs | Stack | Build step | SSG-agnostic | License | Skill alignment | Notes |
 |---|---|---|:---:|:---:|---|:---:|---|
-| **`scripts/site_indexes.py`** (used) | robots.txt, sitemap.xml, llms.txt, Atom/RSS, humans.txt | Python stdlib | ✗ | ✓ | Unlicense | ✓ | One-shot, no deps. |
+| **`scripts/site_indexes.py`** (used) | robots.txt, sitemap.xml, llms.txt, Atom/RSS, humans.txt | Python stdlib | ✗ | ✓ | BSD-3-Clause | ✓ | One-shot, no deps. |
 | [sitemap npm](https://www.npmjs.com/package/sitemap) | sitemap | Node | ✓ | ✓ | MIT | ~ | One-purpose. |
 | [python-sitemap](https://github.com/c4software/python-sitemap) | sitemap | Python | ✗ | ✓ | MIT | ~ | One-purpose. |
 | [feedgen](https://feedgen.kiesow.be/) | Atom/RSS | Python | ✗ | ✓ | LGPL | ~ | Feeds only. |

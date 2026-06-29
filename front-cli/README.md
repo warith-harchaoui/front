@@ -93,4 +93,4 @@ or downloaded.
 
 ## License
 
-The Unlicense. The same applies as for the rest of the `front` repo.
+BSD-3-Clause (same as scikit-learn, and the rest of the `front` repo).

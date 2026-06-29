@@ -8,7 +8,7 @@ version = "0.2.0"
 description = "Unified front driver — single entry point for the four front skills (front-ui, front-cli-gui, front-publish, front-accessibility)."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "Unlicense" }
+license = { text = "BSD-3-Clause" }
 authors = [{ name = "Warith Harchaoui" }]
 keywords = ["front", "claude", "skill", "cli", "tailwind", "a11y"]
 

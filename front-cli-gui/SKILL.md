@@ -12,7 +12,7 @@ description: >-
   "argparse to GUI", "click to web UI", "GUI for my Python script". Output
   follows the front-ui stack rules — install front-ui alongside for full
   design tokens.
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Output is one-page HTML + ES
   modules + Tailwind that runs in any modern browser. Reads CLIs from any

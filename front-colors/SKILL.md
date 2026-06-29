@@ -15,7 +15,7 @@ description: >-
   "regenerate brand tokens", "tailwind config from palette". Output is
   JSON / stdout / generated config / exit codes suitable for pre-commit
   and CI.
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (audit_contrast,
   simulate_cvd) need Python 3.9+ stdlib + Pillow (for simulate_cvd only).

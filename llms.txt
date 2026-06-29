@@ -1,6 +1,6 @@
 # front
 
-> Four Claude / OpenCode skills for vanilla JavaScript + Tailwind CSS + Montserrat/Inter frontends. Released into the public domain under The Unlicense. For solo developers and small teams shipping internal tools without a designer.
+> Eight Claude / OpenCode skills for vanilla JavaScript + Tailwind CSS + Roboto frontends. Released under the BSD-3-Clause license (same as scikit-learn). For solo developers and small teams shipping internal tools without a designer.
 
 This repository is a **bundle of four [Anthropic skills](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf)**. Use them from **Claude Code** (`cp -r front-* ~/.claude/skills/`) or from **OpenCode** (`cp -r front-* ~/.opencode/skills/`). Each skill auto-triggers on its frontmatter description.
 
@@ -91,4 +91,4 @@ Every shipped skill carries a "Two modes — make and audit" section in its SKIL
 - [LANDSCAPE.md](LANDSCAPE.md): Comparison matrices vs alternatives.
 - [CHANGELOG.md](CHANGELOG.md): Release notes (0.2.0 = the four-skill split).
 - [CONTRIBUTING.md](CONTRIBUTING.md): How to propose changes.
-- [LICENSE.md](LICENSE.md): The Unlicense + Montserrat OFL carve-out.
+- [LICENSE.md](LICENSE.md): BSD-3-Clause + Roboto OFL carve-out.

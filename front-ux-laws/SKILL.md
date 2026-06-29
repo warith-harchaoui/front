@@ -15,7 +15,7 @@ description: >-
   front-accessibility (a11y lint), front-publish (docs site), front-colors
   (contrast). Output is HTML-aware findings via JSON or stdout, exit
   codes for pre-commit / CI.
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The auditor needs
   Python 3.9+ stdlib only (html.parser, argparse, json). No network

@@ -14,7 +14,7 @@ description: >-
   language", "rewrite at grade N", "simplify this copy", "narrate this
   post", "podcast my blog". Output follows the front-ui stack rules —
   install front-ui alongside for the full design tokens.
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (favicons,
   site_indexes, plain_language, meta_from_ollama, md_to_html, lint_markdown)

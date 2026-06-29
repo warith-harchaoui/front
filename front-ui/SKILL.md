@@ -13,7 +13,7 @@ description: >-
   skills: front-cli-gui (wrap a CLI in a GUI), front-publish (Markdown →
   website + meta tags + favicons), front-accessibility (a11y lint), front-colors
   (contrast audit, CVD), front-vision (alt text), front-audio (captions).
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. No Python runtime required to use
   the skill itself (output is HTML + CSS + vanilla JS). Optional validator

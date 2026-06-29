@@ -13,7 +13,7 @@ description: >-
   "captions", "transcribe video", "transcribe audio", "WebVTT", "SRT",
   "subtitle file", "VTT", "caption track". Output is a captions file on
   disk + a ready-to-paste video / audio snippet on stdout.
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
   ``pywhispercpp`` (see ``scripts/requirements-captions.txt``) + a local

@@ -14,7 +14,7 @@ description: >-
   "describe this image", "draft alt", "image description", "img has no
   alt", "decorative image". Output is plain text / JSON on stdout suitable
   for pre-commit and CI.
-license: Unlicense
+license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
   Pillow + requests (see ``scripts/requirements-alt-text.txt``) and a

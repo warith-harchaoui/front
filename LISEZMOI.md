@@ -388,7 +388,7 @@ front/                                  ← racine du dépôt
 ├── LANDSCAPE.md                        ← matrices comparatives vs alternatives
 ├── CHANGELOG.md                        ← notes de version
 ├── CONTRIBUTING.md                     ← comment proposer des changements
-├── LICENSE.md                          ← The Unlicense (OFL pour Roboto / Roboto Serif / Roboto Mono)
+├── LICENSE.md                          ← BSD-3-Clause (OFL pour Roboto / Roboto Serif / Roboto Mono)
 ├── llms.txt                            ← index https://llmstxt.org/ pour les LLM
 ├── pytest.ini, requirements-dev.txt    ← outillage dev partagé
 ├── tests/                              ← suite pytest partagée pour les quatre skills
@@ -460,18 +460,19 @@ et [Google Material Design](https://material.io/design).
 
 ## Licence
 
-**The Unlicense** — code publié dans le domaine public, sans
-copyright ni restrictions. Vous pouvez l'utiliser, le modifier, le
-redistribuer ou le vendre, sans permission, attribution ni redevance.
-Voir `LICENSE.md` pour le texte canonique. Les trois familles Roboto
-(Roboto, Roboto Serif, Roboto Mono) restent sous SIL Open Font License
-(voir le `OFL.txt` joint dans chaque dossier
-`front-ui/assets/fonts/roboto*/`) — la dédicace au domaine public ne
-change pas ce point.
+**BSD-3-Clause** — la même licence que **scikit-learn**. Permissive :
+utilisation, modification, redistribution, vente, intégration dans des
+produits commerciaux. Les trois conditions sont (1) conserver la notice
+de copyright dans les redistributions de code source, (2) la reproduire
+dans la documentation des distributions binaires, (3) ne pas utiliser
+le nom du détenteur du copyright pour endosser des produits dérivés
+sans autorisation. Voir `LICENSE.md` pour le texte canonique. Les
+trois familles Roboto (Roboto, Roboto Serif, Roboto Mono) restent sous
+SIL Open Font License (voir le `OFL.txt` joint dans chaque dossier
+`front-ui/assets/fonts/roboto*/`) — la licence BSD-3-Clause ci-dessus
+s'applique au code source, pas aux polices.
 
-**Licence vs. attribution.** Le code est publié sous l'Unlicense
-(domaine public — aucune autorisation requise pour l'utiliser, le
-forker, le modifier ou le re-marquer). Les crédits d'auteur dans la
-documentation sont une reconnaissance volontaire, pas une exigence de
-licence. Vous êtes libre de les retirer ou de les remplacer dans votre
-fork.
+**Licence vs. attribution.** Les crédits d'auteur dans la documentation
+sont une reconnaissance volontaire (pas la condition #3 de la licence).
+Vous êtes libre de les retirer ou de les remplacer dans votre fork ;
+les obligations BSD-3-Clause ci-dessus sont ce qui voyage avec le code.

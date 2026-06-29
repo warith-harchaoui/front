@@ -1,9 +1,11 @@
 # Contributing to `front`
 
-The project is released into the public domain under
-[The Unlicense](LICENSE.md) — you can use, modify, redistribute and sell
-without permission, attribution or fee. Contributions are welcome on the
-same terms.
+The project is released under the [BSD-3-Clause
+license](LICENSE.md) — the same one used by scikit-learn. Permissive:
+use, modify, redistribute, sell, ship in commercial products, with
+three short conditions (copyright notice in source + in binary
+distribution docs; no endorsement-without-permission). Contributions
+are welcome on the same terms.
 
 ## Before you start
 
@@ -58,10 +60,13 @@ PR is merged.
 - **Hard rules are hard.** If a change weakens rule 1–9 in any
   SKILL.md, document the reason in the PR description and update
   `CHANGELOG.md`.
-- **Public-domain.** New files are released into the public domain. Do
-  not include code copied from a license-restricted source without
-  documenting the carve-out (see the Roboto / Roboto Serif / Roboto
-  Mono OFL bundle as the template).
+- **BSD-3-Clause.** New files inherit the repo's BSD-3-Clause
+  license. Do not include code copied from a license-incompatible
+  source (GPL, AGPL) without documenting a clean-room carve-out;
+  permissively-licensed (MIT / BSD / Apache / Unlicense) snippets
+  are fine to vendor as long as the upstream copyright notice is
+  preserved. The Roboto / Roboto Serif / Roboto Mono OFL bundle is
+  the template for how to ship a carve-out.
 
 ## What we ship
 

@@ -315,7 +315,7 @@ front/                                  ← repo root
 ├── LANDSCAPE.md                        ← comparison matrices vs alternatives
 ├── CHANGELOG.md                        ← release notes
 ├── CONTRIBUTING.md                     ← how to propose changes
-├── LICENSE.md                          ← The Unlicense (OFL carve-out for Roboto / Roboto Serif / Roboto Mono)
+├── LICENSE.md                          ← BSD-3-Clause (OFL carve-out for Roboto / Roboto Serif / Roboto Mono)
 ├── llms.txt                            ← https://llmstxt.org/ index for LLM consumers
 ├── pytest.ini, requirements-dev.txt    ← shared dev tooling
 ├── tests/                              ← shared pytest suite covers every skill
@@ -374,9 +374,18 @@ We also drew on the [Apple Human Interface Guidelines](https://developer.apple.c
 
 ## License
 
-**The Unlicense** — released into the public domain, no copyright, no restrictions. Use, modify, redistribute, sell — without permission, attribution, or fee. See `LICENSE.md` for the canonical text. The bundled Roboto / Roboto Serif / Roboto Mono fonts remain under the SIL Open Font License (see the `OFL.txt` bundled in each `front-ui/assets/fonts/roboto*/` folder); the public-domain dedication doesn't change that.
+**BSD-3-Clause** — the same license used by **scikit-learn**.
+Permissive: use, modify, redistribute, sell, ship in commercial
+products. The three conditions are (1) keep the copyright notice in
+source redistributions, (2) reproduce it in binary distributions'
+documentation, (3) do not use the copyright holder's name to endorse
+derived products without permission. See `LICENSE.md` for the canonical
+text. The bundled Roboto / Roboto Serif / Roboto Mono fonts remain
+under the SIL Open Font License (see the `OFL.txt` bundled in each
+`front-ui/assets/fonts/roboto*/` folder); the BSD-3-Clause license
+above applies to the source, not to the fonts.
 
-**License vs. attribution.** Code is released under the Unlicense
-(public domain — no permission needed to use, fork, modify, or rebrand).
-Author credits in the docs are voluntary acknowledgement, not a license
-requirement. You are free to remove or replace them in your fork.
+**License vs. attribution.** Author credits in the docs are voluntary
+acknowledgement (not part of the license condition #3). You are free
+to remove or replace them in your fork; the BSD-3-Clause obligations
+above are what travels with the code.

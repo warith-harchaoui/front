@@ -1,9 +1,9 @@
 # Security policy
 
-The project is released into the public domain under
-[The Unlicense](LICENSE.md). The same terms apply to the disclosure
-process: report what you find, on your own schedule, with no
-obligation either way.
+The project is released under the [BSD-3-Clause license](LICENSE.md)
+(the same one as scikit-learn). That license carries no warranty
+and disclaims liability — but security disclosure has its own
+norms, set out below.
 
 ## What "security" means here
 
@@ -44,10 +44,10 @@ person on best-effort time. Realistic turnaround:
 
 ## Disclosure
 
-Coordinated disclosure is preferred but not required. The Unlicense
-does not give the maintainer any standing to demand otherwise. If you
-publish first, please link the issue or commit that addresses the
-problem so users can act on the same information.
+Coordinated disclosure is preferred but not required. The
+BSD-3-Clause license does not place any embargo obligation on
+researchers. If you publish first, please link the issue or commit
+that addresses the problem so users can act on the same information.
 
 ## Local execution caveats
 
