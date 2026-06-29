@@ -34,6 +34,10 @@ The skills:
 The companion skills inherit the front-ui stack rules. Install only the
 ones you need.
 
+> **What prompt activates what?** See [`TRIGGERS.md`](TRIGGERS.md) —
+> generated from every `SKILL.md` description, lists every guaranteed
+> trigger phrase against the skill it invokes.
+
 ## Two modes — make and audit
 
 Every front-* skill belongs to one or both halves of a single loop:

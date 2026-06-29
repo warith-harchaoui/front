@@ -40,6 +40,11 @@ Les quatre skills :
 Les skills compagnons héritent des règles de pile de `front-ui`.
 N'installez que ceux dont vous avez besoin.
 
+> **Quelle phrase déclenche quel skill ?** Voir
+> [`TRIGGERS.md`](TRIGGERS.md) — généré depuis chaque `SKILL.md`,
+> liste toutes les phrases garanties par leur description avec le
+> skill qu'elles activent.
+
 ## Deux modes — make et audit
 
 Chaque skill front-* appartient à l'une (ou aux deux) moitiés d'une
