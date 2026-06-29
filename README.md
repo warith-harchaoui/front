@@ -297,9 +297,15 @@ external calls.
 ```bash
 # Quick start. Assumes Ollama + an OpenCode binary on PATH.
 ollama serve &                                # start the daemon
-ollama pull qwen2.5-coder:latest              # a coding-tuned model
-ollama pull gemma4:e4b                        # for front-vision (mlx variant on Mac)
+ollama pull gemma4:e4b-mlx                    # Apple Silicon
+# Linux / Windows: ollama pull gemma4:e4b
 ```
+
+One model handles the whole stack: it drives the OpenCode agent
+loop AND backs every front-* Ollama-backed script
+(`alt_from_ollama`, `meta_from_ollama`, `plain_language`,
+`narrate_post`). Same daemon, same tag, same answer for "which
+model is in play" — `gemma4:e4b`.
 
 #### Wire OpenCode to the local Ollama daemon (one-time config)
 
@@ -319,9 +325,8 @@ exists; only the `provider` key is new):
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "qwen2.5-coder:latest": { "name": "qwen2.5-coder (local)" },
-        "qwen3:8b":             { "name": "qwen3:8b (local)" },
-        "gemma4:e4b-mlx":       { "name": "gemma4:e4b-mlx (local)" }
+        "gemma4:e4b-mlx":       { "name": "gemma4:e4b-mlx (local)" },
+        "gemma4:e4b":           { "name": "gemma4:e4b (local)" }
       }
     }
   }
@@ -331,24 +336,32 @@ exists; only the `provider` key is new):
 Ollama exposes an OpenAI-compatible endpoint at
 `http://localhost:11434/v1`, which the `@ai-sdk/openai-compatible`
 provider speaks natively — no plugin install needed beyond writing
-the config. List exactly the models you have pulled; OpenCode will
-not auto-discover.
+the config. List exactly the model tags you have pulled (run
+`ollama list` to see them); OpenCode will not auto-discover.
 
 Then start OpenCode against the local provider:
 
 ```bash
+# Apple Silicon — the -mlx variant runs faster:
 opencode run "build me a primary CTA button" \
-    -m local-ollama/qwen2.5-coder:latest
+    -m local-ollama/gemma4:e4b-mlx
+
+# Linux / Windows or non-MLX hardware:
+opencode run "build me a primary CTA button" \
+    -m local-ollama/gemma4:e4b
+
 # → ~/.opencode/skills/front-* load automatically per their frontmatter.
 # → The front-vision / front-publish Ollama-backed scripts hit the
 #   same daemon for their per-script work.
 # → Cost: 0 tokens; nothing leaves the machine.
 ```
 
-Model-capability caveat: smaller models (≤ 4B) sometimes emit
-malformed tool-call JSON. **Use a 7B+ tool-capable model**
-(`qwen2.5-coder:latest`, `qwen3:8b`, `llama3.2:3b` is borderline)
-to get reliable bash-tool / file-edit calls inside agent loops.
+If you prefer a coding-tuned model for the agent loop and keep
+`gemma4:e4b` only for the per-script work, the env-var pattern
+documented above (`OLLAMA_MODEL_BASE=gemma4:e4b` for the scripts,
+`-m local-ollama/qwen2.5-coder:latest` for the agent) splits the
+roles cleanly. The README's "Configure the skill scripts" matrix
+above is the reference.
 
 #### Configure the skill scripts (same daemon, separate env vars)
 
