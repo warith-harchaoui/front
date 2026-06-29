@@ -364,7 +364,7 @@ front/                                  ← repo root
 
 Four Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, and the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono). Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
-Special thanks to [Audrey Dejoux](https://www.behance.net/dreyadesign/projects), [Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/) and [Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/) for fruitful discussions.
+Special thanks to [Audrey Dejoux](https://www.behance.net/dreyadesign/projects), [Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/), [Auguste Baum](https://www.linkedin.com/in/auguste-baum/) and [Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/) for fruitful discussions.
 
 Color palettes from <https://harchaoui.org/warith/colors/>.
 

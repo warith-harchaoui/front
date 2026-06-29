@@ -61,7 +61,7 @@ gates on the emitted HTML.
 
 | Mode | Tool | Purpose |
 |---|---|---|
-| **Make** — argparse → HTML | `scripts/cli_to_gui.py` | Introspects a Python CLI's `argparse.ArgumentParser` and emits a single-page vanilla-JS + Tailwind GUI: one `<details>` per sub-command, form fields mapped per action type (str / int / float / choice / bool / file), required marker, default values pre-filled, a "Build command" button that constructs the CLI line locally. Output passes both `front-ux-laws` audit and `front-accessibility` lint with zero findings. |
+| **Make** — CLI → HTML (three adapters) | `scripts/cli_to_gui.py` | Introspects a Python CLI and emits a single-page vanilla-JS + Tailwind GUI: one `<details>` per sub-command, form fields mapped per action type (str / int / float / choice / bool / file), required marker, default values pre-filled, a "Build command" button that constructs the CLI line locally. Output passes both `front-ux-laws` audit and `front-accessibility` lint with zero findings. **Three adapters**: argparse (stdlib, default), Click (`module:factory` returning a `click.Command`), and `--from-help` (subprocess + regex on the help text, works on non-Python CLIs — clap / cobra / commander). |
 | **Make** — worked scaffold | `assets/examples/cli-gui-demo/` | End-to-end runnable demo (HTML + ES module + Python SSE proxy) showing the host-wiring step the emitter leaves to the user. |
 | **Audit** — gate the emitted HTML | Pair with `front-accessibility/scripts/lint_a11y.py` and `front-ux-laws/scripts/audit_laws_of_ux.py` on the emitted output. | The emitter's HTML inherits front-ui stack rules; both auditors apply unmodified. The emitter itself is its own customer — the test suite asserts the output passes both gates. |
 

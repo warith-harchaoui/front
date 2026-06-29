@@ -442,7 +442,8 @@ frontend : JavaScript pur, Tailwind CSS, et la règle des trois Roboto
 
 Un grand merci à
 **[Audrey Dejoux](https://www.behance.net/dreyadesign/projects)**,
-**[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)** et
+**[Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/)**,
+**[Auguste Baum](https://www.linkedin.com/in/auguste-baum/)** et
 **[Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/)**
 pour nos discussions fructueuses.
 

@@ -88,6 +88,11 @@ def sample_cli(tmp_path: Path) -> Path:
             b = sub.add_parser("decode", description="Positional fixture.")
             b.add_argument("path", help="Positional input.")
             return p
+
+        if __name__ == "__main__":
+            # ``--from-help`` needs the script to actually invoke
+            # argparse so the help banner reaches stdout.
+            make_parser().parse_args()
     ''').lstrip()
     p: Path = tmp_path / "sample_cli.py"
     p.write_text(src, encoding="utf-8")
@@ -371,6 +376,94 @@ def test_walk_rejects_unsupported_objects() -> None:
     """``walk()`` raises TypeError on anything other than argparse/Click."""
     with pytest.raises(TypeError):
         walk("not a parser")
+
+
+# ── --from-help adapter ────────────────────────────────────────────────────
+
+
+from cli_to_gui import walk_from_help  # noqa: E402
+
+
+def test_from_help_walks_argparse_cli(
+    sample_cli: Path, tmp_path: Path
+) -> None:
+    """--from-help against an argparse CLI extracts the prog + sub-commands."""
+    tree = walk_from_help(f"{sys.executable} {sample_cli}")
+    assert tree["prog"] in {"sample", sample_cli.stem}
+    # argparse's ``{encode,decode}`` positional gets parsed as
+    # sub-commands; both should appear.
+    assert "encode" in tree["sub_commands"]
+    assert "decode" in tree["sub_commands"]
+
+
+def test_from_help_preserves_choice_metadata(sample_cli: Path) -> None:
+    """argparse renders ``{mp3,ogg,flac}`` in --help; we extract the list."""
+    tree = walk_from_help(f"{sys.executable} {sample_cli}")
+    encode = tree["sub_commands"]["encode"]
+    by_dest = {a["dest"]: a for a in encode["actions"]}
+    # ``format`` has a choice set surfaced in argparse's --help.
+    fmt = by_dest.get("format")
+    assert fmt is not None
+    assert fmt["kind"] == "choice"
+    assert set(fmt["choices"]) == {"mp3", "ogg", "flac"}
+
+
+def test_from_help_html_passes_both_audit_gates(
+    sample_cli: Path, tmp_path: Path
+) -> None:
+    """Same dogfood claim as the introspection adapters."""
+    from cli_to_gui import render_html
+
+    tree = walk_from_help(f"{sys.executable} {sample_cli}")
+    html_out: Path = tmp_path / "fh.html"
+    html_out.write_text(render_html(tree), encoding="utf-8")
+    laws_proc = subprocess.run(
+        [sys.executable, str(AUDIT_LAWS), str(html_out)],
+        capture_output=True, text=True,
+    )
+    a11y_proc = subprocess.run(
+        [sys.executable, str(LINT_A11Y), str(html_out)],
+        capture_output=True, text=True,
+    )
+    assert laws_proc.returncode == 0, laws_proc.stdout + laws_proc.stderr
+    assert a11y_proc.returncode == 0, a11y_proc.stdout + a11y_proc.stderr
+
+
+def test_from_help_strips_python_wrapper_from_prog(
+    sample_cli: Path,
+) -> None:
+    """``python3 script.py`` resolves to the script's own prog, not python3."""
+    tree = walk_from_help(f"{sys.executable} {sample_cli}")
+    assert tree["prog"] != "python"
+    assert tree["prog"] != "python3"
+    assert tree["prog"] != sys.executable
+
+
+def test_from_help_cli_flag(sample_cli: Path) -> None:
+    """The ``--from-help`` flag routes the spec through the subprocess path."""
+    proc = subprocess.run(
+        [
+            sys.executable, str(SCRIPT),
+            "--from-help", f"{sys.executable} {sample_cli}",
+            "--json",
+        ],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["prog"] == "sample"
+    assert "encode" in payload["sub_commands"]
+
+
+def test_from_help_cli_help_advertises_the_flag() -> None:
+    """``--help`` documents the ``--from-help`` flag."""
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), "--help"],
+        capture_output=True, text=True,
+    )
+    assert proc.returncode == 0
+    collapsed: str = " ".join(proc.stdout.split())
+    assert "--from-help" in collapsed
 
 
 def test_argparse_and_click_trees_have_same_shape(

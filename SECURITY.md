@@ -60,6 +60,10 @@ line*. These are intended for use against trusted local code only.
   to a daemon socket, mutates the environment — those run at GUI
   generation time. Treat the spec argument the same way you treat
   `python -c '...'`: only point it at code you would already run.
+  The same caveat applies to the `--from-help` mode: it runs your
+  command with `--help` appended via `subprocess.run` (no shell
+  invocation, `shlex.split` parsed args, 10 s timeout, stderr +
+  stdout captured). Only point it at binaries you trust.
 
 - **`front-publish/scripts/meta_from_ollama.py`** and
   **`…/plain_language.py`** speak to a *local* Ollama daemon on
