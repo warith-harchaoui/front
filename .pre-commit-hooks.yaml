@@ -73,6 +73,22 @@
   pass_filenames: false
   args: [front-ui, front-cli-gui, front-publish, front-accessibility, front-colors, front-vision, front-audio, front-ux-laws]
 
+- id: front-triggers-sync
+  name: front — TRIGGERS.md sync check
+  description: >-
+    Enforce that the committed TRIGGERS.md equals the projection of
+    every SKILL.md description through ``scripts/build_triggers.py``.
+    Fails when a SKILL.md description's trigger phrases change
+    without the generator being re-run. Auto-recoverable by running
+    ``python scripts/build_triggers.py`` and re-staging.
+  entry: python scripts/build_triggers.py --check
+  language: python
+  language_version: python3
+  pass_filenames: false
+  files: '(SKILL\.md|TRIGGERS\.md|scripts/build_triggers\.py)$'
+  additional_dependencies:
+    - PyYAML>=6
+
 - id: front-colors-contrast
   name: front-colors — WCAG contrast audit
   description: >-
