@@ -287,7 +287,7 @@ Pair `scripts/lint_a11y.py` (static, in CI) with axe-core (runtime, in browser t
 
 | Helper | Run location | Model | Lang control | Cost / call | License | Skill alignment | Notes |
 |---|---|---|---|---|---|:---:|---|
-| **`scripts/alt_from_ollama.py`** (used) | local CPU/GPU | Gemma 3 vision (~e2b) via Ollama | `--lang` + project doc | $0 | BSD-3-Clause | ✓ | Offline, predictable. |
+| **`scripts/alt_from_ollama.py`** (used) | local CPU/GPU | Gemma 4 vision (~e2b) via Ollama | `--lang` + project doc | $0 | BSD-3-Clause | ✓ | Offline, predictable. |
 | [Claude vision API](https://docs.claude.com/en/docs/build-with-claude/vision) | hosted | Claude | prompt | paid | proprietary | ~ | Top quality, hosted. |
 | [GPT-4o vision](https://platform.openai.com/docs/guides/vision) | hosted | OpenAI | prompt | paid | proprietary | ✗ | Top quality, hosted. |
 | [Gemini Vision](https://ai.google.dev/gemini-api/docs/vision) | hosted | Google | prompt | paid | proprietary | ✗ | Top quality, hosted. |

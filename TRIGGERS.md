@@ -55,13 +55,13 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `palette to tailwind` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `regenerate brand tokens` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `tailwind config from palette` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
-| `alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
-| `alt text for this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
-| `describe this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
-| `draft alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
-| `image description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
-| `img has no alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
-| `decorative image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `alt text for this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `describe this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `draft alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `image description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `img has no alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `decorative image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
 | `captions` | **front-audio** — Drafts WebVTT / SRT captions via local whisper.cpp. | WiP — captions |
 | `transcribe video` | **front-audio** — Drafts WebVTT / SRT captions via local whisper.cpp. | WiP — captions |
 | `transcribe audio` | **front-audio** — Drafts WebVTT / SRT captions via local whisper.cpp. | WiP — captions |

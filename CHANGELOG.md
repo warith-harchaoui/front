@@ -47,41 +47,25 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
-## [0.15.0] — 2026-06-29 — model-name fix, TRIGGERS.md, drift hook
+## [0.15.0] — 2026-06-29 — TRIGGERS.md + drift hook
 
-Three coherent moves since v0.14.0, all aimed at production
-robustness: a shipped-default model that exists, a generated
-trigger-phrase index that humans can browse, and an automated drift
-gate that keeps the index honest.
+Two coherent moves since v0.14.0: a generated trigger-phrase index
+that humans can browse, and an automated drift gate that keeps the
+index honest.
 
-### `gemma4:e4b` → `gemma3:4b` default + MLX fallback
+### Note on `gemma4:e4b` default
 
-`front-vision`'s default vision model was ``gemma4:e4b`` — a
-forward-looking tag that would 404 on a fresh ``ollama pull`` for
-users without it locally. v0.15.0 swaps to ``gemma3:4b`` (Gemma 3's
-multimodal 4B variant, actively published on the Ollama library as
-of 2025-Q1) so a first-time install actually works.
-
-A second robustness fix lands at the same time: when the
-``-mlx`` variant of the configured base fails to pull (common
-case — the MLX variant of a fresh release often isn't published
-to the registry yet), ``install_alt_ai.py`` now falls back to the
-base tag automatically. The base variant runs on any platform at
-a small perf cost on Apple Silicon — better than a hard failure
-with a tag the user has not heard of.
-
-Files touched (17): the two ``front-vision`` scripts, three
-``front-publish`` scripts that carried their own Ollama-backed
-defaults (``_ollama.py``, ``meta_from_ollama.py``,
-``narrate_post.py``), the ``front a11y alt`` help text in
-``front-cli``, four SKILL.md / reference files
-(``front-vision/SKILL.md``, ``front-vision/references/alt-text-ai.md``,
-``front-accessibility/SKILL.md``,
-``front-ui/references/ui-guidelines/foundations/images.md``,
-``front-publish/references/audio-narration.md``), and the
-top-level docs (``README``, ``LISEZMOI``, ``LANDSCAPE``,
-``llms.txt``). CHANGELOG history kept intact — past entries
-describe the old default at the time of their release.
+An intermediate commit during v0.15.0 development swapped the
+``front-vision`` default from ``gemma4:e4b`` to ``gemma3:4b`` on
+the (mistaken) assumption the former was a forward-looking tag.
+The maintainer reverted the swap before the next release —
+``gemma4:e4b`` (with the ``-mlx`` variant on Apple Silicon) is
+the canonical default and was always available. The
+``install_alt_ai.py`` script no longer auto-falls-back to the
+non-MLX base on a failed pull; it now exits with an actionable
+message telling the user to ``ollama pull <tag>`` themselves
+when the registry doesn't have a fresh tag yet, rather than
+silently downgrading model quality / perf characteristics.
 
 ### `TRIGGERS.md` — generated trigger-phrase reference
 

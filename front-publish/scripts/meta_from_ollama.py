@@ -158,7 +158,7 @@ def _cache_key(goal: str, page_text: str, site_name: str, lang: str, model: str)
     lang : str
         Two-letter language code.
     model : str
-        Ollama model tag, e.g. ``gemma3:4b-mlx``.
+        Ollama model tag, e.g. ``gemma4:e4b-mlx``.
 
     Returns
     -------

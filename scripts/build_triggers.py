@@ -87,7 +87,7 @@ WHAT_IT_DOES: dict[str, str] = {
     "front-publish": "Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite.",
     "front-accessibility": "Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs.",
     "front-colors": "WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter.",
-    "front-vision": "Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b).",
+    "front-vision": "Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b).",
     "front-audio": "Drafts WebVTT / SRT captions via local whisper.cpp.",
     "front-ux-laws": "Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers.",
 }
