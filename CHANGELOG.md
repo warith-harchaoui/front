@@ -47,6 +47,101 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.15.0] — 2026-06-29 — model-name fix, TRIGGERS.md, drift hook
+
+Three coherent moves since v0.14.0, all aimed at production
+robustness: a shipped-default model that exists, a generated
+trigger-phrase index that humans can browse, and an automated drift
+gate that keeps the index honest.
+
+### `gemma4:e4b` → `gemma3:4b` default + MLX fallback
+
+`front-vision`'s default vision model was ``gemma4:e4b`` — a
+forward-looking tag that would 404 on a fresh ``ollama pull`` for
+users without it locally. v0.15.0 swaps to ``gemma3:4b`` (Gemma 3's
+multimodal 4B variant, actively published on the Ollama library as
+of 2025-Q1) so a first-time install actually works.
+
+A second robustness fix lands at the same time: when the
+``-mlx`` variant of the configured base fails to pull (common
+case — the MLX variant of a fresh release often isn't published
+to the registry yet), ``install_alt_ai.py`` now falls back to the
+base tag automatically. The base variant runs on any platform at
+a small perf cost on Apple Silicon — better than a hard failure
+with a tag the user has not heard of.
+
+Files touched (17): the two ``front-vision`` scripts, three
+``front-publish`` scripts that carried their own Ollama-backed
+defaults (``_ollama.py``, ``meta_from_ollama.py``,
+``narrate_post.py``), the ``front a11y alt`` help text in
+``front-cli``, four SKILL.md / reference files
+(``front-vision/SKILL.md``, ``front-vision/references/alt-text-ai.md``,
+``front-accessibility/SKILL.md``,
+``front-ui/references/ui-guidelines/foundations/images.md``,
+``front-publish/references/audio-narration.md``), and the
+top-level docs (``README``, ``LISEZMOI``, ``LANDSCAPE``,
+``llms.txt``). CHANGELOG history kept intact — past entries
+describe the old default at the time of their release.
+
+### `TRIGGERS.md` — generated trigger-phrase reference
+
+A repo-root quick-reference table mapping every guaranteed trigger
+phrase to the skill it activates and that skill's status. Three
+columns: ``Trigger phrase | Activates | Status``. Hand-edit
+forbidden by convention; CI enforces it (see the drift hook below).
+
+How it works:
+
+- ``scripts/build_triggers.py`` reads each SKILL.md's
+  ``description`` field via YAML frontmatter parsing, extracts the
+  quoted trigger phrases by regex, and renders the table.
+- ``STATUS`` and ``WHAT_IT_DOES`` constants inside the script are
+  the only manual surface. Adding skill #9 forces an explicit
+  decision on both via the test parametrisation across
+  ``SHIPPED_SKILLS``.
+- ``--check`` mode diffs the generated output against the committed
+  ``TRIGGERS.md`` and exits 1 on mismatch.
+
+New ``tests/test_triggers_md.py`` (26 tests) asserts existence,
+shape, completeness, and exact-match drift. README + LISEZMOI gain
+a blockquote at the end of their skill table pointing users at
+``TRIGGERS.md`` for "what should I say to invoke X" lookup.
+
+### Drift hook — `front-triggers-sync`
+
+A new entry in ``.pre-commit-hooks.yaml`` that runs
+``scripts/build_triggers.py --check`` on every commit touching a
+``SKILL.md``, ``TRIGGERS.md``, or the generator itself. Refuses
+the commit when the two have diverged, with a one-line stderr
+pointing the user at ``python scripts/build_triggers.py`` +
+re-stage. Auto-recoverable — never blocks on a human judgement
+call.
+
+This is the third drift hook in the repo (``front-ui-validate-skill``
+gates SKILL.md ↔ Anthropic spec; ``front-publish-lint-markdown``
+gates markdown ↔ housekeeping rules). The shape generalises:
+**file pair + generator + ``--check`` flag + pre-commit entry**.
+
+### `audit_contrast --fix` asymmetry — documented as intentional
+
+While auditing today's work, I noticed
+``front-colors/scripts/audit_contrast.py``'s ``--fix`` mode is
+**suggest-only** while the other three auditors'
+``--fix`` modes apply edits in place. That asymmetry is by
+design: changing a brand hex is a design decision, not a
+mechanical repair. Auto-applying would create silent brand-drift
+risk that mechanical fixes (adding ``min-h-11``, stripping
+redundant ARIA, chunking digits) do not.
+
+``front-colors/SKILL.md`` "Two modes" table now carries a
+"Note on --fix semantics" subsection explaining the design intent
+so future contributors don't "harmonise" the inconsistency away.
+
+### Tests + spec
+
+453 tests pass. ``scripts/validate_all.py`` green on all eight
+skills. CI green on every push since the v0.14.0 cut.
+
 ## [0.14.0] — 2026-06-29 — cli_to_gui shape protocol + BSD-3-Clause
 
 Two coherent moves landed since the v0.13.0 cut.
