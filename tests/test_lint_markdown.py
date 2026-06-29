@@ -54,9 +54,14 @@ def test_lint_help_advertises_mermaid_and_ai() -> None:
 
 
 def test_version_flag() -> None:
+    """``-V`` must exit 0 and report the shared SKILL_VERSION."""
+    # Read from the canonical source so the test does not lock to one
+    # release tag (cf. test_cli_help.py).
+    from _argparse import SKILL_VERSION  # noqa: E402
+
     proc = _run("-V")
     assert proc.returncode == 0
-    assert "0.2.0" in proc.stdout
+    assert SKILL_VERSION in proc.stdout
 
 
 def test_prompts_load_without_pyyaml() -> None:

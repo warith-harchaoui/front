@@ -55,12 +55,23 @@ def _run(script: Path, *args: str) -> subprocess.CompletedProcess:
 
 @pytest.mark.parametrize("script", SCRIPTS, ids=lambda p: f"{p.parent.parent.name}/{p.name}")
 def test_version_flag(script: Path) -> None:
-    """`-V` / `--version` must exit 0 and mention the 0.2.0 release."""
+    """``-V`` / ``--version`` must exit 0 and match the shared SKILL_VERSION."""
+    # Read the version from the canonical source — the per-skill
+    # ``_argparse.py`` factory — rather than hard-coding a literal
+    # that would lock the test to one release tag and fail every
+    # version bump (this is exactly the failure mode that bit us
+    # at v0.15.0).
+    from _argparse import SKILL_VERSION  # noqa: E402
+
     proc = _run(script, "--version")
     assert proc.returncode == 0, (
         f"{script} exited {proc.returncode}\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
     )
-    assert "0.2.0" in proc.stdout
+    assert SKILL_VERSION in proc.stdout, (
+        f"{script} --version output ('{proc.stdout.strip()}') does not "
+        f"carry the shared SKILL_VERSION ('{SKILL_VERSION}'). Check that "
+        f"the script's _argparse copy is in sync with the others."
+    )
 
 
 @pytest.mark.parametrize("script", SCRIPTS, ids=lambda p: f"{p.parent.parent.name}/{p.name}")
