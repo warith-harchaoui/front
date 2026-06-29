@@ -30,7 +30,7 @@ from typing import Any, Callable, Optional, Sequence
 import click
 
 
-SKILL_VERSION = "0.15.0"
+SKILL_VERSION = "0.15.1"
 
 
 #: Context settings shared by every front Click command. ``-h`` joins

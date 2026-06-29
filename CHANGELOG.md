@@ -47,6 +47,47 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.15.1] — 2026-06-29 — restore `gemma4:e4b` default
+
+Patch release reverting the model-name swap that briefly landed
+in v0.15.0. ``gemma4:e4b`` (with the ``-mlx`` variant on Apple
+Silicon) is the maintainer's canonical default and was always
+available; the v0.15.0 swap to ``gemma3:4b`` was a misread of the
+tag's availability.
+
+### What changed
+
+- Restored ``gemma4:e4b`` (and the ``-mlx`` Apple-Silicon variant)
+  as the default vision tag across 17 files: two ``front-vision``
+  scripts, three ``front-publish`` Ollama-backed scripts
+  (``_ollama.py``, ``meta_from_ollama.py``, ``narrate_post.py``),
+  the ``front a11y alt`` help text in ``front-cli``, four
+  SKILL.md / reference files
+  (``front-vision/SKILL.md``,
+  ``front-vision/references/alt-text-ai.md``,
+  ``front-accessibility/SKILL.md``,
+  ``front-ui/references/ui-guidelines/foundations/images.md``,
+  ``front-publish/references/audio-narration.md``), and the
+  top-level docs (``README``, ``LISEZMOI``, ``LANDSCAPE``,
+  ``CONTRIBUTING``, ``llms.txt``).
+- ``TRIGGERS.md`` regenerated through the build_triggers script
+  so the projection matches the restored description text.
+- Removed the MLX → base auto-fallback in
+  ``front-vision/scripts/install_alt_ai.py``. Silently
+  downgrading to the non-MLX variant on a failed pull would change
+  perf + accuracy characteristics under the user's nose. The new
+  failure message names the exact ``ollama pull <tag>`` command to
+  run when the registry hasn't propagated a fresh tag yet — match
+  for how the maintainer bootstrapped the tag in the first place.
+
+### Versions
+
+All eight ``SKILL.md`` frontmatter versions, all eight
+``_argparse.py`` and three ``_click.py`` ``SKILL_VERSION``
+constants, and ``front-cli/pyproject.toml`` bumped to ``0.15.1``.
+
+461 tests pass; spec validator green on all eight skills.
+
 ## [0.15.0] — 2026-06-29 — TRIGGERS.md + drift hook
 
 Two coherent moves since v0.14.0: a generated trigger-phrase index
