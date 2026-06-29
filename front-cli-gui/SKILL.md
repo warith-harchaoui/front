@@ -65,6 +65,51 @@ gates on the emitted HTML.
 | **Make** — worked scaffold | `assets/examples/cli-gui-demo/` | End-to-end runnable demo (HTML + ES module + Python SSE proxy) showing the host-wiring step the emitter leaves to the user. |
 | **Audit** — gate the emitted HTML | Pair with `front-accessibility/scripts/lint_a11y.py` and `front-ux-laws/scripts/audit_laws_of_ux.py` on the emitted output. | The emitter's HTML inherits front-ui stack rules; both auditors apply unmodified. The emitter itself is its own customer — the test suite asserts the output passes both gates. |
 
+## Quick recipe — the one command
+
+Most CLI → GUI conversions are a single invocation of the make-side
+script. Don't re-derive the workflow if the user just wants the HTML.
+
+```bash
+# Spec is "<file>.py:factory" or "pkg.mod:factory".
+# Factory is a zero-arg callable returning argparse.ArgumentParser
+# OR click.Command (auto-detected).
+python3 scripts/cli_to_gui.py <spec> --out path/to/index.html
+
+# Examples:
+python3 scripts/cli_to_gui.py mycli/cli.py:make_parser --out dist/gui.html
+python3 scripts/cli_to_gui.py mypkg.cli:cli            --out dist/gui.html
+
+# For a non-Python CLI (clap / cobra / commander), or a Python CLI
+# whose factory cannot be imported: --from-help runs the binary
+# with --help and parses the output.
+python3 scripts/cli_to_gui.py --from-help "mybin"        --out dist/gui.html
+python3 scripts/cli_to_gui.py --from-help "cargo run --" --out dist/gui.html
+```
+
+If the user's CLI factory takes arguments (rare), write a tiny
+zero-arg wrapper:
+
+```python
+# adapter.py
+from mypkg.cli import _make_format_parser
+def make_parser():
+    return _make_format_parser("docx")
+```
+
+Then point the spec at `adapter.py:make_parser`.
+
+Verify the output passes both audit gates (zero findings):
+
+```bash
+python3 ~/.claude/skills/front-ux-laws/scripts/audit_laws_of_ux.py path/to/index.html
+python3 ~/.claude/skills/front-accessibility/scripts/lint_a11y.py   path/to/index.html
+```
+
+The longer design workflow below is for the bespoke cases the
+one-command recipe can't reach (new CLI design choices, custom
+streaming-output layouts, host wiring decisions).
+
 ## CLI → GUI workflow (the flagship)
 
 When the user points to an existing CLI project and asks for a GUI:
