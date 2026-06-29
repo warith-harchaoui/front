@@ -21,7 +21,7 @@ The script:
 
 3. Pulls the vision model used by :mod:`alt_from_ollama`:
 
-   * Default tag: ``gemma4:e4b``.
+   * Default tag: ``gemma3:4b``.
    * On MLX-capable hardware (Darwin + arm64/aarch64), the ``-mlx``
      variant is selected automatically.
    * Override the tag with ``OLLAMA_MODEL=<tag>`` or change the base
@@ -82,7 +82,7 @@ import click
 
 #: Base model tag. The ``-mlx`` suffix is appended at runtime on MLX-capable
 #: hardware. Override with the ``OLLAMA_MODEL_BASE`` env var.
-BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e4b")
+BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma3:4b")
 
 
 # ── Hardware / model picking ────────────────────────────────────────────────
@@ -273,7 +273,7 @@ def pull_model(tag: str) -> None:
     Parameters
     ----------
     tag : str
-        Ollama model tag (e.g. ``gemma4:e2b`` or ``gemma4:e2b-mlx``).
+        Ollama model tag (e.g. ``gemma3:4b`` or ``gemma3:4b-mlx``).
 
     Raises
     ------
@@ -295,14 +295,35 @@ def pull_model(tag: str) -> None:
 
     print(f"→ Pulling {tag}…")
     proc = subprocess.run(["ollama", "pull", tag])
-    if proc.returncode != 0:
-        sys.stderr.write(
-            f"\nCould not pull `{tag}`. Check your network connection and the model tag.\n"
-            "To try a different on-device vision model, set OLLAMA_MODEL and re-run, e.g.:\n"
-            "    OLLAMA_MODEL=gemma3n:e2b python scripts/install_alt_ai.py\n"
-            "Browse tags at https://ollama.com/library\n"
+    if proc.returncode == 0:
+        return
+    # Common Apple-Silicon path: the ``-mlx`` variant of a base tag may
+    # not be published yet on the Ollama registry. Fall back to the
+    # base tag (without ``-mlx``) once, transparently, so the user
+    # does not have to know about the MLX naming convention to get a
+    # working install. The base variant is universal — it runs on any
+    # platform, MLX or not — at a small perf cost on Apple Silicon.
+    if tag.endswith("-mlx"):
+        fallback: str = tag[: -len("-mlx")]
+        print(
+            f"→ `{tag}` was not pulled. Retrying with the non-MLX base "
+            f"variant `{fallback}` (slightly slower on Apple Silicon but "
+            f"universally published)…"
         )
-        sys.exit(1)
+        if fallback in installed:
+            print(f"→ {fallback} already present.")
+            return
+        retry = subprocess.run(["ollama", "pull", fallback])
+        if retry.returncode == 0:
+            return
+
+    sys.stderr.write(
+        f"\nCould not pull `{tag}`. Check your network connection and the model tag.\n"
+        "To try a different on-device vision model, set OLLAMA_MODEL and re-run, e.g.:\n"
+        "    OLLAMA_MODEL=llava:7b python scripts/install_alt_ai.py\n"
+        "Browse tags at https://ollama.com/library\n"
+    )
+    sys.exit(1)
 
 
 # ── CLI entry point ────────────────────────────────────────────────────────
@@ -316,7 +337,7 @@ def pull_model(tag: str) -> None:
         "Environment variables (override before running):\n"
         "  OLLAMA_MODEL       Exact model tag to pull (wins outright).\n"
         "  OLLAMA_MODEL_BASE  Base tag; '-mlx' is auto-appended on Apple Silicon.\n"
-        "                     Default: gemma4:e2b.\n"
+        "                     Default: gemma3:4b.\n"
         "  OLLAMA_URL         Daemon endpoint (default: http://localhost:11434)."
     ),
     epilog=(

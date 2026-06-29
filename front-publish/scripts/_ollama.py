@@ -18,7 +18,7 @@ from typing import Optional
 
 OLLAMA_URL: str = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
-DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e2b")
+DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma3:4b")
 
 
 BANNED_PREFIXES: dict[str, tuple[str, ...]] = {

@@ -50,7 +50,7 @@ reste en feuille de route.
 | Skill | Make (générer) | Audit (porte) |
 |---|---|---|
 | **front-ui** | `references/` + `assets/components/` — playbook de génération HTML / Tailwind / dataviz | `scripts/validate.py`, `references/checklist.md`, `anti-patterns.md`, `ergonomics-criteria.md` |
-| **front-cli-gui** | `scripts/cli_to_gui.py` (émetteur argparse → HTML) + `assets/examples/cli-gui-demo/` (scaffold exécutable) | Accouplez `front-accessibility` + `front-ux-laws` sur le HTML produit (l'émetteur est son propre client — sa sortie passe les deux audits avec zéro finding). |
+| **front-cli-gui** | `scripts/cli_to_gui.py` (émetteur CLI → HTML — adaptateurs argparse + Click + `--from-help`) + `assets/examples/cli-gui-demo/` (scaffold exécutable) | Accouplez `front-accessibility` + `front-ux-laws` sur le HTML produit (l'émetteur est son propre client — sa sortie passe les deux audits avec zéro finding). |
 | **front-publish** | `favicons.py`, `meta_from_ollama.py`, `site_indexes.py`, `plain_language.py`, `md_to_html.py`, `narrate.py` | `lint_markdown.py` |
 | **front-accessibility** | _(rien — voir `front-ui` pour les templates, `front-vision` pour les alt, `front-audio` pour les sous-titres)_ | `lint_a11y.py` (14 règles, stdlib seul) |
 | **front-colors** | `palette_to_tailwind.py` (CSV → tailwind.config.js) | `audit_contrast.py`, `simulate_cvd.py` |
@@ -173,7 +173,7 @@ comme amélioration éditoriale optionnelle, pas exigence WCAG.
 | `front-publish` (site Markdown, meta, favicons, indexes, langage clair, narration audio) | Stable | 11 scripts publics couvrant les quatre artefacts cœur (favicons, meta, indexes, langage clair) + Markdown → HTML + lint Markdown + pipeline narration audio (orchestrateur, wrappers OpenVoice et Chatterbox, sélecteur de voix, installeur). Couverture déterministe large (favicons, site-indexes, meta, langage clair, lint, narration) ; suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
 | `front-accessibility` — lint | Stable (renommé depuis `front-a11y` en 0.9.0) | Lint a11y statique 14 règles, stdlib uniquement. Désormais resserré au lint après les sorties color / vision / audio. |
 | `front-colors` — audit contraste, simulation CVD, palette curatée, éclaircissement / assombrissement perceptuels | Stable (nouveau en 0.7.0) | Correcteur de contraste par voisin OKLCH, matrices CVD de Machado, CSV palette unifiée (base Apple + projections émotion / concept / psychologie), module `_colors` stdlib uniquement, classe `Color`. Sorti de `front-accessibility` pour un périmètre plus clair. |
-| `front-vision` — texte alternatif W3C via vision Ollama locale | Stable (nouveau en 0.8.0) | Modèle par défaut `gemma4:e4b` (variante `-mlx` auto-sélectionnée sur Apple silicon). Arbre de décision par objectif, biais par texte environnant + vocabulaire projet, cache disque. Sorti de `front-accessibility` pour un périmètre plus clair. Éval texte alternatif sur fixtures Wikipedia. |
+| `front-vision` — texte alternatif W3C via vision Ollama locale | Stable (nouveau en 0.8.0) | Modèle par défaut `gemma3:4b` (variante `-mlx` auto-sélectionnée sur Apple silicon). Arbre de décision par objectif, biais par texte environnant + vocabulaire projet, cache disque. Sorti de `front-accessibility` pour un périmètre plus clair. Éval texte alternatif sur fixtures Wikipedia. |
 | `front-audio` — **sous-titres WebVTT / SRT via whisper.cpp local** | **WiP / TODO** (sorti en 0.9.0) | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées), le clip utilisateur `vocab-biasing-clip.wav`, et une révision prévue de l'intégration whisper.cpp via `pdbms`. Voir [Roadmap](CHANGELOG.md#roadmap). |
 | `LISEZMOI.md` (README français) | Stable | À parité structurelle avec le README EN — même ordre des sections, contenu maintenu en synchronisation à chaque release. |
 
@@ -235,6 +235,7 @@ cp -r front-accessibility ~/.claude/skills/   # uniquement pour lint a11y statiq
 cp -r front-colors  ~/.claude/skills/   # uniquement pour contraste WCAG / CVD / palette curatée
 cp -r front-vision  ~/.claude/skills/   # uniquement pour texte alternatif via vision locale
 cp -r front-audio   ~/.claude/skills/   # uniquement pour sous-titres / transcriptions audio-vidéo
+cp -r front-ux-laws ~/.claude/skills/   # uniquement pour un vocabulaire partagé + auditeur pre-commit des Laws of UX
 ```
 
 Vérifier l'installation sur disque :

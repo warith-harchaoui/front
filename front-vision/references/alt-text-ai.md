@@ -2,8 +2,8 @@
 
 The skill emits `<img>` tags with meaningful `alt`, following the W3C / WAI decision tree (<https://www.w3.org/WAI/tutorials/images/decision-tree/>). When the author hasn't supplied `alt`, the skill drafts it with a **local vision model running on Ollama** — nothing leaves the machine.
 
-- **Model (default):** `gemma4:e2b`
-- **MLX-capable hardware variant:** `gemma4:e2b-mlx` (selected automatically)
+- **Model (default):** `gemma3:4b`
+- **MLX-capable hardware variant:** `gemma3:4b-mlx` (selected automatically)
 - **Override anywhere:** `OLLAMA_MODEL=<tag>` (for example `gemma3n:e2b`).
 
 Runtime: **Python 3.9+** (cross-platform, one helper per task).
@@ -161,7 +161,7 @@ Cache writes fail silently (`try/except OSError`) — caching is opportunistic a
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `Cannot reach Ollama at http://localhost:11434` | Daemon not running | `python scripts/install_alt_ai.py` (idempotent) or `ollama serve`. |
-| `Error: model not found` | Tag mistyped or installer skipped | Re-run installer, or `ollama pull gemma4:e2b` directly. |
+| `Error: model not found` | Tag mistyped or installer skipped | Re-run installer, or `ollama pull gemma3:4b` directly. |
 | Garbled or hallucinated text | Image very small / very large | The script downscales to 1024 px by default; raise quality of source or set `--resize 768`. |
 | Very slow first call | First inference loads weights | Subsequent calls are fast; keep the daemon up. |
 

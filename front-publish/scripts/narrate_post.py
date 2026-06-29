@@ -108,7 +108,7 @@ ENGINES: tuple[str, ...] = ("openvoice", "chatterbox")
 
 #: Default LLM model when ``--ai-hints`` is passed — same default
 #: alt_from_ollama uses, so the user only has to pull one model.
-DEFAULT_LLM_MODEL: str = os.environ.get("OLLAMA_MODEL", "gemma4:e2b")
+DEFAULT_LLM_MODEL: str = os.environ.get("OLLAMA_MODEL", "gemma3:4b")
 
 #: Ollama daemon URL (shared default with alt_from_ollama / meta_from_ollama).
 OLLAMA_URL: str = os.environ.get("OLLAMA_URL", "http://localhost:11434")
@@ -138,7 +138,7 @@ def _llm_classify_segment(
     prev_text, next_text : str
         Adjacent segment text, used as context.
     model : str
-        Ollama model tag (e.g. ``gemma4:e2b``).
+        Ollama model tag (e.g. ``gemma3:4b``).
     timeout_s : float
         Per-call wall-clock budget.
 

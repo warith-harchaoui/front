@@ -43,7 +43,7 @@ Notes
 -----
 * Requires Python 3.9+, ``requests``. Pillow is opportunistic
   (used to downscale images before sending; if missing, the original is sent).
-* Default model: ``gemma4:e4b`` (the ``-mlx`` variant is selected automatically
+* Default model: ``gemma3:4b`` (the ``-mlx`` variant is selected automatically
   on Apple-silicon Macs). Override with ``OLLAMA_MODEL=<tag>`` or ``--model``.
 * Default Ollama endpoint: ``http://localhost:11434``. Override with ``OLLAMA_URL``.
 * On-disk cache lives under ``~/.cache/front-skill/alt/`` by default. Override
@@ -103,7 +103,7 @@ OLLAMA_URL: str = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
 #: Base model tag. The "-mlx" variant is appended at runtime on MLX-capable
 #: hardware; both flavors are visible to Ollama as separate tags.
-DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e4b")
+DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma3:4b")
 
 #: Hard cap on output length. W3C does not mandate a fixed maximum, but ~150
 #: characters is the upper bound that stays comfortable for screen-reader users.
@@ -141,7 +141,7 @@ def _cache_key(image_bytes: bytes, kind: str, lang: str, context: str, model: st
     context : str
         Page-context hint passed via ``--context``.
     model : str
-        Ollama model tag, e.g. ``gemma4:e2b-mlx``.
+        Ollama model tag, e.g. ``gemma3:4b-mlx``.
 
     Returns
     -------
@@ -198,7 +198,7 @@ def _model_has_vision(model: str) -> bool:
     silently degrades us to the non-MLX fallback.
 
     Why this exists: as of Ollama 0.30, some ``-mlx`` quantisations of
-    multimodal models (notably ``gemma4:e2b-mlx``) ship without the
+    multimodal models (notably ``gemma3:4b-mlx``) ship without the
     ``vision`` capability — the API accepts an ``images`` payload and
     silently discards it, returning generic prose like *"Please provide
     the image you are referring to."* The non-MLX variant of the same
@@ -221,7 +221,7 @@ def pick_default_model() -> str:
     On Apple-Silicon-class arm64 macOS we prefer the MLX-optimised
     variant (``<base>-mlx``) for its lower first-token latency — but
     only when the MLX manifest actually advertises the ``vision``
-    capability. When it doesn't (e.g. ``gemma4:e2b-mlx`` on Ollama
+    capability. When it doesn't (e.g. ``gemma3:4b-mlx`` on Ollama
     0.30), we fall back to the non-MLX variant so images are not
     silently dropped.
 

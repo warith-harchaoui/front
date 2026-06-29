@@ -18,7 +18,7 @@ Pick the skill your change belongs to:
 | Markdown → website workflow, meta tags, favicons, site indexes, plain-language rewriter, i18n | `front-publish/` |
 | `lint_a11y.py` (static HTML a11y lint) | `front-accessibility/` |
 | WCAG contrast audit, CVD simulation, curated palette, perceptual lighten / darken | `front-colors/` |
-| W3C alt text via local Ollama vision (`gemma4:e4b` / `-mlx` on Apple silicon) | `front-vision/` |
+| W3C alt text via local Ollama vision (`gemma3:4b` / `-mlx` on Apple silicon) | `front-vision/` |
 | Local WebVTT / SRT captions via whisper.cpp | `front-audio/` |
 
 Cross-skill changes (e.g. a stack rule that affects every skill) start in

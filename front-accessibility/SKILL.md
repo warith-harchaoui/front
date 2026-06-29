@@ -167,7 +167,7 @@ project-wide language switch stays consistent. See
 | You also need… | Install |
 |---|---|
 | WCAG contrast audit, CVD simulation, curated palette, perceptual lighten / darken | ``front-colors`` |
-| W3C alt text via local Ollama vision (``gemma4:e4b`` / ``-mlx`` on Apple silicon) | ``front-vision`` |
+| W3C alt text via local Ollama vision (``gemma3:4b`` / ``-mlx`` on Apple silicon) | ``front-vision`` |
 | Local WebVTT / SRT captions via whisper.cpp | ``front-audio`` |
 | Vanilla-JS + Tailwind UI generation | ``front-ui`` |
 | Wrap a CLI in a GUI | ``front-cli-gui`` |

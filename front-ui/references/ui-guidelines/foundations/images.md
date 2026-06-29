@@ -59,7 +59,7 @@
 
 ## AI-drafted alt text
 
-When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default `gemma4:e2b`; `gemma4:e2b-mlx` on MLX-capable hardware). Local-only — nothing leaves the machine. Runtime is Python 3.9+.
+When the author has not supplied `alt`, the skill drafts it with a **local vision model running on Ollama** (default `gemma3:4b`; `gemma3:4b-mlx` on MLX-capable hardware). Local-only — nothing leaves the machine. Runtime is Python 3.9+.
 
 Install once (cross-platform):
 

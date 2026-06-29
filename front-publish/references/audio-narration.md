@@ -149,7 +149,7 @@ default narration hints per segment. The pipeline honors:
 
 Pass `--ai-hints` to call the same local Ollama daemon
 `alt_from_ollama.py` and `meta_from_ollama.py` already use (default
-model: `gemma4:e2b`). The LLM classifies each segment in context
+model: `gemma3:4b`). The LLM classifies each segment in context
 (prev / next segment, section title) and returns:
 
 ```json

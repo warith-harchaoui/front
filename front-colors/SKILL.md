@@ -118,7 +118,9 @@ emitter, two audit-side gates, all backed by the same CSV.
 | Mode | Tool | Purpose |
 |---|---|---|
 | **Make** — emit Tailwind config from the curated palette | `scripts/palette_to_tailwind.py` | Render `references/palette.csv` as a `theme.extend.colors` block (default) or a complete `tailwind.config.js`. |
-| **Audit** — gate before ship | `scripts/audit_contrast.py`, `scripts/simulate_cvd.py` | WCAG ratio audit with OKLCH-neighbour fix; CVD simulation (protanopia / deuteranopia / tritanopia). |
+| **Audit** — gate before ship | `scripts/audit_contrast.py`, `scripts/simulate_cvd.py` | WCAG ratio audit with **suggest-only** OKLCH-neighbour fix; CVD simulation (protanopia / deuteranopia / tritanopia). |
+
+**Note on `--fix` semantics.** Other front-* auditors (`audit_laws_of_ux --fix`, `lint_a11y --fix`, `lint_markdown --fix`) apply mechanical edits in place — adding `min-h-11`, stripping redundant ARIA, chunking digits. `audit_contrast --fix` is intentionally **suggest-only** because changing a brand hex is a design decision, not a mechanical repair. The script proposes the nearest accessible OKLCH neighbour for each failing pair; a human reviews and applies. This asymmetry is by design; do not "harmonise" it without a designer in the loop.
 
 The two halves agree on the source of truth — see the next section.
 
