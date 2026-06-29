@@ -254,3 +254,141 @@ def test_malformed_spec_exits_one(tmp_path: Path) -> None:
     )
     assert proc.returncode == 1
     assert "module:factory" in proc.stderr
+
+
+# ── Click adapter ──────────────────────────────────────────────────────────
+
+
+# Skip the Click block entirely when Click is not importable — the
+# adapter is opt-in and the rest of the file must work without it.
+click = pytest.importorskip("click")
+from cli_to_gui import walk, walk_click  # noqa: E402
+
+
+@pytest.fixture
+def sample_click_cli(tmp_path: Path) -> Path:
+    """
+    Write a self-contained Click CLI exposing ``get_cli()``.
+
+    Mirrors the argparse fixture's coverage: a group with two
+    sub-commands, one exercising every parameter kind (option +
+    flag + Choice + int + path + positional argument), so each
+    test can hit the same shape via either adapter.
+    """
+    src: str = textwrap.dedent('''
+        """Sample Click CLI for cli_to_gui tests."""
+        import click
+
+        @click.group()
+        def cli():
+            """Sample Click CLI used by the test suite."""
+            pass
+
+        @cli.command()
+        @click.option("--input", "-i", required=True, help="Input path.")
+        @click.option("--bitrate", type=int, default=128, help="Bitrate in kbps.")
+        @click.option("--gain", type=float, default=1.5)
+        @click.option(
+            "--format", "fmt",
+            type=click.Choice(["mp3", "ogg", "flac"]),
+            default="mp3",
+        )
+        @click.option("--verbose", is_flag=True)
+        def encode(input, bitrate, gain, fmt, verbose):
+            """Encode a file (exercises every field kind)."""
+            pass
+
+        @cli.command()
+        @click.argument("path", type=click.Path())
+        def decode(path):
+            """Decode a file."""
+            pass
+
+        def get_cli():
+            return cli
+    ''').lstrip()
+    p: Path = tmp_path / "click_cli.py"
+    p.write_text(src, encoding="utf-8")
+    return p
+
+
+def test_walk_click_dispatches_via_walk(sample_click_cli: Path) -> None:
+    """The public :func:`walk` dispatches a Click app to the Click adapter."""
+    from cli_to_gui import load_parser_from_spec
+
+    cli_obj = load_parser_from_spec(f"{sample_click_cli}:get_cli")
+    tree = walk(cli_obj)
+    assert tree["prog"] == "cli"
+    assert set(tree["sub_commands"]) == {"encode", "decode"}
+
+
+def test_walk_click_covers_every_param_kind(sample_click_cli: Path) -> None:
+    """Click adapter normalises options into the same canonical kinds."""
+    from cli_to_gui import load_parser_from_spec
+
+    cli_obj = load_parser_from_spec(f"{sample_click_cli}:get_cli")
+    tree = walk_click(cli_obj)
+    by_dest: dict[str, dict] = {
+        a["dest"]: a for a in tree["sub_commands"]["encode"]["actions"]
+    }
+    assert by_dest["input"]["required"] is True
+    assert by_dest["bitrate"]["kind"] == "int"
+    assert by_dest["bitrate"]["default"] == 128
+    assert by_dest["gain"]["kind"] == "float"
+    assert by_dest["gain"]["default"] == 1.5
+    assert by_dest["fmt"]["kind"] == "choice"
+    assert set(by_dest["fmt"]["choices"]) == {"mp3", "ogg", "flac"}
+    assert by_dest["verbose"]["kind"] == "bool"
+    # Sub-command positional surfaces as kind=file (click.Path).
+    decode_kinds = [
+        a["kind"] for a in tree["sub_commands"]["decode"]["actions"]
+    ]
+    assert "file" in decode_kinds
+
+
+def test_click_emitted_html_passes_both_audit_gates(
+    sample_click_cli: Path, tmp_path: Path
+) -> None:
+    """Same dogfood claim as argparse: zero findings from both auditors."""
+    from cli_to_gui import load_parser_from_spec, render_html
+
+    cli_obj = load_parser_from_spec(f"{sample_click_cli}:get_cli")
+    html_out: Path = tmp_path / "click.html"
+    html_out.write_text(render_html(walk(cli_obj)), encoding="utf-8")
+    laws_proc = subprocess.run(
+        [sys.executable, str(AUDIT_LAWS), str(html_out)],
+        capture_output=True, text=True,
+    )
+    a11y_proc = subprocess.run(
+        [sys.executable, str(LINT_A11Y), str(html_out)],
+        capture_output=True, text=True,
+    )
+    assert laws_proc.returncode == 0, laws_proc.stdout + laws_proc.stderr
+    assert a11y_proc.returncode == 0, a11y_proc.stdout + a11y_proc.stderr
+
+
+def test_walk_rejects_unsupported_objects() -> None:
+    """``walk()`` raises TypeError on anything other than argparse/Click."""
+    with pytest.raises(TypeError):
+        walk("not a parser")
+
+
+def test_argparse_and_click_trees_have_same_shape(
+    sample_cli: Path, sample_click_cli: Path
+) -> None:
+    """
+    Both adapters emit dicts with the same top-level keys.
+
+    Catches regressions where one adapter starts adding (or losing)
+    a field the renderer reaches for — that would silently break
+    the other side without firing a type error.
+    """
+    from cli_to_gui import load_parser_from_spec
+
+    argp = walk(load_parser_from_spec(f"{sample_cli}:make_parser"))
+    clk = walk(load_parser_from_spec(f"{sample_click_cli}:get_cli"))
+    assert set(argp) == set(clk)
+    # And the per-action shape must match too.
+    argp_action = argp["sub_commands"]["encode"]["actions"][0]
+    clk_action = clk["sub_commands"]["encode"]["actions"][0]
+    assert set(argp_action) == set(clk_action)

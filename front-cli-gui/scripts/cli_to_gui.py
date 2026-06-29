@@ -17,16 +17,39 @@ emitted page builds the command string locally and shows it for the
 user to copy / paste / submit through the host adapter of their
 choice (FastAPI SSE, Tauri ``invoke()``, Express, plain shell).
 
+Supported source frameworks
+---------------------------
+
+The emitter is **framework-agnostic** at the renderer boundary: a
+small adapter protocol normalises every supported framework into a
+canonical parser-tree dict (``prog`` / ``description`` / ``actions``
+/ ``sub_commands``). Two adapters ship today:
+
+- **argparse** (stdlib, always available). Walks
+  :class:`argparse.ArgumentParser` via :func:`walk_parser`. Used
+  when the factory returns an argparse parser.
+- **Click** (optional dep). Walks :class:`click.Command` via
+  :func:`walk_click`. Typer apps work via their underlying Click
+  group (``app.cli``). Click is imported lazily so argparse-only
+  users keep their stdlib-only run.
+
+The renderer never branches on framework — :func:`walk` dispatches
+by type and the HTML side sees a single shape. Adding a third
+framework (Cobra via ``--from-help``, clap, …) is a new adapter +
+the same dict; the renderer never moves.
+
 Why introspect, not parse ``--help``?
 -------------------------------------
 
-``--help`` text is a presentation format. Two CLIs with identical
-behaviour can ship very different ``--help`` outputs depending on
-formatter, line-wrap width and the author's stylistic choices.
-:mod:`argparse`'s in-memory parser carries the **structured** truth:
-sub-parser actions, choice lists, ``type=`` callables, ``required``
-flags, ``nargs`` shapes, defaults. The HTML emitter consumes that
-structured form so the same input always yields the same output.
+``--help`` text is a presentation format — fragile under
+formatter / line-wrap / locale variation. An in-memory parser
+carries the **structured** truth (choice lists, ``type=`` callables,
+``required`` flags, defaults). When the framework is reachable,
+prefer introspection. For non-Python binaries (clap / cobra /
+commander) or when the parser cannot be imported, the planned
+``--from-help`` adapter parses the help text as a low-fidelity
+fallback (everything maps to ``"text"`` unless ``[default: …]`` or
+similar is visible).
 
 Inputs
 ------
@@ -38,11 +61,9 @@ The caller names a parser factory as ``SPEC``:
 - ``my_pkg.my_cli:build_parser`` — import the dotted module path,
   call the named factory.
 
-The factory must be a zero-argument callable returning an
-:class:`argparse.ArgumentParser`. (Click / Typer apps can expose a
-factory wrapping ``cli.to_info_dict()`` or
-``click.make_default_short_help``; the converter does not import
-those frameworks itself.)
+The factory must be a zero-argument callable returning EITHER an
+:class:`argparse.ArgumentParser` OR a :class:`click.Command`
+(Click Group or Command). Adapter selection is automatic.
 
 Outputs
 -------
@@ -167,12 +188,27 @@ def load_parser_from_spec(spec: str) -> argparse.ArgumentParser:
             f"Module '{mod_part}' has no attribute '{factory_name}'."
         )
     parser_obj = factory()
-    if not isinstance(parser_obj, argparse.ArgumentParser):
-        raise ValueError(
-            f"Factory '{spec}' returned a "
-            f"{type(parser_obj).__name__}, not ArgumentParser."
-        )
-    return parser_obj
+    # Adapter dispatch (see :func:`walk`): an argparse.ArgumentParser
+    # or any Click BaseCommand counts. Anything else is rejected with
+    # an actionable error message — we name both frameworks the
+    # adapter understands so the user knows what to return.
+    if isinstance(parser_obj, argparse.ArgumentParser):
+        return parser_obj
+    # Click is an optional dependency. We import it lazily so the
+    # ``language: python`` pre-commit hook + minimal CI runners that
+    # only target argparse keep working without Click on the path.
+    try:
+        import click  # noqa: WPS433  (lazy by design)
+    except ImportError:
+        click = None  # type: ignore[assignment]
+    if click is not None and isinstance(parser_obj, click.Command):
+        return parser_obj
+    raise ValueError(
+        f"Factory '{spec}' returned a "
+        f"{type(parser_obj).__name__}; expected argparse.ArgumentParser "
+        f"or click.Command (install click if your factory returns "
+        f"a Click app)."
+    )
 
 
 # ── Walking the parser tree ────────────────────────────────────────────────
@@ -248,6 +284,9 @@ def walk_parser(parser: argparse.ArgumentParser) -> dict[str, Any]:
 
     Help / version actions are filtered out — they exist only on the
     CLI surface, not in a GUI.
+
+    See also :func:`walk` for the framework-agnostic entry point that
+    dispatches between this and :func:`walk_click`.
     """
     actions: list[dict[str, Any]] = []
     sub_commands: dict[str, dict[str, Any]] = {}
@@ -268,6 +307,196 @@ def walk_parser(parser: argparse.ArgumentParser) -> dict[str, Any]:
         "actions": actions,
         "sub_commands": sub_commands,
     }
+
+
+# ── Click adapter ──────────────────────────────────────────────────────────
+
+
+def _click_param_kind(param: Any) -> str:
+    """
+    Map a :class:`click.Parameter` to a form-field kind string.
+
+    Mirrors :func:`_action_kind` but reads from Click's structured
+    ``param.type`` / ``param.is_flag`` / ``param.multiple`` attributes
+    instead of argparse's heuristic ``type=`` callable.
+
+    Parameters
+    ----------
+    param : click.Parameter
+        The Click parameter (an ``Option`` or ``Argument``).
+
+    Returns
+    -------
+    str
+        One of ``"bool"``, ``"int"``, ``"float"``, ``"choice"``,
+        ``"file"``, ``"text"``.
+    """
+    # ``is_flag=True`` is Click's idiomatic boolean switch (parallel
+    # to argparse's ``store_true`` / ``store_false``).
+    if getattr(param, "is_flag", False):
+        return "bool"
+    # ``count=True`` increments an int per repetition (``-vvv``). We
+    # render it as an integer field — the GUI cannot reasonably ask
+    # the user to "click v three times".
+    if getattr(param, "count", False):
+        return "int"
+    # ``click.types.*`` are concrete instances on ``param.type``. We
+    # inspect the type's ``name`` so we do not need to import the
+    # ``click.types`` symbols at module load (Click is optional).
+    type_name: str = getattr(param.type, "name", "") or ""
+    if type_name == "boolean":
+        return "bool"
+    if type_name in ("integer", "integer range"):
+        return "int"
+    if type_name in ("float", "float range"):
+        return "float"
+    if type_name == "choice":
+        return "choice"
+    if type_name in ("path", "filename", "file"):
+        return "file"
+    return "text"
+
+
+def _click_param_choices(param: Any) -> list[str] | None:
+    """Extract the choices list from a ``click.Choice`` param if present."""
+    type_name: str = getattr(param.type, "name", "") or ""
+    if type_name != "choice":
+        return None
+    choices: Any = getattr(param.type, "choices", None)
+    if choices is None:
+        return None
+    return [str(c) for c in choices]
+
+
+def _serialize_click_param(param: Any) -> dict[str, Any]:
+    """
+    Project one :class:`click.Parameter` into the canonical action dict.
+
+    The output schema is identical to :func:`serialize_action` —
+    ``dest``, ``flags``, ``kind``, ``choices``, ``required``,
+    ``default``, ``help``, ``nargs``, ``metavar`` — so the HTML
+    renderer never has to branch on the source framework.
+    """
+    # ``opts`` is the list of ``--flag`` strings for Options;
+    # Arguments have no opts (positional).
+    flags: list[str] = list(getattr(param, "opts", []) or [])
+    # ``default`` is sometimes a callable (Click resolves it lazily).
+    # We materialise + safe-serialise so the HTML emitter sees a
+    # value it can write into ``value="…"``.
+    default: Any = getattr(param, "default", None)
+    if callable(default):
+        try:
+            default = default()
+        except Exception:  # noqa: BLE001 — best-effort; fall back to None.
+            default = None
+    # Click 8.2+ uses a sentinel value (``click.core.Sentinel.UNSET``
+    # or similar) for parameters with no explicit default; treat it
+    # as "no default" so the HTML emitter does not stamp a literal
+    # ``Sentinel.UNSET`` into the form's ``value="…"`` attribute.
+    if default is not None and "Sentinel" in type(default).__name__:
+        default = None
+    return {
+        "dest": param.name,
+        "flags": flags,
+        "kind": _click_param_kind(param),
+        "choices": _click_param_choices(param),
+        "required": bool(getattr(param, "required", False)),
+        "default": _safe_default(default),
+        "help": (getattr(param, "help", "") or "").strip(),
+        # Click uses ``nargs=-1`` for "any number"; argparse uses "*".
+        # We surface Click's int directly so the HTML side can decide.
+        "nargs": getattr(param, "nargs", None),
+        "metavar": getattr(param, "metavar", None),
+    }
+
+
+def walk_click(cmd: Any, prog: str | None = None) -> dict[str, Any]:
+    """
+    Walk a :class:`click.Command` into the canonical parser tree.
+
+    Mirrors :func:`walk_parser` exactly — same dict shape — so the
+    HTML renderer never branches on the source framework. Handles
+    both leaf ``Command`` and nested ``Group`` trees; ``--help`` is
+    filtered (Click adds it automatically and it has no GUI value).
+
+    Parameters
+    ----------
+    cmd : click.Command
+        A Click command or group. Typer apps expose their underlying
+        Click group via ``app.cli`` — pass that.
+    prog : str or None, optional
+        Override the ``prog`` field. Defaults to the command's own
+        ``name`` (Click sets this from the function name).
+
+    Returns
+    -------
+    dict
+        The canonical parser tree.
+    """
+    actions: list[dict[str, Any]] = []
+    sub_commands: dict[str, dict[str, Any]] = {}
+    # ``cmd.params`` are the leaf options / arguments.
+    for param in getattr(cmd, "params", []) or []:
+        # Click sometimes emits an ``HelpOption`` automatically; we
+        # detect it via ``param.is_eager`` + an empty ``name``-shape.
+        name: str | None = getattr(param, "name", None)
+        if not name or name == "help":
+            continue
+        actions.append(_serialize_click_param(param))
+    # ``Group.commands`` is a dict of sub-commands. Leaf ``Command``
+    # objects do not have ``commands``.
+    subs: dict[str, Any] = getattr(cmd, "commands", {}) or {}
+    for name, sub in subs.items():
+        sub_commands[name] = walk_click(sub, prog=name)
+    return {
+        "prog": prog or getattr(cmd, "name", "cli") or "cli",
+        "description": (getattr(cmd, "help", "") or "").strip(),
+        "actions": actions,
+        "sub_commands": sub_commands,
+    }
+
+
+# ── Public dispatch ────────────────────────────────────────────────────────
+
+
+def walk(obj: Any) -> dict[str, Any]:
+    """
+    Walk a CLI object (argparse or Click) into the canonical tree.
+
+    Single entry point for the HTML renderer — it does not need to
+    know which framework produced the input.
+
+    Parameters
+    ----------
+    obj : argparse.ArgumentParser or click.Command
+        The CLI to introspect.
+
+    Returns
+    -------
+    dict
+        Canonical parser tree (``prog``, ``description``, ``actions``,
+        ``sub_commands``).
+
+    Raises
+    ------
+    TypeError
+        If ``obj`` is neither an argparse parser nor a Click command.
+    """
+    if isinstance(obj, argparse.ArgumentParser):
+        return walk_parser(obj)
+    # Click is optional; only attempt the isinstance check after a
+    # successful lazy import. Skipping the import on argparse-only
+    # users keeps the script stdlib-only at run time.
+    try:
+        import click  # noqa: WPS433
+    except ImportError:
+        click = None  # type: ignore[assignment]
+    if click is not None and isinstance(obj, click.Command):
+        return walk_click(obj)
+    raise TypeError(
+        f"walk() expected argparse.ArgumentParser or click.Command, "
+        f"got {type(obj).__name__}"
+    )
 
 
 # ── HTML rendering ─────────────────────────────────────────────────────────
@@ -579,11 +808,11 @@ def main(argv: list[str] | None = None) -> int:
     parser: argparse.ArgumentParser = make_parser(
         prog="front-cli-gui-to-html",
         description=(
-            "Introspect an argparse-based Python CLI and emit a "
-            "single-page vanilla-JS + Tailwind GUI mapping every "
-            "sub-command and flag to a form field. Make-side primary "
-            "of the front-cli-gui skill — counterpart to the static "
-            "scaffold in assets/examples/cli-gui-demo/."
+            "Introspect a Python CLI (argparse OR Click — autodetected) "
+            "and emit a single-page vanilla-JS + Tailwind GUI mapping "
+            "every sub-command and flag to a form field. Make-side "
+            "primary of the front-cli-gui skill — counterpart to the "
+            "static scaffold in assets/examples/cli-gui-demo/."
         ),
     )
     parser.add_argument(
@@ -591,7 +820,9 @@ def main(argv: list[str] | None = None) -> int:
         help=(
             "Parser factory spec — 'path/to/cli.py:factory' OR "
             "'pkg.mod:factory'. The factory is a zero-argument "
-            "callable returning an argparse.ArgumentParser."
+            "callable returning EITHER an argparse.ArgumentParser "
+            "OR a click.Command (Group or Command). Adapter is "
+            "auto-selected from the returned type."
         ),
     )
     parser.add_argument(
@@ -621,12 +852,16 @@ def main(argv: list[str] | None = None) -> int:
     args: argparse.Namespace = parser.parse_args(argv)
 
     try:
-        cli_parser: argparse.ArgumentParser = load_parser_from_spec(args.spec)
+        cli_obj: Any = load_parser_from_spec(args.spec)
     except (ValueError, FileNotFoundError, ImportError, AttributeError) as exc:
         print(f"cli_to_gui: {exc}", file=sys.stderr)
         return 1
 
-    tree: dict[str, Any] = walk_parser(cli_parser)
+    try:
+        tree: dict[str, Any] = walk(cli_obj)
+    except TypeError as exc:
+        print(f"cli_to_gui: {exc}", file=sys.stderr)
+        return 1
     output: str = (
         json.dumps(tree, indent=2, ensure_ascii=False) + "\n"
         if args.json
