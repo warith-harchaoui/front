@@ -372,17 +372,60 @@ local. Zéro appel externe.
 ```bash
 # Démarrage rapide. Suppose Ollama + un binaire OpenCode dans le PATH.
 ollama serve &                                # démarrer le daemon
-ollama pull qwen2.5-coder:7b                  # un modèle entraîné pour le code
+ollama pull qwen2.5-coder:latest              # un modèle entraîné pour le code
 ollama pull gemma4:e4b                        # pour front-vision (variante mlx sur Mac)
+```
 
-# Dire à OpenCode quel modèle pilote l'agent lui-même :
-export OPENCODE_MODEL=qwen2.5-coder:7b
+#### Câbler OpenCode sur le daemon Ollama local (config unique)
 
-opencode                                       # démarrer l'agent
+Le provider `ollama` livré avec OpenCode pointe par défaut sur
+Ollama Cloud. Pour viser votre daemon **local**, ajoutez un
+provider `local-ollama` à `~/.config/opencode/opencode.jsonc`
+(le fichier existe déjà ; seule la clé `provider` est nouvelle) :
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "local-ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:latest": { "name": "qwen2.5-coder (local)" },
+        "qwen3:8b":             { "name": "qwen3:8b (local)" },
+        "gemma4:e4b-mlx":       { "name": "gemma4:e4b-mlx (local)" }
+      }
+    }
+  }
+}
+```
+
+Ollama expose un endpoint compatible OpenAI sur
+`http://localhost:11434/v1`, que le provider
+`@ai-sdk/openai-compatible` parle nativement — pas de plugin à
+installer en plus de la config. Listez exactement les modèles que
+vous avez pull-és ; OpenCode ne les découvre pas automatiquement.
+
+Puis lancez OpenCode sur le provider local :
+
+```bash
+opencode run "construis-moi un bouton CTA principal" \
+    -m local-ollama/qwen2.5-coder:latest
 # → ~/.opencode/skills/front-* se chargent automatiquement.
 # → Les scripts front-vision / front-publish basés Ollama
 #   tapent dans le même daemon pour leurs traitements.
+# → Coût : 0 token ; rien ne quitte la machine.
 ```
+
+Réserve sur la capacité du modèle : les modèles plus petits
+(≤ 4B) émettent parfois du JSON de tool-call mal formé.
+**Utilisez un modèle 7B+ compatible tools**
+(`qwen2.5-coder:latest`, `qwen3:8b` ; `llama3.2:3b` est juste à
+la limite) pour des appels bash / édition de fichiers fiables
+dans la boucle de l'agent.
 
 #### Configurer les scripts des skills (même daemon, variables séparées)
 

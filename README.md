@@ -297,17 +297,58 @@ external calls.
 ```bash
 # Quick start. Assumes Ollama + an OpenCode binary on PATH.
 ollama serve &                                # start the daemon
-ollama pull qwen2.5-coder:7b                  # a coding-tuned model
+ollama pull qwen2.5-coder:latest              # a coding-tuned model
 ollama pull gemma4:e4b                        # for front-vision (mlx variant on Mac)
+```
 
-# Tell OpenCode which model to drive the agent itself:
-export OPENCODE_MODEL=qwen2.5-coder:7b
+#### Wire OpenCode to the local Ollama daemon (one-time config)
 
-opencode                                       # start the agent
+OpenCode's bundled `ollama` provider points at Ollama Cloud by
+default. To target your **local** daemon, add a `local-ollama`
+provider to `~/.config/opencode/opencode.jsonc` (the file already
+exists; only the `provider` key is new):
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "local-ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:latest": { "name": "qwen2.5-coder (local)" },
+        "qwen3:8b":             { "name": "qwen3:8b (local)" },
+        "gemma4:e4b-mlx":       { "name": "gemma4:e4b-mlx (local)" }
+      }
+    }
+  }
+}
+```
+
+Ollama exposes an OpenAI-compatible endpoint at
+`http://localhost:11434/v1`, which the `@ai-sdk/openai-compatible`
+provider speaks natively — no plugin install needed beyond writing
+the config. List exactly the models you have pulled; OpenCode will
+not auto-discover.
+
+Then start OpenCode against the local provider:
+
+```bash
+opencode run "build me a primary CTA button" \
+    -m local-ollama/qwen2.5-coder:latest
 # → ~/.opencode/skills/front-* load automatically per their frontmatter.
 # → The front-vision / front-publish Ollama-backed scripts hit the
 #   same daemon for their per-script work.
+# → Cost: 0 tokens; nothing leaves the machine.
 ```
+
+Model-capability caveat: smaller models (≤ 4B) sometimes emit
+malformed tool-call JSON. **Use a 7B+ tool-capable model**
+(`qwen2.5-coder:latest`, `qwen3:8b`, `llama3.2:3b` is borderline)
+to get reliable bash-tool / file-edit calls inside agent loops.
 
 #### Configure the skill scripts (same daemon, separate env vars)
 
