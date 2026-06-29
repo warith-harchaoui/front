@@ -148,104 +148,202 @@ What you give the agent and what comes back. Each row is a self-contained flow �
 
 The skills follow the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf) and are read natively by **Claude Code** and **OpenCode**. Install only the ones you need.
 
-### Claude Code
+The Claude Code and OpenCode flows are **identical except for the
+install directory** — both runtimes read SKILL.md files from a
+per-skill folder, and the same tarballs serve both. The instructions
+below show one path; the second runtime is a one-line substitution.
 
-Install from a tagged GitHub release. This pins a version, verifies the
-checksum, and gives you a stable rule-set that won't drift under you
-between updates.
+> **Shared variables.** Replace `<RUNTIME>` with `claude` or
+> `opencode` below. Pin `VERSION` to the latest tag — see
+> [releases](https://github.com/warith-harchaoui/front/releases).
+
+### 1. Download a tagged release (checksum-verified)
 
 ```bash
-# 1. Download a tagged release
-VERSION=0.6.5
+VERSION=0.15.1
 curl -L -o front-skills.tar.gz \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/front-skills-${VERSION}.tar.gz
 curl -L -o SHA256SUMS \
     https://github.com/warith-harchaoui/front/releases/download/v${VERSION}/SHA256SUMS
 
-# 2. Verify checksum (macOS: shasum; Linux: sha256sum)
-shasum -a 256 -c SHA256SUMS    # or: sha256sum -c SHA256SUMS
+# macOS: shasum -a 256 -c SHA256SUMS
+# Linux: sha256sum -c SHA256SUMS
+shasum -a 256 -c SHA256SUMS
 
-# 3. Extract and install the ones you need
 tar xzf front-skills.tar.gz
-mkdir -p ~/.claude/skills
-cp -r front-ui      ~/.claude/skills/   # always
-cp -r front-cli-gui ~/.claude/skills/   # only if you wrap CLIs
-cp -r front-publish ~/.claude/skills/   # only if you ship docs sites
-cp -r front-accessibility ~/.claude/skills/   # only if you need static a11y lint
-cp -r front-colors  ~/.claude/skills/   # only if you need WCAG contrast / CVD / curated palette
-cp -r front-vision  ~/.claude/skills/   # only if you need AI alt text from local vision model
-cp -r front-audio   ~/.claude/skills/   # only if you need AI captions / transcripts from audio / video
-cp -r front-ux-laws ~/.claude/skills/   # only if you want a shared vocabulary + pre-commit auditor for the Laws of UX
 ```
 
-Verify the install on disk:
+If you only need one skill, swap the bundle for a per-skill tarball
+(e.g. `front-accessibility-${VERSION}.tar.gz`). The same `SHA256SUMS`
+covers every artifact.
+
+### 2. Copy into the runtime's skills directory
+
+Pick **one** runtime block:
 
 ```bash
-ls ~/.claude/skills/front-ui/SKILL.md
+# Claude Code:
+RUNTIME=claude   # → ~/.claude/skills/
+# OpenCode:
+RUNTIME=opencode # → ~/.opencode/skills/
+
+mkdir -p ~/.${RUNTIME}/skills
+cp -r front-ui            ~/.${RUNTIME}/skills/   # always
+cp -r front-cli-gui       ~/.${RUNTIME}/skills/   # only if you wrap CLIs
+cp -r front-publish       ~/.${RUNTIME}/skills/   # only if you ship docs sites
+cp -r front-accessibility ~/.${RUNTIME}/skills/   # only if you need static a11y lint
+cp -r front-colors        ~/.${RUNTIME}/skills/   # only if you need WCAG contrast / CVD / palette
+cp -r front-vision        ~/.${RUNTIME}/skills/   # only if you need AI alt text (local Ollama)
+cp -r front-audio         ~/.${RUNTIME}/skills/   # only if you need AI captions (local whisper.cpp)
+cp -r front-ux-laws       ~/.${RUNTIME}/skills/   # only if you want the Laws-of-UX audit + reference
 ```
 
-Verify the SKILL.md is well-formed (real YAML, name matches folder,
-description in the Anthropic 50–1024 char range):
+Install in **both** runtimes if you switch between them — the same
+folder copied to two paths.
+
+### 3. Verify
 
 ```bash
-# Run once from a clone of this repo (the validator is stdlib + PyYAML)
+# A skill is installed and its SKILL.md is on disk:
+ls ~/.${RUNTIME}/skills/front-ui/SKILL.md
+
+# Optional — if you cloned the repo too, verify every installed skill
+# against the Anthropic spec (stdlib + PyYAML, no network):
 python3 scripts/validate_all.py
 ```
 
-If you only need a single skill, download its per-skill tarball instead
-of the bundle (e.g. `front-accessibility-${VERSION}.tar.gz`). Each release also
-ships per-skill tarballs alongside the bundle and the same `SHA256SUMS`
-covers all of them.
+The runtime reads each skill's `SKILL.md` frontmatter description at
+conversation start; matching prompts auto-trigger the skill. See
+[`TRIGGERS.md`](TRIGGERS.md) for the per-phrase index.
 
-Claude Code reads each skill's frontmatter description and applies it
-when a user message matches its trigger phrases.
+### Cleanup — remove stale or renamed skills
 
-### OpenCode
-
-[OpenCode](https://opencode.ai) is an open-source terminal coding agent
-that supports Claude, GPT and local models behind the same UX. The
-release-based flow above works the same — extract the bundle, then:
+If you installed an older version, your `~/.${RUNTIME}/skills/`
+folder may carry orphan directories from past renames (e.g.
+`front-a11y/` from before the v0.9.0 rename to `front-accessibility`).
+Run the helper to detect + remove them:
 
 ```bash
-mkdir -p ~/.opencode/skills
-cp -r front-* ~/.opencode/skills/
+# Audit only (lists orphan skill folders; never deletes):
+python3 scripts/cleanup_local_skills.py
+
+# Apply: prompts for confirmation per directory before removal.
+python3 scripts/cleanup_local_skills.py --apply
 ```
 
-Use OpenCode when you want skill behavior without provider lock-in, or
-when you're already running OpenCode as your daily driver.
+It checks both `~/.claude/skills/` and `~/.opencode/skills/` against
+the canonical `SKILLS.txt` manifest and flags any `front-*` folder
+that no longer ships from this repo. Read [`SKILLS.txt`](SKILLS.txt)
+for the canonical list.
+
+### Upgrade
+
+Repeat steps 1–3 with the new `VERSION`. The on-disk skill folder
+name is stable so each `cp -r` overwrites in place — no manual
+removal between versions, except when a skill is **renamed** (use
+the cleanup helper above for those). Skill renames are listed in
+[`CHANGELOG.md`](CHANGELOG.md).
 
 ### Install from source (contributor / developer path)
 
-If you want to iterate on the skills themselves, or pin to a specific
-commit that hasn't been tagged, clone and copy directly. No checksum
-step here — you're responsible for verifying you cloned the commit you
-intended.
+To iterate on the skills, or pin to a commit that has not been
+tagged, clone and copy from the working tree. No checksum step —
+you are responsible for verifying you cloned the commit you intended.
 
 ```bash
 git clone https://github.com/warith-harchaoui/front.git
 cd front
 python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
-python3 -m pytest                                # 500+ deterministic tests
-python3 scripts/validate_all.py                  # 6 skills × YAML + content
-mkdir -p ~/.claude/skills
-cp -r front-ui      ~/.claude/skills/            # always
-cp -r front-accessibility ~/.claude/skills/            # optional companions
-cp -r front-colors  ~/.claude/skills/
-cp -r front-vision  ~/.claude/skills/
-cp -r front-audio   ~/.claude/skills/
-cp -r front-colors  ~/.claude/skills/
-cp -r front-vision  ~/.claude/skills/
+python3 -m pytest                                # full deterministic suite
+python3 scripts/validate_all.py                  # all 8 skills, YAML + content
+
+# Mirrors step 2 above:
+RUNTIME=claude   # or opencode
+mkdir -p ~/.${RUNTIME}/skills
+for skill in $(grep -v '^[[:space:]]*#' SKILLS.txt | grep -v '^[[:space:]]*$'); do
+    cp -r "$skill" ~/.${RUNTIME}/skills/
+done
 ```
 
 `CONTRIBUTING.md` walks the same flow at the contributor level.
 
-### Upgrading
+### OpenCode + local Ollama — the zero-token path
 
-To upgrade, repeat the release-based steps with a newer `VERSION`. The
-on-disk skill folder name is stable, so `cp -r front-ui ~/.claude/skills/`
-overwrites the previous install in place. The `SHA256SUMS` for each
-release is the source of truth — if the checksum check fails, do not
-install the artifact.
+[OpenCode](https://opencode.ai) is the second supported runtime —
+and the natural fit for an **all-local, no-tokens** workflow.
+OpenCode is model-agnostic: point it at a local
+[Ollama](https://ollama.com) daemon and you get the same skill
+behaviour as Claude Code with two real differences:
+
+- **No API tokens.** Nothing leaves your machine; nothing bills.
+- **No usage limits.** Run the loop overnight on a long batch
+  without watching a meter.
+
+The trade-off is model quality. A 7-13 B local model is below
+Claude / GPT-4 on hard reasoning; the front-* skills compensate
+because they front-load the *opinion* (stack rules, audit checks,
+trigger phrases) — the model mostly has to follow a script, not
+invent it. For UI work, alt text, captions, contrast audits,
+Laws-of-UX checks, the local path is genuinely usable today.
+
+The fit with this repo is direct: **three front-* skills already
+talk to a local Ollama daemon** for their AI surfaces — `front-vision`
+(alt text, `gemma4:e4b`), `front-publish/meta_from_ollama.py` (page
+meta), `front-publish/plain_language.py` (copy rewrite). When you
+run OpenCode against the same Ollama daemon, the whole loop —
+agent + skill-driven scripts — uses one local model. Zero
+external calls.
+
+```bash
+# Quick start. Assumes Ollama + an OpenCode binary on PATH.
+ollama serve &                                # start the daemon
+ollama pull qwen2.5-coder:7b                  # a coding-tuned model
+ollama pull gemma4:e4b                        # for front-vision (mlx variant on Mac)
+
+# Tell OpenCode which model to drive the agent itself:
+export OPENCODE_MODEL=qwen2.5-coder:7b
+
+opencode                                       # start the agent
+# → ~/.opencode/skills/front-* load automatically per their frontmatter.
+# → The front-vision / front-publish Ollama-backed scripts hit the
+#   same daemon for their per-script work.
+```
+
+#### Configure the skill scripts (same daemon, separate env vars)
+
+OpenCode drives the agent; the skill scripts that *also* talk to
+Ollama (alt text, meta tags, plain-language rewrites, audio
+narration) read their own env vars. There is **no overlap with
+`OPENCODE_MODEL`** — set both, both should agree on the daemon
+URL, but the model tag can differ:
+
+| Env var | Read by | What it does | Default |
+|---|---|---|---|
+| `OLLAMA_URL` | every Ollama-backed script | Daemon endpoint. Must match the URL OpenCode talks to. | `http://localhost:11434` |
+| `OLLAMA_MODEL` | every Ollama-backed script | Exact tag to use (wins over the auto-MLX picker). | _(unset)_ |
+| `OLLAMA_MODEL_BASE` | `alt_from_ollama.py`, `meta_from_ollama.py`, `narrate_post.py` | Base tag; `-mlx` auto-appended on Apple Silicon. | `gemma4:e4b` |
+| `FRONT_LANG_PAIR` | every script that speaks language | First entry = default `--lang` when no flag is passed. | `en,fr` |
+| `OPENCODE_MODEL` | OpenCode itself | Agent-side model tag. Independent of the skill scripts. | _(per OpenCode)_ |
+
+The honest pattern: keep `OLLAMA_URL` the same across the two, let
+each side pick the model that fits its job. The agent benefits
+from a coding-tuned model (Qwen 2.5 Coder, DeepSeek-Coder); the
+vision script needs a multimodal model (Gemma 4); the
+plain-language rewriter is fine on either.
+
+```bash
+# Same daemon for both; different model per concern.
+export OLLAMA_URL=http://localhost:11434
+export OPENCODE_MODEL=qwen2.5-coder:7b
+export OLLAMA_MODEL_BASE=gemma4:e4b   # ↰ vision / meta / narration
+```
+
+Pick OpenCode when token costs matter, when the work is bulk /
+repetitive (alt-text a 500-image library, regenerate meta tags on
+every doc commit, audit a 50-page docs site), or when the data
+must not leave the box. Pick Claude Code when the work needs
+frontier-model judgement (novel design synthesis, ambiguous
+refactors, code review of unfamiliar libraries).
 
 ### Trust model
 
