@@ -45,24 +45,30 @@ framework runtime.
 
 A cross-platform CLI + local web GUI that wraps **Pandoc** with a
 curated styling layer: a single `.md` file becomes a polished Office
-document. The CLI (`md2docx`, `md2pptx`, `md2star`) does the
-non-interactive case; `md2star gui` launches the local editor —
-folder browser on the left, CodeMirror Markdown editor in the middle,
-live PDF.js preview on the right, auto-render 2.5 s after typing pause
-with `⌘↵` / `Ctrl ↵` to force.
+document. The CLI (`md2docx`, `md2pptx`, `md2pdf`) does the
+non-interactive case; the live editor shown below is the
+**Overleaf-style split pane** — Markdown source on the left, PDF
+preview on the right, debounced 500 ms after typing with `⌘ Enter` /
+`Ctrl Enter` to force. The render pipeline is the same one the CLI
+uses: `md2docx` to produce the .docx, then headless LibreOffice
+(`soffice --convert-to pdf`) to render the preview.
 
 Why this entry matters for the gallery: md2star is the concrete
 **CLI → GUI** target the `front-cli-gui` skill was designed for —
 real CLI surface, real local web GUI, dark-mode peer on every panel,
-no framework runtime. The Tauri shell that will wrap it as a desktop
-applicatif is on the [roadmap](CHANGELOG.md#roadmap); the local-web
-GUI shown below is what's live today.
+no framework runtime. The split-pane editor is stdlib-only (Python's
+`http.server` for the backend, vanilla ES module + Tailwind Play CDN
+for the front end) and passes both `front-ux-laws` and
+`front-accessibility` audits with zero findings on the emitted HTML.
+The Tauri shell that will wrap it as a desktop application is on the
+[roadmap](CHANGELOG.md#roadmap); the local-web GUI shown below is
+what's live today.
 
 | Light | Dark |
 |---|---|
 | ![md2star — light](assets/gallery/md2star/light.png) | ![md2star — dark](assets/gallery/md2star/dark.png) |
 
-**Author:** [Warith Harchaoui](https://linkedin.com/in/warith-harchaoui)  ·  **Stack:** Python CLI + vanilla JS / CodeMirror / PDF.js GUI
+**Author:** [Warith Harchaoui](https://linkedin.com/in/warith-harchaoui)  ·  **Stack:** Python stdlib HTTP server + vanilla JS + Tailwind + `md2docx` + headless LibreOffice
 
 
 
