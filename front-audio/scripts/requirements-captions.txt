@@ -1,0 +1,32 @@
+# Requirements for install_captions.py and captions_from_whisper.py
+#
+# Install:
+#   pip install -r scripts/requirements-captions.txt
+#
+# Used for:
+#   - vocal-helper : the project author's whisper.cpp over-layer. Owns the
+#                    model defaults, word-timestamp wiring, hallucination
+#                    guard and the vocabulary-biasing prompt lever. Pulls
+#                    ``pywhispercpp`` (whisper.cpp binding, pre-compiled
+#                    wheels) transitively — captions no longer touch
+#                    pywhispercpp directly.
+#   - audio-helper : 16 kHz mono decode (``load_audio``) + WAV conversion
+#                    (``sound_converter``) for audio sources.
+#   - video-helper : audio-track extraction (``extract_audio_track``) for
+#                    video sources.
+#   - click        : CLI parser for captions_from_whisper.py; install_captions
+#                    keeps its bespoke flow.
+#   - langdetect   : detect language from vocabulary source text so the
+#                    composed initial_prompt opener matches.
+#
+# The three ``*-helper`` packages are pinned to tagged releases so their
+# public API (function names, signatures) stays stable. The ``.git@vX``
+# URL form must match how ``vocal-helper`` pins ``audio-helper`` /
+# ``os-helper`` internally — otherwise pip treats the two direct
+# references as conflicting and the resolve fails.
+
+click>=8.1
+langdetect>=1.0.9
+vocal-helper @ git+https://github.com/warith-harchaoui/vocal-helper.git@v0.3.1
+audio-helper @ git+https://github.com/warith-harchaoui/audio-helper.git@v1.5.2
+video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.6.1

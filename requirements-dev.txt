@@ -1,0 +1,30 @@
+# Developer dependencies for working on the front skill.
+#
+# Install:
+#   pip install -r requirements-dev.txt
+#
+# Runtime dependencies live in front/scripts/requirements.txt; install
+# both for a full local environment:
+#   pip install -r requirements-dev.txt -r front/scripts/requirements.txt
+
+# Fast deterministic test suite under tests/
+pytest>=8.0.0
+
+# Real YAML parser for SKILL.md frontmatter validation.
+# Used by scripts/validate_skill.py + tests/test_validate_skill.py;
+# the regex-only frontmatter check is no longer trusted as the gate.
+PyYAML>=6.0
+
+# Optional: LLM-output quality assertions under tests/eval/.
+# These tests need a running Ollama daemon and are marked with
+# ``@pytest.mark.eval`` so they are NOT collected in the default run.
+# Enable with: pytest -m eval
+#
+# Each eval test loads its own optional dependency via
+# ``pytest.importorskip`` so a missing package skips the test cleanly
+# rather than crashing the suite.
+deepeval>=1.0.0
+# textstat — Flesch-Kincaid grade scoring for plain-language eval.
+textstat>=0.7.0
+# jiwer — Word Error Rate for the captions eval.
+jiwer>=3.0.0
