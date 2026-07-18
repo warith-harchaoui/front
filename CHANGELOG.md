@@ -40,12 +40,14 @@ elsewhere in the codebase.
    becomes the production reference.
 
 3. **Unified i18n make + audit.** GUI strings and LLM prompts share one
-   concern — language — so one YAML i18n catalog (message id → per-locale
-   text) should serve both. **make**: `cli_to_gui` / front-ui scaffolds emit
-   and load a YAML catalog instead of hardcoding strings. **audit**: a static
-   check flags a translation dict embedded in `.js`/`.html` or a prompt inlined
-   in `.py`, with a "move to YAML" finding (same JSON + exit-code shape as the
-   other auditors). Prompts already comply; the GUI side is the build.
+   concern — language — so one per-project catalog, **`locales/i18n.yaml`**
+   (message id → per-locale text), serves both. **make**: `cli_to_gui` /
+   front-ui scaffolds emit and read `locales/i18n.yaml` instead of hardcoding
+   strings. **audit**: a static check flags any GUI string or prompt living
+   outside `locales/i18n.yaml` — a translation dict in `.js`/`.html` or a
+   prompt inlined in `.py` — with a "move to `locales/i18n.yaml`" finding (same
+   JSON + exit-code shape as the other auditors). Prompts already comply; the
+   GUI side is the build.
 
 Adoption-side milestones (user-driven; not engineering work):
 
