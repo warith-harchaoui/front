@@ -507,7 +507,7 @@ def polarity_color(
     if not polarity:
         return None
     if role == "breach":
-        base = POLARITY_COLOR["breach"]
+        base: str | None = POLARITY_COLOR["breach"]
     elif polarity.startswith("target="):
         base = POLARITY_COLOR["target"]
     else:

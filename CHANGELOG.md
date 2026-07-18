@@ -59,6 +59,11 @@ Documentation + tooling. No on-disk skill layout change; not yet tagged.
   make/audit pattern (audit = `ruff check`; make = `ruff check --fix`). Implicit
   re-exports now use the PEP 484 `name as name` form; ~18 genuinely-unused
   imports removed; 5 undefined-name (F821) typing defects fixed.
+- **`mypy` type gate** (CODING_ALL.md rule 3, type half) — `mypy.ini` +
+  `scripts/run_mypy.sh` (per-skill-dir, `ignore_missing_imports`), wired into the
+  CI `lint` job. Fixed 27 real type defects surfaced by the first run (bad
+  `callable` annotations, lazy `numpy`/`pandas` forward refs, `Optional`
+  assignments, `Image.Resampling.LANCZOS`, tuple-width casts, a redefinition).
 - **`GALLERY.md`** — three real adoption entries (roitelet, intentions, sql),
   each with a project logo, joining md2star. All are projects the maintainer
   ships with the `front-*` skills.

@@ -15,10 +15,14 @@ pytest>=8.0.0
 # the regex-only frontmatter check is no longer trusted as the gate.
 PyYAML>=6.0
 
-# Lint / import-hygiene gate (CODING_ALL.md rule 3), config in ruff.toml.
-# audit: `ruff check .` (wired into CI) — make: `ruff check --fix .`.
+# Lint / import-hygiene gate (CODING_ALL.md rule 3, lint half), config in
+# ruff.toml. audit: `ruff check .` (wired into CI) — make: `ruff check --fix .`.
 # Pinned to the 0.15 line so the CI gate is reproducible.
 ruff>=0.15,<0.16
+
+# Type gate (CODING_ALL.md rule 3, type half), config in mypy.ini. Run via
+# scripts/run_mypy.sh (per-skill-dir, ignore_missing_imports for heavy backends).
+mypy>=1.8,<2.0
 
 # Optional: LLM-output quality assertions under tests/eval/.
 # These tests need a running Ollama daemon and are marked with

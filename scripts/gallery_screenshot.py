@@ -45,6 +45,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 from playwright.sync_api import sync_playwright
 
@@ -116,7 +117,7 @@ def capture_one(
         try:
             context = browser.new_context(
                 viewport={"width": width, "height": height},
-                color_scheme=color_scheme,  # drives prefers-color-scheme
+                color_scheme=cast(Any, color_scheme),  # drives prefers-color-scheme
                 device_scale_factor=2,      # retina-quality PNG
             )
             page = context.new_page()

@@ -26,7 +26,7 @@ from __future__ import annotations
 import csv
 import math
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, cast
 
 __all__ = [
     # sRGB primitives
@@ -185,8 +185,8 @@ def meets_wcag(
             f"Unknown WCAG (level, size): ({level!r}, {size!r}). "
             f"Valid: {sorted(WCAG_THRESHOLDS.keys())}"
         ) from e
-    fg_lin = parse_hex_linear(fg) if isinstance(fg, str) else tuple(srgb_to_linear(c) for c in fg)
-    bg_lin = parse_hex_linear(bg) if isinstance(bg, str) else tuple(srgb_to_linear(c) for c in bg)
+    fg_lin = parse_hex_linear(fg) if isinstance(fg, str) else cast("tuple[float, float, float]", tuple(srgb_to_linear(c) for c in fg))
+    bg_lin = parse_hex_linear(bg) if isinstance(bg, str) else cast("tuple[float, float, float]", tuple(srgb_to_linear(c) for c in bg))
     return contrast_ratio(fg_lin, bg_lin) >= target
 
 
@@ -248,7 +248,7 @@ def _shift_lightness(hex_or_rgb: str | tuple[int, int, int], delta: float) -> st
     if isinstance(hex_or_rgb, str):
         lin = parse_hex_linear(hex_or_rgb)
     else:
-        lin = tuple(srgb_to_linear(c) for c in hex_or_rgb)
+        lin = cast("tuple[float, float, float]", tuple(srgb_to_linear(c) for c in hex_or_rgb))
     L, C, H = oklab_to_oklch(linear_to_oklab(lin))
     new_L = max(0.0, min(1.0, L + delta))
     out = oklab_to_linear(oklch_to_oklab((new_L, C, H)))

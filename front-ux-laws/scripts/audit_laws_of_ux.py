@@ -98,7 +98,7 @@ import sys
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Callable, Iterable
 
 from _argparse import make_parser
 
@@ -767,7 +767,7 @@ def check_tesler(path: str, lines: list[str]) -> list[Finding]:
 #: Map of CLI law names to (walker-check, text-check) entries. ``None``
 #: means the check does not need that input shape.
 LAW_REGISTRY: dict[str, tuple[
-    "callable | None", "callable | None"
+    "Callable[..., Any] | None", "Callable[..., Any] | None"
 ]] = {
     "hick": (check_hick, None),
     "choice-overload": (check_choice_overload, None),
@@ -943,7 +943,7 @@ def _fix_jakob(lines: list[str], finding: "Finding") -> bool:
 #: Map of law → fixer. Laws absent from this map are reported but
 #: cannot be auto-fixed (Tesler, Selective-Attention, Choice-Overload,
 #: Hick — these need design decisions, not text edits).
-LAW_FIXERS: dict[str, "callable"] = {
+LAW_FIXERS: dict[str, "Callable[..., Any]"] = {
     "fitts": _fix_fitts,
     "aesthetic-usability": _fix_aesthetic_usability,
     "miller": _fix_miller,
@@ -1279,7 +1279,7 @@ def main(argv: list[str] | None = None) -> int:
     for p in files:
         findings.extend(audit_file(p, laws))
 
-    out: str = format_json(findings) if args.json else format_text(findings)
+    out = format_json(findings) if args.json else format_text(findings)
     sys.stdout.write(out)
 
     if not findings:

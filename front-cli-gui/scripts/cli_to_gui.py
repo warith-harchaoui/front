@@ -125,7 +125,7 @@ from _argparse import make_parser
 # ── Loading the user's parser ──────────────────────────────────────────────
 
 
-def load_parser_from_spec(spec: str) -> argparse.ArgumentParser:
+def load_parser_from_spec(spec: str) -> Any:
     """
     Load a parser factory from a ``module:callable`` spec.
 

@@ -70,9 +70,12 @@ from _click import front_command, run_command  # noqa: E402
 import sys
 import tempfile
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import click
+
+if TYPE_CHECKING:
+    import numpy
 
 # Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))

@@ -50,20 +50,24 @@ pytest -m eval          # opt-in deepeval LLM-quality tests (need Ollama)
 The default invocation skips the `eval` marker. Tests must pass before a
 PR is merged.
 
-## Linting
+## Linting & types
 
-CI runs a blocking `ruff check` (the `lint` job) — the audit half of the
-suite's make/audit pattern. Config lives in `ruff.toml`. Before opening a PR:
+CI's `lint` job runs two blocking static gates — the audit half of the suite's
+make/audit pattern. Before opening a PR:
 
 ```bash
-ruff check .            # audit — must be clean (CI blocks otherwise)
-ruff check --fix .      # make — apply the auto-fixable subset
+ruff check .            # lint audit — must be clean (CI blocks otherwise)
+ruff check --fix .      # lint make — apply the auto-fixable subset
+./scripts/run_mypy.sh   # type audit — per-skill-dir mypy (config in mypy.ini)
 ```
 
-Two gotchas the config already handles: `E741` (`l`) is allowed because it is
-the OKLab *lightness* channel in the colour math, and helper functions that a
-script re-exports for its tests use the `name as name` form so `--fix` never
-deletes a live re-export — keep that form when adding one.
+Config lives in `ruff.toml` and `mypy.ini`. Three conventions the config
+already encodes: `E741` (`l`) is allowed because it is the OKLab *lightness*
+channel in the colour math; helper functions a script re-exports for its tests
+use the `name as name` form so `ruff --fix` never deletes a live re-export
+(keep that form when adding one); and the type gate uses `ignore_missing_imports`
+so the heavy optional backends (torch / nemo / dowhy / ollama) need not be
+installed to type-check the code's own annotations.
 
 ## Conventions
 

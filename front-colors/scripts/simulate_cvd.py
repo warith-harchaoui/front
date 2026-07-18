@@ -59,6 +59,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from typing import cast
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -100,10 +101,11 @@ def simulate_image(im: Image.Image, kind: str) -> Image.Image:
     out = Image.new("RGB", rgb.size)
     src_pixels = rgb.load()
     dst_pixels = out.load()
+    assert src_pixels is not None and dst_pixels is not None  # load() is None only on a closed image
     w, h = rgb.size
     for y in range(h):
         for x in range(w):
-            dst_pixels[x, y] = simulate_pixel(src_pixels[x, y], matrix)
+            dst_pixels[x, y] = simulate_pixel(cast("tuple[int, int, int]", src_pixels[x, y]), matrix)
     return out
 
 

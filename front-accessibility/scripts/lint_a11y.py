@@ -89,7 +89,7 @@ from _argparse import make_parser  # noqa: E402
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Optional
+from typing import Any, Callable, Optional
 
 
 # ── Data structures ────────────────────────────────────────────────────────
@@ -544,7 +544,7 @@ def check_motion_reduce(root: Element) -> list[Finding]:
 
 
 # Registered rules — declaring them in a list makes ``--ignore`` cheap.
-ALL_RULES: dict[str, callable] = {
+ALL_RULES: dict[str, "Callable[..., Any]"] = {
     "html-missing-lang": check_html_lang,
     "img-missing-alt": check_img,
     "img-redundant-aria": check_img,
@@ -674,7 +674,7 @@ def _fix_motion_reduce_guard(lines: list[str], finding: "Finding") -> bool:
 #: buttons / missing labels / missing headings / color-only state
 #: are deliberately absent — those need a content decision the
 #: linter cannot make for the user.
-RULE_FIXERS: dict[str, "callable"] = {
+RULE_FIXERS: dict[str, "Callable[..., Any]"] = {
     "html-missing-lang": _fix_html_missing_lang,
     "img-redundant-aria": _fix_img_redundant_aria,
     "tabindex-positive": _fix_tabindex_positive,

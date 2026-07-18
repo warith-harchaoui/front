@@ -212,16 +212,16 @@ def _run_rule_pass(cues: List[Dict[str, Any]]) -> Dict[str, List[Tuple[str, floa
         # Turn-initial vocative: addressed to the OTHER speaker.
         # We attribute to the previous non-self speaker id when present;
         # otherwise the next different speaker id.
-        m = _VOCATIVE_START_RE.match(text)
-        if m:
+        vm = _VOCATIVE_START_RE.match(text)
+        if vm:
             target = _find_other_speaker(cues, i, spk)
-            add(target, _clean_name(m.group("name")), CONF_VOCATIVE_START)
+            add(target, _clean_name(vm.group("name")), CONF_VOCATIVE_START)
 
         # Turn-final vocative: also addressed to the OTHER speaker.
-        m = _VOCATIVE_END_RE.search(text)
-        if m:
+        em = _VOCATIVE_END_RE.search(text)
+        if em:
             target = _find_other_speaker(cues, i, spk)
-            add(target, _clean_name(m.group("name")), CONF_VOCATIVE_END)
+            add(target, _clean_name(em.group("name")), CONF_VOCATIVE_END)
 
     return candidates
 

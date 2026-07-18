@@ -321,7 +321,7 @@ def build_vega_spec(spec_ctx: Dict[str, Any]) -> Dict[str, Any]:
 
 def _mark_for_kind(kind: str) -> Dict[str, Any]:
     """Map a --kind flag to a Vega-Lite mark dict."""
-    return {
+    marks: Dict[str, Dict[str, Any]] = {
         "bar":           {"type": "bar", "cornerRadiusEnd": 4},
         "bar-h":         {"type": "bar", "cornerRadiusEnd": 4},
         "bar-stacked":   {"type": "bar", "cornerRadiusEnd": 4},
@@ -335,7 +335,8 @@ def _mark_for_kind(kind: str) -> Dict[str, Any]:
         "violin":        {"type": "area", "orient": "horizontal", "opacity": 0.6},
         "heatmap":       {"type": "rect"},
         "heatmap-count": {"type": "rect"},
-    }.get(kind, {"type": "point"})
+    }
+    return marks.get(kind, {"type": "point"})
 
 
 def _label_for(name: Optional[str], lang: str, is_time: bool = False) -> str:

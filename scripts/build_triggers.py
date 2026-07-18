@@ -137,7 +137,7 @@ def _extract_triggers(description: str) -> list[str]:
     # Some skills use "Trigger phrases:", others embed quotes directly
     # in prose ("Use it for ..."). We accept both — anything quoted in
     # the description is a trigger candidate.
-    parts: list[str] = re.findall(r'"([^"]+)"|“([^”]+)”', description)
+    parts: list[tuple[str, str]] = re.findall(r'"([^"]+)"|“([^”]+)”', description)
     flat: list[str] = [a or b for a, b in parts]
     # Deduplicate while preserving first-seen order.
     seen: set[str] = set()

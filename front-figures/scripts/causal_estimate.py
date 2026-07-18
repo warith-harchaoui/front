@@ -57,7 +57,10 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
+if TYPE_CHECKING:
+    import pandas
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _argparse import make_parser  # noqa: E402

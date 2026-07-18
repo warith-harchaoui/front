@@ -475,7 +475,7 @@ def maybe_resize(data: bytes, max_edge: int) -> bytes:
     if not HAVE_PILLOW or max_edge <= 0:
         return data
     try:
-        im = Image.open(io.BytesIO(data))
+        im: "Image.Image" = Image.open(io.BytesIO(data))
         # Convert palette / alpha-only modes to RGB so the JPEG re-encode works.
         if im.mode in ("RGBA", "LA", "P"):
             im = im.convert("RGB")
@@ -485,7 +485,7 @@ def maybe_resize(data: bytes, max_edge: int) -> bytes:
             return data
         # Use the float ratio to keep the aspect ratio precise after rounding.
         scale: float = max_edge / float(max(w, h))
-        im = im.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+        im = im.resize((int(w * scale), int(h * scale)), Image.Resampling.LANCZOS)
         buf = io.BytesIO()
         im.save(buf, format="JPEG", quality=88, optimize=True)
         return buf.getvalue()

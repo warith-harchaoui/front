@@ -179,7 +179,7 @@ def resize_square(im: Image.Image, size: int) -> Image.Image:
         New RGBA image of side ``size``.
     """
     src = im.copy()
-    src.thumbnail((size, size), Image.LANCZOS)
+    src.thumbnail((size, size), Image.Resampling.LANCZOS)
     canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     canvas.paste(src, ((size - src.width) // 2, (size - src.height) // 2), src)
     return canvas
@@ -234,7 +234,7 @@ def make_maskable(im: Image.Image, bg: tuple[int, int, int]) -> Image.Image:
     canvas = Image.new("RGB", (MASKABLE_SIZE, MASKABLE_SIZE), bg)
     inner: int = int(MASKABLE_SIZE * MASKABLE_SAFE)
     fit = im.copy()
-    fit.thumbnail((inner, inner), Image.LANCZOS)
+    fit.thumbnail((inner, inner), Image.Resampling.LANCZOS)
     pad: tuple[int, int] = (
         (MASKABLE_SIZE - fit.width) // 2,
         (MASKABLE_SIZE - fit.height) // 2,
