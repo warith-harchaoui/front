@@ -164,6 +164,16 @@ Pour des sites réels déjà livrés sur cette pile, voir
   `FRONT_LANG_PAIR` (par exemple `export FRONT_LANG_PAIR="en,fr"`) ;
   la première entrée devient le `--lang` par défaut des scripts
   Ollama quand aucun drapeau n'est passé.
+- **L'i18n vit dans du YAML, jamais dans du JS.** Les chaînes
+  traduisibles — libellés d'interface **et** prompts LLM — vivent dans
+  un catalogue YAML séparé (id de message → texte par locale), chargé à
+  l'exécution ; jamais un dictionnaire de traductions figé dans du
+  JavaScript, jamais un prompt en dur dans du Python. Interface et
+  prompts partagent une seule source de vérité linguistique car ils
+  partagent une seule question : la *langue*. Les prompts fonctionnent
+  déjà ainsi (`prompts/*.yaml`, chargés via `_prompts.load_prompt`) ; la
+  même règle gouverne les interfaces générées, côté **make** (émettre du
+  YAML) comme côté **audit** (signaler les chaînes en JS ou en dur).
 
 ## État d'avancement
 

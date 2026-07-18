@@ -39,6 +39,14 @@ elsewhere in the codebase.
    `cli-gui-demo` stays as the scaffold reference; the Tauri example
    becomes the production reference.
 
+3. **Unified i18n make + audit.** GUI strings and LLM prompts share one
+   concern — language — so one YAML i18n catalog (message id → per-locale
+   text) should serve both. **make**: `cli_to_gui` / front-ui scaffolds emit
+   and load a YAML catalog instead of hardcoding strings. **audit**: a static
+   check flags a translation dict embedded in `.js`/`.html` or a prompt inlined
+   in `.py`, with a "move to YAML" finding (same JSON + exit-code shape as the
+   other auditors). Prompts already comply; the GUI side is the build.
+
 Adoption-side milestones (user-driven; not engineering work):
 
 - Real Claude Code session against the four skills to verify trigger
@@ -47,9 +55,10 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
-## [Unreleased]
+## [0.18.0] — 2026-07-18 — `ruff` + `mypy` gates, `EXAMPLES.md`, gallery adoption
 
-Documentation + tooling. No on-disk skill layout change; not yet tagged.
+Documentation + tooling. No on-disk skill layout change — the per-skill tarballs
+are unchanged; this release adds repo-root docs, CI gates, and dev config.
 
 - **`EXAMPLES.md`** at the repository root — a runnable cookbook, one recipe
   per skill (deterministic 🟢 vs local-AI 🤖) anchored on `tests/fixtures/`,
@@ -64,9 +73,15 @@ Documentation + tooling. No on-disk skill layout change; not yet tagged.
   CI `lint` job. Fixed 27 real type defects surfaced by the first run (bad
   `callable` annotations, lazy `numpy`/`pandas` forward refs, `Optional`
   assignments, `Image.Resampling.LANCZOS`, tuple-width casts, a redefinition).
-- **`GALLERY.md`** — three real adoption entries (roitelet, intentions, sql),
-  each with a project logo, joining md2star. All are projects the maintainer
-  ships with the `front-*` skills.
+- **`GALLERY.md`** — four real adoption entries (md2star, roitelet, intentions,
+  sql), each with a project logo. All are projects the maintainer ships with the
+  `front-*` skills. The "Adding to the gallery" submission boilerplate was
+  dropped (this is a curated showcase, not an open-submission list).
+- **i18n house rule documented** — translatable strings (GUI labels **and** LLM
+  prompts) live in a separate YAML catalog, never embedded in JS or inlined in
+  Python; GUI and prompts share one language source of truth. Prompts already
+  comply (`prompts/*.yaml`). See `README.md` → "What the skills enforce". The
+  make/audit *implementation* for GUI i18n is roadmapped below.
 
 ## [0.17.0] — 2026-07-07 — `front-audio` captions on `vocal-helper` + pinned helper releases
 
