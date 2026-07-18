@@ -4,15 +4,17 @@ description: >-
   Generate vanilla JavaScript + Tailwind CSS UI code — components, pages,
   forms, dialogs, dashboards — for solo developers and small teams shipping
   internal tools without a designer. Default typography is the three-Roboto
-  rule (Roboto sans + Roboto Serif + Roboto Mono); honors user-specified
-  fonts and respects existing typefaces when auditing existing UI. Output
-  is semantic HTML + Tailwind utility classes + vanilla ES modules with
-  dark-mode peers, focus rings, reduced-motion guards. Use it for "build a
-  UI", "create a component", "design a page", "make a form / modal / button
-  / nav", "scaffold a landing", "build a web app", "audit this UI". Companion
-  skills: front-cli-gui (wrap a CLI in a GUI), front-publish (Markdown →
-  website + meta tags + favicons), front-accessibility (a11y lint), front-colors
-  (contrast audit, CVD), front-vision (alt text), front-audio (captions).
+  rule (Roboto sans + Roboto Serif + Roboto Mono); honors user-specified fonts
+  and respects existing typefaces when auditing existing UI. Output is
+  semantic HTML + Tailwind utility classes + vanilla ES modules with dark-mode
+  peers, focus rings, reduced-motion guards. Use it for "build a UI", "create
+  a component", "design a page", "make a form / modal / button / nav",
+  "scaffold a landing", "build a web app", "audit this UI", "dark mode
+  toggle", "responsive layout", "dashboard / data table", "settings page",
+  "empty state / skeleton". Companion skills: front-cli-gui (wrap a CLI in a
+  GUI), front-publish (Markdown → website + meta tags + favicons),
+  front-accessibility (a11y lint), front-colors (contrast audit, CVD),
+  front-vision (alt text), front-audio (captions).
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. No Python runtime required to use
@@ -21,7 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

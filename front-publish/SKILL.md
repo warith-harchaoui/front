@@ -1,19 +1,20 @@
 ---
 name: front-publish
 description: >-
-  Turn a folder of Markdown (README + docs/ + blog/) into a static site
-  with per-page meta tags (Open Graph + Twitter Card + Schema.org
-  JSON-LD), a full favicon / app-icon / PWA-icon set from one logo,
-  robots.txt + sitemap.xml + llms.txt + Atom / RSS + humans.txt,
-  plain-language rewrites, and MP3 narration via local OSS TTS. Applies
-  Google's SEO + GEO (AI Optimization) foundations to the emitted
-  artifacts. For solo developers and small teams shipping a site without
-  an SSG. Trigger phrases: "markdown to website", "meta tags", "OG card",
-  "SEO", "AI Overview", "GEO", "favicons", "app icons", "PWA icons",
-  "robots.txt", "sitemap", "llms.txt", "Atom feed", "RSS", "plain
-  language", "rewrite at grade N", "simplify this copy", "narrate this
-  post", "podcast my blog". Output follows the front-ui stack rules —
-  install front-ui alongside for the full design tokens.
+  Turn a folder of Markdown (README + docs/ + blog/) into a static site with
+  per-page meta tags (Open Graph + Twitter Card + Schema.org JSON-LD), a full
+  favicon / app-icon / PWA-icon set from one logo, robots.txt + sitemap.xml +
+  llms.txt + Atom / RSS + humans.txt, plain-language rewrites, and MP3
+  narration via local OSS TTS. Applies Google's SEO + GEO (AI Optimization)
+  foundations to the emitted artifacts. For solo developers and small teams
+  shipping a site without an SSG. Trigger phrases: "markdown to website",
+  "meta tags", "OG card", "SEO", "AI Overview", "GEO", "favicons", "app
+  icons", "PWA icons", "robots.txt", "sitemap", "llms.txt", "Atom feed",
+  "RSS", "plain language", "rewrite at grade N", "simplify this copy",
+  "narrate this post", "podcast my blog", "text to speech", "readability /
+  grade level", "schema.org JSON-LD", "humans.txt". Output follows the
+  front-ui stack rules — install front-ui alongside for the full design
+  tokens.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (favicons,
@@ -24,7 +25,7 @@ compatibility: >-
   torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

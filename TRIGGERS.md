@@ -13,11 +13,21 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `scaffold a landing` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
 | `build a web app` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
 | `audit this UI` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
+| `dark mode toggle` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
+| `responsive layout` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
+| `dashboard / data table` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
+| `settings page` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
+| `empty state / skeleton` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
 | `wrap this CLI in a GUI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `build a UI for my CLI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `argparse to GUI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `click to web UI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `GUI for my Python script` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
+| `wrap my command-line tool` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
+| `web form for my script` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
+| `Typer / clap / cobra to GUI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
+| `GUI for my Go or Rust CLI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
+| `frontend for a CLI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `markdown to website` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `meta tags` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `OG card` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
@@ -37,11 +47,20 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `simplify this copy` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `narrate this post` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `podcast my blog` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `text to speech` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `readability / grade level` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `schema.org JSON-LD` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `humans.txt` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `a11y lint` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
 | `check this HTML for accessibility` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
 | `static a11y check` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
 | `WCAG-friendly lint` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
 | `a11y pre-commit` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
+| `missing alt` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
+| `unlabelled input` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
+| `WCAG compliance` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
+| `ARIA / keyboard check` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
+| `fix accessibility` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
 | `WCAG check` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `contrast audit` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `is my palette accessible` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
@@ -55,6 +74,11 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `palette to tailwind` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `regenerate brand tokens` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `tailwind config from palette` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
+| `brand colors` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
+| `accessible color pair` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
+| `color-blind safe` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
+| `protanopia / tritanopia` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
+| `generate palette` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
 | `alt text for this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
 | `describe this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
@@ -62,6 +86,10 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `image description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
 | `img has no alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
 | `decorative image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `functional image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `figure / chart description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `accessible images` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
+| `batch alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
 | `who spoke when` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `who is who` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `I'm Alice` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
@@ -81,12 +109,17 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `identify speakers` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `name the speakers` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `speaker VTT` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
+| `subtitles` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `design this screen using Hick / Fitts / Miller` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `what does Peak-End say here` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `is this onboarding fighting the Paradox of the Active User` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `audit for Laws of UX` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `is my nav too Hick-heavy` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `check my form for Postel / Tesler` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
+| `too many choices / options` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
+| `cognitive load` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
+| `Doherty threshold` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
+| `reduce clutter` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `chart this` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `make a figure` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `SHAP plot` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
@@ -103,6 +136,10 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `audit this figure` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `colorblind safe palette` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `dual y-axis` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `bar / line / scatter chart` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `Vega-Lite` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `visualize data` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `audit this chart` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 
 ## How discovery works
 

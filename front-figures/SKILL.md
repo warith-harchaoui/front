@@ -1,21 +1,21 @@
 ---
 name: front-figures
 description: >-
-  Data-science figures for vanilla-JS + Tailwind, both make and
-  audit — publication-quality matplotlib / seaborn plots, Vega-Lite
-  JSON in the front-ui house style, model-explainability plots via
-  SHAP / Shapash / TimeSHAP / LIME, causal-effect estimation and
-  DAG rendering via DoWhy / EconML, and a static auditor that flags
-  data-viz sins (missing axis labels, dual y-axes, truncated
-  baselines, 3D pies, rainbow palettes, CVD-unsafe hues, chartjunk,
-  undeclared polarity). Deterministic auditor, local-first make
-  side. Pairs with front-colors, front-vision, front-accessibility.
-  Trigger phrases: "chart this", "make a figure", "SHAP plot",
-  "explain this model", "feature importance", "shapash", "timeshap",
-  "LIME", "causal inference", "DoWhy", "EconML", "treatment
-  effect", "DAG", "audit this figure", "colorblind safe palette",
-  "dual y-axis". Output: Vega JSON / PNG / SVG on disk +
-  ``<figure>`` snippet; auditor emits JSON + exit codes for CI.
+  Data-science figures for vanilla-JS + Tailwind, both make and audit —
+  publication-quality matplotlib / seaborn plots, Vega-Lite JSON in the
+  front-ui house style, model-explainability plots via SHAP / Shapash /
+  TimeSHAP / LIME, causal-effect estimation and DAG rendering via DoWhy /
+  EconML, and a static auditor that flags data-viz sins (missing axis labels,
+  dual y-axes, truncated baselines, 3D pies, rainbow palettes, CVD-unsafe
+  hues, chartjunk, undeclared polarity). Deterministic auditor, local-first
+  make side. Pairs with front-colors, front-vision, front-accessibility.
+  Trigger phrases: "chart this", "make a figure", "SHAP plot", "explain this
+  model", "feature importance", "shapash", "timeshap", "LIME", "causal
+  inference", "DoWhy", "EconML", "treatment effect", "DAG", "audit this
+  figure", "colorblind safe palette", "dual y-axis", "bar / line / scatter
+  chart", "Vega-Lite", "visualize data", "audit this chart". Output: Vega JSON
+  / PNG / SVG on disk + ``<figure>`` snippet; auditor emits JSON + exit codes
+  for CI.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The auditor (static) needs
@@ -26,7 +26,7 @@ compatibility: >-
   network required at figure-generation time once installed.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

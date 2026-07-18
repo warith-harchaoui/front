@@ -57,6 +57,28 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.19.0] — 2026-07-18 — exhaustive trigger phrases + version sync
+
+Improves **skill activation** (Claude Code + OpenCode) and fixes a version drift.
+No behavioural change to any script.
+
+- **Trigger-phrase exhaustiveness.** Every skill's `description` gained
+  user-language trigger phrases covering capabilities that previously had no
+  activation keyword — so a skill is less likely to "go under the rug". E.g.
+  front-ui (+`dark mode toggle`, `dashboard`, `data table`, `empty state`),
+  front-accessibility (+`missing alt`, `WCAG compliance`, `fix accessibility`),
+  front-figures (+`bar / line / scatter chart`, `Vega-Lite`, `visualize data`),
+  front-cli-gui (+`Typer / clap / cobra to GUI`, `GUI for my Go or Rust CLI`),
+  and similar for colors / ux-laws / publish / vision / audio. All descriptions
+  stay within the repo's 1024-char cap; `TRIGGERS.md` regenerated.
+- **Version sync.** `metadata.version` in every `SKILL.md` was stale at 0.15.1;
+  it now tracks the release (0.19.0) alongside `SKILL_VERSION` and `front-cli`.
+- **Deterministic type gate.** Pinned `types-PyYAML` + `types-requests` so the
+  `mypy` CI job resolves `yaml`/`requests` identically everywhere (fixes a
+  works-locally-fails-in-CI stub mismatch).
+- **i18n rule sharpened** — the canonical catalog is named: **`locales/i18n.yaml`**,
+  one file for GUI strings AND prompts, on both the make and audit sides.
+
 ## [0.18.0] — 2026-07-18 — `ruff` + `mypy` gates, `EXAMPLES.md`, gallery adoption
 
 Documentation + tooling. No on-disk skill layout change — the per-skill tarballs

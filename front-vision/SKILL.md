@@ -7,12 +7,13 @@ description: >-
   text and project-vocabulary biasing, deterministic on-disk cache so the same
   image + parameters never hit the model twice. Default model is
   ``gemma4:e4b`` (the ``-mlx`` variant is auto-selected on Apple-silicon
-  Macs); override with ``OLLAMA_MODEL`` / ``--model``. For solo developers
-  and small teams who want accessibility content drafted locally with no
-  SaaS cost or data exfiltration. Drafts are starting points — verify before
-  committing. Trigger phrases: "alt text", "alt text for this image",
-  "describe this image", "draft alt", "image description", "img has no
-  alt", "decorative image". Output is plain text / JSON on stdout suitable
+  Macs); override with ``OLLAMA_MODEL`` / ``--model``. For solo developers and
+  small teams who want accessibility content drafted locally with no SaaS cost
+  or data exfiltration. Drafts are starting points — verify before committing.
+  Trigger phrases: "alt text", "alt text for this image", "describe this
+  image", "draft alt", "image description", "img has no alt", "decorative
+  image", "functional image", "figure / chart description", "accessible
+  images", "batch alt text". Output is plain text / JSON on stdout suitable
   for pre-commit and CI.
 license: BSD-3-Clause
 compatibility: >-
@@ -24,7 +25,7 @@ compatibility: >-
   first run.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

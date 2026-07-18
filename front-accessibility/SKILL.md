@@ -5,22 +5,23 @@ description: >-
   Fourteen rules decidable from source — missing alt, unlabelled inputs,
   button-without-text, ``<div onclick>``, missing dialog close, ``lang``
   attribute, bad heading order, color-only state, motion-reduce guards, and
-  more — without a browser or runtime DOM. For solo developers and small
-  teams who need a fast, deterministic, CI-friendly gate before shipping —
-  NOT a replacement for axe-core / Pa11y / Lighthouse (runtime DOM audits
-  catch what a static parser cannot). Color contrast lives in the companion
+  more — without a browser or runtime DOM. For solo developers and small teams
+  who need a fast, deterministic, CI-friendly gate before shipping — NOT a
+  replacement for axe-core / Pa11y / Lighthouse (runtime DOM audits catch what
+  a static parser cannot). Color contrast lives in the companion
   ``front-colors`` skill, AI alt-text in ``front-vision``, AI captions in
   ``front-audio``. Trigger phrases: "a11y lint", "check this HTML for
   accessibility", "static a11y check", "WCAG-friendly lint", "a11y
-  pre-commit". Output is JSON / stdout / exit codes suitable for pre-commit
-  and CI.
+  pre-commit", "missing alt", "unlabelled input", "WCAG compliance", "ARIA /
+  keyboard check", "fix accessibility". Output is JSON / stdout / exit codes
+  suitable for pre-commit and CI.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The lint_a11y script needs
   Python 3.9+ stdlib only — no third-party deps, no browser, no network.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

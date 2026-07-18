@@ -9,9 +9,10 @@ description: >-
   Rust CLI authors, ML researchers, data scientists, DevOps / SRE) who need a
   usable web UI without picking up React or learning Gradio's / Streamlit's
   look. Trigger phrases: "wrap this CLI in a GUI", "build a UI for my CLI",
-  "argparse to GUI", "click to web UI", "GUI for my Python script". Output
-  follows the front-ui stack rules — install front-ui alongside for full
-  design tokens.
+  "argparse to GUI", "click to web UI", "GUI for my Python script", "wrap my
+  command-line tool", "web form for my script", "Typer / clap / cobra to GUI",
+  "GUI for my Go or Rust CLI", "frontend for a CLI". Output follows the
+  front-ui stack rules — install front-ui alongside for full design tokens.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Output is one-page HTML + ES
@@ -21,7 +22,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

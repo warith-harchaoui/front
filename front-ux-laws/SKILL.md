@@ -1,20 +1,20 @@
 ---
 name: front-ux-laws
 description: >-
-  Apply the canonical Laws of UX (Jon Yablonski, lawsofux.com) to
-  vanilla-JS + Tailwind work — both when making new UI ("design this
-  screen using Hick / Fitts / Miller", "what does Peak-End say here",
-  "is this onboarding fighting the Paradox of the Active User") AND
-  when auditing existing HTML ("audit for Laws of UX", "is my nav too
-  Hick-heavy", "check my form for Postel / Tesler"). Reference covers
-  30 laws with trigger / action / Tailwind hook. Static auditor
-  scripts/audit_laws_of_ux.py flags the mechanically-detectable subset
-  (Hick, Miller, Fitts, Jakob, Tesler, Aesthetic-Usability,
-  Selective Attention, Doherty, Choice Overload) with severity and
-  JSON output. Pairs with companion skills front-ui (generation),
+  Apply the canonical Laws of UX (Jon Yablonski, lawsofux.com) to vanilla-JS +
+  Tailwind work — both when making new UI ("design this screen using Hick /
+  Fitts / Miller", "what does Peak-End say here", "is this onboarding fighting
+  the Paradox of the Active User") AND when auditing existing HTML ("audit for
+  Laws of UX", "is my nav too Hick-heavy", "check my form for Postel /
+  Tesler", "too many choices / options", "cognitive load", "Doherty
+  threshold", "reduce clutter"). Reference covers 30 laws with trigger /
+  action / Tailwind hook. Static auditor scripts/audit_laws_of_ux.py flags the
+  mechanically-detectable subset (Hick, Miller, Fitts, Jakob, Tesler,
+  Aesthetic-Usability, Selective Attention, Doherty, Choice Overload) with
+  severity and JSON output. Pairs with companion skills front-ui (generation),
   front-accessibility (a11y lint), front-publish (docs site), front-colors
-  (contrast). Output is HTML-aware findings via JSON or stdout, exit
-  codes for pre-commit / CI.
+  (contrast). Output is HTML-aware findings via JSON or stdout, exit codes for
+  pre-commit / CI.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The auditor needs
@@ -22,7 +22,7 @@ compatibility: >-
   access required. Reference is plain Markdown with no exec deps.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   source: https://lawsofux.com/
 ---
 

@@ -1,22 +1,20 @@
 ---
 name: front-audio
 description: >-
-  Local-AI captions, speaker diarization and speaker identification
-  for video / audio. Generates W3C WebVTT / SRT / plain-text captions
-  from a local whisper.cpp build (vocal-helper), then adds "who
-  spoke when" via NVIDIA NeMo Sortformer and "who is who" via NeMo
-  TitaNet embeddings (against reference clips) OR a transcript-based
-  rule + local Ollama pass that mines self-introductions ("I'm
-  Alice") and vocatives ("Hey Mary, ..."). Merger emits speaker-
-  labelled VTT with ``<v Name>`` cues. Project-vocab biasing on the
-  caption path. Bilingual EN/FR default, configurable via lang_pair.
-  Local-first — never sends audio to a SaaS. Trigger phrases:
-  "captions", "transcribe video", "transcribe audio", "WebVTT",
-  "SRT", "subtitle file", "VTT", "caption track", "diarization",
-  "who spoke when", "speaker labels", "Sortformer", "TitaNet",
-  "identify speakers", "name the speakers", "speaker VTT". Output
-  is a captions / RTTM / speakers.json / speaker-VTT file on disk +
-  a ready-to-paste snippet on stdout.
+  Local-AI captions, speaker diarization and speaker identification for video
+  / audio. Generates W3C WebVTT / SRT / plain-text captions from a local
+  whisper.cpp build (vocal-helper), then adds "who spoke when" via NVIDIA NeMo
+  Sortformer and "who is who" via NeMo TitaNet embeddings (against reference
+  clips) OR a transcript-based rule + local Ollama pass that mines
+  self-introductions ("I'm Alice") and vocatives ("Hey Mary, ..."). Merger
+  emits speaker- labelled VTT with ``<v Name>`` cues. Project-vocab biasing on
+  the caption path. Bilingual EN/FR default, configurable via lang_pair.
+  Local-first — never sends audio to a SaaS. Trigger phrases: "captions",
+  "transcribe video", "transcribe audio", "WebVTT", "SRT", "subtitle file",
+  "VTT", "caption track", "diarization", "who spoke when", "speaker labels",
+  "Sortformer", "TitaNet", "identify speakers", "name the speakers", "speaker
+  VTT", "subtitles". Output is a captions / RTTM / speakers.json / speaker-VTT
+  file on disk + a ready-to-paste snippet on stdout.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
@@ -34,7 +32,7 @@ compatibility: >-
   install completes.
 metadata:
   author: Warith Harchaoui
-  version: 0.15.1
+  version: 0.19.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
