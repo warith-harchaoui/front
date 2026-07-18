@@ -16,6 +16,8 @@ at the bottom of this file.
 
 ## [md2star — Markdown → branded `.docx` / `.pptx` / `.pdf`](https://github.com/warith-harchaoui/md2star)
 
+<img src="assets/gallery/md2star/logo.png" alt="md2star logo" width="64">
+
 > *Convert Markdown into branded `.docx`, `.pptx`, and `.pdf`, end to end.*
 
 A cross-platform CLI + local web GUI that wraps **Pandoc** with a
@@ -71,6 +73,89 @@ below is what's live today.
 | ![md2star PPTX — light](assets/gallery/md2star/pptx-light.png) | ![md2star PPTX — dark](assets/gallery/md2star/pptx-dark.png) |
 
 **Author:** [Warith Harchaoui](https://linkedin.com/in/warith-harchaoui)  ·  **Stack:** Python stdlib HTTP server + vanilla JS + Tailwind + pdf.js + `md2docx` / `md2pptx` + headless LibreOffice
+
+
+
+## [roitelet — local-first lab for LLM / RAG / agentic systems](https://github.com/warith-harchaoui/roitelet)
+
+<img src="assets/gallery/roitelet/logo.png" alt="roitelet logo" width="64">
+
+> *Several AI models answer your question at the same time, and a local model picks the best parts of each answer for you.*
+
+A local-first workbench for designing and comparing LLM, RAG, and
+agentic setups before they become client architectures. The chat UI
+fans one prompt out to several models at once, then a local Ollama
+"judge" synthesizes a single answer; slash-commands (`/image`,
+`/personal`, `/help`) switch modes, and a companion Markdown editor
+handles longer drafts. It runs entirely on the machine, bound to
+`127.0.0.1` by default, and is used at deraison.ai to prototype
+architectures with clients.
+
+Why it earns its place: one **WCAG-tuned semantic token set** (surface /
+label tiers, each with a `-dark` peer) is shared across every surface,
+so the `dark:` peer rule holds on the chat pane, the sidebar, and the
+editor alike — no framework runtime, vanilla ES modules, Tailwind JIT,
+self-hosted Roboto. Captures show the fresh-install empty state.
+
+| Light | Dark |
+|---|---|
+| ![roitelet — light](assets/gallery/roitelet/light.png) | ![roitelet — dark](assets/gallery/roitelet/dark.png) |
+
+**Author:** [Warith Harchaoui](https://linkedin.com/in/warith-harchaoui)  ·  **Stack:** Python (FastAPI + uvicorn) + vanilla JS (no build, Tailwind JIT) + self-hosted Roboto + local Ollama
+
+
+
+## [intentions — Déraison Assurances intent router](https://github.com/warith-harchaoui/intentions)
+
+<img src="assets/gallery/intentions/logo.png" alt="intentions logo" width="64">
+
+> *Route a caller's request to the right department by comparing three intent engines side by side — TF-IDF, BERT, and a local LLM.*
+
+A teaching demo for intent detection: the same request runs through
+TF-IDF (instant, offline), BERT embeddings (semantic), and a local LLM
+(Ollama, zero-shot with strict JSON), shown with confidence bars and
+latencies so the trade-offs are visible. Intents live in Markdown —
+one `# h1` per intent in `knowledge_base/` — so a domain expert adds
+one without touching code.
+
+Why it earns its place: the front cites the front-ui house style in its
+own source comments (`web/app.js`: "règle front-ui n°1") — vanilla ES
+modules, vendored Tailwind for an offline page, three-Roboto, and a
+`dark:` peer on every surface (dark capture shows the live LLM badge and
+the 21-intent knowledge base).
+
+| Light | Dark |
+|---|---|
+| ![intentions — light](assets/gallery/intentions/light.png) | ![intentions — dark](assets/gallery/intentions/dark.png) |
+
+**Author:** [Warith Harchaoui](https://linkedin.com/in/warith-harchaoui)  ·  **Stack:** Python (FastAPI) + vanilla JS + Tailwind (vendored) + scikit-learn / sentence-transformers / local Ollama
+
+
+
+## [sql — Text2SQL teaching demo](https://github.com/warith-harchaoui/sql)
+
+<img src="assets/gallery/sql/logo.png" alt="sql logo" width="64">
+
+> *French natural-language questions become SQL through three approaches — raw QwenCoder, LangChain, and Vanna RAG — 100% local via Ollama.*
+
+A side-by-side text-to-SQL demo over a synthetic hospital database
+(30 tables, fictional data). The same question is answered by three
+approaches; the generated SQL is shown, run read-only (`mode=ro`,
+single `SELECT`), and — when a chart fits — a local Gemma model picks a
+visualization that is rendered as **Vega-Lite** (generated code is
+never executed).
+
+Why it earns its place: the front cites the front-ui house style in its
+source comments and vendors Tailwind for a fully local page; the
+`front-figures` philosophy shows up literally — the model chooses the
+chart, the page renders it as Vega-Lite. Both color schemes carry the
+full `dark:` peer set.
+
+| Light | Dark |
+|---|---|
+| ![sql — light](assets/gallery/sql/light.png) | ![sql — dark](assets/gallery/sql/dark.png) |
+
+**Author:** [Warith Harchaoui](https://linkedin.com/in/warith-harchaoui)  ·  **Stack:** Python (FastAPI) + vanilla JS + Tailwind (vendored) + Vega-Lite + local Ollama (qwen2.5-coder / Gemma) + SQLite
 
 
 
