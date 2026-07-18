@@ -50,6 +50,21 @@ pytest -m eval          # opt-in deepeval LLM-quality tests (need Ollama)
 The default invocation skips the `eval` marker. Tests must pass before a
 PR is merged.
 
+## Linting
+
+CI runs a blocking `ruff check` (the `lint` job) — the audit half of the
+suite's make/audit pattern. Config lives in `ruff.toml`. Before opening a PR:
+
+```bash
+ruff check .            # audit — must be clean (CI blocks otherwise)
+ruff check --fix .      # make — apply the auto-fixable subset
+```
+
+Two gotchas the config already handles: `E741` (`l`) is allowed because it is
+the OKLab *lightness* channel in the colour math, and helper functions that a
+script re-exports for its tests use the `name as name` form so `--fix` never
+deletes a live re-export — keep that form when adding one.
+
 ## Conventions
 
 - **No emojis in shipped files** (SKILL.md, references, scripts). The

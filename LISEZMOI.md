@@ -108,7 +108,8 @@ Ce **n'est pas** le bon choix pour :
 Pour les alternatives par catégorie et l'aide à la décision « est-ce
 que `front` est le bon outil ? », voir [LANDSCAPE.md](LANDSCAPE.md).
 Pour des sites réels déjà livrés sur cette pile, voir
-[GALLERY.md](GALLERY.md).
+[GALLERY.md](GALLERY.md). Pour des recettes copier-coller par skill
+(avec la sortie attendue), voir [`EXAMPLES.md`](EXAMPLES.md).
 
 ## Ce que les skills garantissent
 

@@ -47,6 +47,22 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [Unreleased]
+
+Documentation + tooling. No on-disk skill layout change; not yet tagged.
+
+- **`EXAMPLES.md`** at the repository root — a runnable cookbook, one recipe
+  per skill (deterministic 🟢 vs local-AI 🤖) anchored on `tests/fixtures/`,
+  each showing expected output. Linked from `README.md` and `LISEZMOI.md`.
+- **`ruff` lint gate** (CODING_ALL.md rule 3, lint half) — a pinned `ruff.toml`
+  plus a blocking `ruff check` CI job (`lint`), following the suite's own
+  make/audit pattern (audit = `ruff check`; make = `ruff check --fix`). Implicit
+  re-exports now use the PEP 484 `name as name` form; ~18 genuinely-unused
+  imports removed; 5 undefined-name (F821) typing defects fixed.
+- **`GALLERY.md`** — three real adoption entries (roitelet, intentions, sql),
+  each with a project logo, joining md2star. All are projects the maintainer
+  ships with the `front-*` skills.
+
 ## [0.17.0] — 2026-07-07 — `front-audio` captions on `vocal-helper` + pinned helper releases
 
 Minor release. The `front-audio` captions tier now delegates speech-to-text
