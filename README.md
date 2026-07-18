@@ -87,7 +87,8 @@ This is **not** the right pick for:
 
 For alternatives in every category — and how to decide whether `front`
 is the right pick — see [LANDSCAPE.md](LANDSCAPE.md). For real sites
-already shipped on the stack, see [GALLERY.md](GALLERY.md).
+already shipped on the stack, see [GALLERY.md](GALLERY.md). For copy-paste
+recipes per skill (with expected output), see [`EXAMPLES.md`](EXAMPLES.md).
 
 ## What the skills enforce
 
