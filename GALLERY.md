@@ -156,9 +156,3 @@ full `dark:` peer set.
 | ![sql — light](assets/gallery/sql/light.png) | ![sql — dark](assets/gallery/sql/dark.png) |
 
 **Author:** [Warith Harchaoui](https://linkedin.com/in/warith-harchaoui)  ·  **Stack:** Python (FastAPI) + vanilla JS + Tailwind (vendored) + Vega-Lite + local Ollama (qwen2.5-coder / Gemma) + SQLite
-
-
-
-## Adding to the gallery
-
-The gallery is part of the repo on purpose — entries land via pull request, get reviewed like code, and ship with the next release. There is no separate showcase site or CMS to log into.
