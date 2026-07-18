@@ -458,19 +458,17 @@ def apply_pronunciation(
 
 #: System prompt for the Ollama emotion classifier. Returns strict JSON
 #: per segment; the orchestrator validates and clamps the result before
-#: it reaches the engine.
-LLM_SYSTEM_PROMPT: str = (
-    "You are a narration coach annotating one prose segment at a time "
-    "for a text-to-speech engine. Reply with ONE JSON object and "
-    "nothing else. Keys: emotion (one of: neutral, cheerful, sad, "
-    "cautious, enthusiastic, contemplative, warm, calm, angry, "
-    "whispering, friendly), intensity (0.0-1.0 float), pace (slow, "
-    "normal, fast), pause_before_ms (int 0-3000), pause_after_ms (int "
-    "0-3000), emphasis_word (single word from the segment, or empty "
-    "string). Base your decisions on the segment text and the optional "
-    "preceding/following segments. Never invent content; describe how "
-    "to read what is there."
-)
+#: it reaches the engine. Loaded from prompts/narration_emotion.yaml, NOT
+#: inlined — LLM prompts, like GUI strings, live in a YAML catalog per the
+#: front-* i18n rule (see front-ui/scripts/audit_i18n.py, rule I18N002).
+import sys as _sys  # noqa: E402
+
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _prompts import load_prompt as _load_prompt  # noqa: E402
+
+LLM_SYSTEM_PROMPT: str = _load_prompt(
+    "narration_emotion", prompts_dir=Path(__file__).resolve().parent / "prompts"
+)["system"]
 
 
 def _clamp(value: Any, lo: float, hi: float, fallback: float) -> float:

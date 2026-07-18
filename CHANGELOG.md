@@ -57,6 +57,25 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.20.0] — 2026-07-18 — unified i18n make + audit (`locales/i18n.yaml`)
+
+New **front-ui** capability, built to the make/audit paradigm: translatable
+strings — GUI labels **and** LLM prompts — live in one per-project catalog,
+`locales/i18n.yaml`, never in JS or inlined in Python.
+
+- **make** — `front-ui/scripts/i18n_make.py` scaffolds `locales/i18n.yaml`
+  (`gui:` + `prompts:` namespaces), compiles it to `locales/i18n.json` (the
+  browser can't read YAML), and emits `locales/i18n.js`, a framework-free
+  loader with `initI18n()` + `t(id)`.
+- **audit** — `front-ui/scripts/audit_i18n.py` flags **I18N001** (a translation
+  dict embedded in JS/HTML) and **I18N002** (an LLM prompt inlined in Python),
+  JSON + exit codes, wired as the `front-ui-i18n-audit` pre-commit hook.
+- **Dogfood** — the repo now passes its own i18n audit: the narration-emotion
+  Ollama system prompt moved from an inline `_narrate.py` constant to
+  `front-publish/scripts/prompts/narration_emotion.yaml`, loaded via `_prompts`.
+- Description triggers gain `i18n to YAML` / `audit i18n`; 14 new tests;
+  `TRIGGERS.md` regenerated.
+
 ## [0.19.0] — 2026-07-18 — exhaustive trigger phrases + version sync
 
 Improves **skill activation** (Claude Code + OpenCode) and fixes a version drift.

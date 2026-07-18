@@ -43,6 +43,9 @@ SCRIPTS = [
     REPO_ROOT / "front-cli-gui" / "scripts" / "cli_to_gui.py",
     # front-ux-laws
     REPO_ROOT / "front-ux-laws" / "scripts" / "audit_laws_of_ux.py",
+    # front-ui
+    REPO_ROOT / "front-ui"      / "scripts" / "audit_i18n.py",
+    REPO_ROOT / "front-ui"      / "scripts" / "i18n_make.py",
 ]
 
 

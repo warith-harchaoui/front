@@ -238,6 +238,22 @@ Validate that a skill folder is spec-compliant (used in CI via
 python3 front-ui/scripts/validate.py front-ui
 ```
 
+**i18n — one `locales/i18n.yaml` for GUI strings AND prompts** (make + audit):
+
+```bash
+# make: scaffold locales/i18n.yaml (gui: + prompts:), compile to i18n.json,
+# emit the vanilla-JS loader (initI18n / t)
+python3 front-ui/scripts/i18n_make.py --dir .
+# -> created ./locales/i18n.yaml  |  compiled ./locales/i18n.json  |  emitted ./locales/i18n.js
+
+# audit: flag translations embedded in JS/HTML (I18N001) or prompts inlined
+# in Python (I18N002) — they belong in the catalog. 0 = clean, 1 = findings.
+python3 front-ui/scripts/audit_i18n.py src/
+```
+
+In the browser: `import { initI18n, t } from "./locales/i18n.js";
+await initI18n(); el.textContent = t("action.save");`.
+
 ---
 
 ## Running the whole audit sweep

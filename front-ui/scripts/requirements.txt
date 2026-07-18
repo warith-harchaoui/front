@@ -9,6 +9,11 @@
 #     lint_a11y.py           — static accessibility linter
 #     audit_contrast.py      — WCAG contrast audit
 #     site_indexes.py        — robots / sitemap / llms.txt / Atom / humans
+#     audit_i18n.py          — i18n-in-code audit (JS translation dicts + inline prompts)
+#
+#   PyYAML (pip install PyYAML)
+#     i18n_make.py           — scaffold/compile locales/i18n.yaml + JS loader
+#     validate.py            — (also reads SKILL.md YAML)
 #
 #   pip install -r requirements-favicons.txt
 #     favicons.py            — favicon / PWA icon set generator

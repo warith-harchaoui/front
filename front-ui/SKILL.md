@@ -11,10 +11,10 @@ description: >-
   a component", "design a page", "make a form / modal / button / nav",
   "scaffold a landing", "build a web app", "audit this UI", "dark mode
   toggle", "responsive layout", "dashboard / data table", "settings page",
-  "empty state / skeleton". Companion skills: front-cli-gui (wrap a CLI in a
-  GUI), front-publish (Markdown → website + meta tags + favicons),
-  front-accessibility (a11y lint), front-colors (contrast audit, CVD),
-  front-vision (alt text), front-audio (captions).
+  "empty state / skeleton", "i18n to YAML", "audit i18n". Companion skills:
+  front-cli-gui (wrap a CLI in a GUI), front-publish (Markdown → website +
+  meta tags + favicons), front-accessibility (a11y lint), front-colors
+  (contrast audit, CVD), front-vision (alt text), front-audio (captions).
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. No Python runtime required to use
@@ -23,7 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.19.0
+  version: 0.20.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -69,11 +69,29 @@ This skill ships both halves of the front-* loop:
 
 | Mode | Tool | Purpose |
 |---|---|---|
-| **Make** — generate UI | `references/` + `assets/components/*.html` + `assets/starter-page.html` + `assets/fonts/` | Generation playbook: token map, decision tree below, copy-and-adapt component shapes, three-Roboto webfonts. |
-| **Audit** — gate before ship | `scripts/validate.py` + `references/checklist.md` + `references/anti-patterns.md` + `references/ergonomics-criteria.md` | Skill-spec validator (stdlib only); pre-ship quality gate; eight-criteria ergonomic review; anti-pattern refusal list. |
+| **Make** — generate UI | `references/` + `assets/components/*.html` + `assets/starter-page.html` + `assets/fonts/` + `scripts/i18n_make.py` | Generation playbook: token map, decision tree below, copy-and-adapt component shapes, three-Roboto webfonts. `i18n_make.py` scaffolds + compiles `locales/i18n.yaml` (GUI strings **and** prompts) and emits a vanilla-JS loader. |
+| **Audit** — gate before ship | `scripts/validate.py` + `scripts/audit_i18n.py` + `references/checklist.md` + `references/anti-patterns.md` + `references/ergonomics-criteria.md` | Skill-spec validator (stdlib only); pre-ship quality gate; eight-criteria ergonomic review; anti-pattern refusal list. `audit_i18n.py` flags GUI translations embedded in JS/HTML and LLM prompts inlined in Python (they belong in `locales/i18n.yaml`). |
 
 Pair with `front-ux-laws` for canonical-law audits and `front-colors`
 for contrast / CVD audits on the emitted output.
+
+### i18n — one `locales/i18n.yaml` for GUI *and* prompts
+
+Translatable strings — GUI labels and LLM prompts — share one concern
+(language), so they share one per-project catalog: **`locales/i18n.yaml`**
+(`gui:` and `prompts:` namespaces, each `message.id → { en: …, fr: … }`).
+Never hardcode a UI string in JavaScript, never inline a prompt in Python.
+
+```bash
+# make: scaffold locales/i18n.yaml, compile to locales/i18n.json, emit i18n.js
+python scripts/i18n_make.py --dir .
+# audit: flag any string/prompt living in code instead of the catalog
+python scripts/audit_i18n.py src/          # I18N001 (JS dict) / I18N002 (py prompt)
+```
+
+In the browser: `import { initI18n, t } from "./locales/i18n.js"; await
+initI18n(); el.textContent = t("action.save");`. In Python, load prompts from
+the catalog (as the other skills load `prompts/*.yaml` via `_prompts`).
 
 ## Hard rules
 

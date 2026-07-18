@@ -22,7 +22,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.19.0
+  version: 0.20.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

@@ -18,6 +18,8 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `dashboard / data table` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
 | `settings page` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
 | `empty state / skeleton` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
+| `i18n to YAML` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
+| `audit i18n` | **front-ui** — Generates vanilla JS + Tailwind UI (components, pages, dataviz, audit). | Stable |
 | `wrap this CLI in a GUI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `build a UI for my CLI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `argparse to GUI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
