@@ -9,7 +9,7 @@
 ## What this is
 
 `front` made of several **Claude / OpenCode skills** with a curated design
-system for a frontend stack voering a large spectrum from choice of colors to accessibility, UX, audio, vision, CLI to GUI etc. 
+system for a frontend stack voering a large spectrum from choice of colors to accessibility, UX, audio, vision, CLI to GUI etc.
 
 The skills:
 
@@ -523,7 +523,7 @@ Color palettes from <https://harchaoui.org/warith/colors/>.
 
 The three Roboto families are bundled in `front-ui/assets/fonts/roboto/`, `front-ui/assets/fonts/roboto-serif/`, and `front-ui/assets/fonts/roboto-mono/`, each under the SIL Open Font License — see the bundled `OFL.txt` in each folder.
 
-We also drew on the [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/), [Google Material Design](https://material.io/design) and [Laws of UX](https://lawsofux.com/) 
+We also drew on the [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/), [Google Material Design](https://material.io/design) and [Laws of UX](https://lawsofux.com/)
 
 ## License
 
