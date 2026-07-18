@@ -155,7 +155,7 @@ def require_model(ollama_available: dict) -> Callable[[str], None]:
     Return a callable that skips the test when the named model is not pulled.
 
     The check is forgiving: we match any tag whose name *starts with* the
-    requested base (so ``llava`` matches ``llava:7b`` and ``llava-mlx:7b``).
+    requested base (so ``gemma3`` matches ``gemma3:4b``).
     Pass the bare base — the test should not care about the size/variant
     suffix.
     """

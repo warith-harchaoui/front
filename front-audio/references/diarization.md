@@ -42,11 +42,11 @@ transcript-based LLM pass) to the caption stream.
 | **Sortformer** — end-to-end diarization transformer | "who spoke when" for up to 4 concurrent speakers | `nvidia/diar_sortformer_4spk-v1` |
 | **TitaNet-Large** — 192-D speaker-verification embeddings | "who is who" by matching against reference clips | `nvidia/speakerverification_en_titanet_large` |
 | **whisper.cpp** (via vocal-helper → pywhispercpp) | captions / transcript | `ggml-large-v3-turbo` |
-| **Gemma 3** (via Ollama, optional) | name inference from transcript | `gemma3:e4b` (`-mlx` on Apple silicon) |
+| **Gemma 3** (via Ollama, optional) | name inference from transcript | `gemma3:4b` |
 
 Override any model with `--model` or the matching env var:
 `NEMO_DIAR_MODEL`, `NEMO_TITANET_MODEL`, `FRONT_WHISPER_MODEL`,
-`OLLAMA_MODEL_BASE`.
+`OLLAMA_MODEL` (the one model is `gemma3:4b`).
 
 ## Install
 

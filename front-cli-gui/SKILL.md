@@ -2,16 +2,16 @@
 name: front-cli-gui
 description: >-
   Wrap an existing command-line tool in a single-page vanilla-JavaScript +
-  Tailwind GUI. Reads the CLI's argument parser (argparse, click, clap,
-  commander, cobra), maps sub-commands and flags to forms / segmented controls
-  / file inputs / streaming log panels, and emits one index.html + app.js +
-  Tailwind config. For solo developers and small teams (Python / Node / Go /
-  Rust CLI authors, ML researchers, data scientists, DevOps / SRE) who need a
-  usable web UI without picking up React or learning Gradio's / Streamlit's
-  look. Trigger phrases: "wrap this CLI in a GUI", "build a UI for my CLI",
-  "argparse to GUI", "click to web UI", "GUI for my Python script", "wrap my
-  command-line tool", "web form for my script", "Typer / clap / cobra to GUI",
-  "GUI for my Go or Rust CLI", "frontend for a CLI". Output follows the
+  Tailwind GUI. Trigger phrases: "wrap this CLI in a GUI", "build a UI for my
+  CLI", "argparse to GUI", "click to web UI", "GUI for my Python script",
+  "wrap my command-line tool", "web form for my script", "Typer / clap / cobra
+  to GUI", "GUI for my Go or Rust CLI", "frontend for a CLI". Reads the CLI's
+  argument parser (argparse, click, clap, commander, cobra), maps sub-commands
+  and flags to forms / segmented controls / file inputs / streaming log
+  panels, and emits one index.html + app.js + Tailwind config. For solo
+  developers and small teams (Python / Node / Go / Rust CLI authors, ML
+  researchers, data scientists, DevOps / SRE) who need a usable web UI without
+  picking up React or learning Gradio's / Streamlit's look. Output follows the
   front-ui stack rules — install front-ui alongside for full design tokens.
 license: BSD-3-Clause
 compatibility: >-
@@ -22,7 +22,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.20.0
+  version: 0.21.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 

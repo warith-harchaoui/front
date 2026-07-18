@@ -57,7 +57,7 @@ Notes
 -----
 * Requires Python 3.9+, ``requests``. No Pillow dependency.
 * Default model and endpoint are inherited from :mod:`alt_from_ollama`
-  (``OLLAMA_URL``, ``OLLAMA_MODEL``, ``OLLAMA_MODEL_BASE``).
+  (``OLLAMA_URL``, ``OLLAMA_MODEL`` — the one model is gemma3:4b).
 * On-disk cache lives under ``~/.cache/front-skill/meta/`` by default.
   Override with ``FRONT_CACHE_DIR``; disable with ``FRONT_NO_CACHE=1`` or
   ``--no-cache``.
@@ -158,7 +158,7 @@ def _cache_key(goal: str, page_text: str, site_name: str, lang: str, model: str)
     lang : str
         Two-letter language code.
     model : str
-        Ollama model tag, e.g. ``gemma4:e4b-mlx``.
+        Ollama model tag, e.g. ``gemma3:4b``.
 
     Returns
     -------

@@ -81,21 +81,17 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `color-blind safe` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `protanopia / tritanopia` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
 | `generate palette` | **front-colors** — WCAG contrast audit + CVD simulation + curated palette + Tailwind config emitter. | Stable |
-| `alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `alt text for this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `describe this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `draft alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `image description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `img has no alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `decorative image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `functional image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `figure / chart description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `accessible images` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `batch alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma4:e4b). | Stable |
-| `who spoke when` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
-| `who is who` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
-| `I'm Alice` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
-| `Hey Mary, ...` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
+| `alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `alt text for this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `describe this image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `draft alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `image description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `img has no alt` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `decorative image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `functional image` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `figure / chart description` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `accessible images` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
+| `batch alt text` | **front-vision** — Drafts W3C-compliant alt text via local Ollama vision (gemma3:4b). | Stable |
 | `captions` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `transcribe video` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `transcribe audio` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
@@ -105,6 +101,7 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `VTT` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `caption track` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `diarization` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
+| `who spoke when` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `speaker labels` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `Sortformer` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `TitaNet` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
@@ -112,6 +109,9 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `name the speakers` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `speaker VTT` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `subtitles` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
+| `who is who` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
+| `I'm Alice` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
+| `Hey Mary, ...` | **front-audio** — Drafts WebVTT / SRT captions via whisper.cpp, adds speaker diarization (NeMo Sortformer), speaker ID (TitaNet or transcript-based rule + local Ollama), and speaker-labelled VTT. | Stable — WiP: caption WER baselines |
 | `design this screen using Hick / Fitts / Miller` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `what does Peak-End say here` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `is this onboarding fighting the Paradox of the Active User` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |

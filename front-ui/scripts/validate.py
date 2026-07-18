@@ -135,8 +135,8 @@ def _is_user_facing_doc(path: Path, line: str) -> bool:
 
     A handful of files legitimately mention platform names because they
     describe install steps that require them (the local Ollama alt-text
-    helper, for instance, has an MLX-on-Darwin-arm64 code path). Those are
-    exempt. So is the Material Design reference, which compares Material
+    helper, for instance, documents brew / winget / apt install steps).
+    Those are exempt. So is the Material Design reference, which compares Material
     tokens to the skill's tokens.
 
     Parameters

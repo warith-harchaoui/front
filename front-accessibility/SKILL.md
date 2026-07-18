@@ -21,7 +21,7 @@ compatibility: >-
   Python 3.9+ stdlib only — no third-party deps, no browser, no network.
 metadata:
   author: Warith Harchaoui
-  version: 0.20.0
+  version: 0.21.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -168,7 +168,7 @@ project-wide language switch stays consistent. See
 | You also need… | Install |
 |---|---|
 | WCAG contrast audit, CVD simulation, curated palette, perceptual lighten / darken | ``front-colors`` |
-| W3C alt text via local Ollama vision (``gemma4:e4b`` / ``-mlx`` on Apple silicon) | ``front-vision`` |
+| W3C alt text via local Ollama vision (``gemma3:4b``) | ``front-vision`` |
 | Local WebVTT / SRT captions via whisper.cpp | ``front-audio`` |
 | Vanilla-JS + Tailwind UI generation | ``front-ui`` |
 | Wrap a CLI in a GUI | ``front-cli-gui`` |

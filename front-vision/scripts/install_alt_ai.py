@@ -21,11 +21,10 @@ The script:
 
 3. Pulls the vision model used by :mod:`alt_from_ollama`:
 
-   * Default tag: ``gemma4:e4b``.
-   * On MLX-capable hardware (Darwin + arm64/aarch64), the ``-mlx``
-     variant is selected automatically.
-   * Override the tag with ``OLLAMA_MODEL=<tag>`` or change the base
-     with ``OLLAMA_MODEL_BASE=<base>`` before running.
+   * Default tag: ``gemma3:4b`` — multimodal (vision + text) and in the
+     public Ollama registry, so ``ollama pull`` works on any box.
+   * This is the only authorized model; ``OLLAMA_MODEL`` remains a bare
+     escape hatch for tests.
 
 Usage
 -----
@@ -37,8 +36,6 @@ Usage
     # Re-run is idempotent: no-ops when Ollama and the model are present
     python install_alt_ai.py
 
-    # Override to a different on-device vision model
-    OLLAMA_MODEL=gemma3n:e2b python install_alt_ai.py
 
 After this finishes:
 
@@ -80,22 +77,19 @@ import click
 
 # ── Module-level configuration ────────────────────────────────────────────────
 
-#: Base model tag. The ``-mlx`` suffix is appended at runtime on MLX-capable
-#: hardware. Override with the ``OLLAMA_MODEL_BASE`` env var.
-BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e4b")
+#: The one authorized model: ``gemma3:4b`` — multimodal (vision + text),
+#: served through Ollama, in the public registry so ``ollama pull`` works on
+#: any box. This is the ONLY LLM the front skills use; no other tag, no MLX.
+#: (``OLLAMA_MODEL`` remains a bare escape hatch for tests.)
+BASE: str = "gemma3:4b"
 
 
 # ── Hardware / model picking ────────────────────────────────────────────────
 
 def pick_model() -> str:
     """
-    Pick the model tag for the current hardware.
-
-    Resolution order:
-
-    1. ``OLLAMA_MODEL`` env var (explicit override, e.g. for testing).
-    2. ``<BASE>-mlx`` on Darwin + arm64/aarch64 (Apple-Silicon-class).
-    3. ``<BASE>`` everywhere else.
+    Return the model tag: the bare ``OLLAMA_MODEL`` test hook, else ``BASE``
+    (``gemma3:4b`` — the one authorized model).
 
     Returns
     -------
@@ -104,11 +98,7 @@ def pick_model() -> str:
     """
     if model := os.environ.get("OLLAMA_MODEL"):
         return model
-    mlx_capable: bool = (
-        platform.system() == "Darwin"
-        and platform.machine() in {"arm64", "aarch64"}
-    )
-    return f"{BASE}-mlx" if mlx_capable else BASE
+    return BASE
 
 
 # ── Tiny subprocess helpers ────────────────────────────────────────────────
@@ -273,7 +263,7 @@ def pull_model(tag: str) -> None:
     Parameters
     ----------
     tag : str
-        Ollama model tag (e.g. ``gemma4:e4b`` or ``gemma4:e4b-mlx``).
+        Ollama model tag (``gemma3:4b``).
 
     Raises
     ------
@@ -298,21 +288,16 @@ def pull_model(tag: str) -> None:
     if proc.returncode == 0:
         return
 
-    # Fail loudly rather than silently downgrade. The maintainer's
-    # canonical default is ``gemma4:e4b`` (with the ``-mlx`` Apple-
-    # Silicon variant); when the registry does not have a given tag,
-    # the user is expected to ``ollama pull`` it themselves rather
-    # than have us pick a different model on their behalf. An
-    # auto-fallback to the non-MLX variant would change perf
-    # characteristics under the user's nose, which is worse than a
-    # clear error.
+    # Fail loudly rather than silently downgrade. The default is the
+    # registry-standard ``gemma3:4b``; when the registry does not have a
+    # given (overridden) tag, the user is expected to ``ollama pull`` it
+    # themselves rather than have us pick a different model on their
+    # behalf — auto-swapping the model would change output quality under
+    # the user's nose, which is worse than a clear error.
     sys.stderr.write(
         f"\nCould not pull `{tag}`. Check your network connection and the model tag.\n"
-        "If the tag is not on the Ollama registry yet, pull it yourself once:\n"
+        "Pull it once, then re-run:\n"
         f"    ollama pull {tag}\n"
-        "To try a different on-device vision model, set OLLAMA_MODEL and re-run, e.g.:\n"
-        "    OLLAMA_MODEL=llava:7b python scripts/install_alt_ai.py\n"
-        "Browse tags at https://ollama.com/library\n"
     )
     sys.exit(1)
 
@@ -325,17 +310,13 @@ def pull_model(tag: str) -> None:
     help=(
         "Install Ollama (Homebrew / official installer / winget), start its "
         "daemon, and pull the vision model used by `front a11y alt`.\n\n"
-        "Environment variables (override before running):\n"
-        "  OLLAMA_MODEL       Exact model tag to pull (wins outright).\n"
-        "  OLLAMA_MODEL_BASE  Base tag; '-mlx' is auto-appended on Apple Silicon.\n"
-        "                     Default: gemma4:e4b.\n"
-        "  OLLAMA_URL         Daemon endpoint (default: http://localhost:11434)."
+        "The one authorized model is gemma3:4b (via Ollama). Env vars:\n"
+        "  OLLAMA_MODEL  Bare escape hatch for tests (default: gemma3:4b).\n"
+        "  OLLAMA_URL    Daemon endpoint (default: http://localhost:11434)."
     ),
     epilog=(
-        "Examples:\n"
+        "Example:\n"
         "  front-accessibility-install-alt-ai\n"
-        "  front-accessibility-install-alt-ai --model gemma3n:e2b\n"
-        "  OLLAMA_MODEL_BASE=llava python install_alt_ai.py\n"
     ),
 )
 @click.option(
@@ -343,8 +324,8 @@ def pull_model(tag: str) -> None:
     "model_override",
     default=None,
     help=(
-        "Ollama model tag to pull. Overrides OLLAMA_MODEL and the platform "
-        "auto-detection (Apple-Silicon '-mlx' suffix)."
+        "Ollama model tag to pull (bare test hook; the one authorized "
+        "model is gemma3:4b)."
     ),
 )
 def _cli(model_override: Optional[str]) -> int:

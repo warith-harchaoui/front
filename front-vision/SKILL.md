@@ -5,16 +5,15 @@ description: >-
   decision tree for informative / decorative / functional / text / complex /
   group purposes, bilingual output (EN/FR default, configurable), surrounding-
   text and project-vocabulary biasing, deterministic on-disk cache so the same
-  image + parameters never hit the model twice. Default model is
-  ``gemma4:e4b`` (the ``-mlx`` variant is auto-selected on Apple-silicon
-  Macs); override with ``OLLAMA_MODEL`` / ``--model``. For solo developers and
-  small teams who want accessibility content drafted locally with no SaaS cost
-  or data exfiltration. Drafts are starting points — verify before committing.
-  Trigger phrases: "alt text", "alt text for this image", "describe this
-  image", "draft alt", "image description", "img has no alt", "decorative
-  image", "functional image", "figure / chart description", "accessible
-  images", "batch alt text". Output is plain text / JSON on stdout suitable
-  for pre-commit and CI.
+  image + parameters never hit the model twice. Default model is ``gemma3:4b``
+  (registry-standard, multimodal); override with ``OLLAMA_MODEL`` /
+  ``--model``. For solo developers and small teams who want accessibility
+  content drafted locally with no SaaS cost or data exfiltration. Drafts are
+  starting points — verify before committing. Trigger phrases: "alt text",
+  "alt text for this image", "describe this image", "draft alt", "image
+  description", "img has no alt", "decorative image", "functional image",
+  "figure / chart description", "accessible images", "batch alt text". Output
+  is plain text / JSON on stdout suitable for pre-commit and CI.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
@@ -25,7 +24,7 @@ compatibility: >-
   first run.
 metadata:
   author: Warith Harchaoui
-  version: 0.20.0
+  version: 0.21.0
   lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
 ---
 
@@ -38,7 +37,7 @@ Solo developers and small teams who:
 - Need **W3C-compliant alt text** drafted from images at commit time, not
   at runtime via a hosted service.
 - Want **local-first AI** — no SaaS, no data exfiltration, no per-image
-  cost. Apple-silicon Macs get the MLX variant automatically.
+  cost. Runs on any box through Ollama.
 - Want **bilingual output** (EN/FR by default; pair configurable via
   ``lang_pair``) without spelling out the language flag every time.
 - Want **vocabulary biasing** so the model knows your product / brand /
@@ -56,7 +55,7 @@ This skill is **make-only** in the front-* duality — by design:
 
 | Mode | Tool | Purpose |
 |---|---|---|
-| **Make** — draft accessible image text | `scripts/alt_from_ollama.py` + `scripts/install_alt_ai.py` | W3C-compliant alt text via local Ollama vision (default `gemma4:e4b`, `-mlx` auto-selected on Apple silicon). Per-purpose decision tree, surrounding-text + vocabulary biasing, on-disk cache. |
+| **Make** — draft accessible image text | `scripts/alt_from_ollama.py` + `scripts/install_alt_ai.py` | W3C-compliant alt text via local Ollama vision (default `gemma3:4b`; override via OLLAMA_MODEL / --model). Per-purpose decision tree, surrounding-text + vocabulary biasing, on-disk cache. |
 | **Audit** — gate the presence of `alt=` | _(see `front-accessibility/scripts/lint_a11y.py`)_ | Static lint catches `<img>` without `alt` and `<img alt="">` on non-decorative images. |
 
 Pair with `front-accessibility` to close the loop: this skill drafts
@@ -74,7 +73,7 @@ the text; the a11y lint verifies it lands on every `<img>`.
 | Trigger | Tool | Run |
 |---|---|---|
 | "alt text" / `<img>` with no `alt` / "describe this image" | `alt_from_ollama.py` | Match W3C image-purpose decision tree → `python scripts/alt_from_ollama.py [--kind informative\|decorative\|functional\|text\|complex\|group] [--lang fr] [--in DOC] [--vocab-from DIR] <src>`. Tag drafts with `data-alt-source="ai"`. |
-| "Ollama not installed" / "first-time setup" | `install_alt_ai.py` | `python scripts/install_alt_ai.py` — installs the daemon, pulls `gemma4:e4b` (or `gemma4:e4b-mlx` on Apple silicon). |
+| "Ollama not installed" / "first-time setup" | `install_alt_ai.py` | `python scripts/install_alt_ai.py` — installs the daemon, pulls `gemma3:4b`. |
 
 ## W3C image-purpose mapping
 
@@ -90,21 +89,12 @@ the text; the a11y lint verifies it lands on every `<img>`.
 When the caller does not pass ``--kind``, the script falls back to
 ``informative`` — the safest non-zero default for a random ``<img>``.
 
-## Model defaults and MLX selection
+## Model
 
-The default base model is **``gemma4:e4b``** — a 4B-parameter vision
-model with the right size / quality tradeoff for local first-pass alt
-drafting. On Apple-silicon Macs (Darwin + arm64), the
-``-mlx`` suffix is appended automatically (``gemma4:e4b-mlx``); both
-tags are visible to Ollama as separate, independently pulled tags.
-
-Override paths, in order of precedence:
-
-1. ``--model <tag>`` on the command line.
-2. ``OLLAMA_MODEL=<tag>`` env var (full tag, including any ``-mlx``).
-3. ``OLLAMA_MODEL_BASE=<base>`` env var (skill appends the ``-mlx``
-   suffix on MLX-capable hardware).
-4. The built-in default above.
+The one authorized model is **``gemma3:4b``** — a 4B-parameter multimodal
+model served through Ollama, in the public registry so ``ollama pull``
+works on any box. No other model, no MLX. (``OLLAMA_MODEL`` / ``--model``
+remain as a bare escape hatch for testing.)
 
 The endpoint defaults to ``http://localhost:11434`` and can be
 overridden with ``OLLAMA_URL``.
@@ -182,7 +172,7 @@ first entry → langdetect on available text → POSIX locale fallback.
 | Script | Install | Purpose |
 |---|---|---|
 | ``scripts/alt_from_ollama.py`` | ``pip install -r scripts/requirements-alt-text.txt`` + Ollama | W3C-compliant alt text via local vision model. |
-| ``scripts/install_alt_ai.py`` | stdlib only (shells out to brew / winget / official installer) | Installs Ollama + pulls the default vision model (``gemma4:e4b`` / ``gemma4:e4b-mlx`` on MLX-capable hardware). |
+| ``scripts/install_alt_ai.py`` | stdlib only (shells out to brew / winget / official installer) | Installs Ollama + pulls the default vision model (``gemma3:4b``). |
 | ``scripts/prompts/*.yaml`` | (data) | Per-purpose prompt templates (short / long × informative / functional / text / complex / group). |
 | ``scripts/_argparse.py``, ``scripts/_click.py``, ``scripts/_lang.py``, ``scripts/_prompts.py``, ``scripts/_vocab.py`` | (internal helpers) | Argparse / Click factory, language detection, YAML prompt loader, project-vocab biasing. Duplicated per-skill so each skill stays self-contained. |
 

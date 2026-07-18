@@ -163,7 +163,7 @@ def vision() -> None:
 
 
 @vision.command(name="alt", context_settings=CONTEXT_SETTINGS, add_help_option=False,
-                help="W3C-compliant alt text via a local Ollama vision model (default: gemma4:e4b, MLX variant on Apple silicon).")
+                help="W3C-compliant alt text via a local Ollama vision model (gemma3:4b).")
 @click.pass_context
 def vision_alt(ctx: click.Context) -> None:
     sys.exit(_run_script("front-vision", "alt_from_ollama.py", tuple(ctx.args)))

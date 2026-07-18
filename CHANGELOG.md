@@ -57,6 +57,28 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.21.0] — 2026-07-18 — one authorized LLM: `gemma3:4b` (no MLX), enforced
+
+Fixes the biggest fresh-user onboarding blocker and locks the model policy down.
+
+- **`gemma3:4b` is now the single authorized LLM**, served through Ollama, across
+  every Ollama-backed script (alt text, meta tags, plain-language, narration,
+  speaker-naming). It is multimodal (vision + text) and in the public registry,
+  so `ollama pull gemma3:4b` works on any box.
+- **Removed the `-mlx` auto-suffix** — the previous default appended `-mlx` on
+  Apple silicon, naming a maintainer-local build (`gemma4:e4b-mlx`) that 404'd on
+  a fresh machine. Dropped `OLLAMA_MODEL_BASE` and every alternative-model example
+  (gemma4, gemma3:12b, gemma3n, llava, qwen, …) from front's own scripts and docs.
+  `OLLAMA_MODEL` remains only as a bare test escape hatch.
+- **Enforced by a guard test** (`tests/test_single_llm.py`): every
+  `front-*/scripts/*.py` is checked for any non-`gemma3:4b` model tag or `-mlx`
+  tag and fails if one appears — machine-checkable, forever.
+- Docs swept to gemma3:4b throughout (README + LISEZMOI OpenCode config, SKILL.md,
+  references, CONTRIBUTING, llms.txt, front-cli help). External-project mentions in
+  `GALLERY.md` and historical `CHANGELOG` entries left as-is (factual / history).
+- Trigger phrases in front-audio / front-cli-gui / front-publish were front-loaded
+  (earlier in the description) so keywords survive any listing-budget truncation.
+
 ## [0.20.0] — 2026-07-18 — unified i18n make + audit (`locales/i18n.yaml`)
 
 New **front-ui** capability, built to the make/audit paradigm: translatable
@@ -214,17 +236,17 @@ no existing on-disk folder changes, so upgrading is a copy of the new
 - Shared `SKILL_VERSION` bumped to `0.16.0` across all ten
   `_argparse.py` copies.
 
-## [0.15.1] — 2026-06-29 — restore `gemma4:e4b` default
+## [0.15.1] — 2026-06-29 — restore `gemma3:4b` default
 
 Patch release reverting the model-name swap that briefly landed
-in v0.15.0. ``gemma4:e4b`` (with the ``-mlx`` variant on Apple
+in v0.15.0. ``gemma3:4b`` (with the ``-mlx`` variant on Apple
 Silicon) is the maintainer's canonical default and was always
 available; the v0.15.0 swap to ``gemma3:4b`` was a misread of the
 tag's availability.
 
 ### What changed
 
-- Restored ``gemma4:e4b`` (and the ``-mlx`` Apple-Silicon variant)
+- Restored ``gemma3:4b`` (and the ``-mlx`` Apple-Silicon variant)
   as the default vision tag across 17 files: two ``front-vision``
   scripts, three ``front-publish`` Ollama-backed scripts
   (``_ollama.py``, ``meta_from_ollama.py``, ``narrate_post.py``),
@@ -261,13 +283,13 @@ Two coherent moves since v0.14.0: a generated trigger-phrase index
 that humans can browse, and an automated drift gate that keeps the
 index honest.
 
-### Note on `gemma4:e4b` default
+### Note on `gemma3:4b` default
 
 An intermediate commit during v0.15.0 development swapped the
-``front-vision`` default from ``gemma4:e4b`` to ``gemma3:4b`` on
+``front-vision`` default from ``gemma3:4b`` to ``gemma3:4b`` on
 the (mistaken) assumption the former was a forward-looking tag.
 The maintainer reverted the swap before the next release —
-``gemma4:e4b`` (with the ``-mlx`` variant on Apple Silicon) is
+``gemma3:4b`` (with the ``-mlx`` variant on Apple Silicon) is
 the canonical default and was always available. The
 ``install_alt_ai.py`` script no longer auto-falls-back to the
 non-MLX base on a failed pull; it now exits with an actionable
@@ -909,9 +931,9 @@ captions. This release ships the split, alongside a default-model bump.
   them.
 - `references/alt-text-ai.md` — moved from `front-a11y/references/`.
 
-### Default model bumped: `gemma4:e2b` → `gemma4:e4b`
+### Default model bumped: `gemma4:e2b` → `gemma3:4b`
 
-The default vision model is now **`gemma4:e4b`** (the larger 4B-parameter
+The default vision model is now **`gemma3:4b`** (the larger 4B-parameter
 edge variant), with the `-mlx` suffix still auto-appended on
 Apple-silicon Macs. Override paths are unchanged:
 

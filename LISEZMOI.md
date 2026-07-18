@@ -225,7 +225,7 @@ comme amélioration éditoriale optionnelle, pas exigence WCAG.
 | `front-publish` (site Markdown, meta, favicons, indexes, langage clair, narration audio) | Stable | 11 scripts publics couvrant les quatre artefacts cœur (favicons, meta, indexes, langage clair) + Markdown → HTML + lint Markdown + pipeline narration audio (orchestrateur, wrappers OpenVoice et Chatterbox, sélecteur de voix, installeur). Couverture déterministe large (favicons, site-indexes, meta, langage clair, lint, narration) ; suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
 | `front-accessibility` — lint | Stable (renommé depuis `front-a11y` en 0.9.0) | Lint a11y statique 14 règles, stdlib uniquement. Désormais resserré au lint après les sorties color / vision / audio. |
 | `front-colors` — audit contraste, simulation CVD, palette curatée, éclaircissement / assombrissement perceptuels | Stable (nouveau en 0.7.0) | Correcteur de contraste par voisin OKLCH, matrices CVD de Machado, CSV palette unifiée (base Apple + projections émotion / concept / psychologie), module `_colors` stdlib uniquement, classe `Color`. Sorti de `front-accessibility` pour un périmètre plus clair. |
-| `front-vision` — texte alternatif W3C via vision Ollama locale | Stable (nouveau en 0.8.0) | Modèle par défaut `gemma4:e4b` (variante `-mlx` auto-sélectionnée sur Apple silicon). Arbre de décision par objectif, biais par texte environnant + vocabulaire projet, cache disque. Sorti de `front-accessibility` pour un périmètre plus clair. Éval texte alternatif sur fixtures Wikipedia. |
+| `front-vision` — texte alternatif W3C via vision Ollama locale | Stable (nouveau en 0.8.0) | Modèle `gemma3:4b` via Ollama (le seul LLM autorisé). Arbre de décision par objectif, biais par texte environnant + vocabulaire projet, cache disque. Sorti de `front-accessibility` pour un périmètre plus clair. Éval texte alternatif sur fixtures Wikipedia. |
 | `front-audio` — **sous-titres WebVTT / SRT via whisper.cpp local** | **WiP / TODO** (sorti en 0.9.0) | `captions_from_whisper.py` est fonctionnel ; ce qui manque, ce sont les baselines WER par langue (`en` / `fr` / `es` câblés via l'extracteur, baselines pas encore publiées), le clip utilisateur `vocab-biasing-clip.wav`, et une révision prévue de l'intégration whisper.cpp via `pdbms`. Voir [Roadmap](CHANGELOG.md#roadmap). |
 | `LISEZMOI.md` (README français) | Stable | À parité structurelle avec le README EN — même ordre des sections, contenu maintenu en synchronisation à chaque release. |
 
@@ -410,7 +410,7 @@ utilisable.
 
 L'ajustement avec ce dépôt est direct : **trois skills front-*
 parlent déjà à un daemon Ollama local** pour leurs surfaces IA —
-`front-vision` (alt text, `gemma4:e4b`),
+`front-vision` (alt text, `gemma3:4b`),
 `front-publish/meta_from_ollama.py` (meta de page),
 `front-publish/plain_language.py` (réécriture de copie). Quand vous
 lancez OpenCode contre le même daemon Ollama, toute la boucle —
@@ -419,16 +419,15 @@ local. Zéro appel externe.
 
 ```bash
 # Démarrage rapide. Suppose Ollama + un binaire OpenCode dans le PATH.
-ollama serve &                                # démarrer le daemon
-ollama pull gemma4:e4b-mlx                    # Apple Silicon
-# Linux / Windows : ollama pull gemma4:e4b
+ollama serve &         # démarrer le daemon
+ollama pull gemma3:4b  # le seul modèle — boucle d'agent ET tous les scripts
 ```
 
 Un seul modèle pour toute la pile : il pilote la boucle d'agent
 OpenCode ET sert tous les scripts front-* basés Ollama
 (`alt_from_ollama`, `meta_from_ollama`, `plain_language`,
 `narrate_post`). Même daemon, même tag, même réponse à « quel
-modèle tourne ? » — `gemma4:e4b`.
+modèle tourne ? » — `gemma3:4b`.
 
 #### Câbler OpenCode sur le daemon Ollama local (config unique)
 
@@ -448,8 +447,7 @@ provider `local-ollama` à `~/.config/opencode/opencode.jsonc`
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "gemma4:e4b-mlx":       { "name": "gemma4:e4b-mlx (local)" },
-        "gemma4:e4b":           { "name": "gemma4:e4b (local)" }
+        "gemma3:4b": { "name": "gemma3:4b (local)" }
       }
     }
   }
@@ -466,13 +464,8 @@ OpenCode ne les découvre pas automatiquement.
 Puis lancez OpenCode sur le provider local :
 
 ```bash
-# Apple Silicon — la variante -mlx tourne plus vite :
 opencode run "construis-moi un bouton CTA principal" \
-    -m local-ollama/gemma4:e4b-mlx
-
-# Linux / Windows ou matériel non-MLX :
-opencode run "construis-moi un bouton CTA principal" \
-    -m local-ollama/gemma4:e4b
+    -m local-ollama/gemma3:4b
 
 # → ~/.opencode/skills/front-* se chargent automatiquement.
 # → Les scripts front-vision / front-publish basés Ollama
@@ -480,13 +473,10 @@ opencode run "construis-moi un bouton CTA principal" \
 # → Coût : 0 token ; rien ne quitte la machine.
 ```
 
-Si vous préférez un modèle entraîné pour le code côté agent et
-réservez `gemma4:e4b` aux traitements des scripts, le motif via
-variables d'environnement (documenté plus haut —
-`OLLAMA_MODEL_BASE=gemma4:e4b` pour les scripts,
-`-m local-ollama/qwen2.5-coder:latest` pour l'agent) sépare les
-rôles proprement. Le tableau « Configurer les scripts des skills »
-ci-dessus est la référence.
+Un seul modèle, `gemma3:4b`, sert la boucle d'agent ET tous les
+scripts — même daemon, même tag. `gemma3:4b` est multimodal, donc le
+script de vision (alt text) tourne sur le même modèle que les scripts
+texte. Il n'y a rien d'autre à choisir.
 
 #### Configurer les scripts des skills (même daemon, variables séparées)
 
@@ -499,22 +489,19 @@ doivent pointer sur le même daemon, mais le modèle peut différer :
 | Variable | Lue par | Effet | Défaut |
 |---|---|---|---|
 | `OLLAMA_URL` | tout script basé Ollama | URL du daemon. Doit correspondre à celui d'OpenCode. | `http://localhost:11434` |
-| `OLLAMA_MODEL` | tout script basé Ollama | Tag exact à utiliser (prioritaire sur l'auto-MLX). | _(non défini)_ |
-| `OLLAMA_MODEL_BASE` | `alt_from_ollama.py`, `meta_from_ollama.py`, `narrate_post.py` | Tag de base ; `-mlx` auto-ajouté sur Apple Silicon. | `gemma4:e4b` |
+| `OLLAMA_MODEL` | tout script basé Ollama | Échappatoire nu (surtout pour les tests). Le seul modèle autorisé est `gemma3:4b`. | `gemma3:4b` |
 | `FRONT_LANG_PAIR` | tout script gérant la langue | Première entrée = `--lang` par défaut si pas de flag. | `en,fr` |
-| `OPENCODE_MODEL` | OpenCode lui-même | Tag du modèle côté agent. Indépendant des scripts. | _(défini par OpenCode)_ |
+| `OPENCODE_MODEL` | OpenCode lui-même | Tag du modèle côté agent — mettez `gemma3:4b`. | `gemma3:4b` |
 
-Le motif honnête : gardez `OLLAMA_URL` identique des deux côtés ;
-laissez chaque côté choisir son modèle. L'agent bénéficie d'un
-modèle entraîné pour le code (Qwen 2.5 Coder, DeepSeek-Coder) ; le
-script de vision a besoin d'un multimodal (Gemma 4) ; le
-réécriveur en langage clair fonctionne avec l'un comme l'autre.
+Le motif est volontairement ennuyeux : `gemma3:4b` sur le même
+daemon pour l'agent comme pour les scripts. `gemma3:4b` étant
+multimodal, le script de vision et les scripts texte le partagent —
+pas de jonglage de modèle par préoccupation, pas de MLX.
 
 ```bash
-# Même daemon des deux côtés ; modèle différent par préoccupation.
+# Un daemon, un modèle, pour tout.
 export OLLAMA_URL=http://localhost:11434
-export OPENCODE_MODEL=qwen2.5-coder:7b
-export OLLAMA_MODEL_BASE=gemma4:e4b   # ↰ vision / meta / narration
+export OPENCODE_MODEL=gemma3:4b
 ```
 
 Choisissez OpenCode quand les coûts de tokens comptent, quand le

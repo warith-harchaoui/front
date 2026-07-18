@@ -23,8 +23,8 @@ Guess **who is who** from a speaker-diarized transcript. Two passes:
 2. **LLM pass** — optional; runs only when ``--ollama`` is passed or
    ``OLLAMA_URL`` is reachable. Sends a compact JSON prompt to a local
    Ollama daemon and expects a JSON mapping in return. Same default
-   model / URL as :mod:`alt_from_ollama` (``gemma3:e4b`` +
-   ``http://localhost:11434``); the ``-mlx`` variant is auto-selected
+   model / URL as :mod:`alt_from_ollama` (``gemma3:4b`` +
+   ``http://localhost:11434``); override the model via OLLAMA_MODEL
    on Apple-silicon.
 
 Whichever pass returns the higher-confidence label per speaker wins.
@@ -77,7 +77,7 @@ Usage
     # From an un-merged pair (captions + diarization)
     python name_from_transcript.py interview.vtt \\
         --diarization interview.diarization.json \\
-        --ollama --model gemma3:e4b --out interview.speakers.json
+        --ollama --model gemma3:4b --out interview.speakers.json
 
 Author
 ------
@@ -111,7 +111,8 @@ import click
 DEFAULT_OLLAMA_URL: str = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
 #: Default vision/text-friendly Ollama base tag.
-DEFAULT_OLLAMA_MODEL: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma3:e4b")
+#: The one authorized model: gemma3:4b (via Ollama). No other tag, no MLX.
+DEFAULT_OLLAMA_MODEL: str = "gemma3:4b"
 
 #: Names shorter than this are usually stopwords (Al, Ed, Jo). Not banned
 #: outright — the rule pass just requires stronger evidence.
@@ -296,18 +297,12 @@ def _reachable(url: str) -> bool:
 
 
 def _resolve_ollama_model(base: str) -> str:
-    """Return the model tag to send; auto-append ``-mlx`` on Apple Silicon.
+    """Return the model tag to send: the ``OLLAMA_MODEL`` override, else ``base``.
 
-    Mirrors :func:`alt_from_ollama._resolve_model` so both scripts pick
-    the same weight family when the caller has not overridden.
+    ``base`` defaults to the registry-standard ``gemma3:4b`` (pullable on any
+    box). No ``-mlx`` auto-suffix — that only named a maintainer-local build.
     """
-    import platform
-    override = os.environ.get("OLLAMA_MODEL", "").strip()
-    if override:
-        return override
-    if platform.system() == "Darwin" and platform.machine().startswith("arm"):
-        return f"{base}-mlx"
-    return base
+    return os.environ.get("OLLAMA_MODEL", "").strip() or base
 
 
 def _build_transcript_excerpt(cues: List[Dict[str, Any]], max_cues: int = 120) -> str:
@@ -489,7 +484,7 @@ def _merge(*passes: Dict[str, Tuple[str, float]]) -> Dict[str, str]:
 @click.option("--url", "ollama_url", default=DEFAULT_OLLAMA_URL, show_default=True,
               help="Ollama endpoint URL.")
 @click.option("--model", "ollama_model", default=DEFAULT_OLLAMA_MODEL, show_default=True,
-              help="Ollama base model tag (auto-appends -mlx on Apple Silicon).")
+              help="Ollama base model tag (registry-standard; override via OLLAMA_MODEL).")
 def _cli(
     transcript: Path,
     diarization_path: Optional[Path],

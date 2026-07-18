@@ -73,33 +73,12 @@ class TestPickDefaultModel:
         monkeypatch.setenv("OLLAMA_MODEL", "custom:tag")
         assert alt.pick_default_model() == "custom:tag"
 
-    def test_mlx_suffix_on_darwin_arm64(self, monkeypatch):
+    def test_default_is_registry_base_no_mlx(self, monkeypatch):
+        # gemma3:4b is registry-standard and multimodal; no ``-mlx`` auto-suffix
+        # (that only named a maintainer-local build and 404'd on a fresh box).
+        # Platform-independent now; power users override via OLLAMA_MODEL.
         monkeypatch.delenv("OLLAMA_MODEL", raising=False)
-        monkeypatch.setattr(alt.platform, "system", lambda: "Darwin")
-        monkeypatch.setattr(alt.platform, "machine", lambda: "arm64")
-        # _model_has_vision queries the live Ollama daemon; pin to True so
-        # this test exercises the platform branch, not the daemon state.
-        monkeypatch.setattr(alt, "_model_has_vision", lambda _tag: True)
-        assert alt.pick_default_model().endswith("-mlx")
-
-    def test_mlx_falls_back_when_vision_missing(self, monkeypatch):
-        monkeypatch.delenv("OLLAMA_MODEL", raising=False)
-        monkeypatch.setattr(alt.platform, "system", lambda: "Darwin")
-        monkeypatch.setattr(alt.platform, "machine", lambda: "arm64")
-        # Simulate Ollama 0.30 MLX quantisation without vision capability.
-        monkeypatch.setattr(alt, "_model_has_vision", lambda _tag: False)
         assert alt.pick_default_model() == alt.DEFAULT_BASE
-
-    def test_no_suffix_on_linux_x86(self, monkeypatch):
-        monkeypatch.delenv("OLLAMA_MODEL", raising=False)
-        monkeypatch.setattr(alt.platform, "system", lambda: "Linux")
-        monkeypatch.setattr(alt.platform, "machine", lambda: "x86_64")
-        assert not alt.pick_default_model().endswith("-mlx")
-
-    def test_no_suffix_on_intel_mac(self, monkeypatch):
-        monkeypatch.delenv("OLLAMA_MODEL", raising=False)
-        monkeypatch.setattr(alt.platform, "system", lambda: "Darwin")
-        monkeypatch.setattr(alt.platform, "machine", lambda: "x86_64")
         assert not alt.pick_default_model().endswith("-mlx")
 
 

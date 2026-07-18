@@ -37,16 +37,12 @@ class TestPickModel:
         monkeypatch.setenv("OLLAMA_MODEL", "explicit:tag")
         assert ia.pick_model() == "explicit:tag"
 
-    def test_mlx_suffix_on_darwin_arm64(self, monkeypatch):
+    def test_default_is_registry_base_no_mlx(self, monkeypatch):
+        # No ``-mlx`` auto-suffix on any platform — that only ever named a
+        # maintainer-local build and 404'd on a fresh box. The default is the
+        # registry-standard BASE (gemma3:4b); power users override via OLLAMA_MODEL.
         monkeypatch.delenv("OLLAMA_MODEL", raising=False)
-        monkeypatch.setattr(ia.platform, "system", lambda: "Darwin")
-        monkeypatch.setattr(ia.platform, "machine", lambda: "arm64")
-        assert ia.pick_model().endswith("-mlx")
-
-    def test_no_suffix_on_linux(self, monkeypatch):
-        monkeypatch.delenv("OLLAMA_MODEL", raising=False)
-        monkeypatch.setattr(ia.platform, "system", lambda: "Linux")
-        monkeypatch.setattr(ia.platform, "machine", lambda: "x86_64")
+        assert ia.pick_model() == ia.BASE
         assert not ia.pick_model().endswith("-mlx")
 
 

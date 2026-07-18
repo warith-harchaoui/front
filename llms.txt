@@ -71,7 +71,7 @@ Every shipped skill carries a "Two modes — make and audit" section in its SKIL
 - [front-colors/scripts/simulate_cvd.py](front-colors/scripts/simulate_cvd.py): CVD image transforms.
 - [front-colors/scripts/_colors.py](front-colors/scripts/_colors.py): Shared color primitives (sRGB, WCAG, OKLab/OKLCH, CVD matrices, palette accessors, perceptual lighten/darken).
 - [front-colors/references/palette.csv](front-colors/references/palette.csv): Curated palette — one row per color, semantic projections (Base / Emotion / Concepts / Psychology±) as columns.
-- [front-vision/scripts/alt_from_ollama.py](front-vision/scripts/alt_from_ollama.py): W3C alt text via local Ollama vision (default `gemma4:e4b`, `-mlx` on Apple silicon).
+- [front-vision/scripts/alt_from_ollama.py](front-vision/scripts/alt_from_ollama.py): W3C alt text via local Ollama vision (`gemma3:4b`).
 - [front-vision/scripts/install_alt_ai.py](front-vision/scripts/install_alt_ai.py): Installs Ollama + pulls the vision model.
 - [front-audio/scripts/captions_from_whisper.py](front-audio/scripts/captions_from_whisper.py): WebVTT / SRT captions via pywhispercpp.
 - [front-audio/scripts/install_captions.py](front-audio/scripts/install_captions.py): Installs pywhispercpp + model.

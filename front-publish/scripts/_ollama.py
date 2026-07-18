@@ -12,13 +12,13 @@ from __future__ import annotations
 
 import locale
 import os
-import platform
 from typing import Optional
 
 
 OLLAMA_URL: str = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
-DEFAULT_BASE: str = os.environ.get("OLLAMA_MODEL_BASE", "gemma4:e4b")
+#: The one authorized model: gemma3:4b (via Ollama). No other tag, no MLX.
+DEFAULT_BASE: str = "gemma3:4b"
 
 
 BANNED_PREFIXES: dict[str, tuple[str, ...]] = {
@@ -51,10 +51,8 @@ LANG_INSTRUCTIONS: dict[str, str] = {
 
 def pick_default_model() -> str:
     """Pick the Ollama model tag for the current hardware."""
-    if model := os.environ.get("OLLAMA_MODEL"):
-        return model
-    mlx_capable = platform.system() == "Darwin" and platform.machine() in {"arm64", "aarch64"}
-    return f"{DEFAULT_BASE}-mlx" if mlx_capable else DEFAULT_BASE
+    # OLLAMA_MODEL is a bare escape hatch for tests; else the one authorized model.
+    return os.environ.get("OLLAMA_MODEL") or DEFAULT_BASE
 
 
 def detect_lang() -> str:
