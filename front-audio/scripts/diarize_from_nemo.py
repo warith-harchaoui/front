@@ -81,7 +81,7 @@ import sys
 import tempfile
 from pathlib import Path as _PathHelper
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
 from _click import front_command, run_command  # noqa: E402

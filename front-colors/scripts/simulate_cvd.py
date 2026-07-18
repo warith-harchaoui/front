@@ -67,9 +67,9 @@ from _colors import (  # noqa: E402
     CVD_LABELS,
     CVD_MATRICES,
     CVD_SHORTHAND,
-    linear_to_srgb,
+    linear_to_srgb as linear_to_srgb,  # re-exported for tests/consumers
     simulate_pixel,
-    srgb_to_linear,
+    srgb_to_linear as srgb_to_linear,  # re-exported for tests/consumers
 )
 
 from PIL import Image, ImageDraw, ImageFont

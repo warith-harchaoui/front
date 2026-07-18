@@ -125,7 +125,7 @@ def cmd_convert(args: argparse.Namespace) -> int:
     return fake_run(
         [
             f"reading {args.input}",
-            f"decoding pixels",
+            "decoding pixels",
             f"encoding as {args.to.upper()} (quality {args.quality})",
         ],
         Path(args.output),

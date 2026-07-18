@@ -19,7 +19,6 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-import pytest
 
 
 # The extractor lives under tests/fixtures/, not in any scripts/ dir on

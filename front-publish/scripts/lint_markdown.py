@@ -62,16 +62,14 @@ Author
 
 from __future__ import annotations
 
-import argparse
 import json
-import os
 import re
 import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _argparse import make_parser  # noqa: E402
@@ -356,10 +354,10 @@ def render_mermaid_block(mermaid_src: str, out_png: Path) -> tuple[bool, str]:
             )
 
     return False, (
-        f"no local Mermaid renderer available. "
-        f"Install one of:\n"
-        f"  pip install mmdc                                (pure Python, recommended)\n"
-        f"  npm install -g @mermaid-js/mermaid-cli          (Node + Chromium)"
+        "no local Mermaid renderer available. "
+        "Install one of:\n"
+        "  pip install mmdc                                (pure Python, recommended)\n"
+        "  npm install -g @mermaid-js/mermaid-cli          (Node + Chromium)"
     )
 
 

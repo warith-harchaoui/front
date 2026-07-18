@@ -64,7 +64,7 @@ from _colors import (  # noqa: E402
     oklab_to_oklch,
     oklch_to_oklab,
     parse_hex_linear,
-    relative_luminance,
+    relative_luminance as relative_luminance,  # re-exported for tests/consumers
     to_hex,
 )
 
