@@ -315,7 +315,9 @@ def run_timeshap(model: Any, data: Any, ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         from timeshap.explainer import local_report  # type: ignore
-        from timeshap.plot import plot_temp_coalition_pruning  # type: ignore
+        # Availability guard: verify the timeshap.plot submodule imports too
+        # (distinct from timeshap.explainer above); the symbol itself is unused.
+        from timeshap.plot import plot_temp_coalition_pruning  # type: ignore  # noqa: F401
     except ImportError as exc:  # pragma: no cover
         raise SystemExit(
             "TimeSHAP is not installed. Run `python scripts/install_figures.py --tier explain`."

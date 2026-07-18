@@ -76,7 +76,7 @@ import click
 
 # Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))
-from _vocab import resolve_vocab_terms, surrounding_text  # noqa: E402
+from _vocab import resolve_vocab_terms  # noqa: E402
 from _lang import detect_text_language, lang_pair_default  # noqa: E402
 
 

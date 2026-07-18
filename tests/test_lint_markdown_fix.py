@@ -29,7 +29,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 
 # ``conftest.py`` adds ``front-publish/scripts`` to sys.path.
 from lint_markdown import fix_trailing_whitespace

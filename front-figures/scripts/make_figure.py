@@ -78,7 +78,6 @@ from _argparse import make_parser  # noqa: E402
 from _lang import resolve_lang  # noqa: E402
 from _style import (  # noqa: E402
     infer_polarity,
-    load_palette,
     matplotlib_rc,
     polarity_color,
     polarity_tag,

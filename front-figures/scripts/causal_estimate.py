@@ -190,7 +190,6 @@ def run_dowhy(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     method_params: Dict[str, Any] = {}
     if ctx["estimator"] in {"dml", "dr", "causal-forest"}:
-        from sklearn.linear_model import LassoCV
         from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
         method_params = {
             "init_params": {

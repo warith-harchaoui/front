@@ -15,6 +15,28 @@ name: ci
     branches: [main]
 
 jobs:
+  # Lint / import-hygiene gate — the AUDIT half of the make/audit paradigm the
+  # skills themselves ship (audit: `ruff check`; make: `ruff check --fix`).
+  # Fast and dependency-light (ruff only), so it fails a PR quickly before the
+  # heavier test matrix runs. Config lives in ruff.toml (E741 ignored as the
+  # OKLab lightness `l` is intentional; implicit re-exports use `name as name`).
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install ruff
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Ruff lint (audit gate)
+        run: ruff check .
+
   test:
     runs-on: ubuntu-latest
     strategy:

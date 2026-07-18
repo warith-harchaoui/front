@@ -149,7 +149,7 @@ def synthesise(
         # The exact OpenVoice v2 public API surface (BaseSpeakerTTS,
         # ToneColorConverter, se_extractor) lives under
         # ``openvoice``; we late-import to keep ``--check`` cheap.
-        openvoice = importlib.import_module("openvoice")
+        importlib.import_module("openvoice")  # availability check (raises if absent)
         base_tts = importlib.import_module("openvoice.api")  # BaseSpeakerTTS
         tone_converter_mod = importlib.import_module("openvoice.api")
         se_extractor_mod = importlib.import_module("openvoice.se_extractor")

@@ -12,13 +12,9 @@ Author
 
 from __future__ import annotations
 
-import importlib
-import importlib.util
-import subprocess
 import sys
 import types
 from types import SimpleNamespace
-from unittest.mock import patch
 
 import pytest
 

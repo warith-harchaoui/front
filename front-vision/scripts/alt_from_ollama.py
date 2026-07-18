@@ -60,7 +60,6 @@ from __future__ import annotations
 import base64
 import hashlib
 import io
-import json
 import locale
 import sys as _sys
 from pathlib import Path as _PathHelper
