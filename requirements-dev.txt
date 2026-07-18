@@ -23,6 +23,11 @@ ruff>=0.15,<0.16
 # Type gate (CODING_ALL.md rule 3, type half), config in mypy.ini. Run via
 # scripts/run_mypy.sh (per-skill-dir, ignore_missing_imports for heavy backends).
 mypy>=1.8,<2.0
+# Type stubs so the gate is deterministic across environments (yaml + requests
+# are otherwise "installed but unstubbed" → import-untyped noise that varies by
+# what transitive deps happen to ship).
+types-PyYAML
+types-requests
 
 # Optional: LLM-output quality assertions under tests/eval/.
 # These tests need a running Ollama daemon and are marked with
