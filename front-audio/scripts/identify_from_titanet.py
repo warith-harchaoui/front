@@ -71,7 +71,14 @@ import sys
 import tempfile
 from pathlib import Path as _PathHelper
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+
+# numpy is imported lazily inside the functions below (heavy; only needed on the
+# identify path). Declare it for type-checkers/ruff only, via TYPE_CHECKING
+# (False at runtime), so the "numpy.ndarray" string annotations resolve without
+# paying the import cost at module load.
+if TYPE_CHECKING:
+    import numpy
 
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
 from _click import front_command, run_command  # noqa: E402
@@ -133,7 +140,7 @@ def _titanet_model(model_tag: str, device: str):
 
 # ── Embedding helpers ──────────────────────────────────────────────────────
 
-def embed_clip(model: Any, wav_path: Path) -> "numpy.ndarray":  # noqa: F821
+def embed_clip(model: Any, wav_path: Path) -> "numpy.ndarray":
     """Return the TitaNet embedding of a WAV clip.
 
     Parameters
@@ -198,7 +205,7 @@ def build_speaker_centroids(
     *,
     max_clips_per_speaker: int = 5,
     min_clip_seconds: float = 1.5,
-) -> Dict[str, "numpy.ndarray"]:  # noqa: F821
+) -> Dict[str, "numpy.ndarray"]:
     """Compute one TitaNet centroid per anonymous speaker id.
 
     Parameters
@@ -247,7 +254,7 @@ def build_speaker_centroids(
     return centroids
 
 
-def build_reference_centroids(model: Any, refs_dir: Path) -> Dict[str, "numpy.ndarray"]:  # noqa: F821
+def build_reference_centroids(model: Any, refs_dir: Path) -> Dict[str, "numpy.ndarray"]:
     """Load reference clips and return one centroid per stem.
 
     Parameters
@@ -274,8 +281,8 @@ def build_reference_centroids(model: Any, refs_dir: Path) -> Dict[str, "numpy.nd
 
 
 def match_speakers(
-    centroids: Dict[str, "numpy.ndarray"],  # noqa: F821
-    refs: Dict[str, "numpy.ndarray"],  # noqa: F821
+    centroids: Dict[str, "numpy.ndarray"],
+    refs: Dict[str, "numpy.ndarray"],
     threshold: float = DEFAULT_THRESHOLD,
 ) -> Dict[str, str]:
     """Assign each anonymous speaker to the nearest reference name.
