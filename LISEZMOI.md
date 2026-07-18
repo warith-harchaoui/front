@@ -46,6 +46,39 @@ N'installez que ceux dont vous avez besoin.
 > liste toutes les phrases garanties par leur description avec le
 > skill qu'elles activent.
 
+## Fonctionnalités — ce qui est inhabituel pour un skill Claude
+
+La plupart des skills Claude — y compris les `document-skills` d'Anthropic
+(docx, pdf, pptx, xlsx) et les `example-skills` (artifacts, GIFs, serveurs MCP,
+design) — ne font que du **make** : le modèle produit un artefact. `front` est
+conçu autrement, et ces traits le distinguent :
+
+- **Make *et* audit.** Chaque skill associe la génération à un **auditeur
+  déterministe** qui sort en erreur au moindre problème — il y en a six
+  (`lint_a11y`, `audit_contrast`, `audit_laws_of_ux`, `audit_figure`,
+  `audit_i18n`, `lint_markdown`). Aucun skill officiel d'Anthropic ne livre un
+  linter statique comme raison d'être ; ici c'est la moitié du design.
+- **Des gardes CI / pre-commit, pas du feeling.** Les auditeurs émettent du JSON
+  + des codes de sortie et se livrent via un manifeste
+  [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) — un seul bloc `repo:` et
+  ils bloquent les commits, quel que soit l'auteur (humain ou machine).
+- **IA locale, zéro fuite SaaS.** Le texte alternatif tourne sur un modèle de
+  vision Ollama local ; les sous-titres / la diarisation sur une build
+  whisper.cpp locale. Rien ne quitte la machine — les skills officiels passent
+  d'abord par le cloud Claude.
+- **Générateurs déterministes.** palette → config Tailwind, CLI → GUI, jeux
+  d'icônes favicon / PWA, sitemaps / flux, et `locales/i18n.yaml` — des artefacts
+  reproductibles qu'un modèle ne dériverait pas à l'octet près.
+- **Durci comme un produit, pas une démo.** Une vraie suite pytest + une couche
+  d'éval IA (DeepEval), de la CI sur Python 3.10–3.12, des tarballs de release
+  par skill vérifiés par checksum, et un validateur de conformité au spec — face
+  à des exemples de niveau démonstration.
+- **Portable entre runtimes.** Un même dossier de skill sert **Claude Code** et
+  **OpenCode** ; les chemins IA visent des modèles locaux pour qu'un modèle
+  OpenCode plus petit suive un script au lieu d'en inventer un.
+- **i18n unifiée.** Les chaînes d'interface *et* les prompts LLM vivent dans un
+  seul `locales/i18n.yaml`, appliqué côté make comme côté audit.
+
 ## Deux modes — make et audit
 
 Chaque skill front-* appartient à l'une (ou aux deux) moitiés d'une

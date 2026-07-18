@@ -32,6 +32,37 @@ ones you need.
 > generated from every `SKILL.md` description, lists every guaranteed
 > trigger phrase against the skill it invokes.
 
+## Features — what's unusual for a Claude skill
+
+Most Claude skills — including Anthropic's own `document-skills` (docx, pdf,
+pptx, xlsx) and `example-skills` (artifacts, GIFs, MCP servers, design) — are
+**make-only**: the model produces an artifact. `front` is built differently, and
+these traits set it apart:
+
+- **Make *and* audit.** Every skill pairs generation with a **deterministic
+  auditor** that exits non-zero on findings — six of them (`lint_a11y`,
+  `audit_contrast`, `audit_laws_of_ux`, `audit_figure`, `audit_i18n`,
+  `lint_markdown`). No official Anthropic skill ships a static lint gate as its
+  purpose; here it's half the design.
+- **CI / pre-commit gates, not vibes.** The auditors emit JSON + exit codes and
+  ship as a [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) manifest — one
+  `repo:` block and they block commits, whoever (or whatever) wrote the code.
+- **Local-first AI, zero SaaS egress.** Alt text runs on a local Ollama vision
+  model; captions / diarization on a local whisper.cpp build. Nothing leaves the
+  machine — the official skills are cloud-Claude-first.
+- **Deterministic generators.** palette → Tailwind config, CLI → GUI, favicon /
+  PWA-icon sets, sitemaps / feeds, and `locales/i18n.yaml` — reproducible
+  artifacts a model would not derive byte-for-byte.
+- **Hardened like a product, not a demo.** A real pytest suite + an AI-eval
+  layer (DeepEval), CI across Python 3.10–3.12, checksum-verified per-skill
+  release tarballs, and a spec-conformance validator — vs demonstration-grade
+  examples.
+- **Runtime-portable.** One skill folder serves both **Claude Code** and
+  **OpenCode**; the AI paths target local models so a smaller OpenCode model
+  follows a script instead of inventing one.
+- **Unified i18n.** GUI strings *and* LLM prompts live in a single
+  `locales/i18n.yaml`, enforced on both the make and audit sides.
+
 ## Two modes — make and audit
 
 Every front-* skill belongs to one or both halves of a single loop:
