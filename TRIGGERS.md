@@ -30,6 +30,7 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `Typer / clap / cobra to GUI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `GUI for my Go or Rust CLI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `frontend for a CLI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
+| `streaming log panel for a CLI` | **front-cli-gui** — Wraps an argparse / Click / any-CLI in a single-page HTML GUI (three adapters). | Stable |
 | `markdown to website` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `meta tags` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `OG card` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
@@ -53,6 +54,10 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `readability / grade level` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `schema.org JSON-LD` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `humans.txt` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `lint markdown` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `broken links` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `site index` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
+| `OpenVoice / Chatterbox TTS` | **front-publish** — Markdown → static site + meta tags + favicons + site indexes + plain-language rewrite. | Stable |
 | `a11y lint` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
 | `check this HTML for accessibility` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |
 | `static a11y check` | **front-accessibility** — Static HTML a11y lint (14 rules) with `--fix` for the five safe mechanical repairs. | Stable |

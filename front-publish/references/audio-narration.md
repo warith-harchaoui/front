@@ -136,8 +136,8 @@ default narration hints per segment. The pipeline honors:
 | List item (last) | 800 ms pause after |
 | Blockquote | Wrapped with "Quote: ... End quote." + lower intensity |
 | Code fence | Skipped (sigil-heavy; rarely reads well) |
-| Image `![alt](url)` | Alt text only (URL dropped) |
-| Link `[text](url)` | Link text only (URL dropped) |
+| Image (`![alt](…)`) | Alt text only (URL dropped) |
+| Link (`[text](…)`) | Link text only (URL dropped) |
 | Inline code `` `x` `` | Backticks stripped, content kept |
 | Emoji `⚠️ 💡 🎉 🔥 …` | Emotion baseline set per emoji (see lookup table in `_narrate.EMOJI_EMOTION`) |
 | Frontmatter `narration.tone` | Project-wide baseline emotion |

@@ -3,7 +3,7 @@
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
 <p align="center">
-  <img src="assets/logo.png" alt="Front — four Claude / OpenCode skills for vanilla JS + Tailwind frontends" width="240">
+  <img src="assets/logo.png" alt="Front — nine Claude / OpenCode skills for vanilla JS + Tailwind frontends" width="240">
 </p>
 
 ## What this is
@@ -135,7 +135,7 @@ recipes per skill (with expected output), see [`EXAMPLES.md`](EXAMPLES.md).
 
 ## Status
 
-A snapshot of where each surface stands at `v0.9.0`. The eight skill folders are stable; the only WiP area is **audio captions** (front-audio, video → text). The **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
+A snapshot of where each surface stands. The nine skill folders are stable; the only WiP area is **audio captions** (front-audio, video → text). The **audio narration** feature (front-publish, text → audio) is stable and clearly framed as optional editorial enhancement, not WCAG compliance.
 
 | Area | Status | Notes |
 |---|---|---|
@@ -284,7 +284,7 @@ git clone https://github.com/warith-harchaoui/front.git
 cd front
 python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
 python3 -m pytest                                # full deterministic suite
-python3 scripts/validate_all.py                  # all 8 skills, YAML + content
+python3 scripts/validate_all.py                  # all 9 skills, YAML + content
 
 # Mirrors step 2 above:
 RUNTIME=claude   # or opencode
@@ -449,7 +449,7 @@ beyond `pre-commit install`.
 # .pre-commit-config.yaml — add the repo as one entry
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.12.0          # pin a tag — bump with renovate / dependabot
+    rev: v0.24.0          # pin a tag — bump with renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit
@@ -534,7 +534,7 @@ front/                                  ← repo root
 
 [Warith Harchaoui, Ph.D.](https://www.linkedin.com/in/warith-harchaoui/)
 
-Four Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, and the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono). Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
+Nine Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, and the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono). Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
 Special thanks to [Audrey Dejoux](https://www.behance.net/dreyadesign/projects), [Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/), [Auguste Baum](https://www.linkedin.com/in/auguste-baum/) and [Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/) for fruitful discussions.
 

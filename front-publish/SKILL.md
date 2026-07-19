@@ -10,7 +10,8 @@ description: >-
   icons", "robots.txt", "sitemap", "llms.txt", "Atom feed", "RSS", "plain
   language", "rewrite at grade N", "simplify this copy", "narrate this post",
   "podcast my blog", "text to speech", "readability / grade level",
-  "schema.org JSON-LD", "humans.txt". Applies Google's SEO + GEO (AI
+  "schema.org JSON-LD", "humans.txt", "lint markdown", "broken links", "site
+  index", "OpenVoice / Chatterbox TTS". Applies Google's SEO + GEO (AI
   Optimization) foundations to the emitted artifacts. For solo developers and
   small teams shipping a site without an SSG. Output follows the front-ui
   stack rules — install front-ui alongside for the full design tokens.
@@ -24,7 +25,7 @@ compatibility: >-
   torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.23.0
+  version: 0.24.0
 ---
 
 # front-publish — Markdown → website, meta, icons, indexes, plain language

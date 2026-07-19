@@ -104,6 +104,15 @@ installed to type-check the code's own annotations.
 - Auto-fix suggestions presented as final decisions for things that
   need a designer's eye (palette choices, typography pairings).
 
+## AI-tool attribution
+
+AI tools may be used during development, but **authorship and responsibility
+remain with the human maintainers**. Commit authorship, release notes, and the
+contributor list name only human contributors. Do **not** add
+`Co-Authored-By: …` AI trailers or list an AI assistant as an author or
+co-author. This is enforced in CI by `.github/workflows/no-claude-trailers.yml`,
+which fails a push whose commits carry an AI-attribution trailer.
+
 ## Release process (maintainer)
 
 Two equivalent paths; pick one per release and don't mix them.

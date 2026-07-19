@@ -57,6 +57,43 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.24.0] — 2026-07-19 — dual-runtime + coding-standard conformance pass
+
+A ralph-loop conformance round driven by a from-scratch `.private/ASSESSMENT.md`
+rewrite (two fresh sub-audits: the coding-standards gist, and dual-runtime /
+skill-standard / trigger conformance). Applies the cheap, high-value fixes the
+audit surfaced; the structural debt (SKILL.md body → `references/` progressive
+disclosure) is logged for its own round.
+
+- **Dual-runtime fix (Claude Code *and* OpenCode).** `front-cli-gui/SKILL.md`
+  hardcoded `~/.claude/skills/front-ux-laws/scripts/...`, which fails under
+  OpenCode (`~/.opencode/skills/`). Rewritten to the relative
+  `front-ux-laws/scripts/...` form. Zero absolute skill paths remain in any
+  SKILL.md — both runtimes now run every documented command verbatim.
+- **AI-tool attribution policy.** Added a stated "AI-tool attribution" section
+  to `CONTRIBUTING.md`: AI tools may assist, but authorship and responsibility
+  stay human, and no `Co-Authored-By` AI trailers are added — the paragraph the
+  existing `no-claude-trailers.yml` CI gate was already enforcing implicitly.
+- **Trigger coverage.** Added the missing real-capability triggers surfaced by
+  the audit: `front-publish` (OpenVoice / Chatterbox TTS, markdown lint, broken
+  links, site index) and `front-cli-gui` (streaming log panel for a CLI). All
+  descriptions stay within the 1,024-char self-cap; `TRIGGERS.md` regenerated
+  and drift-checked.
+- **Docstring backfill (85% → 89%).** numpy-style docstrings added to the
+  `_colors.py` `Color` dunders/properties/methods, the `_lang.py`
+  `_VisibleTextParser` HTMLParser hooks (re-propagated byte-identically to all
+  five copies), and a module header for `front_cli/__main__.py` (the last
+  header miss).
+- **Version detail correction.** `front-vision/SKILL.md` now states bilingual
+  output is "language auto-detected from context" rather than an "EN/FR default,
+  configurable" — matching the no-default-language, always-detect design.
+- **Doc freshness.** README/LISEZMOI skill-count staleness fixed (four → nine),
+  install pin examples bumped.
+
+All gates green: ruff, mypy (per-skill-dir), `validate_all.py`,
+`build_triggers.py --check`, and the full pytest suite (including the
+`_lang.py` copy-sync guard).
+
 ## [0.23.0] — 2026-07-19 — one shared body-text extractor across skills
 
 Consolidates the duplicated HTML/Markdown text-extraction into a single,

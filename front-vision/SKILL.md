@@ -3,17 +3,18 @@ name: front-vision
 description: >-
   W3C-compliant alt-text drafting via a local Ollama vision model — per-image
   decision tree for informative / decorative / functional / text / complex /
-  group purposes, bilingual output (EN/FR default, configurable), surrounding-
-  text and project-vocabulary biasing, deterministic on-disk cache so the same
-  image + parameters never hit the model twice. Default model is ``gemma3:4b``
-  (registry-standard, multimodal); override with ``OLLAMA_MODEL`` /
-  ``--model``. For solo developers and small teams who want accessibility
-  content drafted locally with no SaaS cost or data exfiltration. Drafts are
-  starting points — verify before committing. Trigger phrases: "alt text",
-  "alt text for this image", "describe this image", "draft alt", "image
-  description", "img has no alt", "decorative image", "functional image",
-  "figure / chart description", "accessible images", "batch alt text". Output
-  is plain text / JSON on stdout suitable for pre-commit and CI.
+  group purposes, bilingual output (EN/FR, language auto-detected from
+  context), surrounding- text and project-vocabulary biasing, deterministic
+  on-disk cache so the same image + parameters never hit the model twice.
+  Default model is ``gemma3:4b`` (registry-standard, multimodal); override
+  with ``OLLAMA_MODEL`` / ``--model``. For solo developers and small teams who
+  want accessibility content drafted locally with no SaaS cost or data
+  exfiltration. Drafts are starting points — verify before committing. Trigger
+  phrases: "alt text", "alt text for this image", "describe this image",
+  "draft alt", "image description", "img has no alt", "decorative image",
+  "functional image", "figure / chart description", "accessible images",
+  "batch alt text". Output is plain text / JSON on stdout suitable for
+  pre-commit and CI.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
@@ -24,7 +25,7 @@ compatibility: >-
   first run.
 metadata:
   author: Warith Harchaoui
-  version: 0.23.0
+  version: 0.24.0
 ---
 
 # front-vision — local AI alt text for accessibility

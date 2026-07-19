@@ -44,6 +44,34 @@ def test_lint_detects_known_intentional_issues() -> None:
     assert "[" in proc.stdout or proc.stdout.strip() == "[]"
 
 
+def test_link_syntax_in_code_span_is_not_a_broken_link(tmp_path: Path) -> None:
+    """MD050 must ignore link *syntax examples* inside inline-code / fences.
+
+    Documenting ``[text](url)`` in a table cell or code span is not a real
+    link; the broken-link check must skip code before scanning (regression:
+    ``front-publish/references/audio-narration.md`` flagged its own docs).
+    """
+    doc = tmp_path / "syntax.md"
+    doc.write_text(
+        "# Syntax\n\n"
+        "| Element | Behaviour |\n"
+        "|---|---|\n"
+        "| Link (`[text](url)`) | text kept, URL dropped |\n"
+        "| Image (`![alt](url)`) | alt kept |\n\n"
+        "```markdown\n[also here](nowhere.md)\n```\n",
+        encoding="utf-8",
+    )
+    proc = _run(str(doc), "--format", "text")
+    assert "MD050" not in proc.stdout, (
+        f"code-span link syntax wrongly flagged:\n{proc.stdout}"
+    )
+
+    # A genuine broken link OUTSIDE code must still be caught.
+    doc.write_text("See [the missing page](does-not-exist.md).\n", encoding="utf-8")
+    proc = _run(str(doc), "--format", "text")
+    assert "MD050" in proc.stdout and proc.returncode == 1
+
+
 def test_lint_help_advertises_mermaid_and_ai() -> None:
     proc = _run("-h")
     assert proc.returncode == 0

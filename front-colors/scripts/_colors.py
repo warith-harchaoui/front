@@ -486,6 +486,7 @@ class Color:
     __slots__ = ("_rgb",)
 
     def __init__(self, value: str | tuple[int, int, int] | Iterable[int]) -> None:
+        """Build a Color from a hex string or an ``(r, g, b)`` 0–255 triple."""
         if isinstance(value, str):
             self._rgb: tuple[int, int, int] = parse_hex(value)
         else:
@@ -496,31 +497,39 @@ class Color:
 
     @classmethod
     def from_name(cls, name: str) -> "Color":
+        """Build a Color from a CSS/X11 colour name (e.g. ``"rebeccapurple"``)."""
         return cls(name_to_hex(name))
 
     @property
     def rgb(self) -> tuple[int, int, int]:
+        """The ``(r, g, b)`` channels as integers in ``[0, 255]``."""
         return self._rgb
 
     @property
     def hex(self) -> str:
+        """The colour as a ``#rrggbb`` hex string."""
         return rgb_to_hex(self._rgb)
 
     @property
     def linear(self) -> tuple[float, float, float]:
+        """The colour in linear-light sRGB (each channel gamma-expanded)."""
         return tuple(srgb_to_linear(c) for c in self._rgb)  # type: ignore[return-value]
 
     @property
     def oklch(self) -> tuple[float, float, float]:
+        """The colour as OKLCH ``(L, C, H)`` (perceptual lightness/chroma/hue)."""
         return oklab_to_oklch(linear_to_oklab(self.linear))
 
     def lighten(self, amount: float = 0.1) -> "Color":
+        """Return a copy lightened by ``amount`` on the OKLCH L axis."""
         return Color(lighten(self.hex, amount))
 
     def darken(self, amount: float = 0.1) -> "Color":
+        """Return a copy darkened by ``amount`` on the OKLCH L axis."""
         return Color(darken(self.hex, amount))
 
     def contrast_with(self, other: "Color | str | tuple[int, int, int]") -> float:
+        """WCAG contrast ratio (1–21) between this colour and ``other``."""
         other_c = other if isinstance(other, Color) else Color(other)
         return contrast_ratio(self.linear, other_c.linear)
 
@@ -530,13 +539,17 @@ class Color:
         level: str = "AA",
         size: str = "normal",
     ) -> bool:
+        """True iff this colour on ``other`` meets the WCAG ``level`` at ``size``."""
         return meets_wcag(self.hex, other.hex if isinstance(other, Color) else other, level, size)
 
     def __repr__(self) -> str:
+        """Unambiguous ``Color("#rrggbb")`` representation."""
         return f"Color({self.hex!r})"
 
     def __eq__(self, other: object) -> bool:
+        """Two Colors are equal iff their RGB triples match."""
         return isinstance(other, Color) and other._rgb == self._rgb
 
     def __hash__(self) -> int:
+        """Hash by RGB triple so Colors are usable as dict keys / in sets."""
         return hash(self._rgb)

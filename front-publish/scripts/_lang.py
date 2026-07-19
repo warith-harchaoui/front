@@ -47,15 +47,18 @@ class _VisibleTextParser(HTMLParser):
         self.chunks: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: object) -> None:
+        """Enter a skip region for code/graphics/boilerplate tags."""
         # ``attrs`` is part of the HTMLParser override contract (unused here).
         if tag in ("script", "style", "svg", "noscript"):
             self._skip_depth += 1
 
     def handle_endtag(self, tag: str) -> None:
+        """Leave a skip region when its closing tag is reached."""
         if tag in ("script", "style", "svg", "noscript") and self._skip_depth:
             self._skip_depth -= 1
 
     def handle_data(self, data: str) -> None:
+        """Collect non-empty visible text outside any skip region."""
         if not self._skip_depth and data.strip():
             self.chunks.append(data.strip())
 

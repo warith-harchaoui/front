@@ -214,10 +214,17 @@ def fix_trailing_whitespace(text: str) -> str:
 
 
 def lint_local_links(path: Path, text: str) -> list[Finding]:
-    """MD050 — local link targets exist on disk."""
+    """MD050 — local link targets exist on disk.
+
+    Scans a code-stripped view of the document so link *syntax examples* inside
+    fenced blocks or inline-code spans (e.g. documenting ``[text](url)`` in a
+    table cell) are not mistaken for real links. ``_strip_code`` preserves line
+    breaks, so reported line numbers stay accurate.
+    """
     findings: list[Finding] = []
     parent = path.parent
-    for m in LINK_RE.finditer(text):
+    prose = _strip_code(text)
+    for m in LINK_RE.finditer(prose):
         href = m.group(2)
         if href.startswith(("http://", "https://", "mailto:", "#")):
             continue

@@ -6,12 +6,12 @@
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
 <p align="center">
-  <img src="assets/logo.png" alt="Front — quatre skills Claude / OpenCode pour des frontends en JavaScript pur + Tailwind" width="240">
+  <img src="assets/logo.png" alt="Front — neuf skills Claude / OpenCode pour des frontends en JavaScript pur + Tailwind" width="240">
 </p>
 
 ## De quoi s'agit-il ?
 
-`front`, c'est **quatre petits skills Claude / OpenCode** qui cadrent
+`front`, c'est **neuf skills Claude / OpenCode** qui cadrent
 l'agent sur une seule pile frontend — JavaScript pur, Tailwind CSS,
 et la règle des trois Roboto (Roboto pour les sans-serif, Roboto Serif
 pour les serif, Roboto Mono pour le code) — et lui fournissent un
@@ -24,7 +24,7 @@ stylé, anneau de focus visible, garde-fous pour `prefers-reduced-motion`,
 graphiques en Vega-Lite, texte alternatif rédigé selon les recommandations
 W3C / WAI.
 
-Les quatre skills :
+Les neuf skills :
 
 | Skill | Quand l'installer | Phrases déclencheuses |
 |---|---|---|
@@ -370,7 +370,7 @@ git clone https://github.com/warith-harchaoui/front.git
 cd front
 python3 -m pip install -r requirements-dev.txt   # PyYAML + pytest
 python3 -m pytest                                # suite complète déterministe
-python3 scripts/validate_all.py                  # tous les 8 skills, YAML + contenu
+python3 scripts/validate_all.py                  # tous les 9 skills, YAML + contenu
 
 # Reflète l'étape 2 ci-dessus :
 RUNTIME=claude   # ou opencode
@@ -545,7 +545,7 @@ dans [pre-commit](https://pre-commit.com/) avec un seul bloc `repo:`
 # .pre-commit-config.yaml — ajouter le dépôt en une entrée
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.12.0          # fixer une tag — bumper via renovate / dependabot
+    rev: v0.24.0          # fixer une tag — bumper via renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit
@@ -594,7 +594,7 @@ front/                                  ← racine du dépôt
 ├── LICENSE.md                          ← BSD-3-Clause (OFL pour Roboto / Roboto Serif / Roboto Mono)
 ├── llms.txt                            ← index https://llmstxt.org/ pour les LLM
 ├── pytest.ini, requirements-dev.txt    ← outillage dev partagé
-├── tests/                              ← suite pytest partagée pour les quatre skills
+├── tests/                              ← suite pytest partagée pour les neuf skills
 ├── assets/logo.png                     ← logo du projet
 │
 ├── front-ui/                           ← skill de génération d'UI

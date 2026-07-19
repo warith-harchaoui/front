@@ -5,14 +5,15 @@ description: >-
   Tailwind GUI. Trigger phrases: "wrap this CLI in a GUI", "build a UI for my
   CLI", "argparse to GUI", "click to web UI", "GUI for my Python script",
   "wrap my command-line tool", "web form for my script", "Typer / clap / cobra
-  to GUI", "GUI for my Go or Rust CLI", "frontend for a CLI". Reads the CLI's
-  argument parser (argparse, click, clap, commander, cobra), maps sub-commands
-  and flags to forms / segmented controls / file inputs / streaming log
-  panels, and emits one index.html + app.js + Tailwind config. For solo
-  developers and small teams (Python / Node / Go / Rust CLI authors, ML
-  researchers, data scientists, DevOps / SRE) who need a usable web UI without
-  picking up React or learning Gradio's / Streamlit's look. Output follows the
-  front-ui stack rules — install front-ui alongside for full design tokens.
+  to GUI", "GUI for my Go or Rust CLI", "frontend for a CLI", "streaming log
+  panel for a CLI". Reads the CLI's argument parser (argparse, click, clap,
+  commander, cobra), maps sub-commands and flags to forms / segmented controls
+  / file inputs / streaming log panels, and emits one index.html + app.js +
+  Tailwind config. For solo developers and small teams (Python / Node / Go /
+  Rust CLI authors, ML researchers, data scientists, DevOps / SRE) who need a
+  usable web UI without picking up React or learning Gradio's / Streamlit's
+  look. Output follows the front-ui stack rules — install front-ui alongside
+  for full design tokens.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Output is one-page HTML + ES
@@ -22,7 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.23.0
+  version: 0.24.0
 ---
 
 # front-cli-gui — CLI → web GUI
@@ -102,8 +103,8 @@ Then point the spec at `adapter.py:make_parser`.
 Verify the output passes both audit gates (zero findings):
 
 ```bash
-python3 ~/.claude/skills/front-ux-laws/scripts/audit_laws_of_ux.py path/to/index.html
-python3 ~/.claude/skills/front-accessibility/scripts/lint_a11y.py   path/to/index.html
+python3 front-ux-laws/scripts/audit_laws_of_ux.py path/to/index.html
+python3 front-accessibility/scripts/lint_a11y.py   path/to/index.html
 ```
 
 The longer design workflow below is for the bespoke cases the
