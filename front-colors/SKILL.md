@@ -22,7 +22,7 @@ compatibility: >-
   No network or model required at any point.
 metadata:
   author: Warith Harchaoui
-  version: 0.24.0
+  version: 0.25.0
 ---
 
 # front-colors — color audit, curation, and perceptual transforms

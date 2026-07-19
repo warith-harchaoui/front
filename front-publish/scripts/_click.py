@@ -29,7 +29,7 @@ from typing import Any, Callable, Optional, Sequence
 import click
 
 
-SKILL_VERSION = "0.24.0"
+SKILL_VERSION = "0.25.0"
 
 
 #: Context settings shared by every front Click command. ``-h`` joins
@@ -52,6 +52,7 @@ class FrontCommand(click.Command):
     """
 
     def format_usage(self, ctx: click.Context, formatter: click.HelpFormatter) -> None:
+        """Write the usage line with an explicit ``[--help]`` token restored."""
         pieces = self.collect_usage_pieces(ctx)
         formatter.write_usage(ctx.command_path, " ".join(["[--help]"] + pieces))
 
@@ -82,6 +83,7 @@ def front_command(
     """
 
     def decorator(func: Callable[..., Any]) -> click.Command:
+        """Wrap ``func`` as a :class:`FrontCommand` with a ``-V`` / ``--version`` flag."""
         cmd = click.command(
             name=name,
             cls=FrontCommand,

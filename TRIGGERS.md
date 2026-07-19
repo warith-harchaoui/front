@@ -139,6 +139,8 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `DoWhy` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `EconML` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `treatment effect` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `refute` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `refutation` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `DAG` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `audit this figure` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `colorblind safe palette` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
@@ -147,6 +149,7 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `Vega-Lite` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `visualize data` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `audit this chart` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `install figures` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 
 ## How discovery works
 

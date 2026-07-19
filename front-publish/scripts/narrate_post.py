@@ -105,8 +105,9 @@ from _narrate import (  # noqa: E402
 #: never leak into the orchestrator's import graph.
 ENGINES: tuple[str, ...] = ("openvoice", "chatterbox")
 
-#: Default LLM model when ``--ai-hints`` is passed — same default
-#: alt_from_ollama uses, so the user only has to pull one model.
+#: The one authorized LLM for ``--ai-hints`` — ``gemma3:4b`` (via Ollama), the
+#: same model :mod:`alt_from_ollama` uses, so the user only ever pulls one. Not
+#: user-selectable; ``OLLAMA_MODEL`` is honoured only as a test seam.
 DEFAULT_LLM_MODEL: str = os.environ.get("OLLAMA_MODEL", "gemma3:4b")
 
 #: Ollama daemon URL (shared default with alt_from_ollama / meta_from_ollama).
@@ -387,11 +388,6 @@ def parse_args() -> argparse.Namespace:
         help="Enrich segment hints via local Ollama (off by default).",
     )
     parser.add_argument(
-        "--ai-hints-model",
-        default=DEFAULT_LLM_MODEL,
-        help=f"Ollama model for --ai-hints (default: {DEFAULT_LLM_MODEL}).",
-    )
-    parser.add_argument(
         "--ai-hints-only",
         action="store_true",
         help="Print the enriched segment hints as JSON and exit. "
@@ -424,7 +420,9 @@ def main() -> int:
     segments = apply_pronunciation(segments, load_pronunciation(args.post))
 
     if args.ai_hints:
-        segments = enrich_with_llm(segments, model=args.ai_hints_model)
+        # The model is fixed at gemma3:4b (the one authorized LLM); not a CLI
+        # knob. ``enrich_with_llm`` defaults to ``DEFAULT_LLM_MODEL``.
+        segments = enrich_with_llm(segments)
 
     if args.ai_hints_only:
         print(json.dumps(segments, indent=2, ensure_ascii=False))

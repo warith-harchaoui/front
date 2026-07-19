@@ -42,6 +42,7 @@ class _VisibleTextParser(HTMLParser):
     not prose)."""
 
     def __init__(self) -> None:
+        """Initialise the parser with an empty skip-depth counter and chunk buffer."""
         super().__init__(convert_charrefs=True)
         self._skip_depth: int = 0
         self.chunks: list[str] = []

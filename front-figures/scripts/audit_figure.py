@@ -195,11 +195,13 @@ class _FigureScanner(HTMLParser):
     """Collect ``<figure>`` blocks and inner ``<img>`` tags."""
 
     def __init__(self) -> None:
+        """Initialise the ``<figure>`` collector with empty figure list and stack."""
         super().__init__(convert_charrefs=True)
         self.figures: List[Dict[str, Any]] = []
         self._stack: List[Dict[str, Any]] = []
 
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]) -> None:
+        """Track ``<figure>`` / ``<figcaption>`` / ``<img>`` openings and their nesting."""
         attr_map = {k.lower(): (v or "") for k, v in attrs}
         if tag == "figure":
             entry = {"role": attr_map.get("role", ""), "has_caption": False, "imgs": [], "line": self.getpos()[0]}
@@ -211,6 +213,7 @@ class _FigureScanner(HTMLParser):
             self._stack[-1]["imgs"].append({"alt": attr_map.get("alt", None), "line": self.getpos()[0]})
 
     def handle_endtag(self, tag: str) -> None:
+        """Pop the current ``<figure>`` off the stack when it closes."""
         if tag == "figure" and self._stack:
             self._stack.pop()
 

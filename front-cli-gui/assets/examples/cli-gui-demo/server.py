@@ -125,12 +125,14 @@ class DemoHandler(BaseHTTPRequestHandler):
 
     # Quieter than the default — only log errors.
     def log_message(self, fmt: str, *args) -> None:  # noqa: D401
+        """Silence per-request logging (only errors surface)."""
         return
 
     # ── GET → static files ─────────────────────────────────────────────────
 
     def do_GET(self) -> None:  # noqa: N802 — http.server requires this name.
         # GET '/' or '/index.html' both serve the page.
+        """Serve the demo's static files (``/`` maps to ``index.html``)."""
         target = static_path(self.path or "/")
         if target is None:
             self.send_error(404, "Not Found")
@@ -147,6 +149,7 @@ class DemoHandler(BaseHTTPRequestHandler):
     # ── POST → run the CLI and stream the output ──────────────────────────
 
     def do_POST(self) -> None:  # noqa: N802
+        """Run the wrapped CLI for ``/run`` and stream its output back."""
         if self.path != "/run":
             self.send_error(404, "Not Found")
             return

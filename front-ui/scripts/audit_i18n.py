@@ -190,6 +190,7 @@ def audit_py(path: Path) -> List[Dict[str, Any]]:
 
     def check(name: str, value: ast.expr, lineno: int) -> None:
         # Only string-literal values count; a ``load_prompt(...)`` call is fine.
+        """Flag a string-literal GUI/prompt value that should live in ``locales/i18n.yaml``."""
         is_str = isinstance(value, ast.Constant) and isinstance(value.value, str)
         # A joined f-string (ast.JoinedStr) built inline is also an inlined prompt.
         is_fstr = isinstance(value, ast.JoinedStr)

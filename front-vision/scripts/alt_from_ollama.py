@@ -776,11 +776,6 @@ def describe(
     help="Downscale long edge to N px before sending (Pillow). 0 disables.",
 )
 @click.option(
-    "--model",
-    default=None,
-    help="Override the Ollama model tag.",
-)
-@click.option(
     "--no-cache",
     "no_cache",
     is_flag=True,
@@ -839,7 +834,6 @@ def _cli(
     lang: Optional[str],
     context: str,
     resize: int,
-    model: Optional[str],
     no_cache: bool,
     longdesc: bool,
     in_doc: Optional[Path],
@@ -898,13 +892,14 @@ def _cli(
         lang = detect_text_language(detection_text, fallback=detect_lang()) \
             if detection_text else detect_lang()
 
+    # The model is fixed (gemma3:4b, the one authorized LLM); ``describe``
+    # resolves it internally via ``pick_default_model`` — not user-selectable.
     text = describe(
         src,
         kind=kind,
         lang=lang,
         context=context,
         resize=resize,
-        model=model,
         vocabulary=vocabulary,
     )
 
@@ -934,7 +929,6 @@ def _cli(
             lang=raw_lang,
             context=raw_context,
             resize=resize,
-            model=model,
         )
         # Resolve a sibling path: ``<src>.longdesc.md`` for files; for URLs
         # write into the current working directory under a sanitized name.

@@ -6,8 +6,8 @@ description: >-
   group purposes, bilingual output (EN/FR, language auto-detected from
   context), surrounding- text and project-vocabulary biasing, deterministic
   on-disk cache so the same image + parameters never hit the model twice.
-  Default model is ``gemma3:4b`` (registry-standard, multimodal); override
-  with ``OLLAMA_MODEL`` / ``--model``. For solo developers and small teams who
+  The one authorized model is ``gemma3:4b`` (registry-standard, multimodal)
+  via Ollama — no other model, no MLX. For solo developers and small teams who
   want accessibility content drafted locally with no SaaS cost or data
   exfiltration. Drafts are starting points — verify before committing. Trigger
   phrases: "alt text", "alt text for this image", "describe this image",
@@ -25,7 +25,7 @@ compatibility: >-
   first run.
 metadata:
   author: Warith Harchaoui
-  version: 0.24.0
+  version: 0.25.0
 ---
 
 # front-vision — local AI alt text for accessibility
@@ -55,7 +55,7 @@ This skill is **make-only** in the front-* duality — by design:
 
 | Mode | Tool | Purpose |
 |---|---|---|
-| **Make** — draft accessible image text | `scripts/alt_from_ollama.py` + `scripts/install_alt_ai.py` | W3C-compliant alt text via local Ollama vision (default `gemma3:4b`; override via OLLAMA_MODEL / --model). Per-purpose decision tree, surrounding-text + vocabulary biasing, on-disk cache. |
+| **Make** — draft accessible image text | `scripts/alt_from_ollama.py` + `scripts/install_alt_ai.py` | W3C-compliant alt text via local Ollama vision (the one authorized model, `gemma3:4b` — no other model, no MLX). Per-purpose decision tree, surrounding-text + vocabulary biasing, on-disk cache. |
 | **Audit** — gate the presence of `alt=` | _(see `front-accessibility/scripts/lint_a11y.py`)_ | Static lint catches `<img>` without `alt` and `<img alt="">` on non-decorative images. |
 
 Pair with `front-accessibility` to close the loop: this skill drafts
@@ -93,8 +93,9 @@ When the caller does not pass ``--kind``, the script falls back to
 
 The one authorized model is **``gemma3:4b``** — a 4B-parameter multimodal
 model served through Ollama, in the public registry so ``ollama pull``
-works on any box. No other model, no MLX. (``OLLAMA_MODEL`` / ``--model``
-remain as a bare escape hatch for testing.)
+works on any box. No other model, no MLX, and the model is **not selectable**
+on the command line: there is no ``--model`` flag. (``OLLAMA_MODEL`` is honoured
+only as a bare test seam so the suite can point the resolver at a stub.)
 
 The endpoint defaults to ``http://localhost:11434`` and can be
 overridden with ``OLLAMA_URL``.

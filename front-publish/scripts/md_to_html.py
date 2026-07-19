@@ -177,6 +177,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 
 @dataclass
 class Conversion:
+    """Result of converting one Markdown file: source, destination, success flag, message."""
     src: Path
     dst: Path
     ok: bool
@@ -220,6 +221,7 @@ def _replace_mermaid_blocks(text: str, src_path: Path, out_dir: Path) -> tuple[s
 
 def convert_one(src: Path, out_dir: Path, *, title: str, site_name: str,
                 lang: str, description: str, katex_base: str) -> Conversion:
+    """Convert a single Markdown file to a styled standalone HTML page."""
     try:
         import markdown  # type: ignore
     except ImportError:
@@ -261,12 +263,14 @@ def convert_one(src: Path, out_dir: Path, *, title: str, site_name: str,
 
 
 def gather_inputs(target: Path) -> list[Path]:
+    """Return the Markdown files to convert (the file, or all ``*.md`` under a dir)."""
     if target.is_file():
         return [target]
     return sorted(target.rglob("*.md")) + sorted(target.rglob("*.markdown"))
 
 
 def main() -> int:
+    """CLI entry point for the Markdown-to-HTML converter; returns a process exit code."""
     p = make_parser(
         prog="front-publish-md-to-html",
         description="Markdown → HTML converter integrated with the front skill — "

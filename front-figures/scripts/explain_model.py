@@ -330,6 +330,7 @@ def run_timeshap(model: Any, data: Any, ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     # Wrap the model in the callable TimeSHAP expects
     def model_fn(x: "np.ndarray") -> "np.ndarray":
+        """Adapt the loaded model to the ``(x) -> predictions`` callable TimeSHAP expects."""
         return model(x) if callable(model) else model.predict(x)
 
     pruning_dict = {"tol": ctx.get("tolerance", 0.025)}

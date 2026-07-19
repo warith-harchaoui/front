@@ -31,6 +31,7 @@ SCRIPTS_SUBDIR = "scripts"
 # Search order for finding a skill folder by name. Each element is a base
 # directory that contains `front-<name>/` folders.
 def _candidate_bases() -> list[Path]:
+    """Return the ordered base dirs searched for ``front-<name>`` skill folders."""
     bases: list[Path] = []
     env = os.environ.get("FRONT_SKILLS_PATH", "")
     for chunk in env.split(":"):
@@ -117,6 +118,7 @@ def ui() -> None:
             help="Run the front-ui pre-ship quality gate.")
 @click.pass_context
 def ui_validate(ctx: click.Context) -> None:
+    """Run the front-ui pre-ship quality gate (delegates to ``validate.py``)."""
     sys.exit(_run_script("front-ui", "validate.py", tuple(ctx.args)))
 
 
@@ -131,6 +133,7 @@ def accessibility() -> None:
                        help="Static a11y lint over HTML files (14 rules).")
 @click.pass_context
 def accessibility_lint(ctx: click.Context) -> None:
+    """Run the static a11y lint over HTML files (delegates to ``lint_a11y.py``)."""
     sys.exit(_run_script("front-accessibility", "lint_a11y.py", tuple(ctx.args)))
 
 
@@ -145,6 +148,7 @@ def audio() -> None:
                help="WebVTT / SRT / plain-text captions via local whisper.cpp.")
 @click.pass_context
 def audio_captions(ctx: click.Context) -> None:
+    """Generate WebVTT / SRT / plain-text captions via local whisper.cpp."""
     sys.exit(_run_script("front-audio", "captions_from_whisper.py", tuple(ctx.args)))
 
 
@@ -152,6 +156,7 @@ def audio_captions(ctx: click.Context) -> None:
                help="Install pywhispercpp and download the model used by `front audio captions`.")
 @click.pass_context
 def audio_install(ctx: click.Context) -> None:
+    """Install pywhispercpp and download the caption model."""
     sys.exit(_run_script("front-audio", "install_captions.py", tuple(ctx.args)))
 
 
@@ -166,6 +171,7 @@ def vision() -> None:
                 help="W3C-compliant alt text via a local Ollama vision model (gemma3:4b).")
 @click.pass_context
 def vision_alt(ctx: click.Context) -> None:
+    """Draft W3C-compliant alt text via the local Ollama vision model."""
     sys.exit(_run_script("front-vision", "alt_from_ollama.py", tuple(ctx.args)))
 
 
@@ -173,6 +179,7 @@ def vision_alt(ctx: click.Context) -> None:
                 help="Install Ollama and pull the vision model used by `front vision alt`.")
 @click.pass_context
 def vision_install(ctx: click.Context) -> None:
+    """Install Ollama and pull the vision model used by ``front vision alt``."""
     sys.exit(_run_script("front-vision", "install_alt_ai.py", tuple(ctx.args)))
 
 
@@ -187,6 +194,7 @@ def colors() -> None:
                 help="WCAG contrast audit + OKLCH-neighbour fix hint.")
 @click.pass_context
 def colors_contrast(ctx: click.Context) -> None:
+    """Run the WCAG contrast audit with an OKLCH-neighbour fix hint."""
     sys.exit(_run_script("front-colors", "audit_contrast.py", tuple(ctx.args)))
 
 
@@ -194,6 +202,7 @@ def colors_contrast(ctx: click.Context) -> None:
                 help="Color-vision-deficiency (protanopia / deuteranopia / tritanopia) rendering.")
 @click.pass_context
 def colors_cvd(ctx: click.Context) -> None:
+    """Render a screenshot under protanopia / deuteranopia / tritanopia."""
     sys.exit(_run_script("front-colors", "simulate_cvd.py", tuple(ctx.args)))
 
 
@@ -208,6 +217,7 @@ def publish() -> None:
                  help="Generate favicon / PWA icon set + manifest from a logo.")
 @click.pass_context
 def publish_favicons(ctx: click.Context) -> None:
+    """Generate a favicon / PWA icon set + manifest from one logo."""
     sys.exit(_run_script("front-publish", "favicons.py", tuple(ctx.args)))
 
 
@@ -215,6 +225,7 @@ def publish_favicons(ctx: click.Context) -> None:
                  help="Draft per-page meta tags (title, description, OG, Twitter, JSON-LD).")
 @click.pass_context
 def publish_meta(ctx: click.Context) -> None:
+    """Draft per-page meta tags (title, description, OG, Twitter, JSON-LD)."""
     sys.exit(_run_script("front-publish", "meta_from_ollama.py", tuple(ctx.args)))
 
 
@@ -222,6 +233,7 @@ def publish_meta(ctx: click.Context) -> None:
                  help="Emit robots.txt + sitemap.xml + llms.txt + Atom/RSS + humans.txt.")
 @click.pass_context
 def publish_indexes(ctx: click.Context) -> None:
+    """Emit robots.txt + sitemap.xml + llms.txt + Atom/RSS + humans.txt."""
     sys.exit(_run_script("front-publish", "site_indexes.py", tuple(ctx.args)))
 
 
@@ -229,6 +241,7 @@ def publish_indexes(ctx: click.Context) -> None:
                  help="Rewrite UI copy in plain language at a target grade.")
 @click.pass_context
 def publish_plain(ctx: click.Context) -> None:
+    """Rewrite UI copy in plain language at a target reading grade."""
     sys.exit(_run_script("front-publish", "plain_language.py", tuple(ctx.args)))
 
 
@@ -236,6 +249,7 @@ def publish_plain(ctx: click.Context) -> None:
                  help="Lint Markdown — headings, alt text, links, LaTeX delimiters, Mermaid (rendered locally).")
 @click.pass_context
 def publish_lint_md(ctx: click.Context) -> None:
+    """Lint Markdown — headings, alt text, links, LaTeX, Mermaid."""
     sys.exit(_run_script("front-publish", "lint_markdown.py", tuple(ctx.args)))
 
 
@@ -243,4 +257,5 @@ def publish_lint_md(ctx: click.Context) -> None:
                  help="Convert Markdown → HTML with local Mermaid PNG embed, KaTeX LaTeX, three-Roboto + Tailwind shell.")
 @click.pass_context
 def publish_md_to_html(ctx: click.Context) -> None:
+    """Convert Markdown to HTML (Mermaid PNG, KaTeX, Tailwind shell)."""
     sys.exit(_run_script("front-publish", "md_to_html.py", tuple(ctx.args)))

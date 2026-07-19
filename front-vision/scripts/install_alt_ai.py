@@ -72,8 +72,6 @@ from typing import Optional
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
 from _click import front_command, run_command  # noqa: E402
 
-import click
-
 
 # ── Module-level configuration ────────────────────────────────────────────────
 
@@ -319,23 +317,15 @@ def pull_model(tag: str) -> None:
         "  front-accessibility-install-alt-ai\n"
     ),
 )
-@click.option(
-    "--model",
-    "model_override",
-    default=None,
-    help=(
-        "Ollama model tag to pull (bare test hook; the one authorized "
-        "model is gemma3:4b)."
-    ),
-)
-def _cli(model_override: Optional[str]) -> int:
+def _cli() -> int:
     """Click command body for ``install_alt_ai``; returns an int exit code.
 
-    Behaviour is identical to the previous parser-less ``main`` — the
-    only addition is a ``-h`` / ``--help`` flag (and the optional
-    ``--model`` override, equivalent to ``OLLAMA_MODEL=<tag>``).
+    Behaviour is identical to the previous parser-less ``main`` — the only
+    addition is a ``-h`` / ``--help`` flag. The model is fixed at gemma3:4b (the
+    one authorized LLM), resolved by :func:`pick_model`; it is not selectable on
+    the command line (``OLLAMA_MODEL`` remains only as a test seam).
     """
-    model: str = model_override or pick_model()
+    model: str = pick_model()
     print(f"→ Platform: {platform.system()} {platform.machine()}")
     print(f"→ Target model: {model}")
 

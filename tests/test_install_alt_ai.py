@@ -33,14 +33,15 @@ def _fail_proc(code: int = 1) -> SimpleNamespace:
 # ── pick_model ─────────────────────────────────────────────────────────────
 
 class TestPickModel:
-    def test_env_override_wins(self, monkeypatch):
+    def test_env_seam_wins(self, monkeypatch):
+        # OLLAMA_MODEL is a TEST SEAM only (never a user-facing model choice).
         monkeypatch.setenv("OLLAMA_MODEL", "explicit:tag")
         assert ia.pick_model() == "explicit:tag"
 
     def test_default_is_registry_base_no_mlx(self, monkeypatch):
         # No ``-mlx`` auto-suffix on any platform — that only ever named a
-        # maintainer-local build and 404'd on a fresh box. The default is the
-        # registry-standard BASE (gemma3:4b); power users override via OLLAMA_MODEL.
+        # maintainer-local build and 404'd on a fresh box. With the seam unset
+        # the one authorized model (gemma3:4b) is used.
         monkeypatch.delenv("OLLAMA_MODEL", raising=False)
         assert ia.pick_model() == ia.BASE
         assert not ia.pick_model().endswith("-mlx")

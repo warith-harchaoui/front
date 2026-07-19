@@ -165,6 +165,7 @@ class TreeBuilder(HTMLParser):
     def __init__(self) -> None:
         # ``convert_charrefs=False`` keeps entities literal so ``<pre>`` blocks
         # in user docs survive the round-trip unchanged.
+        """Initialise the audit parser's element and text accumulators."""
         super().__init__(convert_charrefs=False)
         # The root is a synthetic ``html`` element so the tree always has a
         # single entry point; the real ``<html>`` becomes its only child.
@@ -176,6 +177,7 @@ class TreeBuilder(HTMLParser):
     def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
         # ``getpos()`` returns (line, column) for the current token; only
         # the line is preserved.
+        """Record an opening tag and its attributes for later rule checks."""
         line, _ = self.getpos()
         elem = Element(
             tag=tag.lower(),
@@ -192,6 +194,7 @@ class TreeBuilder(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         # Pop until we hit a matching open tag (or the root). This handles
         # documents with mismatched closes without raising.
+        """Record a closing tag for structural (nesting / heading) checks."""
         for i in range(len(self.stack) - 1, 0, -1):
             if self.stack[i].tag == tag.lower():
                 del self.stack[i:]
@@ -199,6 +202,7 @@ class TreeBuilder(HTMLParser):
 
     def handle_startendtag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
         # Self-closing form (``<br />``); treat as a leaf.
+        """Record a self-closing tag (e.g. ``<img/>``, ``<input/>``)."""
         self.handle_starttag(tag, attrs)
         if tag.lower() not in VOID_ELEMENTS:
             self.stack.pop()
@@ -206,6 +210,7 @@ class TreeBuilder(HTMLParser):
     def handle_data(self, data: str) -> None:
         # Append text to the *currently open* element. Whitespace-only text
         # outside any element is ignored.
+        """Accumulate visible text for rules that inspect element content."""
         if self.stack and data.strip():
             self.stack[-1].text += data
 

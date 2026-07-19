@@ -109,6 +109,7 @@ def extract_vocabulary(text: str) -> list[str]:
 
     def keep(term: str) -> None:
         # Strip surrounding punctuation and accept terms ≥ 2 chars only.
+        """Add a cleaned term to the ordered set, skipping dupes and 1-char noise."""
         term = term.strip(" .,;:!?'\"()[]{}")
         if len(term) < 2 or term.lower() in seen:
             return
@@ -292,6 +293,7 @@ def collect_project_text(root: Path, budget: int = PROJECT_READ_BUDGET) -> str:
     used: int = 0
 
     def append(text: str) -> None:
+        """Append text up to the remaining character budget, then stop."""
         nonlocal used
         if used >= budget:
             return

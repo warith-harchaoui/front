@@ -84,6 +84,7 @@ INFO = "info"
 
 @dataclass
 class Finding:
+    """One lint finding: file path, 1-indexed line, rule id, severity, and message."""
     path: Path
     line: int            # 1-indexed
     rule: str            # short id e.g. "MD001"
@@ -252,6 +253,7 @@ def _strip_code(text: str) -> str:
     """
     # Blank out fenced blocks but keep their newlines.
     def blank_fence(m: re.Match[str]) -> str:
+        """Replace a fenced block with equal-count newlines to preserve line numbers."""
         return "\n" * m.group(0).count("\n")
     no_fence = FENCE_RE.sub(blank_fence, text)
     # Blank out inline-code spans.
@@ -307,6 +309,7 @@ def lint_latex_blocks(path: Path, text: str) -> list[Finding]:
 # ── Mermaid rendering ─────────────────────────────────────────────────────
 
 def have_python_mmdc() -> bool:
+    """Return ``True`` when the Python ``mmdc`` package is importable."""
     try:
         import mmdc  # noqa: F401
         return True
@@ -315,6 +318,7 @@ def have_python_mmdc() -> bool:
 
 
 def have_node_mmdc() -> bool:
+    """Return ``True`` when the Node ``mmdc`` CLI is on ``PATH``."""
     return shutil.which("mmdc") is not None
 
 
@@ -434,6 +438,7 @@ except ImportError:
 
 
 def ai_suggest_mermaid(mermaid_src: str, model: str) -> Optional[list[dict]]:
+    """Ask the local LLM for accessible Mermaid node labels; ``None`` if unavailable."""
     if not HAVE_AI:
         return None
     payload = {
@@ -455,6 +460,7 @@ def ai_suggest_mermaid(mermaid_src: str, model: str) -> Optional[list[dict]]:
 
 
 def ai_caption_latex(latex_src: str, lang: str, model: str) -> Optional[str]:
+    """Ask the local LLM for a plain-language caption of a LaTeX block; ``None`` if unavailable."""
     if not HAVE_AI:
         return None
     payload = {
@@ -579,6 +585,7 @@ def _lint_standalone_mermaid(
 
 
 def main() -> int:
+    """CLI entry point for the Markdown linter; returns a process exit code."""
     p = make_parser(
         prog="front-publish-lint-md",
         description="Lint Markdown — heading order, code-fence languages, image alt, "

@@ -583,6 +583,7 @@ def _run_whisper_stage(
     )
 
     async def _drive() -> list:
+        """Drive one segment through the async caption stage and return its cues."""
         inbox: asyncio.Queue = asyncio.Queue()
         outbox: asyncio.Queue = asyncio.Queue()
         await inbox.put(segment)

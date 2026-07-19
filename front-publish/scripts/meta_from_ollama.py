@@ -387,11 +387,6 @@ def extract_json(text: str) -> dict:
     help="BCP-47 base tag (en, fr, es, …).",
 )
 @click.option(
-    "--model",
-    default=None,
-    help="Override the Ollama model tag.",
-)
-@click.option(
     "--no-cache",
     "no_cache",
     is_flag=True,
@@ -404,7 +399,6 @@ def _cli(
     site_name: str,
     canonical: str,
     lang: Optional[str],
-    model: Optional[str],
     no_cache: bool,
 ) -> int:
     """Click command body for ``meta_from_ollama``; returns an int exit code.
@@ -446,7 +440,8 @@ def _cli(
         resolved_lang = detect_text_language(page_text, fallback=detect_lang())
     else:
         resolved_lang = detect_lang()
-    resolved_model: str = model or pick_default_model()
+    # The model is fixed (gemma3:4b, the one authorized LLM); not a CLI knob.
+    resolved_model: str = pick_default_model()
 
     # Cache check — fast path returns immediately when the inputs match a
     # previous run.

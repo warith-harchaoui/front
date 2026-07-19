@@ -57,6 +57,41 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.25.0] — 2026-07-19 — one-LLM lock, 100% docstrings, progressive disclosure
+
+Second ralph-loop conformance round (fresh from-scratch `.private/ASSESSMENT.md`).
+Closes the last real inconsistency the prior round flagged, takes docstrings to
+100%, and pays down the progressive-disclosure debt on the two longest skills.
+
+- **One-LLM lock — the model is no longer user-selectable.** The `--model`
+  override is removed from every Ollama-LLM script (`front-vision`
+  alt_from_ollama / install_alt_ai, `front-audio` name_from_transcript,
+  `front-publish` plain_language / meta_from_ollama / narrate_post). The model is
+  fixed at `gemma3:4b`; `OLLAMA_MODEL` survives only as a labelled **test seam**,
+  never a user knob. The `front-vision` description/body/help no longer advertise
+  an override. This is now **enforced**: `test_single_llm.py` asserts (a) no LLM
+  script defines a `--model` / `--ai-hints-model` CLI flag and (b) no SKILL.md
+  `description:` advertises `OLLAMA_MODEL` / `--model`.
+- **Docstrings: 89% → 100%.** Backfilled the remaining 65 callables — HTMLParser
+  hooks (`audit_figure`, `audit_laws_of_ux`, `lint_a11y`), the 15 `front-cli`
+  Click leaf commands, `Finding` / `Conversion` dataclasses, nested closures
+  (`keep`, `append`, `blank_fence`, `model_fn`, `add`), and shared-helper methods
+  (re-propagated across copies). Every function / class / method is now documented.
+- **Progressive disclosure (Anthropic skill guide).** `front-figures/SKILL.md`
+  338 → 276: the inline Explainability / Causality / Auditor-rules tables — which
+  duplicated `references/explainability.md`, `references/causality.md`,
+  `references/audit-figure.md` — collapsed to concise pointers; the house-style
+  list tightened. `front-ui/SKILL.md` 262 → 222: the two inline worked examples
+  moved to the new `references/examples.md`. No content lost; the validator
+  confirms every reference path resolves.
+- **Triggers.** `front-figures` description trimmed (1022 → 1005 chars, dropped
+  the redundant "Pairs with…" prose) to make budget for the missing `refute` /
+  `refutation` (causal refutation battery) and `install figures`
+  (`install_figures.py`) triggers. `TRIGGERS.md` regenerated and drift-checked.
+
+All gates green: ruff, mypy (per-skill-dir), `validate_all.py`,
+`build_triggers.py --check`, the single-LLM lock gate, and the full pytest suite.
+
 ## [0.24.0] — 2026-07-19 — dual-runtime + coding-standard conformance pass
 
 A ralph-loop conformance round driven by a from-scratch `.private/ASSESSMENT.md`

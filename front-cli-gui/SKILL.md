@@ -23,7 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.24.0
+  version: 0.25.0
 ---
 
 # front-cli-gui — CLI → web GUI

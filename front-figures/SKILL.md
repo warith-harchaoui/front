@@ -8,14 +8,13 @@ description: >-
   EconML, and a static auditor that flags data-viz sins (missing axis labels,
   dual y-axes, truncated baselines, 3D pies, rainbow palettes, CVD-unsafe
   hues, chartjunk, undeclared polarity). Deterministic auditor, local-first
-  make side. Pairs with front-colors, front-vision, front-accessibility.
-  Trigger phrases: "chart this", "make a figure", "SHAP plot", "explain this
-  model", "feature importance", "shapash", "timeshap", "LIME", "causal
-  inference", "DoWhy", "EconML", "treatment effect", "DAG", "audit this
-  figure", "colorblind safe palette", "dual y-axis", "bar / line / scatter
-  chart", "Vega-Lite", "visualize data", "audit this chart". Output: Vega JSON
-  / PNG / SVG on disk + ``<figure>`` snippet; auditor emits JSON + exit codes
-  for CI.
+  make side. Trigger phrases: "chart this", "make a figure", "SHAP plot",
+  "explain this model", "feature importance", "shapash", "timeshap", "LIME",
+  "causal inference", "DoWhy", "EconML", "treatment effect", "refute",
+  "refutation", "DAG", "audit this figure", "colorblind safe palette", "dual
+  y-axis", "bar / line / scatter chart", "Vega-Lite", "visualize data", "audit
+  this chart", "install figures". Output: Vega JSON / PNG / SVG on disk +
+  ``<figure>`` snippet; auditor emits JSON + exit codes for CI.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The auditor (static) needs
@@ -26,7 +25,7 @@ compatibility: >-
   network required at figure-generation time once installed.
 metadata:
   author: Warith Harchaoui
-  version: 0.24.0
+  version: 0.25.0
 ---
 
 # front-figures — data-viz, explainability, and causality figures
@@ -115,107 +114,46 @@ any of the tiers.
 
 ## House style — figures that match `front-ui`
 
-Every figure emitted by `make_figure.py` inherits the same design
-tokens as the rest of the front-* ecosystem:
+Every figure `make_figure.py` emits inherits the front-* design tokens:
 
-1. **Colors** from `front-colors/references/palette.csv` (single source
-   of truth). No rainbow palettes, no matplotlib defaults, no Vega
-   defaults. Sequential encodings use `viridis`; diverging encodings
-   use `RdBu_r` (colorblind-safe when the center is zero); qualitative
-   encodings pull from the curated Apple-inspired palette.
-2. **Roboto** for every text element (labels, titles, legends). Roboto
-   Serif for editorial / publication presets. Roboto Mono for tabular
-   value labels and axis tick numbers.
-3. **No top spine, no right spine.** Bottom (x) and left (y) baselines
-   only, matching `front-ui/references/charts-vega.md`.
-4. **No tick marks** on either axis — labels alone read fine.
-5. **No gridlines** unless explicitly needed (heatmaps get a light
-   grid; time series don't).
-6. **No 3D**, no drop shadows, no gradients (except a single linear
-   fill for area charts).
-7. **Tabular numerals** for value labels.
-8. **Dark-mode aware** — Vega config toggles on
-   `data-color-scheme="dark"`; matplotlib uses `plt.style.use("dark_background")`
-   under `--dark`.
-9. **Polarity stated** on every quantitative axis whose "good direction"
-   is well-defined for the chart's context — appended to the axis
-   title as `"(higher is better)"`, `"(lower is better)"`, or
-   `"(target = N)"`. The primary encoding is *reinforced* by a
-   palette color derived from the metric's semantic intent —
-   **Green** for both `higher-better` and `lower-better` (both are
-   wins; Psychology-Positive: *Health*, *Hope*, *Growth*), **Blue**
-   for `target=<N>` (compliance frame; Psychology-Positive: *Trust*,
-   *Logic*, *Security*), **Red** reserved for the SLA-breach overlay
-   (Psychology-Negative: *Warning*, *Danger*). Never carried by
-   color alone — the text tag stays on the axis so the chart survives
-   CVD readers. See `references/polarity-and-color.md` +
-   `front-ui/references/charts-vega.md` §
-   "Polarity — higher or lower is better". Source of the semantic
-   palette: <https://harchaoui.org/warith/colors/>.
-10. **`role="img"` + `<figcaption>`** on every emitted `<figure>`; alt
-    text drafted from the chart title + polarity when
-    `--alt-from-title` is set.
+1. **Colors** from `front-colors/references/palette.csv` — no rainbows,
+   no library defaults. Sequential → `viridis`; diverging → `RdBu_r`;
+   qualitative → the curated Apple-inspired palette.
+2. **Roboto** everywhere (Serif for publication presets; Mono for
+   tabular value labels and tick numbers); **tabular numerals**.
+3. **No top/right spine, no tick marks, no gridlines** (heatmaps
+   excepted), **no 3D / shadows / gradients** (bar one area fill) —
+   matching `front-ui/references/charts-vega.md`.
+4. **Dark-mode aware** — Vega toggles on `data-color-scheme="dark"`;
+   matplotlib uses `dark_background` under `--dark`.
+5. **Polarity stated** on every quantitative axis with a well-defined
+   good direction — `(higher is better)` / `(lower is better)` /
+   `(target = N)`, reinforced (never carried) by a semantic palette
+   colour. Full mapping: `references/polarity-and-color.md`.
+6. **`role="img"` + `<figcaption>`** on every `<figure>`; alt text from
+   the chart title + polarity when `--alt-from-title` is set.
 
-## Explainability — one dispatcher, four engines
+## Explainability, causality, and auditor rules — see references
 
-`explain_model.py` picks the right engine given the model and data
-shape. You can override with `--engine`.
+The detailed catalogues live in `references/` (progressive disclosure —
+load the one you need):
 
-| Engine | When it fits | What it emits |
-|---|---|---|
-| **SHAP** (default) | Tree models (`XGBRegressor`, `LightGBM`, `RandomForest`, `sklearn.tree.*`), linear models, kernel models via `shap.Explainer`. | Summary plot (bar + beeswarm), dependence plots for the top-N features, one waterfall for the row with the largest absolute prediction. All as PNG + SVG in the output dir. |
-| **Shapash** | You want a full stakeholder-facing HTML report — feature contributions per row, global importance, filters. Wraps SHAP under the hood; you don't need to pick a masker. | A `smart_explainer.generate_report()` HTML + the underlying SHAP artefacts. |
-| **TimeSHAP** | Recurrent / attention-based **time-series** predictors (LSTM, GRU, transformer classifiers on sequences). SHAP alone struggles with sequence-shaped inputs; TimeSHAP decomposes contributions along the time axis. | Event / feature / cell level attribution plots, plus a pruned relevance summary. |
-| **LIME** | Black-box classifiers where SHAP is impractical (very deep nets, non-differentiable ensembles). Local approximation only; use as a fallback. | One HTML file per explained row (LIME's native output). |
-
-If `--engine auto` (the default) the dispatcher inspects the model
-object: `hasattr(model, "tree_") | "xgboost" in type(model).__module__ |
-"lightgbm" in type(model).__module__` → SHAP; `isinstance(model, torch.nn.Module)
-and data.ndim == 3` → TimeSHAP; otherwise → SHAP `Explainer` (which
-falls back to KernelSHAP). Pass `--report shapash` to always emit the
-Shapash HTML report on top of whatever engine was picked.
-
-## Causality — DoWhy's four-step loop, opinionated
-
-`causal_estimate.py` runs the canonical DoWhy pattern:
-
-1. **Model.** Load `dag.gml` (or a DoWhy-string DAG) and wrap the data
-   in a `CausalModel(data, treatment, outcome, graph)`.
-2. **Identify.** Ask the identification engine which backdoor /
-   instrumental / frontdoor set closes the estimand.
-3. **Estimate.** Backend picked by treatment type:
-   - **Binary treatment, discrete confounders** → DoWhy's built-in
-     propensity-score matching / stratification.
-   - **Continuous treatment or high-dimensional confounders** →
-     EconML's `LinearDML`, `SparseLinearDRLearner`, or `CausalForest`
-     depending on `--estimator`.
-4. **Refute.** Runs a battery of DoWhy refuters unless `--refute none`:
-   - **Placebo treatment refuter** — swap treatment with random noise;
-     estimate should collapse to zero.
-   - **Random common cause** — add an unobserved random confounder;
-     estimate should not change much.
-   - **Data subset refuter** — re-estimate on a random subset;
-     estimate should be stable.
-
-Output: `effect.json` (point estimate + CI + refutation deltas) and
-`dag.svg` (rendered via graphviz in the front-* house style).
-
-## Auditor rules — what the static parser flags
-
-Each rule ships with a **severity** and a **false-positive note** so
-you know when to `--ignore`.
-
-| Rule | Severity | What the static parser flags | False positives |
-|---|---|---|---|
-| `missing-axis-title` | error | Vega-Lite `encoding.x.axis.title` / `.y.axis.title` empty or absent for a quantitative axis. | An intentional single-metric sparkline where the title covers both axes — pass `--ignore missing-axis-title`. |
-| `dual-y-axis` | error | Two `y` encodings resolved to independent scales. | Twin-axis line charts are almost always misleading; the false-positive rate is genuinely low. |
-| `truncated-baseline` | warning | Bar chart with `scale.zero: false` on the value axis. | Ratio scales (log, ratio) — the parser exempts `scale.type` in `("log", "pow", "sqrt", "symlog")`. |
-| `pie-3d` | error | `mark.type == "arc"` with a rotate transform or an SVG with `perspective(` in the transform. | None — 3D pies are always wrong. |
-| `rainbow-palette` | error | Sequential encoding using `hsv`, `hsl`, `jet`, `rainbow`, or a hand-rolled hue rotation. | Only if you're explicitly rendering the visible spectrum; use `--ignore rainbow-palette`. |
-| `cvd-unsafe` | warning | Categorical palette contains a red + green pair with no lightness or shape differentiator. | Delegated preview: run `front-colors/scripts/simulate_cvd.py` on the rendered PNG for confirmation. |
-| `missing-polarity` | warning | Quantitative axis title matches a known metric (`latency`, `error`, `conversion`, `revenue`, …) without a `(higher is better)` / `(lower is better)` / `(target …)` tag. | Metrics with genuinely ambiguous polarity (headcount, inventory) — `--ignore missing-polarity`. |
-| `chartjunk` | warning | Background gradient, drop shadow, or mark shadow filter in the spec. | Intentional editorial illustrations — `--ignore chartjunk`. |
-| `role-img-missing` | error | Rendered `<figure>` without `role="img"` and no `<figcaption>`. | Pure decorative figures — mark with `role="presentation"` and `--ignore role-img-missing`. |
+- **Explainability.** `explain_model.py` dispatches to SHAP (default,
+  tree/linear/kernel) / Shapash (stakeholder HTML report) / TimeSHAP
+  (recurrent / attention time-series) / LIME (black-box fallback);
+  `--engine auto` inspects the model, `--engine` overrides, `--report
+  shapash` always adds the HTML report. Full engine-selection matrix and
+  per-engine output contract: `references/explainability.md`.
+- **Causality.** `causal_estimate.py` runs DoWhy's model → identify →
+  estimate → refute loop (EconML backends for continuous treatment;
+  placebo / random-common-cause / data-subset refuters unless `--refute
+  none`), writing `effect.json` + a house-styled `dag.svg`. Backends,
+  DAG encodings, and the refutation battery: `references/causality.md`.
+- **Auditor rules.** `audit_figure.py` flags `missing-axis-title`,
+  `dual-y-axis`, `truncated-baseline`, `pie-3d`, `rainbow-palette`,
+  `cvd-unsafe`, `missing-polarity`, `chartjunk`, and `role-img-missing`,
+  each with a severity and an `--ignore` escape. Full rule catalogue with
+  false-positive notes: `references/audit-figure.md`.
 
 ## Curated defaults — user data wins
 

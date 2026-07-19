@@ -69,14 +69,16 @@ class TestComposeVocabularyHint:
 # ── pick_default_model ─────────────────────────────────────────────────────
 
 class TestPickDefaultModel:
-    def test_env_override_wins(self, monkeypatch):
+    def test_env_seam_wins(self, monkeypatch):
+        # OLLAMA_MODEL is a TEST SEAM only (so the suite can point the resolver
+        # at a stub without a live daemon) — never a user-facing model choice.
         monkeypatch.setenv("OLLAMA_MODEL", "custom:tag")
         assert alt.pick_default_model() == "custom:tag"
 
     def test_default_is_registry_base_no_mlx(self, monkeypatch):
         # gemma3:4b is registry-standard and multimodal; no ``-mlx`` auto-suffix
         # (that only named a maintainer-local build and 404'd on a fresh box).
-        # Platform-independent now; power users override via OLLAMA_MODEL.
+        # With the seam unset the one authorized model is used.
         monkeypatch.delenv("OLLAMA_MODEL", raising=False)
         assert alt.pick_default_model() == alt.DEFAULT_BASE
         assert not alt.pick_default_model().endswith("-mlx")

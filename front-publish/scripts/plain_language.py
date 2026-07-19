@@ -369,11 +369,6 @@ def rewrite(
     help="Comma-separated tokens to keep verbatim (brand names, identifiers).",
 )
 @click.option(
-    "--model",
-    default=None,
-    help="Override the Ollama model tag.",
-)
-@click.option(
     "--no-cache",
     "no_cache",
     is_flag=True,
@@ -385,7 +380,6 @@ def _cli(
     target_grade: int,
     lang: Optional[str],
     preserve: str,
-    model: Optional[str],
     no_cache: bool,
 ) -> int:
     """Click command body for ``plain_language``; returns an int exit code.
@@ -413,12 +407,13 @@ def _cli(
 
     preserve_list: list[str] = [t.strip() for t in preserve.split(",") if t.strip()]
 
+    # The model is fixed (gemma3:4b); ``rewrite`` resolves it via
+    # ``pick_default_model`` — not user-selectable.
     out = rewrite(
         text,
         target_grade=target_grade,
         lang=lang,
         preserve=preserve_list,
-        model=model,
     )
 
     sys.stdout.write(out)

@@ -22,10 +22,10 @@ Guess **who is who** from a speaker-diarized transcript. Two passes:
 
 2. **LLM pass** — optional; runs only when ``--ollama`` is passed or
    ``OLLAMA_URL`` is reachable. Sends a compact JSON prompt to a local
-   Ollama daemon and expects a JSON mapping in return. Same default
-   model / URL as :mod:`alt_from_ollama` (``gemma3:4b`` +
-   ``http://localhost:11434``); override the model via OLLAMA_MODEL
-   on Apple-silicon.
+   Ollama daemon and expects a JSON mapping in return. Same fixed
+   model / URL as :mod:`alt_from_ollama` (``gemma3:4b``, the one
+   authorized LLM, + ``http://localhost:11434``). The model is not
+   selectable; ``OLLAMA_MODEL`` remains only as a test seam.
 
 Whichever pass returns the higher-confidence label per speaker wins.
 
@@ -77,7 +77,7 @@ Usage
     # From an un-merged pair (captions + diarization)
     python name_from_transcript.py interview.vtt \\
         --diarization interview.diarization.json \\
-        --ollama --model gemma3:4b --out interview.speakers.json
+        --ollama --out interview.speakers.json
 
 Author
 ------
@@ -198,6 +198,7 @@ def _run_rule_pass(cues: List[Dict[str, Any]]) -> Dict[str, List[Tuple[str, floa
     candidates: Dict[str, List[Tuple[str, float]]] = {}
 
     def add(spk: str, name: Optional[str], conf: float) -> None:
+        """Append a ``(name, confidence)`` candidate for a speaker, skipping empties."""
         if not name:
             return
         candidates.setdefault(spk, []).append((name, conf))
@@ -483,15 +484,12 @@ def _merge(*passes: Dict[str, Tuple[str, float]]) -> Dict[str, str]:
               help="Run the LLM refinement pass via local Ollama.")
 @click.option("--url", "ollama_url", default=DEFAULT_OLLAMA_URL, show_default=True,
               help="Ollama endpoint URL.")
-@click.option("--model", "ollama_model", default=DEFAULT_OLLAMA_MODEL, show_default=True,
-              help="Ollama base model tag (registry-standard; override via OLLAMA_MODEL).")
 def _cli(
     transcript: Path,
     diarization_path: Optional[Path],
     out: Optional[Path],
     use_ollama: bool,
     ollama_url: str,
-    ollama_model: str,
 ) -> int:
     """Click command body; returns an int exit code."""
     if not transcript.is_file():
@@ -520,7 +518,9 @@ def _cli(
 
     llm_final: Dict[str, Tuple[str, float]] = {}
     if use_ollama and _reachable(ollama_url):
-        resolved_model = _resolve_ollama_model(ollama_model)
+        # The model is fixed at gemma3:4b (the one authorized LLM); not a CLI
+        # knob. ``OLLAMA_MODEL`` remains only as a test seam.
+        resolved_model = _resolve_ollama_model(DEFAULT_OLLAMA_MODEL)
         print(f"→ Refining with Ollama ({resolved_model} @ {ollama_url})…", file=sys.stderr)
         llm_final = _llm_pass(cues, url=ollama_url, model=resolved_model, seed_names=rule_final)
     elif use_ollama:

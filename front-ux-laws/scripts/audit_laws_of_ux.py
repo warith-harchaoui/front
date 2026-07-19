@@ -243,6 +243,7 @@ class Walker(HTMLParser):
     """
 
     def __init__(self) -> None:
+        """Initialise the audit parser's element and text accumulators."""
         super().__init__(convert_charrefs=True)
         self.elements: list[Element] = []
         self._stack: list[int] = []
@@ -252,6 +253,7 @@ class Walker(HTMLParser):
     def handle_starttag(
         self, tag: str, attrs: list[tuple[str, str | None]]
     ) -> None:
+        """Record an opening tag and its attributes for later rule checks."""
         parent: int = self._stack[-1] if self._stack else -1
         line, _ = self.getpos()
         elem: Element = Element(
@@ -269,6 +271,7 @@ class Walker(HTMLParser):
 
     def handle_endtag(self, tag: str) -> None:
         # HTML in the wild is messy; only pop if the top matches.
+        """Record a closing tag for structural (nesting / heading) checks."""
         while self._stack:
             top: int = self._stack[-1]
             if self.elements[top].tag == tag:
@@ -280,6 +283,7 @@ class Walker(HTMLParser):
         self, tag: str, attrs: list[tuple[str, str | None]]
     ) -> None:
         # Self-closing form (``<input … />``) — same as start but no push.
+        """Record a self-closing tag (e.g. ``<img/>``, ``<input/>``)."""
         parent: int = self._stack[-1] if self._stack else -1
         line, _ = self.getpos()
         self.elements.append(
@@ -292,6 +296,7 @@ class Walker(HTMLParser):
         )
 
     def handle_data(self, data: str) -> None:
+        """Accumulate visible text for rules that inspect element content."""
         if not self._stack:
             return
         # Attach the raw text run to the element currently open.
