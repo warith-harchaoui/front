@@ -57,6 +57,24 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.23.0] — 2026-07-19 — one shared body-text extractor across skills
+
+Consolidates the duplicated HTML/Markdown text-extraction into a single,
+tested helper — the foundation for content-based language detection.
+
+- **`_lang.extract_body_text(content, fmt)`** — one canonical, stdlib-only
+  extractor: HTML (`html.parser`, skips `<script>`/`<style>`/`<svg>`/
+  `<noscript>`), Markdown (drops syntax, keeps prose + link/list labels), or
+  plain; `fmt="auto"` sniffs. Plus `detect_language(content, fmt)` =
+  extract + `detect_text_language`. Duplicated byte-identical across every
+  skill's `_lang.py` (self-contained), enforced by a **sync-guard test**.
+- **Consumers rewired** off their private extractors: `lint_a11y`'s
+  `<html lang>` fixer (was a local `_VisibleText`), `meta_from_ollama`
+  (was a local `extract_text`), `make_figure` (was `resolve_lang`; now detects
+  from the chart's title/labels). No configured default language anywhere.
+- **`tests/test_bodytext.py`** — HTML/Markdown/plain extraction, malformed-HTML
+  resilience, en/fr detection, no-signal fallback, and the copy-drift guard.
+
 ## [0.22.0] — 2026-07-19 — language is always detected; `lang_pair` removed
 
 No configured default language anywhere. The output language is **detected from

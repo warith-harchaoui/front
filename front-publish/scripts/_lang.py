@@ -2,22 +2,23 @@
 _lang
 =====
 
-Tiny language-detection helper shared across the Ollama-backed scripts.
+Shared, stdlib-first helper for **content-based language handling**: extract the
+visible body text from HTML / Markdown / plain content, then detect its language
+with `langdetect`_. One canonical implementation, duplicated (intentionally)
+across every front-* skill so each stays self-contained — **keep every copy
+byte-identical** (a test, ``tests/test_bodytext.py``, enforces it).
 
-Wraps `langdetect`_ — the Python port of Google's language-detection
-library — with a graceful fallback for environments where it is not
-installed.
+There is **no configured default language** anywhere in the suite: callers pass
+the content they actually process (surrounding text, page HTML, the input to
+rewrite, a transcript, chart labels) and the language is detected from it.
 
-The library is opt-in. ``langdetect`` lives under each Ollama tool's
-own ``requirements-*.txt`` file (alt text, meta tags, plain language,
-captions) so the lightweight scripts that need no third-party deps
-(``validate.py``, ``lint_a11y.py``, ``audit_contrast.py``,
-``site_indexes.py``) install nothing extra.
+``langdetect`` is opt-in — it lives under each Ollama tool's own
+``requirements-*.txt``. When it is absent, detection degrades to the caller's
+explicit fallback; ``extract_body_text`` itself is pure stdlib.
 
-Determinism note: ``langdetect`` seeds its random source from the input
-string by default, but its public ``DetectorFactory`` exposes a manual
-seed. We pin the seed once at import so two calls with the same text
-always return the same language tag.
+Determinism note: ``langdetect`` seeds its RNG from the input by default; we pin
+``DetectorFactory.seed`` once at import so the same text always maps to the same
+tag.
 
 .. _langdetect: https://github.com/Mimino666/langdetect
 
@@ -29,16 +30,133 @@ Author
 from __future__ import annotations
 
 import importlib.util
+import re
+from html.parser import HTMLParser
 
 
+# ── Body-text extraction (stdlib only) ──────────────────────────────────────
+
+class _VisibleTextParser(HTMLParser):
+    """Collect an HTML document's visible text, skipping ``<script>``,
+    ``<style>``, ``<svg>`` and ``<noscript>`` (code / graphics / boilerplate,
+    not prose)."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._skip_depth: int = 0
+        self.chunks: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: object) -> None:
+        # ``attrs`` is part of the HTMLParser override contract (unused here).
+        if tag in ("script", "style", "svg", "noscript"):
+            self._skip_depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in ("script", "style", "svg", "noscript") and self._skip_depth:
+            self._skip_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        if not self._skip_depth and data.strip():
+            self.chunks.append(data.strip())
+
+
+def _strip_html(content: str) -> str:
+    """Return the visible text of an HTML fragment/document."""
+    parser = _VisibleTextParser()
+    try:
+        parser.feed(content)
+    except Exception:  # noqa: BLE001 — malformed HTML must never crash a caller
+        # Fall back to a crude tag strip so we still return *some* text.
+        return re.sub(r"<[^>]+>", " ", content)
+    return " ".join(parser.chunks)
+
+
+#: Ordered Markdown cleanups: each (pattern, replacement) drops syntax while
+#: keeping the human-readable text (link/image *labels*, list *items*, …).
+_MD_SUBS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"```.*?```", re.S), " "),        # fenced code blocks
+    (re.compile(r"~~~.*?~~~", re.S), " "),         # fenced code blocks (~)
+    (re.compile(r"`[^`]*`"), " "),                  # inline code
+    (re.compile(r"!\[[^\]]*\]\([^)]*\)"), " "),     # images (drop alt + url)
+    (re.compile(r"\[([^\]]*)\]\([^)]*\)"), r"\1"),  # links -> label text
+    (re.compile(r"^\s{0,3}#{1,6}\s*", re.M), ""),   # ATX heading markers
+    (re.compile(r"^\s{0,3}>\s?", re.M), ""),         # blockquote markers
+    (re.compile(r"^\s{0,3}([*+-]|\d+\.)\s+", re.M), ""),  # list markers
+    (re.compile(r"^\s*([-*_]\s*){3,}$", re.M), " "),  # horizontal rules
+    (re.compile(r"[*_~]{1,3}"), ""),                 # emphasis / strikethrough
+    (re.compile(r"<[^>]+>"), " "),                    # inline HTML tags
+)
+
+
+def _strip_markdown(content: str) -> str:
+    """Return the prose text of a Markdown document (syntax removed)."""
+    text: str = content
+    for pattern, repl in _MD_SUBS:
+        text = pattern.sub(repl, text)
+    return text
+
+
+def _sniff_format(content: str) -> str:
+    """Guess the content format: ``"html"``, ``"markdown"``, or ``"text"``."""
+    head: str = content.lstrip()[:2000].lower()
+    if "<html" in head or "<body" in head or re.search(r"</[a-z][a-z0-9]*>", head):
+        return "html"
+    # Markdown signals: fenced code, ATX heading, or a link/image.
+    if re.search(r"(^|\n)\s{0,3}#{1,6}\s", content) or "```" in content \
+            or re.search(r"!\?\[[^\]]*\]\([^)]*\)", content) \
+            or re.search(r"\[[^\]]+\]\([^)]+\)", content):
+        return "markdown"
+    return "text"
+
+
+def extract_body_text(content: str, fmt: str = "auto") -> str:
+    """Extract the visible **body text** from HTML / Markdown / plain content.
+
+    A single, shared extraction step so every skill detects language (and
+    reasons over content) from the *same* cleanly-extracted text rather than
+    each caller assembling its own detection input. Stdlib-only.
+
+    Parameters
+    ----------
+    content : str
+        Raw source — an HTML document/fragment, a Markdown document, or plain
+        text.
+    fmt : str, optional
+        ``"html"`` / ``"htm"``, ``"markdown"`` / ``"md"``, ``"text"`` /
+        ``"plain"``, or ``"auto"`` (sniff from the content). Default ``"auto"``.
+
+    Returns
+    -------
+    str
+        Whitespace-collapsed visible text (single-spaced, trimmed).
+
+    Examples
+    --------
+    >>> extract_body_text("<html><body><p>Hello <b>world</b></p>"
+    ...                    "<script>var x=1</script></body></html>", "html")
+    'Hello world'
+    >>> extract_body_text("# Title\\n\\nSome **bold** [text](http://x).", "markdown")
+    'Title Some bold text.'
+    """
+    resolved: str = _sniff_format(content) if fmt == "auto" else fmt.strip().lower()
+    if resolved in ("html", "htm"):
+        text = _strip_html(content)
+    elif resolved in ("markdown", "md"):
+        text = _strip_markdown(content)
+    else:
+        text = content
+    return " ".join(text.split())
+
+
+# ── Language detection ──────────────────────────────────────────────────────
 
 def _have_langdetect() -> bool:
     """Return ``True`` when ``langdetect`` is importable."""
     return importlib.util.find_spec("langdetect") is not None
 
 
-# Pin the seed once so output is reproducible. The import is guarded so
-# this module stays importable on lightweight installs.
+# Pin the seed once so output is reproducible. Guarded so this module stays
+# importable on lightweight (stdlib-only) installs.
 if _have_langdetect():
     from langdetect import DetectorFactory  # type: ignore[import-not-found]
     DetectorFactory.seed = 0
@@ -82,3 +200,28 @@ def detect_text_language(text: str, fallback: str = "en") -> str:
         return detect(text).split("-")[0].lower()[:2]
     except LangDetectException:
         return fallback
+
+
+def detect_language(content: str, fmt: str = "auto", fallback: str = "en") -> str:
+    """Extract the body text of ``content`` and detect its language.
+
+    Convenience wrapper: ``detect_text_language(extract_body_text(content,
+    fmt), fallback)``. This is the one call every skill should use when it has
+    raw HTML / Markdown / text and wants the language — no configured default,
+    always detected from the content.
+
+    Parameters
+    ----------
+    content : str
+        Raw HTML / Markdown / plain content.
+    fmt : str, optional
+        Format hint for :func:`extract_body_text` (default ``"auto"``).
+    fallback : str, optional
+        Returned only when the language cannot be detected (default ``"en"``).
+
+    Returns
+    -------
+    str
+        Two-letter language code.
+    """
+    return detect_text_language(extract_body_text(content, fmt), fallback=fallback)

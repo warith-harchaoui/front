@@ -24,7 +24,7 @@ compatibility: >-
   torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.22.0
+  version: 0.23.0
 ---
 
 # front-publish — Markdown → website, meta, icons, indexes, plain language

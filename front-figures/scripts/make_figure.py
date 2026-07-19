@@ -76,7 +76,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _argparse import make_parser  # noqa: E402
-from _lang import resolve_lang  # noqa: E402
+from _lang import detect_language  # noqa: E402
 from _style import (  # noqa: E402
     infer_polarity,
     matplotlib_rc,
@@ -499,7 +499,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     """CLI entry point."""
     args = build_parser().parse_args(argv)
 
-    lang = resolve_lang(args.lang)
+    # Language: explicit --lang wins; else detect from the chart's own text
+    # (title / subtitle / axis column names) — no configured default.
+    _lang_hint = " ".join(t for t in (args.title, args.subtitle, args.x, args.y) if t)
+    lang = args.lang or detect_language(_lang_hint, fmt="text")
     dark = bool(args.dark) or os.environ.get("FRONT_DARK", "") == "1"
 
     rows, dtypes = load_data(args.data)

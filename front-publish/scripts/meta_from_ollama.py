@@ -94,7 +94,7 @@ from _ollama import (  # noqa: E402
     detect_lang,
     pick_default_model,
 )
-from _lang import detect_text_language  # noqa: E402
+from _lang import detect_text_language, extract_body_text  # noqa: E402
 
 
 # ── Module-level configuration ────────────────────────────────────────────────
@@ -231,12 +231,11 @@ def fetch_url(url: str) -> str:
 
 def extract_text(html: str, limit: int = PAGE_TEXT_LIMIT) -> str:
     """
-    Strip HTML markup and return readable text.
+    Return the readable body text of an HTML page, truncated to ``limit``.
 
-    The extractor is intentionally cheap — it drops ``<script>``, ``<style>``,
-    ``<svg>`` and ``<noscript>`` blocks, then removes all remaining tags and
-    collapses whitespace. It is not a real DOM parser; that is fine for the
-    meta-tag use case, which only needs the gist.
+    Delegates to the shared :func:`_lang.extract_body_text` (the one canonical
+    HTML→text extractor across the suite — drops ``<script>`` / ``<style>``,
+    strips tags, collapses whitespace) and applies the meta-specific length cap.
 
     Parameters
     ----------
@@ -249,16 +248,9 @@ def extract_text(html: str, limit: int = PAGE_TEXT_LIMIT) -> str:
     Returns
     -------
     str
-        Whitespace-collapsed text, truncated to ``limit``.
+        Whitespace-collapsed body text, truncated to ``limit``.
     """
-    # Drop noise blocks wholesale; their contents would mislead the model.
-    html = re.sub(r"(?is)<(script|style|svg|noscript)\b.*?</\1>", " ", html)
-    # Strip the remaining tags. Multi-line ``re.S`` matches angle brackets that
-    # span line breaks (rare but it happens in inlined SVG).
-    text = re.sub(r"(?s)<[^>]+>", " ", html)
-    # Collapse runs of whitespace and trim.
-    text = re.sub(r"\s+", " ", text).strip()
-    return text[:limit]
+    return extract_body_text(html, "html")[:limit]
 
 
 # ── Prompt + JSON extraction ────────────────────────────────────────────────

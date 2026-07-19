@@ -85,6 +85,7 @@ from pathlib import Path as _PathHelper
 # Shared parser factory: prog name, RawDescriptionHelpFormatter, --version.
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
 from _argparse import make_parser  # noqa: E402
+from _lang import detect_text_language, extract_body_text  # noqa: E402
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
@@ -564,39 +565,14 @@ ALL_RULES: dict[str, "Callable[..., Any]"] = {
 # ── Auto-fix machinery ────────────────────────────────────────────────────
 
 
-class _VisibleText(HTMLParser):
-    """Collect the document's visible text, skipping ``<script>`` / ``<style>``.
-
-    Stdlib-only text extraction so the language of an HTML document can be
-    detected from its own body content (no external DOM, no browser).
-    """
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._skip: int = 0
-        self.chunks: list[str] = []
-
-    def handle_starttag(self, tag: str, attrs: object) -> None:
-        if tag in ("script", "style"):
-            self._skip += 1
-
-    def handle_endtag(self, tag: str) -> None:
-        if tag in ("script", "style") and self._skip:
-            self._skip -= 1
-
-    def handle_data(self, data: str) -> None:
-        if not self._skip and data.strip():
-            self.chunks.append(data.strip())
-
-
 def _detect_html_lang(lines: list[str]) -> Optional[str]:
     """Detect the document language from the HTML's own visible body text.
 
-    Extracts the visible text (skipping ``<script>`` / ``<style>``) and runs
-    ``langdetect`` on it. Returns a two-letter BCP-47 base tag, or ``None``
-    when the language cannot be determined — ``langdetect`` not installed, or
-    too little text to be reliable. **There is no default language**: the
-    caller leaves the finding unfixed rather than guessing.
+    Uses the shared :func:`_lang.extract_body_text` (HTML → visible text) and
+    :func:`_lang.detect_text_language`. Returns a two-letter code, or ``None``
+    when the language cannot be determined — ``langdetect`` absent, or too
+    little text. **There is no default language**: the caller then leaves the
+    finding unfixed rather than guessing.
 
     Parameters
     ----------
@@ -608,25 +584,13 @@ def _detect_html_lang(lines: list[str]) -> Optional[str]:
     str or None
         Lower-case two-letter language code, or ``None`` if undetectable.
     """
-    parser = _VisibleText()
-    try:
-        parser.feed("\n".join(lines))
-    except Exception:  # noqa: BLE001 — malformed HTML must not crash the fixer
-        return None
-    text: str = " ".join(parser.chunks)
-    # Need real signal: below ~20 non-whitespace chars langdetect is noise.
+    text: str = extract_body_text("\n".join(lines), "html")
     if len("".join(text.split())) < 20:
         return None
-    try:
-        from langdetect import DetectorFactory, detect  # type: ignore[import-not-found]
-        from langdetect.lang_detect_exception import LangDetectException  # type: ignore[import-not-found]
-    except ImportError:
-        return None
-    DetectorFactory.seed = 0  # deterministic output for the same input
-    try:
-        return detect(text).split("-")[0].lower()[:2]
-    except LangDetectException:
-        return None
+    # Empty fallback → ``detect_text_language`` returns "" when it cannot
+    # detect (langdetect missing / low signal); map that to None (no default).
+    code: str = detect_text_language(text, fallback="")
+    return code or None
 
 
 def _fix_html_missing_lang(lines: list[str], finding: "Finding") -> bool:
