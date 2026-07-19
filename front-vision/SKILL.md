@@ -24,8 +24,7 @@ compatibility: >-
   first run.
 metadata:
   author: Warith Harchaoui
-  version: 0.21.0
-  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
+  version: 0.22.0
 ---
 
 # front-vision — local AI alt text for accessibility
@@ -38,8 +37,8 @@ Solo developers and small teams who:
   at runtime via a hosted service.
 - Want **local-first AI** — no SaaS, no data exfiltration, no per-image
   cost. Runs on any box through Ollama.
-- Want **bilingual output** (EN/FR by default; pair configurable via
-  ``lang_pair``) without spelling out the language flag every time.
+- Want **bilingual output** — the language is auto-detected from the
+  surrounding text (via `langdetect`); no flag, no configured default.
 - Want **vocabulary biasing** so the model knows your product / brand /
   technical-term spellings before it hallucinates a near-miss.
 
@@ -127,29 +126,6 @@ python front-accessibility/scripts/lint_a11y.py public/                       # 
 python front-colors/scripts/audit_contrast.py --palette palette.json # WCAG ratios
 python front-vision/scripts/alt_from_ollama.py public/hero.jpg       # AI alt text
 ```
-
-## Changing the language pair
-
-``front-vision`` inherits **bilingual** defaults (EN/FR by default —
-configurable via ``lang_pair``). The pair lives in this file's
-frontmatter under ``metadata.lang_pair`` as two comma-separated BCP-47
-base tags. It controls the default ``--lang`` for ``alt_from_ollama.py``
-and is mirrored in ``front-accessibility/SKILL.md``, ``front-ui/SKILL.md``, and
-``front-publish/SKILL.md`` so every skill in the family stays in
-lock-step. To switch (Berlin → ``en,de``; Tokyo → ``en,ja``; Madrid →
-``en,es``), edit the value in every SKILL.md.
-
-**Runtime override.** Set the ``FRONT_LANG_PAIR`` environment variable
-to override the pair from the shell — its first comma-split entry
-becomes the default ``--lang`` when no flag is passed:
-
-```bash
-export FRONT_LANG_PAIR="en,de"
-python front-vision/scripts/alt_from_ollama.py photo.jpg   # → German alt text
-```
-
-Precedence (highest first): explicit ``--lang`` flag → ``FRONT_LANG_PAIR``
-first entry → langdetect on available text → POSIX locale fallback.
 
 ## When NOT to use this skill
 

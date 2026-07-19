@@ -47,9 +47,10 @@ Usage
     python make_figure.py data.csv --x quarter --y revenue --kind bar \\
         --preset publication --emit svg --out fig.svg
 
-    # French axis titles via runtime language override
-    FRONT_LANG_PAIR=en,fr python make_figure.py data.csv \\
-        --x date --y conversion_rate --kind line
+    # Axis-title language auto-detected from the column names / title;
+    # pass --lang to force one
+    python make_figure.py data.csv --x date --y conversion_rate \\
+        --kind line --lang fr
 
 Notes
 -----

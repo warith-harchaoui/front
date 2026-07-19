@@ -24,8 +24,7 @@ compatibility: >-
   torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.21.0
-  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
+  version: 0.22.0
 ---
 
 # front-publish — Markdown → website, meta, icons, indexes, plain language
@@ -66,47 +65,6 @@ axis: ten make-side scripts paired with one audit-side gate.
 Pair the emitted HTML with `front-accessibility/scripts/lint_a11y.py`
 (a11y) and `front-colors/scripts/audit_contrast.py` (contrast) to
 complete the audit side end-to-end.
-
-## Changing the language pair
-
-`front-publish` is **bilingual** (EN/FR by default — configurable via
-`lang_pair`). The pair lives in this file's frontmatter, under
-`metadata.lang_pair`, as two comma-separated BCP-47 base tags. To use
-a different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
-
-1. Edit `metadata.lang_pair` in `SKILL.md` (this file).
-2. Mirror the same value in `front-ui/SKILL.md` and
-   `front-accessibility/SKILL.md` so the three skills stay in lock-step.
-3. The pair is consumed everywhere the skill currently uses EN/FR:
-   - **Meta tags** (`scripts/meta_from_ollama.py`): `og:locale` defaults
-     to the first tag, `og:locale_alternate` to the second.
-   - **Site indexes** (`scripts/site_indexes.py`): `<link
-     rel="alternate" hreflang>` pairs in the sitemap.
-   - **Plain-language rewriter** (`scripts/plain_language.py`): the
-     `--lang` default falls back to the first tag if the environment
-     locale isn't set.
-   - **Alt text** (`front-vision/scripts/alt_from_ollama.py --lang`).
-   - **Captions** (`front-audio/scripts/captions_from_whisper.py --lang`).
-
-**Runtime override.** For ad-hoc shells, set the `FRONT_LANG_PAIR`
-environment variable instead of editing the frontmatter — the four
-Ollama-backed scripts read its first comma-split entry as the default
-`--lang` when none is passed on the command line:
-
-```bash
-export FRONT_LANG_PAIR="en,de"
-python front-publish/scripts/plain_language.py copy.md     # → German rewrite
-```
-
-Precedence (highest first): explicit `--lang` flag → `FRONT_LANG_PAIR`
-first entry → langdetect on available text → POSIX locale fallback.
-
-See `references/i18n.md` for the full multilingual recipe (URL
-strategy, `Intl.*`, plurals, RTL, non-Latin fonts). The `lang_pair`
-token is the project-level default for the **two main languages** the
-skill maintains in lock-step; sites that ship in three or more
-languages should keep `lang_pair` as the two anchored languages and
-use the i18n reference's `supported` list for the rest.
 
 ## Markdown → website workflow
 

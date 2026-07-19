@@ -61,23 +61,30 @@ def _write(tmp_path: Path, name: str, body: str) -> Path:
 # ── Per-fixer correctness ──────────────────────────────────────────────────
 
 
-def test_fix_html_missing_lang(tmp_path: Path) -> None:
-    """``<html>`` without ``lang`` gets ``lang="en"`` injected."""
-    p: Path = _write(tmp_path, "page.html", "<html><body></body></html>")
+def test_fix_html_missing_lang_detects_english(tmp_path: Path) -> None:
+    """The fixer detects the language from the document's own body text."""
+    html = ("<html><body><p>The quick brown fox jumps over the lazy dog "
+            "and keeps running along the river bank.</p></body></html>")
+    p: Path = _write(tmp_path, "page.html", html)
     applied, _, _ = fix_file(p, ignored=set())
     assert applied >= 1
-    body: str = p.read_text(encoding="utf-8")
-    assert 'lang="en"' in body
+    assert 'lang="en"' in p.read_text(encoding="utf-8")
 
 
-def test_fix_html_missing_lang_respects_env(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """``FRONT_LANG_PAIR`` first entry overrides the default lang."""
-    monkeypatch.setenv("FRONT_LANG_PAIR", "fr,en")
-    p: Path = _write(tmp_path, "page.html", "<html><body></body></html>")
+def test_fix_html_missing_lang_detects_french(tmp_path: Path) -> None:
+    """Detection is content-driven — French body text yields ``lang="fr"``."""
+    html = ("<html><body><p>Le rapide renard brun saute par-dessus le chien "
+            "paresseux et continue sa route le long du fleuve.</p></body></html>")
+    p: Path = _write(tmp_path, "page.html", html)
     fix_file(p, ignored=set())
     assert 'lang="fr"' in p.read_text(encoding="utf-8")
+
+
+def test_fix_html_missing_lang_no_text_left_unfixed(tmp_path: Path) -> None:
+    """No body text → language undetectable → NO default injected (left unfixed)."""
+    p: Path = _write(tmp_path, "page.html", "<html><body></body></html>")
+    fix_file(p, ignored=set())
+    assert "lang=" not in p.read_text(encoding="utf-8")
 
 
 def test_fix_img_redundant_aria(tmp_path: Path) -> None:
@@ -147,6 +154,7 @@ def test_fix_is_idempotent(tmp_path: Path) -> None:
     """A second --fix pass performs zero edits and emits zero findings."""
     src: str = (
         "<html><body>"
+        "<p>The quick brown fox jumps over the lazy dog and keeps running.</p>"
         '<img src="x.png" alt="" role="presentation" aria-hidden="true">'
         '<button tabindex="3" aria-hidden="true">X</button>'
         '<div class="animate-spin">spin</div>'

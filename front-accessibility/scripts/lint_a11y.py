@@ -78,7 +78,6 @@ Author
 from __future__ import annotations
 
 import json
-import os
 import re
 import sys
 from pathlib import Path as _PathHelper
@@ -565,36 +564,92 @@ ALL_RULES: dict[str, "Callable[..., Any]"] = {
 # ── Auto-fix machinery ────────────────────────────────────────────────────
 
 
-#: Default lang attribute value for the ``html-missing-lang`` fixer.
-#: First comma-split entry of ``FRONT_LANG_PAIR`` when set, else "en".
-def _default_lang() -> str:
-    """
-    Resolve the lang code the fixer should drop into ``<html lang="…">``.
+class _VisibleText(HTMLParser):
+    """Collect the document's visible text, skipping ``<script>`` / ``<style>``.
 
-    Honours the same ``FRONT_LANG_PAIR`` env var as the rest of the
-    front-* ecosystem (e.g. ``"en,de"`` → ``"en"``); falls back to
-    ``"en"`` when the env var is unset or malformed.
+    Stdlib-only text extraction so the language of an HTML document can be
+    detected from its own body content (no external DOM, no browser).
     """
-    pair: str = os.environ.get("FRONT_LANG_PAIR", "").strip()
-    if not pair:
-        return "en"
-    first: str = pair.split(",", 1)[0].strip()
-    return first or "en"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._skip: int = 0
+        self.chunks: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: object) -> None:
+        if tag in ("script", "style"):
+            self._skip += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in ("script", "style") and self._skip:
+            self._skip -= 1
+
+    def handle_data(self, data: str) -> None:
+        if not self._skip and data.strip():
+            self.chunks.append(data.strip())
+
+
+def _detect_html_lang(lines: list[str]) -> Optional[str]:
+    """Detect the document language from the HTML's own visible body text.
+
+    Extracts the visible text (skipping ``<script>`` / ``<style>``) and runs
+    ``langdetect`` on it. Returns a two-letter BCP-47 base tag, or ``None``
+    when the language cannot be determined — ``langdetect`` not installed, or
+    too little text to be reliable. **There is no default language**: the
+    caller leaves the finding unfixed rather than guessing.
+
+    Parameters
+    ----------
+    lines : list of str
+        The full HTML source, split into lines.
+
+    Returns
+    -------
+    str or None
+        Lower-case two-letter language code, or ``None`` if undetectable.
+    """
+    parser = _VisibleText()
+    try:
+        parser.feed("\n".join(lines))
+    except Exception:  # noqa: BLE001 — malformed HTML must not crash the fixer
+        return None
+    text: str = " ".join(parser.chunks)
+    # Need real signal: below ~20 non-whitespace chars langdetect is noise.
+    if len("".join(text.split())) < 20:
+        return None
+    try:
+        from langdetect import DetectorFactory, detect  # type: ignore[import-not-found]
+        from langdetect.lang_detect_exception import LangDetectException  # type: ignore[import-not-found]
+    except ImportError:
+        return None
+    DetectorFactory.seed = 0  # deterministic output for the same input
+    try:
+        return detect(text).split("-")[0].lower()[:2]
+    except LangDetectException:
+        return None
 
 
 def _fix_html_missing_lang(lines: list[str], finding: "Finding") -> bool:
-    """Insert ``lang="en"`` into the ``<html …>`` opening tag."""
+    """Insert ``lang="<detected>"`` into the ``<html …>`` opening tag.
+
+    The language is **detected from the document's own visible body text** —
+    there is no default language. When it cannot be detected (``langdetect``
+    absent, or too little text), the finding is left unfixed for a human
+    rather than guessing.
+    """
     idx: int = finding.line - 1
     if not (0 <= idx < len(lines)):
         return False
     line: str = lines[idx]
-    # Only patch when the tag has no lang attr at all — re-running
-    # against a fixed file is a no-op.
+    # Only patch when the tag has no lang attr at all — re-running against a
+    # fixed file is a no-op.
     if re.search(r"<html\b[^>]*\blang=", line, re.IGNORECASE):
         return False
+    lang: Optional[str] = _detect_html_lang(lines)
+    if not lang:
+        return False  # cannot detect the language → do not inject a default
     new_line: str = re.sub(
-        r"<html\b", f'<html lang="{_default_lang()}"', line, count=1,
-        flags=re.IGNORECASE,
+        r"<html\b", f'<html lang="{lang}"', line, count=1, flags=re.IGNORECASE,
     )
     if new_line == line:
         return False

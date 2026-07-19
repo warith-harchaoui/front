@@ -12,7 +12,7 @@ description: >-
   transcript-based rule + local Ollama pass that mines self-introductions
   ("I'm Alice") and vocatives ("Hey Mary, ..."). Merger emits speaker-
   labelled VTT with ``<v Name>`` cues. Project-vocab biasing on the caption
-  path. Bilingual EN/FR default, configurable via lang_pair. Local-first —
+  path. Bilingual EN/FR default, auto-detected from context. Local-first —
   never sends audio to a SaaS. Output is a captions / RTTM / speakers.json /
   speaker-VTT file on disk + a ready-to-paste snippet on stdout.
 license: BSD-3-Clause
@@ -32,8 +32,7 @@ compatibility: >-
   install completes.
 metadata:
   author: Warith Harchaoui
-  version: 0.21.0
-  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
+  version: 0.22.0
 ---
 
 # front-audio — local AI captions and transcripts
@@ -50,8 +49,8 @@ Solo developers and small teams who:
 - Want **vocabulary biasing** so the model knows the project's
   technical terms / product names / people's names before it
   hallucinates a near-miss spelling.
-- Want a **bilingual** default (EN/FR; pair configurable via
-  ``lang_pair``) without spelling out the language flag every time.
+- Want **bilingual** captions — the language is auto-detected from the
+  transcript / vocabulary (via `langdetect`); no flag, no configured default.
 
 This skill is **not** a substitute for a human review pass. Each draft
 should be read and corrected — automatic captions miss proper nouns,
@@ -156,8 +155,7 @@ for that, switch model.
 ## Models
 
 The installer pulls a small GGML model by default (``ggml-base.en``
-for English-leaning sets, ``ggml-medium`` when ``lang_pair`` is bigger
-than EN). Override paths:
+for English-leaning sets, ``ggml-medium`` for broader / multilingual sets). Override paths:
 
 1. ``--model <path>`` on the command line (full path to a ``.bin``).
 2. ``WHISPER_MODEL_PATH=<path>`` env var.
@@ -180,31 +178,6 @@ python front-audio/scripts/captions_from_whisper.py --auto-project <media>
 element. Add ``<track kind="subtitles">`` for translations,
 ``<track kind="descriptions">`` for audio descriptions,
 ``<track kind="chapters">`` for navigation when chapters exist.
-
-## Changing the language pair
-
-``front-audio`` inherits **bilingual** defaults (EN/FR by default —
-configurable via ``lang_pair``). The pair lives in this file's
-frontmatter under ``metadata.lang_pair`` as two comma-separated BCP-47
-base tags. It controls the default ``--lang`` for
-``captions_from_whisper.py`` and is mirrored in
-``front-accessibility/SKILL.md``, ``front-vision/SKILL.md``,
-``front-ui/SKILL.md`` and ``front-publish/SKILL.md`` so every skill in
-the family stays in lock-step. To switch (Berlin → ``en,de``;
-Tokyo → ``en,ja``; Madrid → ``en,es``), edit the value in every
-SKILL.md.
-
-**Runtime override.** Set the ``FRONT_LANG_PAIR`` environment variable
-to override the pair from the shell — its first comma-split entry
-becomes the default ``--lang`` when no flag is passed:
-
-```bash
-export FRONT_LANG_PAIR="en,de"
-python front-audio/scripts/captions_from_whisper.py podcast.mp3   # → German captions
-```
-
-Precedence (highest first): explicit ``--lang`` flag → ``FRONT_LANG_PAIR``
-first entry → langdetect on available text → POSIX locale fallback.
 
 ## When NOT to use this skill
 

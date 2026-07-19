@@ -26,8 +26,7 @@ compatibility: >-
   network required at figure-generation time once installed.
 metadata:
   author: Warith Harchaoui
-  version: 0.21.0
-  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
+  version: 0.22.0
 ---
 
 # front-figures — data-viz, explainability, and causality figures
@@ -269,29 +268,6 @@ python front-vision/scripts/alt_from_ollama.py --kind complex \
 # 7. Static a11y lint on the page that hosts the figure.
 python front-accessibility/scripts/lint_a11y.py public/report.html
 ```
-
-## Changing the language pair
-
-`front-figures` inherits **bilingual** defaults (EN/FR by default —
-configurable via `lang_pair`). The pair lives in this file's
-frontmatter under `metadata.lang_pair` as two comma-separated BCP-47
-base tags. It controls the default `--lang` for axis titles,
-figure captions, and Shapash report language when the backend
-supports it. It's mirrored in every other `front-*/SKILL.md` so the
-family stays in lock-step.
-
-**Runtime override.** Set the `FRONT_LANG_PAIR` environment variable
-to override the pair from the shell — its first comma-split entry
-becomes the default `--lang` when no flag is passed:
-
-```bash
-export FRONT_LANG_PAIR="en,de"
-python front-figures/scripts/make_figure.py data.csv \
-    --x date --y latency_ms --kind line   # → German axis titles
-```
-
-Precedence (highest first): explicit `--lang` flag → `FRONT_LANG_PAIR`
-first entry → langdetect on available text → POSIX locale fallback.
 
 ## When NOT to use this skill
 

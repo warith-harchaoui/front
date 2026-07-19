@@ -23,8 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.21.0
-  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
+  version: 0.22.0
 ---
 
 # front-ui — vanilla JS + Tailwind UI generation
@@ -102,46 +101,8 @@ the catalog (as the other skills load `prompts/*.yaml` via `_prompts`).
 5. **Both color schemes.** Every styled element gets a `dark:` peer.
 6. **Accessibility is shipping-required.** See `references/ui-guidelines/foundations/accessibility.md`.
 7. **No raw hex** in markup — use semantic Tailwind tokens (`bg-brand-blue`, `text-label-primary`). **Curated default — user colors win** (mirror of rule 3, but for palette): when generating fresh output and no palette has been specified, use the 8 saturated brand hues from `front-colors/references/palette.csv` (regenerable with `python front-colors/scripts/palette_to_tailwind.py`). **The default does NOT apply when:** (a) **auditing an existing UI** — respect the project's tokens; do not propose a CSV swap; (b) **the user names colors** ("our brand is #8B5CF6", "use Material's primary") — use those; (c) **the project already has a `tailwind.config.js`** with brand tokens — leave them alone unless asked. Either way, rule 7's "no raw hex in markup" still holds: add the user's color to the config as a token, then reference the token.
-8. **Bilingual-ready copy** (EN/FR by default — configurable via `lang_pair`). Default to English. Switch to the user's language when they write in it. The project-level pair is set in this SKILL.md's frontmatter `metadata.lang_pair` token and is consumed by every place the skill currently talks about EN/FR — see **Changing the language pair** below and `front-publish/references/i18n.md` for the full configuration recipe.
+8. **Bilingual-ready copy** (EN/FR by default). The output language of the AI-backed scripts is **auto-detected from the input/context text** via `langdetect` — there is no configured default language. For translatable UI strings and prompts, use one `locales/i18n.yaml` catalog (see `front-ui/scripts/i18n_make.py` and `front-publish/references/i18n.md`).
 9. **No third-party trademarks** in defaults (logos, product names, OS branding). Use generic, neutral language.
-
-## Changing the language pair
-
-`front-ui` is **bilingual** (EN/FR by default — configurable via
-`lang_pair`). The pair lives in this file's frontmatter, under
-`metadata.lang_pair`, as two comma-separated BCP-47 base tags. To use a
-different pair (Berlin → `en,de`; Tokyo → `en,ja`; Madrid → `en,es`):
-
-1. Edit `metadata.lang_pair` in `SKILL.md` (this file).
-2. Mirror the same value in any companion skill you install
-   (`front-publish/SKILL.md`, `front-accessibility/SKILL.md`).
-3. The skill uses the pair everywhere it currently uses EN/FR — the
-   alt-text language line (`alt_from_ollama.py --lang`), the captions
-   language hint (`captions_from_whisper.py --lang`), the meta-tag
-   `og:locale_alternate`, the docs site's `<link rel="alternate"
-   hreflang>` pairs.
-
-**Runtime override.** For ad-hoc shells, set the `FRONT_LANG_PAIR`
-environment variable instead of editing the frontmatter — the four
-Ollama-backed scripts (`alt_from_ollama.py`, `captions_from_whisper.py`,
-`meta_from_ollama.py`, `plain_language.py`) read its first comma-split
-entry as the default `--lang` when none is passed on the command line:
-
-```bash
-export FRONT_LANG_PAIR="en,de"
-python front-vision/scripts/alt_from_ollama.py photo.jpg   # → German alt text
-```
-
-Precedence (highest first): explicit `--lang` flag → `FRONT_LANG_PAIR`
-first entry → langdetect on available text → POSIX locale fallback.
-
-The wider i18n model (URL strategy, `Intl.*`, plurals, RTL,
-non-Latin fonts) is in `front-publish/references/i18n.md`. The
-`lang_pair` token is a project-level default for the **two main
-languages** the skill maintains in lock-step; it is not the full
-supported-locale list. Sites that ship in three or more languages
-should keep `lang_pair` as the two anchored languages and use the
-i18n reference's `supported` list for the rest.
 
 ## Build vs prototype
 

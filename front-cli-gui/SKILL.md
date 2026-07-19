@@ -22,8 +22,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.21.0
-  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
+  version: 0.22.0
 ---
 
 # front-cli-gui — CLI → web GUI
@@ -191,17 +190,6 @@ can introspect the command tree at step 4. **Soft default**, in order:
 For non-Python projects, the equivalents that work cleanly with this
 skill are **clap** (Rust), **commander** (Node), and **cobra** (Go) —
 all generate the introspectable `--help` the inventory step expects.
-
-## Changing the language pair
-
-`front-cli-gui` inherits **bilingual** defaults from `front-ui`
-(EN/FR by default — configurable via `lang_pair`). The token in
-`metadata.lang_pair` is informational here (the CLI → GUI scaffold
-itself does not localize strings on your behalf — it preserves the
-labels found in the CLI's `--help`), but mirroring the value across
-every front-* SKILL.md keeps the install consistent for users who
-read more than one skill. See `front-publish/SKILL.md` → "Changing the
-language pair" for the canonical recipe.
 
 ## When NOT to use this skill
 

@@ -29,44 +29,7 @@ Author
 from __future__ import annotations
 
 import importlib.util
-import os
 
-
-def lang_pair_default() -> str | None:
-    """
-    Return the first entry of the ``FRONT_LANG_PAIR`` env var, or ``None``.
-
-    The env var holds a comma-separated language pair like ``"en,fr"``
-    (matching the ``lang_pair`` field in each SKILL.md frontmatter). When
-    set, the first entry is the preferred default language for any script
-    that accepts ``--lang`` and was not given one on the command line.
-
-    Whitespace around each comma-split entry is tolerated; an empty or
-    whitespace-only entry yields ``None`` so the caller falls back to the
-    next layer (langdetect, then env-derived locale).
-
-    Examples
-    --------
-    >>> import os
-    >>> os.environ.pop("FRONT_LANG_PAIR", None)
-    >>> lang_pair_default() is None
-    True
-    >>> os.environ["FRONT_LANG_PAIR"] = "en,fr"
-    >>> lang_pair_default()
-    'en'
-    >>> os.environ["FRONT_LANG_PAIR"] = "  fr ,  de "
-    >>> lang_pair_default()
-    'fr'
-    >>> os.environ["FRONT_LANG_PAIR"] = ""
-    >>> lang_pair_default() is None
-    True
-    >>> del os.environ["FRONT_LANG_PAIR"]
-    """
-    raw = os.environ.get("FRONT_LANG_PAIR", "")
-    if not raw.strip():
-        return None
-    first = raw.split(",", 1)[0].strip()
-    return first or None
 
 
 def _have_langdetect() -> bool:

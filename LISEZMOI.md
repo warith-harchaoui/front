@@ -187,16 +187,13 @@ Pour des sites réels déjà livrés sur cette pile, voir
   **Vite + Tailwind** sur le HTML émis avant déploiement ; les noms de
   classes sont stables, donc les mêmes fichiers survivent à la
   bascule. Voir `front-ui/references/stack-tailwind.md`.
-- Copy bilingue (EN/FR par défaut — configurable via `lang_pair`).
-  Anglais en sortie, bascule sur la langue de l'utilisateur. La paire
-  par projet se règle dans le token `metadata.lang_pair` du frontmatter
-  de n'importe quel skill (EN/FR, EN/DE, EN/ES, EN/JA, …) — voir
-  chaque `SKILL.md` → « Changing the language pair » et
-  `front-publish/references/i18n.md`. Pour une surcharge ponctuelle
-  depuis le shell, utilisez la variable d'environnement
-  `FRONT_LANG_PAIR` (par exemple `export FRONT_LANG_PAIR="en,fr"`) ;
-  la première entrée devient le `--lang` par défaut des scripts
-  Ollama quand aucun drapeau n'est passé.
+- Copy bilingue (EN/FR par défaut). La langue de sortie des scripts
+  IA est **détectée automatiquement depuis le texte d'entrée / de
+  contexte** via `langdetect` — pas de langue par défaut configurée ;
+  passez `--lang` pour en forcer une. Pour les chaînes d'interface et
+  les prompts traduisibles, utilisez un seul catalogue
+  `locales/i18n.yaml` (voir `front-ui/scripts/i18n_make.py` et
+  `front-publish/references/i18n.md`).
 - **L'i18n vit dans du YAML, jamais dans du JS.** Les chaînes
   traduisibles — libellés d'interface **et** prompts LLM — vivent dans
   un seul catalogue par projet, **`locales/i18n.yaml`** (id de message →
@@ -222,7 +219,7 @@ comme amélioration éditoriale optionnelle, pas exigence WCAG.
 | `front-ui` (règles de pile, tokens, composants, dataviz, checklist) | Stable | Les 9 règles dures documentées ; `validate.py` stdlib uniquement ; couvert par `tests/test_validate.py`. |
 | `front-cli` (pilote `front` unifié, complétion shell) | Stable | Basé sur Click ; transmission du `--help` corrigée en 0.3.0 (test de non-régression en 0.3.1). |
 | `front-cli-gui` (CLI → IHM, phare) | Stable (skill + démo exécutable) | `assets/examples/cli-gui-demo/` tourne de bout en bout. Durcissement production (auth, rate-limit, sandbox) délibérément laissé à l'hôte. |
-| `front-publish` (site Markdown, meta, favicons, indexes, langage clair, narration audio) | Stable | 11 scripts publics couvrant les quatre artefacts cœur (favicons, meta, indexes, langage clair) + Markdown → HTML + lint Markdown + pipeline narration audio (orchestrateur, wrappers OpenVoice et Chatterbox, sélecteur de voix, installeur). Couverture déterministe large (favicons, site-indexes, meta, langage clair, lint, narration) ; suite d'éval pour meta + langage clair. Surcharge `FRONT_LANG_PAIR` câblée. |
+| `front-publish` (site Markdown, meta, favicons, indexes, langage clair, narration audio) | Stable | 11 scripts publics couvrant les quatre artefacts cœur (favicons, meta, indexes, langage clair) + Markdown → HTML + lint Markdown + pipeline narration audio (orchestrateur, wrappers OpenVoice et Chatterbox, sélecteur de voix, installeur). Couverture déterministe large (favicons, site-indexes, meta, langage clair, lint, narration) ; suite d'éval pour meta + langage clair. |
 | `front-accessibility` — lint | Stable (renommé depuis `front-a11y` en 0.9.0) | Lint a11y statique 14 règles, stdlib uniquement. Désormais resserré au lint après les sorties color / vision / audio. |
 | `front-colors` — audit contraste, simulation CVD, palette curatée, éclaircissement / assombrissement perceptuels | Stable (nouveau en 0.7.0) | Correcteur de contraste par voisin OKLCH, matrices CVD de Machado, CSV palette unifiée (base Apple + projections émotion / concept / psychologie), module `_colors` stdlib uniquement, classe `Color`. Sorti de `front-accessibility` pour un périmètre plus clair. |
 | `front-vision` — texte alternatif W3C via vision Ollama locale | Stable (nouveau en 0.8.0) | Modèle `gemma3:4b` via Ollama (le seul LLM autorisé). Arbre de décision par objectif, biais par texte environnant + vocabulaire projet, cache disque. Sorti de `front-accessibility` pour un périmètre plus clair. Éval texte alternatif sur fixtures Wikipedia. |
@@ -490,7 +487,6 @@ doivent pointer sur le même daemon, mais le modèle peut différer :
 |---|---|---|---|
 | `OLLAMA_URL` | tout script basé Ollama | URL du daemon. Doit correspondre à celui d'OpenCode. | `http://localhost:11434` |
 | `OLLAMA_MODEL` | tout script basé Ollama | Échappatoire nu (surtout pour les tests). Le seul modèle autorisé est `gemma3:4b`. | `gemma3:4b` |
-| `FRONT_LANG_PAIR` | tout script gérant la langue | Première entrée = `--lang` par défaut si pas de flag. | `en,fr` |
 | `OPENCODE_MODEL` | OpenCode lui-même | Tag du modèle côté agent — mettez `gemma3:4b`. | `gemma3:4b` |
 
 Le motif est volontairement ennuyeux : `gemma3:4b` sur le même

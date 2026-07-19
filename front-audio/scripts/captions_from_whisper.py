@@ -80,7 +80,7 @@ if TYPE_CHECKING:
 # Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))
 from _vocab import resolve_vocab_terms  # noqa: E402
-from _lang import detect_text_language, lang_pair_default  # noqa: E402
+from _lang import detect_text_language  # noqa: E402
 
 
 # ── Module-level configuration ────────────────────────────────────────────────
@@ -796,12 +796,10 @@ def _cli(
         click.echo(f"No such file: {source}", err=True)
         return 1
 
-    # Language for the opener: explicit --lang wins. Then FRONT_LANG_PAIR
-    # (first entry). Otherwise sniff the vocabulary sources for a language
-    # signal before falling back to "en".
+    # Language for the opener: explicit --lang wins. Otherwise ALWAYS detect
+    # by sniffing the vocabulary sources via langdetect — no configured
+    # default; "en" is only the no-signal floor.
     vocab_lang: str = lang
-    if not vocab_lang:
-        vocab_lang = lang_pair_default() or ""
     if not vocab_lang:
         sniff: str = ""
         if vocab_from is not None and vocab_from.is_file():

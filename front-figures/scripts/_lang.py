@@ -1,13 +1,14 @@
 """
 _lang — language / locale resolution for the front-figures scripts.
 
-The resolver follows the precedence documented in every front-* SKILL.md:
+The resolver follows the precedence documented in every front-* SKILL.md.
+There is no configured default language — the output language is always
+detected from the text:
 
     1. explicit ``--lang`` flag on the command line
-    2. ``FRONT_LANG_PAIR`` env var (first comma-split entry)
-    3. langdetect on the text hint supplied by the caller (when available)
-    4. POSIX locale (``LANG`` / ``LC_ALL``)
-    5. hard fallback: English (``en``)
+    2. langdetect on the text hint supplied by the caller (when available)
+    3. POSIX locale (``LANG`` / ``LC_ALL``)
+    4. hard floor: English (``en``)
 
 Duplicated (intentionally) across every front-* skill so each stays
 self-contained. Keep this file in sync with the copies elsewhere.
@@ -24,8 +25,8 @@ import os
 from typing import Optional
 
 
-# BCP-47 base tags this skill knows about. The order determines
-# ``lang_pair`` precedence when the user has not overridden it.
+# BCP-47 base tags this skill knows about. The first is the ``en`` floor
+# returned only when the language cannot be detected from any text.
 DEFAULT_PAIR = ("en", "fr")
 
 
@@ -54,12 +55,8 @@ def resolve_lang(
     if explicit:
         return explicit.strip().lower()
 
-    pair_env = os.environ.get("FRONT_LANG_PAIR", "").strip()
-    if pair_env:
-        first, *_ = [t.strip() for t in pair_env.split(",") if t.strip()]
-        if first:
-            return first.lower()
-
+    # No configured default language: detect from the text hint (chart
+    # title / axis label) via langdetect, else fall through to the locale.
     if text_hint:
         try:
             from langdetect import detect  # type: ignore

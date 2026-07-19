@@ -57,6 +57,26 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.22.0] — 2026-07-19 — language is always detected; `lang_pair` removed
+
+No configured default language anywhere. The output language is **detected from
+the content** via `langdetect`, never from a per-project setting.
+
+- **Removed `lang_pair` / `FRONT_LANG_PAIR` entirely** — the `metadata.lang_pair`
+  SKILL.md frontmatter token, the "Changing the language pair" sections (all 7
+  skills), `lang_pair_default()` in every `_lang.py`, and all doc/env references
+  (README, LISEZMOI, references, make_figure). No almost-empty stub functions
+  left behind.
+- **Always detect from content.** The AI-backed scripts detect the language from
+  the text they process — surrounding/context text (alt), extracted page text
+  (meta), the input itself (plain-language), the transcript/vocabulary
+  (captions), the chart title/labels (figures).
+- **lint_a11y `<html lang>` fixer now detects from the document's own body
+  text** (stdlib HTML-text extraction + langdetect). When the language cannot be
+  determined (too little text, or langdetect absent), the finding is **left
+  unfixed for a human — no default is injected**.
+- Guard test `test_no_lang_pair_default` prevents reintroducing the hook.
+
 ## [0.21.0] — 2026-07-18 — one authorized LLM: `gemma3:4b` (no MLX), enforced
 
 Fixes the biggest fresh-user onboarding blocker and locks the model policy down.

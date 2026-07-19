@@ -220,7 +220,7 @@ yet.
    subset is sane before pushing):
 
    ```bash
-   FRONT_LANG_PAIR="<code>,en" python3 -m pytest -m eval \
+   python3 -m pytest -m eval \
        tests/eval/test_captions_eval.py::test_per_language_wer \
        -k <code>
    ```

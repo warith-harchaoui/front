@@ -81,7 +81,7 @@ import requests
 # Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))
 from _vocab import resolve_vocab_terms, surrounding_text  # noqa: E402
-from _lang import detect_text_language, lang_pair_default  # noqa: E402
+from _lang import detect_text_language  # noqa: E402
 
 # Pillow is *optional*. If available it is used to downscale the image before
 # sending to the model (faster inference, smaller HTTP payload). The script
@@ -889,18 +889,14 @@ def _cli(
         if ctx_from_doc:
             context = (context + "\n" + ctx_from_doc).strip() if context else ctx_from_doc
 
-    # Language: explicit --lang wins. Then FRONT_LANG_PAIR (first entry).
-    # Otherwise detect from any available text (surrounding doc, context
-    # hint, vocabulary join) via langdetect, falling back to the
-    # env-derived locale.
+    # Language: explicit --lang wins. Otherwise ALWAYS detect from the
+    # available surrounding text (doc, context hint, vocabulary) via
+    # langdetect — no configured default. A bare image with no text falls
+    # back to the env/locale signal (detect_lang()).
     if lang is None:
-        lang = lang_pair_default()
-    if lang is None:
-        detection_text: str = " ".join(
-            [context] + (vocabulary or [])
-        ).strip()
-        if detection_text:
-            lang = detect_text_language(detection_text, fallback=detect_lang())
+        detection_text: str = " ".join([context] + (vocabulary or [])).strip()
+        lang = detect_text_language(detection_text, fallback=detect_lang()) \
+            if detection_text else detect_lang()
 
     text = describe(
         src,

@@ -21,8 +21,7 @@ compatibility: >-
   Python 3.9+ stdlib only — no third-party deps, no browser, no network.
 metadata:
   author: Warith Harchaoui
-  version: 0.21.0
-  lang_pair: "en,fr"  # override per-project; e.g. "en,de" or "en,ja"
+  version: 0.22.0
 ---
 
 # front-accessibility — static HTML a11y lint
@@ -55,7 +54,7 @@ repair:
 
 | Mode | Tool | Purpose |
 |---|---|---|
-| **Make** — repair the mechanically-fixable rules | `scripts/lint_a11y.py --fix` | Adds `lang="en"` to `<html>` (honours `FRONT_LANG_PAIR`), strips redundant `role="presentation"` / `aria-hidden="true"` from decorative `<img alt="">`, demotes `tabindex="N>0"` to `tabindex="0"`, strips `aria-hidden` from interactive elements, appends `motion-reduce:transform-none` to animated elements. Idempotent. Use `--dry-run` to preview. |
+| **Make** — repair the mechanically-fixable rules | `scripts/lint_a11y.py --fix` | Adds `lang="en"` to `<html>`, strips redundant `role="presentation"` / `aria-hidden="true"` from decorative `<img alt="">`, demotes `tabindex="N>0"` to `tabindex="0"`, strips `aria-hidden` from interactive elements, appends `motion-reduce:transform-none` to animated elements. Idempotent. Use `--dry-run` to preview. |
 | **Audit** — gate before ship | `scripts/lint_a11y.py` | 14 static rules over HTML (missing alt, unlabelled inputs, button-without-text, `div onclick`, missing dialog close, lang attr, bad heading order, color-only state, motion-reduce guards). Stdlib only, no browser. |
 
 The unfixable rules (empty button, missing label, missing heading,
@@ -127,17 +126,6 @@ python front-audio/scripts/captions_from_whisper.py public/podcast.mp4   # AI ca
 
 Then pair with a runtime audit (axe-core / Pa11y / Lighthouse) before
 shipping.
-
-## Changing the language pair
-
-`front-accessibility` inherits **bilingual** defaults (EN/FR by default
-— configurable via `lang_pair`). The pair lives in this file's
-frontmatter under `metadata.lang_pair` as two comma-separated BCP-47
-base tags. The lint output messages are English-only today; the
-``lang_pair`` token is mirrored across every front-* SKILL.md so a
-project-wide language switch stays consistent. See
-`front-publish/SKILL.md` → "Changing the language pair" and
-`front-publish/references/i18n.md` for the canonical recipe.
 
 ## When NOT to use this skill
 
