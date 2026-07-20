@@ -3,8 +3,9 @@ name: front-vision
 description: >-
   W3C-compliant alt-text drafting via a local Ollama vision model — per-image
   decision tree for informative / decorative / functional / text / complex /
-  group purposes, bilingual output (EN/FR, language auto-detected from
-  context), surrounding- text and project-vocabulary biasing, deterministic
+  group purposes, output in any detected language (native-language phrasing
+  for common ones), surrounding- text and project-vocabulary biasing,
+  deterministic
   on-disk cache so the same image + parameters never hit the model twice.
   The one authorized model is ``gemma3:4b`` (registry-standard, multimodal)
   via Ollama — no other model, no MLX. For solo developers and small teams who
@@ -25,7 +26,7 @@ compatibility: >-
   first run.
 metadata:
   author: Warith Harchaoui
-  version: 0.26.0
+  version: 0.26.1
 ---
 
 # front-vision — local AI alt text for accessibility
@@ -38,8 +39,10 @@ Solo developers and small teams who:
   at runtime via a hosted service.
 - Want **local-first AI** — no SaaS, no data exfiltration, no per-image
   cost. Runs on any box through Ollama.
-- Want **bilingual output** — the language is auto-detected from the
-  surrounding text (via `langdetect`); no flag, no configured default.
+- Want **output in the reader's language** — auto-detected from the
+  surrounding text (via `langdetect`), any language, not a fixed pair; no
+  flag, no configured default. Common languages get a native-language
+  prompt; the rest are named to the model so they still come out right.
 - Want **vocabulary biasing** so the model knows your product / brand /
   technical-term spellings before it hallucinates a near-miss.
 

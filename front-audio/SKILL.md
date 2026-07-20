@@ -32,7 +32,7 @@ compatibility: >-
   install completes.
 metadata:
   author: Warith Harchaoui
-  version: 0.26.0
+  version: 0.26.1
 ---
 
 # front-audio — local AI captions and transcripts

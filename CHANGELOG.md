@@ -57,6 +57,21 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.26.1] — 2026-07-20 — any-language alt-text + captions (best-of-both with md2star)
+
+- **Alt-text + captions now handle any detected language (best-of-both with
+  md2star).** Added a shared `language_name()` + `LANGUAGE_NAMES` (28 languages)
+  to `_lang.py` (byte-identical across all 5 copies). front-vision previously
+  produced **English** alt text for any language outside its 10 curated
+  native-language instructions (e.g. Korean, Polish, Hindi); it now keeps the
+  native-language phrasing for those 10 and names the language to the model for
+  the rest, so a document in any common language gets alt text in that language.
+  front-audio's `translate_captions.py` reuses the same helper for its prompt +
+  track labels (28 language names instead of 11 + raw codes). front-vision keeps
+  its edge over md2star's version — all-references + Markdown/HTML surrounding
+  context with heading prefix, and the full per-purpose W3C decision tree.
+  front-vision description/body updated from "bilingual EN/FR" to any-language.
+
 ## [0.26.0] — 2026-07-20 — two-track captions + helper packages on PyPI
 
 - **front-audio: two-track captions (native + translation).** New

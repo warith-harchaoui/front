@@ -71,3 +71,26 @@ def test_no_lang_pair_default() -> None:
     """`lang_pair_default` is gone — language is always detected, never a
     configured default. Guards against reintroducing the removed hook."""
     assert not hasattr(_lang, "lang_pair_default")
+
+
+class TestLanguageName:
+    """`language_name` — name any language to an LLM so alt-text / captions come
+    out in the detected language rather than collapsing to English."""
+
+    def test_known_codes(self):
+        assert _lang.language_name("fr") == "French"
+        assert _lang.language_name("ko") == "Korean"
+        assert _lang.language_name("en") == "English"
+
+    def test_region_tag_and_case(self):
+        # Region-tagged and upper-case codes normalise to the base language.
+        assert _lang.language_name("pt-BR") == "Portuguese"
+        assert _lang.language_name("FR") == "French"
+
+    def test_unknown_defaults_to_english(self):
+        assert _lang.language_name("xx") == "English"
+
+    def test_unknown_can_keep_the_code(self):
+        # Callers that would rather keep an unnamed code than substitute English
+        # pass the code as the default (used for caption track labels).
+        assert _lang.language_name("xx", default="xx") == "xx"

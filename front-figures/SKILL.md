@@ -25,7 +25,7 @@ compatibility: >-
   network required at figure-generation time once installed.
 metadata:
   author: Warith Harchaoui
-  version: 0.26.0
+  version: 0.26.1
 ---
 
 # front-figures — data-viz, explainability, and causality figures

@@ -229,3 +229,43 @@ def detect_language(content: str, fmt: str = "auto", fallback: str = "en") -> st
         Two-letter language code.
     """
     return detect_text_language(extract_body_text(content, fmt), fallback=fallback)
+
+
+#: English names for the languages we can name to an LLM in a prompt. Lets ANY
+#: detected language be requested by name ("Write ... in Korean.") instead of
+#: silently collapsing to a hardcoded set — a language whose two-letter code is
+#: here gets output in that language even when a skill has no curated,
+#: written-in-the-target-language instruction for it.
+LANGUAGE_NAMES: dict[str, str] = {
+    "en": "English", "fr": "French", "es": "Spanish", "de": "German",
+    "it": "Italian", "pt": "Portuguese", "nl": "Dutch", "ru": "Russian",
+    "zh": "Chinese", "ja": "Japanese", "ko": "Korean", "ar": "Arabic",
+    "hi": "Hindi", "tr": "Turkish", "pl": "Polish", "sv": "Swedish",
+    "no": "Norwegian", "da": "Danish", "fi": "Finnish", "cs": "Czech",
+    "el": "Greek", "he": "Hebrew", "id": "Indonesian", "uk": "Ukrainian",
+    "ro": "Romanian", "hu": "Hungarian", "vi": "Vietnamese", "th": "Thai",
+}
+
+
+def language_name(code: str, default: str = "English") -> str:
+    """Return the English name of a language code (``"fr"`` → ``"French"``).
+
+    Used to name a target language to an LLM in a prompt so ANY detected
+    language can be requested by name instead of collapsing to one hardcoded
+    default. Accepts region-tagged codes (``"pt-BR"``) and is case-insensitive.
+
+    Parameters
+    ----------
+    code : str
+        Two-letter (or region-tagged, e.g. ``"pt-BR"``) language code.
+    default : str, optional
+        Returned when ``code`` is not in :data:`LANGUAGE_NAMES`. Defaults to
+        ``"English"`` (a safe prompt fallback); pass the code itself when the
+        caller would rather keep an unnamed code than substitute English.
+
+    Returns
+    -------
+    str
+        The language's English name, or ``default``.
+    """
+    return LANGUAGE_NAMES.get(code.split("-")[0].lower()[:2], default)

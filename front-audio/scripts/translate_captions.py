@@ -64,7 +64,7 @@ from typing import Callable, Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _click import front_command, run_command  # noqa: E402
-from _lang import detect_text_language, extract_body_text  # noqa: E402
+from _lang import detect_text_language, extract_body_text, language_name  # noqa: E402
 from caption_diarize import parse_caption_cues  # noqa: E402
 
 import click  # noqa: E402
@@ -84,23 +84,6 @@ DEFAULT_OLLAMA_MODEL: str = "gemma3:4b"
 #: cross-cue context (so a sentence split across cues translates as one),
 #: small enough to keep the strict-JSON reply reliable on a 4B model.
 DEFAULT_BATCH_SIZE: int = 8
-
-#: Human-readable names for the languages we label tracks with. Falls back
-#: to the bare code for anything not listed, which is still valid BCP-47.
-LANGUAGE_NAMES: Dict[str, str] = {
-    "en": "English",
-    "fr": "Français",
-    "es": "Español",
-    "de": "Deutsch",
-    "it": "Italiano",
-    "pt": "Português",
-    "nl": "Nederlands",
-    "ar": "العربية",
-    "zh": "中文",
-    "ja": "日本語",
-    "ru": "Русский",
-}
-
 
 class TranslationError(RuntimeError):
     """Raised when the model reply cannot be aligned back to the cues.
@@ -368,8 +351,8 @@ def make_ollama_translator(
     callable
         The batch translator injected into :func:`translate_cues`.
     """
-    target_name: str = LANGUAGE_NAMES.get(target_lang, target_lang)
-    source_name: str = LANGUAGE_NAMES.get(source_lang, source_lang)
+    target_name: str = language_name(target_lang, default=target_lang)
+    source_name: str = language_name(source_lang, default=source_lang)
 
     system: str = (
         f"You are a professional subtitle translator. Translate each "
@@ -455,8 +438,8 @@ def two_track_snippet(
     str
         A ready-to-paste ``<video>`` element with both tracks.
     """
-    native_label: str = LANGUAGE_NAMES.get(audio_lang, audio_lang)
-    target_label: str = LANGUAGE_NAMES.get(target_lang, target_lang)
+    native_label: str = language_name(audio_lang, default=audio_lang)
+    target_label: str = language_name(target_lang, default=target_lang)
     return (
         "<video controls>\n"
         f'  <source src="{media}" />\n'

@@ -7,7 +7,7 @@ duplication is only safe if the copies stay in lockstep — this test makes any
 drift a red build.
 
 Every shared helper is **byte-identical** across all its copies: they carry no
-skill-specific text (the module docstrings were made skill-neutral in v0.26.0),
+skill-specific text (the module docstrings were made skill-neutral in v0.26.1),
 so the strongest, simplest guarantee applies. (``_lang.py`` also has a
 byte-identical guard in ``test_bodytext.py``; keeping it here too is harmless
 belt-and-suspenders.)

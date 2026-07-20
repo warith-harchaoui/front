@@ -81,7 +81,7 @@ import requests
 # Vocabulary + language helpers — shared with the other Ollama-backed scripts.
 sys.path.insert(0, str(Path(__file__).parent))
 from _vocab import resolve_vocab_terms, surrounding_text  # noqa: E402
-from _lang import detect_text_language  # noqa: E402
+from _lang import detect_text_language, language_name  # noqa: E402
 
 # Pillow is *optional*. If available it is used to downscale the image before
 # sending to the model (faster inference, smaller HTTP payload). The script
@@ -234,6 +234,32 @@ LANG_INSTRUCTIONS: dict[str, str] = {
 }
 
 
+def _lang_instruction(lang: str) -> str:
+    """Return the "write in this language" line for the alt-text prompt.
+
+    Uses the curated, written-in-the-target-language phrasing for the languages
+    we have it for (a stronger nudge); for any other detected language it names
+    the language in English ("Write the alt text in Korean.") via
+    :func:`_lang.language_name`, so a document in a language outside the curated
+    set still gets alt text in *that* language instead of silently coming back
+    in English.
+
+    Parameters
+    ----------
+    lang : str
+        Two-letter language code (as detected from the surrounding text).
+
+    Returns
+    -------
+    str
+        A one-line instruction naming the output language.
+    """
+    native = LANG_INSTRUCTIONS.get(lang)
+    if native is not None:
+        return native
+    return f"Write the alt text in {language_name(lang)}."
+
+
 def detect_lang() -> str:
     """
     Detect the desired output language as a two-letter code.
@@ -337,7 +363,7 @@ def long_prompt_for(kind: str, lang: str, context: str = "") -> str:
     str
         The fully assembled prompt.
     """
-    lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
+    lang_line: str = _lang_instruction(lang)
     ctx: str = f" Page context: {context}." if context else ""
     name = _LONG_PROMPTS.get(kind, "alt_long_default")
 
@@ -367,7 +393,7 @@ def prompt_for(kind: str, lang: str, context: str = "") -> str:
     str
         The fully assembled prompt, ready to send to Ollama.
     """
-    lang_line: str = LANG_INSTRUCTIONS.get(lang, LANG_INSTRUCTIONS["en"])
+    lang_line: str = _lang_instruction(lang)
     ctx: str = f" Page context: {context}." if context else ""
     name = _SHORT_PROMPTS.get(kind, "alt_short_default")
 
