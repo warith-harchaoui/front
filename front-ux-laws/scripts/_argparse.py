@@ -1,5 +1,5 @@
 """
-_argparse — shared argparse parser factory for the front-ui scripts.
+_argparse — shared argparse parser factory for a front-* skill's scripts.
 
 ``make_parser(prog, description, epilog=None)`` returns an
 ``ArgumentParser`` pre-configured the way every script in this skill
@@ -10,9 +10,10 @@ expects:
   optional ``epilog`` are not reflowed.
 - A standard ``-V`` / ``--version`` option.
 
-Duplicated (intentionally) across front-ui/scripts/, front-publish/
-scripts/, front-accessibility/scripts/, front-ux-laws/scripts/ so each
-skill stays self-contained.
+Duplicated (intentionally) across every front-* skill so each stays
+self-contained; keep this file in sync with the copies in
+front-colors/scripts/_argparse.py etc. Bump ``SKILL_VERSION`` in every
+copy at release time (release.sh checks the drift).
 
 Author
 ------
@@ -25,7 +26,7 @@ import argparse
 from typing import Optional
 
 
-SKILL_VERSION = "0.25.0"
+SKILL_VERSION = "0.26.0"
 
 
 def make_parser(
@@ -38,11 +39,16 @@ def make_parser(
     Parameters
     ----------
     prog : str
-        Program name shown in ``--help`` (e.g. ``"front-ui-validate"``).
+        Program name shown in ``--help`` (e.g. ``"front-figures-make"``).
     description : str
         One-paragraph description shown above the options table.
     epilog : str or None, optional
         Text shown below the options table — usually usage examples.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Parser with ``-V``/``--version`` pre-attached.
     """
     parser = argparse.ArgumentParser(
         prog=prog,

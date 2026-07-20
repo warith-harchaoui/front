@@ -51,7 +51,7 @@ Exit code
 
 Notes
 -----
-* Python 3.9+, stdlib only for the static rules. Mermaid rendering needs
+* Python 3.10+, stdlib only for the static rules. Mermaid rendering needs
   ``mmdc`` (``pip install -r scripts/requirements-lint-md.txt``).
 * Cross-platform. On Windows the LaTeX delimiter parser is the same.
 

@@ -3,7 +3,7 @@ name: front-accessibility
 description: >-
   Pre-commit static HTML accessibility lint for vanilla-JS + Tailwind output.
   Fourteen rules decidable from source — missing alt, unlabelled inputs,
-  button-without-text, ``<div onclick>``, missing dialog close, ``lang``
+  button-without-text, clickable div (onclick), missing dialog close, lang
   attribute, bad heading order, color-only state, motion-reduce guards, and
   more — without a browser or runtime DOM. For solo developers and small teams
   who need a fast, deterministic, CI-friendly gate before shipping — NOT a
@@ -18,10 +18,10 @@ description: >-
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The lint_a11y script needs
-  Python 3.9+ stdlib only — no third-party deps, no browser, no network.
+  Python 3.10+ stdlib only — no third-party deps, no browser, no network.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
 ---
 
 # front-accessibility — static HTML a11y lint
@@ -33,7 +33,7 @@ Solo developers and small teams who:
 - Need a **pre-commit gate** that fails fast on a11y regressions in
   HTML source — no browser, no runtime DOM, no waiting for a CI
   container to spin up a headless Chromium.
-- Want **stdlib-only Python** (3.9+) so the gate fits in any base
+- Want **stdlib-only Python** (3.10+) so the gate fits in any base
   container and adds zero install time.
 - Don't ship without a designer or QA team, and want the most obvious
   static-decidable rules covered automatically before the diff lands.

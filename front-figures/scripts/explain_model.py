@@ -53,7 +53,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, ``pip install -r requirements-explain.txt``.
+* Python 3.10+, ``pip install -r requirements-explain.txt``.
 * Deferred imports throughout: importing this module does not pull
   shap / shapash / timeshap / lime unless the corresponding path is
   taken.
@@ -82,6 +82,10 @@ from _style import matplotlib_rc  # noqa: E402
 # ------------------------------------------------------------------
 def load_model(path: str) -> Any:
     """Load a pickled model.
+
+    .. warning::
+        Unpickling executes arbitrary code. Only load a model file **you
+        produced or trust** — never a pickle from an untrusted source.
 
     Parameters
     ----------
@@ -137,7 +141,7 @@ def load_data(path: str) -> Any:
 # Engine dispatch
 # ------------------------------------------------------------------
 def pick_engine(model: Any, data: Any) -> str:
-    """Choose SHAP / Shapash / TimeSHAP / LIME from model + data shape.
+    """Auto-dispatch to SHAP or TimeSHAP from model + data shape.
 
     Parameters
     ----------
@@ -149,9 +153,10 @@ def pick_engine(model: Any, data: Any) -> str:
     Returns
     -------
     str
-        Engine identifier: ``"shap"``, ``"timeshap"``, ``"lime"``.
-        (``shapash`` is only picked when the user asks explicitly, since
-        it emits a full HTML report.)
+        ``"timeshap"`` for a 3-D torch sequence model, otherwise ``"shap"``.
+        ``"lime"`` and ``"shapash"`` are never auto-selected — they are only
+        used when the user passes ``--engine`` explicitly (LIME as a black-box
+        fallback; Shapash for its HTML report).
     """
     module = getattr(type(model), "__module__", "") or ""
     lower = module.lower()
@@ -255,8 +260,11 @@ def run_shap(model: Any, data: Any, ctx: Dict[str, Any]) -> Dict[str, Any]:
         import pandas as pd
         vals_df = pd.DataFrame(shap_values.values, columns=feat_names)
         vals_df.to_parquet(out / "shap_values.parquet")
-    except Exception:  # noqa: BLE001
-        pass
+    except Exception as exc:  # noqa: BLE001 — parquet needs pyarrow; optional artifact
+        # Unlike the plots, surface a note so the missing artifact isn't silent
+        # (matches the sibling plot handlers' [warn] convention).
+        print(f"[warn] could not write shap_values.parquet ({exc}); skipping.",
+              file=sys.stderr)
 
     return {
         "engine": "shap",
@@ -408,7 +416,9 @@ def build_parser() -> argparse.ArgumentParser:
             "LIME. Auto-picks by model + data shape unless --engine is set."
         ),
     )
-    parser.add_argument("--model", required=True, help="Path to a pickled / joblib model.")
+    parser.add_argument("--model", required=True,
+                        help="Path to a pickled / joblib model. Loading unpickles it, "
+                             "which runs arbitrary code — only pass a model you trust.")
     parser.add_argument("--data", required=True, help="Path to CSV / JSON / Parquet / NPY.")
     parser.add_argument("--engine", choices=("auto", "shap", "shapash", "timeshap", "lime"),
                         default="auto", help="Explainability engine (default: auto).")

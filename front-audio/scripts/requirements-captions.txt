@@ -19,14 +19,16 @@
 #   - langdetect   : detect language from vocabulary source text so the
 #                    composed initial_prompt opener matches.
 #
-# The three ``*-helper`` packages are pinned to tagged releases so their
-# public API (function names, signatures) stays stable. The ``.git@vX``
-# URL form must match how ``vocal-helper`` pins ``audio-helper`` /
-# ``os-helper`` internally — otherwise pip treats the two direct
-# references as conflicting and the resolve fails.
+# The three ``*-helper`` packages are on PyPI, pinned with a lower bound so
+# their public API (function names, signatures) stays stable while still
+# picking up fixes. ``vocal-helper`` pins ``audio-helper`` / ``os-helper``
+# from PyPI itself, so these direct references dedupe cleanly against its
+# own — no ``.git@vX`` URL form needed any more. ``vocal-helper``'s base
+# install already pulls ``pywhispercpp`` (STT) + ``silero-vad``, so no
+# extra is required for the caption path.
 
 click>=8.1
 langdetect>=1.0.9
-vocal-helper @ git+https://github.com/warith-harchaoui/vocal-helper.git@v0.3.1
-audio-helper @ git+https://github.com/warith-harchaoui/audio-helper.git@v1.5.2
-video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.6.1
+vocal-helper>=0.6.0
+audio-helper>=1.6.0
+video-helper>=1.7.0

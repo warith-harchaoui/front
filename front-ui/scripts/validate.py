@@ -38,7 +38,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, stdlib only.
+* Python 3.10+, stdlib only.
 * The script intentionally avoids importing anything from the skill so it
   can run in a minimal CI container.
 

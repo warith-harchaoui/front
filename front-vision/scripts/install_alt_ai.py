@@ -45,8 +45,8 @@ After this finishes:
 
 Notes
 -----
-* Python 3.9+. ``click`` is the only runtime dependency, used solely to
-  back the ``-h`` / ``--help`` / ``--model`` flags; the install /
+* Python 3.10+. ``click`` is the only runtime dependency, used solely to
+  back the ``-h`` / ``--help`` flags; the install /
   daemon / pull logic is stdlib (``subprocess``, ``urllib``, ``shutil``).
 * On Linux the official installer is downloaded and piped to ``sh`` via
   an intermediate string, which avoids the standard ``curl | sh`` security
@@ -67,7 +67,7 @@ import sys
 import time
 import urllib.request
 from pathlib import Path as _PathHelper
-from typing import Optional
+from typing import Any, Optional
 
 sys.path.insert(0, str(_PathHelper(__file__).resolve().parent))
 from _click import front_command, run_command  # noqa: E402
@@ -101,7 +101,7 @@ def pick_model() -> str:
 
 # ── Tiny subprocess helpers ────────────────────────────────────────────────
 
-def run(cmd: list[str], **kw) -> subprocess.CompletedProcess:
+def run(cmd: list[str], **kw: Any) -> subprocess.CompletedProcess:
     """
     Echo a command and run it via :func:`subprocess.run`.
 

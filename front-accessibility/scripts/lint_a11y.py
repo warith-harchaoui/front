@@ -64,7 +64,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, stdlib only (``html.parser``, ``argparse``, ``pathlib``).
+* Python 3.10+, stdlib only (``html.parser``, ``argparse``, ``pathlib``).
 * The parser is forgiving — it walks documents that contain mixed-case
   tags, missing closures, and inline scripts without raising.
 * This linter is a *first pass*, not a replacement for ``axe-core`` or
@@ -89,7 +89,7 @@ from _lang import detect_text_language, extract_body_text  # noqa: E402
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Iterator, Optional
 
 
 # ── Data structures ────────────────────────────────────────────────────────
@@ -215,7 +215,7 @@ class TreeBuilder(HTMLParser):
             self.stack[-1].text += data
 
 
-def walk(elem: Element):  # type: ignore[no-untyped-def]
+def walk(elem: Element) -> Iterator[Element]:
     """
     Depth-first iterator over every descendant of ``elem`` (excluding the root).
 

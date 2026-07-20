@@ -1,3 +1,8 @@
-"""front-cli — unified driver for the four `front` skills."""
+"""front-cli — unified driver for the front-* skills.
 
-__version__ = "0.2.0"
+Author
+------
+Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>
+"""
+
+__version__ = "0.26.0"

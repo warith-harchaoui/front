@@ -60,7 +60,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+. Install NeMo + Sortformer weights via
+* Python 3.10+. Install NeMo + Sortformer weights via
   ``python install_diarize.py`` first.
 * Extraction uses the same ``audio-helper`` / ``video-helper`` / ffmpeg
   chain as ``captions_from_whisper.py``.
@@ -154,9 +154,9 @@ def extract_audio(src: Path, dst: Path) -> None:
         sys.exit(
             "Neither `audio-helper` / `video-helper` nor `ffmpeg` is available.\n"
             "Install one of:\n"
-            "    pip install git+https://github.com/warith-harchaoui/audio-helper.git@v1.5.2\n"
-            "    pip install git+https://github.com/warith-harchaoui/video-helper.git@v1.6.1\n"
-            "    brew install ffmpeg   (Homebrew)\n"
+            "    pip install audio-helper   (PyPI)\n"
+            "    pip install video-helper   (PyPI)\n"
+            "    brew install ffmpeg   (macOS / Homebrew — https://brew.sh)\n"
             "    apt install ffmpeg    (Debian / Ubuntu)\n"
             "    winget install Gyan.FFmpeg   (Windows)\n"
         )
@@ -244,7 +244,7 @@ def pick_device(explicit: str = "") -> str:
     return "cpu"
 
 
-def _sortformer_model(model_tag: str, device: str):
+def _sortformer_model(model_tag: str, device: str) -> Any:
     """Load a Sortformer checkpoint via NeMo's ``from_pretrained``.
 
     Deferred import so this module can be introspected (``--help``,

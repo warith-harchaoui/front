@@ -3,21 +3,21 @@ name: front-audio
 description: >-
   Local-AI captions, speaker diarization and speaker identification for video
   / audio. Trigger phrases: "captions", "transcribe video", "transcribe
-  audio", "WebVTT", "SRT", "subtitle file", "VTT", "caption track",
-  "diarization", "who spoke when", "speaker labels", "Sortformer", "TitaNet",
-  "identify speakers", "name the speakers", "speaker VTT", "subtitles".
+  audio", "WebVTT", "SRT", "subtitle file", "VTT", "diarization", "who
+  spoke when", "Sortformer", "TitaNet", "identify speakers", "name the
+  speakers", "translate captions", "translated subtitles", "subtitles".
   Generates W3C WebVTT / SRT / plain-text captions from a local whisper.cpp
   build (vocal-helper), then adds "who spoke when" via NVIDIA NeMo Sortformer
   and "who is who" via NeMo TitaNet embeddings (against reference clips) OR a
   transcript-based rule + local Ollama pass that mines self-introductions
   ("I'm Alice") and vocatives ("Hey Mary, ..."). Merger emits speaker-
-  labelled VTT with ``<v Name>`` cues. Project-vocab biasing on the caption
+  labelled VTT with named voice cues. Project-vocab biasing on the caption
   path. Bilingual EN/FR default, auto-detected from context. Local-first —
   never sends audio to a SaaS. Output is a captions / RTTM / speakers.json /
   speaker-VTT file on disk + a ready-to-paste snippet on stdout.
 license: BSD-3-Clause
 compatibility: >-
-  Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
+  Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.10+ stdlib +
   ``vocal-helper`` (the whisper.cpp over-layer, pulling ``pywhispercpp``) +
   ``audio-helper`` / ``video-helper`` (see
   ``scripts/requirements-captions.txt``), plus ``ffmpeg`` on PATH as a
@@ -32,7 +32,7 @@ compatibility: >-
   install completes.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
 ---
 
 # front-audio — local AI captions and transcripts
@@ -88,6 +88,7 @@ heavier **diarization + speaker ID** tier that layers on top.
 | **Make** — speaker identification via **reference clips** | `scripts/identify_from_titanet.py` | NeMo TitaNet 192-D speaker embeddings + cosine matching against a directory of known WAVs (filename stem = display name). |
 | **Make** — speaker identification via the **transcript itself** | `scripts/name_from_transcript.py` | Rule pass over self-introductions ("I'm Alice") + turn-initial / turn-final vocatives ("Hey Mary, ..."). Optional `--ollama` refinement via a local Ollama daemon — same daemon `alt_from_ollama.py` uses. |
 | **Make** — merge captions + diarization | `scripts/caption_diarize.py` | Emits speaker-labelled VTT (`<v Name>` cues), SRT (`Name: text` prefix), or plain text with paragraph breaks per speaker turn. |
+| **Make** — translate captions → second track | `scripts/translate_captions.py` | Translates an existing `.vtt`/`.srt` into the **surrounding-text language** via the local Ollama model (`gemma3:4b`) and prints a two-`<track>` snippet (native `captions` + translated `subtitles`). Captions-only — no audio. |
 | **Audit** — gate the presence of `<track>` | _(see `front-accessibility/scripts/lint_a11y.py`)_ | Static lint catches `<video>` / `<audio>` without a `<track kind="captions">` child. |
 
 Pair with `front-accessibility` to close the loop: this skill drafts
@@ -103,6 +104,7 @@ the file; the a11y lint verifies a `<track>` element references it.
 | `scripts/identify_from_titanet.py` | Speaker identification against reference clips using **TitaNet-Large** 192-D embeddings + cosine matching. Emits a `speakers.json` mapping the anonymous ids to display names. | requires a directory of clean reference clips (one WAV per known speaker); cross-lingual retrieval needs a higher threshold; not designed for open-set identification with dozens of candidates. |
 | `scripts/name_from_transcript.py` | Guesses names from the transcript itself — rule pass over self-introductions ("I'm Alice", "je m'appelle Bob") and vocatives ("Hey Mary, ...", "Thanks, Sam"). Optional `--ollama` refinement uses the same local daemon as `alt_from_ollama.py`. | conversations without introductions or direct address get no name evidence — falls back to anonymous ids. LLM pass is optional (rule-only mode is stdlib). |
 | `scripts/caption_diarize.py` | Merger — attributes every Whisper caption cue to the diarization turn with the largest overlap. Emits WebVTT with `<v Name>` cues, SRT with `Name: text` prefix, or paragraph-broken plain text. | boundaries around overlap remain approximate — the merger picks *one* speaker per cue by construction. |
+| `scripts/translate_captions.py` | Second-track translation of an existing `.vtt`/`.srt` into the surrounding-text language via local Ollama (`gemma3:4b`); batches several cues per call for cross-cue context and re-attaches translations to the original timestamps 1:1; emits `<stem>.<lang>.vtt` + a two-`<track>` snippet. Decoupled from the caption backend (captions in → captions out, no audio). | machine translation from a 4B model — a **draft**, verify before shipping; skips when the surrounding language already equals the audio language; needs a reachable Ollama daemon. |
 | `scripts/install_diarize.py` | Installs `nemo_toolkit[asr]` and pre-downloads both Sortformer + TitaNet checkpoints. Idempotent. | does not install torch with your specific CUDA / ROCm build (install torch first if you need a specific one); does not install `ffmpeg`. |
 
 ## Decision tree
@@ -114,6 +116,7 @@ the file; the a11y lint verifies a `<track>` element references it.
 | "identify speakers" / "match voices" / "who is who" / "TitaNet" | `identify_from_titanet.py` | `python scripts/identify_from_titanet.py <stem>.diarization.json --audio <stem>.wav --refs ./voices/`. Writes `<stem>.speakers.json` — the same shape `caption_diarize.py` consumes. |
 | "name the speakers from the transcript" / "vocative naming" / "self-introduction" | `name_from_transcript.py` | `python scripts/name_from_transcript.py <stem>.speakers.vtt [--ollama]`. Rule pass over EN + FR self-introductions and vocatives; `--ollama` calls the local daemon `alt_from_ollama.py` uses for a JSON-formatted refinement. |
 | "speaker VTT" / "labelled captions" / "merge captions with diarization" | `caption_diarize.py` | `python scripts/caption_diarize.py --captions <stem>.vtt --diarization <stem>.diarization.json --speakers <stem>.speakers.json --out <stem>.speakers.vtt`. Output has `<v Name>` voice cues. |
+| "translate captions" / "translated subtitles" / "two-track captions" / "subtitles in another language" | `translate_captions.py` | `python scripts/translate_captions.py <stem>.vtt [--lang fr] [--in page.html] [--media clip.mp4]`. Target language = `--lang` else detected from the surrounding text (`--in` / `--context`). Writes `<stem>.<lang>.vtt` and prints a `<track kind="captions"> + <track kind="subtitles">` snippet. Needs a local Ollama daemon (`gemma3:4b`). |
 | "Whisper not installed" / "first-time setup" (captions only) | `install_captions.py` | `python scripts/install_captions.py` — pip-installs ``vocal-helper`` (pulling ``pywhispercpp``) and pre-downloads a GGML model so the captioner runs offline. |
 | "NeMo not installed" / "first-time setup" (diarization) | `install_diarize.py` | `python scripts/install_diarize.py` — pip-installs `nemo_toolkit[asr]` and pre-downloads Sortformer + TitaNet weights. Add `--only sortformer` / `--only titanet` to prefetch just one. |
 
@@ -175,7 +178,10 @@ python front-audio/scripts/captions_from_whisper.py --auto-project <media>
 ```
 
 — always emit ``<track kind="captions" srclang="…" default>`` on the
-element. Add ``<track kind="subtitles">`` for translations,
+element. For a **second, translated track**, run
+``scripts/translate_captions.py`` on the produced ``.vtt``: it writes a
+``<track kind="subtitles" srclang="…">`` in the surrounding-text language
+(via local ``gemma3:4b``) and prints the two-track snippet. Add
 ``<track kind="descriptions">`` for audio descriptions,
 ``<track kind="chapters">`` for navigation when chapters exist.
 
@@ -187,9 +193,10 @@ element. Add ``<track kind="subtitles">`` for translations,
 - You need **top-quality accuracy and don't care about local-only /
   cost** → hosted services (Deepgram, AssemblyAI, Whisper.com) are
   noticeably better on noisy or accented audio.
-- You need **translations**, not transcriptions → run a translator
-  over the produced ``.vtt`` afterward; this skill writes captions in
-  the language detected (or specified) only.
+- You need a **human-grade** translation → ``translate_captions.py``
+  drafts a second subtitle track with the local ``gemma3:4b`` model, but
+  it is machine translation from a small model: fine as a starting point,
+  not a substitute for a professional subtitler on published work.
 
 ## References
 
@@ -211,6 +218,7 @@ element. Add ``<track kind="subtitles">`` for translations,
 | ``scripts/identify_from_titanet.py`` | ``pip install -r scripts/requirements-diarize.txt`` | Speaker identification via NeMo **TitaNet-Large** embeddings; cosine matching against a directory of reference clips (one WAV per known speaker). Writes ``speakers.json``. |
 | ``scripts/name_from_transcript.py`` | stdlib + ``click`` (rule pass); optional local Ollama for the ``--ollama`` refinement | Guesses speaker names from the diarized transcript itself — regex for self-introductions + vocatives, optional LLM refinement via the same daemon ``alt_from_ollama.py`` uses. |
 | ``scripts/caption_diarize.py`` | stdlib + ``click`` | Merges captions + diarization + speakers.json → speaker-labelled WebVTT (``<v Name>`` cues), SRT, or plain text. |
+| ``scripts/translate_captions.py`` | stdlib + ``click`` + ``langdetect`` (from ``requirements-captions.txt``); a local Ollama daemon (``gemma3:4b``) at runtime | Translates an existing ``.vtt``/``.srt`` into the surrounding-text language and emits a two-``<track>`` snippet (native ``captions`` + translated ``subtitles``). No audio dependency — decoupled from the caption backend. |
 | ``scripts/install_diarize.py`` | subprocess (uses the active Python's ``pip``) | Installs ``nemo_toolkit[asr]`` and pre-downloads Sortformer + TitaNet checkpoints so the diarization scripts run offline. |
 | ``scripts/_argparse.py``, ``scripts/_click.py``, ``scripts/_lang.py``, ``scripts/_vocab.py`` | (internal helpers) | Argparse / Click factory, language detection, project-vocab biasing. Duplicated per-skill so each skill stays self-contained. |
 

@@ -13,7 +13,7 @@ model cache.
 
 The script:
 
-1. Verifies (or installs) the ``vocal-helper`` package (pinned git
+1. Verifies (or installs) the ``vocal-helper`` package (pinned PyPI
    release). If ``import vocal_helper`` fails, it is installed in the
    active interpreter; ``pywhispercpp`` comes along as a dependency.
 2. Pre-downloads the requested GGML weights into
@@ -30,7 +30,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+. The installer itself is stdlib + pip.
+* Python 3.10+. The installer itself is stdlib + pip.
 * ``pywhispercpp.utils.download_model`` (available via vocal-helper's
   ``pywhispercpp`` dependency) is the canonical way to pre-fetch weights;
   pointing the generator at a local file with ``FRONT_WHISPER_MODEL=<path>``
@@ -78,13 +78,12 @@ DEFAULT_MODEL: str = "large-v3-turbo"
 
 
 #: Import name of the captions STT engine and its pinned pip install spec.
-#: ``vocal-helper`` is a git release (not on PyPI); it declares
-#: ``pywhispercpp`` as a dependency, so this one install provides both the
-#: engine and the ``pywhispercpp.utils.download_model`` used below.
+#: ``vocal-helper`` is published on PyPI; its base install declares
+#: ``pywhispercpp`` (+ ``silero-vad`` / ``audio-helper`` / ``os-helper``) as
+#: dependencies, so this one install provides both the engine and the
+#: ``pywhispercpp.utils.download_model`` used below — no extras needed.
 CAPTIONS_ENGINE_IMPORT: str = "vocal_helper"
-CAPTIONS_ENGINE_SPEC: str = (
-    "vocal-helper @ git+https://github.com/warith-harchaoui/vocal-helper.git@v0.3.1"
-)
+CAPTIONS_ENGINE_SPEC: str = "vocal-helper>=0.6.0"
 
 
 # ── captions engine install (vocal-helper → pywhispercpp) ─────────────────
@@ -113,7 +112,7 @@ def ensure_captions_engine() -> None:
     """
     Install ``vocal-helper`` (the whisper.cpp over-layer) if it is missing.
 
-    Calls ``pip install`` with the pinned git spec in the current
+    Calls ``pip install`` with the pinned PyPI spec in the current
     interpreter when :func:`_is_installed` reports ``vocal_helper`` missing.
     ``pywhispercpp`` (pre-compiled wheels for the three major desktop
     platforms) is pulled in as a dependency, so the STT engine and the
@@ -123,7 +122,7 @@ def ensure_captions_engine() -> None:
     Raises
     ------
     SystemExit
-        When ``pip`` / ``git`` are unavailable, the install command exits
+        When ``pip`` is unavailable, the install command exits
         non-zero, or the post-install check still cannot find the package.
     """
     if _is_installed(CAPTIONS_ENGINE_IMPORT):

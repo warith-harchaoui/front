@@ -31,7 +31,7 @@ input (Vega-Lite JSON, matplotlib SVG, or an HTML document with
 
 ### Human-readable (default)
 
-```
+```text
 audit_figure.py fig.json
   fig.json:1:1  error   missing-axis-title  y encoding has no title
   fig.json:1:1  error   dual-y-axis         two independent y scales

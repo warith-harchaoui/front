@@ -42,7 +42,7 @@ Exit code
 
 Notes
 -----
-* Python 3.9+. Requires the ``markdown`` PyPI package (small, MIT).
+* Python 3.10+. Requires the ``markdown`` PyPI package (small, MIT).
 * Mermaid rendering needs ``mmdc`` (see ``requirements-lint-md.txt``).
 
 Author

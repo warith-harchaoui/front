@@ -1,5 +1,5 @@
 """
-_argparse — shared argparse parser factory for the front-figures scripts.
+_argparse — shared argparse parser factory for a front-* skill's scripts.
 
 ``make_parser(prog, description, epilog=None)`` returns an
 ``ArgumentParser`` pre-configured the way every script in this skill
@@ -26,7 +26,7 @@ import argparse
 from typing import Optional
 
 
-SKILL_VERSION = "0.25.0"
+SKILL_VERSION = "0.26.0"
 
 
 def make_parser(

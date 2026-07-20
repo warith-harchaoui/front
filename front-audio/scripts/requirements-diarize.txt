@@ -18,7 +18,7 @@ nemo_toolkit[asr]>=1.23.0
 numpy>=1.24
 
 # Audio / video extraction (extract_audio → 16 kHz mono WAV) is shared with
-# the captions tier and delegated to the author's helper packages, pinned to
-# tagged releases; ffmpeg remains the last-resort fallback.
-audio-helper @ git+https://github.com/warith-harchaoui/audio-helper.git@v1.5.2
-video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.6.1
+# the captions tier and delegated to the author's helper packages on PyPI,
+# pinned with a lower bound; ffmpeg remains the last-resort fallback.
+audio-helper>=1.6.0
+video-helper>=1.7.0

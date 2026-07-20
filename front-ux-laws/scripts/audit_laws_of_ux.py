@@ -76,7 +76,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, stdlib only. No ``beautifulsoup`` / no ``lxml``.
+* Python 3.10+, stdlib only. No ``beautifulsoup`` / no ``lxml``.
 * Pairs with ``references/laws-of-ux.md`` (the rules) and
   ``references/checklist.md`` (the broader gate).
 * For runtime checks (real layout, focus trap, dynamic

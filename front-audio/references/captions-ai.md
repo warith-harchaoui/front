@@ -56,13 +56,13 @@ whisper.cpp needs 16 kHz mono WAV. The script tries, in order:
 Install the helpers if you want a Python-native extraction path:
 
 ```bash
-pip install git+https://github.com/warith-harchaoui/audio-helper.git@v1.5.2
-pip install git+https://github.com/warith-harchaoui/video-helper.git@v1.6.1
+pip install audio-helper   # PyPI, >=1.6.0
+pip install video-helper   # PyPI, >=1.7.0
 ```
 
 The extraction path uses `audio_helper.sound_converter` and
 `video_helper.extract_audio_track` (16 kHz mono WAV); both are exported by
-the pinned releases above.
+the PyPI releases above.
 
 If neither helper nor `ffmpeg` is available, the script exits with a list of install hints.
 
@@ -132,9 +132,44 @@ The four `<track>` kinds:
 | `kind` | Use | Source |
 |---|---|---|
 | `captions` | Speech + sound effects | `captions_from_whisper.py` (this script) |
-| `subtitles` | Dialogue translation | Pass `--lang <target>` and a target-language vocabulary, or run a second pass per target language. Future flag `--task translate` will route through whisper.cpp's built-in English-translation mode. |
+| `subtitles` | Dialogue translation | `translate_captions.py <stem>.vtt` — translates the native `.vtt` into the surrounding-text language via local `gemma3:4b` and emits the second `<track>`. See "Translated second track" below. |
 | `descriptions` | Visual narration for blind users | Out of scope for an audio model — frame extraction + Gemma vision. Documented as a future helper. |
 | `chapters` | Navigation markers | Heuristic on long segment pauses; documented as a future helper. |
+
+## Translated second track
+
+`translate_captions.py` turns one caption file into **two tracks**: the
+native-language `captions` (what `captions_from_whisper.py` produced) plus a
+translated `subtitles` track in the language of the **surrounding text** — the
+same signal `front-vision` uses to pick the alt-text language. The translation
+runs on the already-produced `.vtt`/`.srt`, so it never touches audio and is
+decoupled from the caption backend.
+
+```bash
+# Target language auto-detected from the page that embeds the media
+python scripts/translate_captions.py talk.vtt --in article.html --media talk.mp4
+
+# …or state it explicitly
+python scripts/translate_captions.py talk.vtt --lang fr --media talk.mp4
+```
+
+How it stays faithful and correctly timed:
+
+- **Language.** `--lang` wins; otherwise the target language is detected from
+  the `--in` document body (or `--context`). It **skips** when that language is
+  already the audio's language — no redundant track.
+- **Batched translation.** Cues are translated in windows of several at a time
+  (default 8) in one Ollama call, so a sentence split across cue boundaries
+  translates as one thought. The reply is numbered; each translated line is
+  re-attached to its **original cue's timestamps** 1:1. On a count mismatch the
+  window is retried one cue at a time (which cannot misalign); an unrecoverable
+  mismatch aborts loudly rather than shift subtitles.
+- **One model.** `gemma3:4b` via local Ollama — the one authorized LLM, not
+  selectable. Needs the daemon running (`ollama serve`, `ollama pull gemma3:4b`).
+- **Draft.** Machine translation from a 4B model — verify before shipping.
+
+It prints the ready-to-paste two-`<track>` snippet (native `captions` +
+translated `subtitles`) so you can wire both at once.
 
 `meta-tags.md` covers the social-preview tags that pair with these surfaces.
 

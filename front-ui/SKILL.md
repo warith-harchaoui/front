@@ -19,11 +19,11 @@ license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. No Python runtime required to use
   the skill itself (output is HTML + CSS + vanilla JS). Optional validator
-  scripts/validate.py needs Python 3.9+ stdlib + PyYAML. Network access not
+  scripts/validate.py needs Python 3.10+ stdlib + PyYAML. Network access not
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
 ---
 
 # front-ui — vanilla JS + Tailwind UI generation

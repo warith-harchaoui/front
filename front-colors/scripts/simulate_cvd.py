@@ -42,7 +42,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, ``Pillow``.
+* Python 3.10+, ``Pillow``.
 * Numeric work uses Python floats (no NumPy dependency) — slower per pixel
   than NumPy but still milliseconds for typical screenshots, and one less
   dependency to install.

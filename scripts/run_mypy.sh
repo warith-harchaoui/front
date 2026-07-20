@@ -24,7 +24,7 @@ log() { printf '%s\n' "$*" >&2; }
 
 fail=0
 checked=0
-for dir in front-*/scripts scripts; do
+for dir in front-*/scripts scripts front-cli/src; do
     # An unmatched glob would expand to the literal pattern — skip non-dirs.
     [ -d "$dir" ] || continue
     checked=$((checked + 1))

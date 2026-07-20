@@ -41,7 +41,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+. ``vocal-helper`` (pulling ``pywhispercpp``) is declared in
+* Python 3.10+. ``vocal-helper`` (pulling ``pywhispercpp``) is declared in
   ``requirements-captions.txt``; :mod:`install_captions` pre-downloads the
   GGML weights.
 * Audio extraction and decoding use ``video-helper`` / ``audio-helper``
@@ -153,9 +153,9 @@ def extract_audio(src: Path, dst: Path) -> None:
         sys.exit(
             "Neither `audio-helper` / `video-helper` nor `ffmpeg` is available.\n"
             "Install one of:\n"
-            "    pip install git+https://github.com/warith-harchaoui/audio-helper.git@v1.5.2\n"
-            "    pip install git+https://github.com/warith-harchaoui/video-helper.git@v1.6.1\n"
-            "    brew install ffmpeg   (Homebrew)\n"
+            "    pip install audio-helper   (PyPI)\n"
+            "    pip install video-helper   (PyPI)\n"
+            "    brew install ffmpeg   (macOS / Homebrew — https://brew.sh)\n"
             "    apt install ffmpeg    (Debian / Ubuntu)\n"
             "    winget install Gyan.FFmpeg   (Windows)\n"
         )
@@ -165,6 +165,9 @@ def extract_audio(src: Path, dst: Path) -> None:
         check=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
+        # Guard against a wedged ffmpeg on a corrupt/streaming input. Audio
+        # extraction is fast; 30 min is generous even for a feature-length file.
+        timeout=1800,
     )
 
 

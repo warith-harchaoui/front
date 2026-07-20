@@ -41,7 +41,7 @@ Usage
 
 Notes
 -----
-* Requires Python 3.9+, ``requests``. Pillow is opportunistic
+* Requires Python 3.10+, ``requests``. Pillow is opportunistic
   (used to downscale images before sending; if missing, the original is sent).
 * Model: ``gemma3:4b`` — the one authorized LLM (multimodal, via Ollama).
 * Default Ollama endpoint: ``http://localhost:11434``. Override with ``OLLAMA_URL``.
@@ -651,8 +651,11 @@ def describe(
         Maximum long-edge in pixels for the image sent to the model.
         ``0`` disables resizing. Default ``1024``.
     model : str or None, optional
-        Ollama model tag to use. ``None`` (default) picks the right tag for
-        the current hardware via :func:`pick_default_model`.
+        Ollama model tag to use. ``None`` (default) resolves the one authorized
+        model (``gemma3:4b``) via :func:`pick_default_model`.
+    vocabulary : list of str or None, optional
+        Project-vocabulary terms (brand / product / technical spellings) fed to
+        the prompt so the model biases toward them instead of a near-miss.
 
     Returns
     -------

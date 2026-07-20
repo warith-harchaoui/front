@@ -545,7 +545,7 @@ dans [pre-commit](https://pre-commit.com/) avec un seul bloc `repo:`
 # .pre-commit-config.yaml — ajouter le dépôt en une entrée
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.25.0          # fixer une tag — bumper via renovate / dependabot
+    rev: v0.26.0          # fixer une tag — bumper via renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit

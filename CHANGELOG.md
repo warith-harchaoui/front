@@ -57,6 +57,37 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.26.0] — 2026-07-20 — two-track captions + helper packages on PyPI
+
+- **front-audio: two-track captions (native + translation).** New
+  `scripts/translate_captions.py` turns one caption file into two `<track>`s —
+  the native-language `captions` plus a translated `subtitles` track in the
+  **surrounding-text language** (the same signal `front-vision` uses for
+  alt-text language), translated by the one authorized LLM (`gemma3:4b` via
+  Ollama). Cues are translated in batched windows for cross-cue context and
+  re-attached to their original timestamps 1:1 (per-cue fallback on a count
+  mismatch; aborts loudly rather than misalign). Runs on the produced
+  `.vtt`/`.srt` only — no audio, decoupled from the caption backend — and prints
+  the ready-to-paste two-track snippet. Skips when the surrounding language
+  already equals the audio language. New trigger phrases: "translate captions",
+  "translated subtitles". Covered by `tests/test_translate_captions.py` and
+  wired into the single-LLM + cli-help gates. Draft output — verify before
+  shipping.
+- **Helper packages migrated from git pins to PyPI.** The author's `*-helper`
+  fleet now ships on PyPI, so `front-audio` pins them with plain lower bounds
+  instead of `git+https://…@vX` URLs: `vocal-helper>=0.6.0` (was `@v0.3.1`),
+  `audio-helper>=1.6.0` (was `@v1.5.2`), `video-helper>=1.7.0` (was `@v1.6.1`).
+  Touches `requirements-captions.txt`, `requirements-diarize.txt`,
+  `install_captions.py` (`CAPTIONS_ENGINE_SPEC`), `captions-ai.md`, and the
+  extractor error messages in `captions_from_whisper.py` / `diarize_from_nemo.py`.
+  vocal-helper 0.6.0 stays API-compatible with the caption seam
+  (`asr.WhisperStage`, `types.DiarizedSegment` / `Utterance`), and its base
+  install still pulls `pywhispercpp` + `silero-vad`, so no extra is needed.
+  Removes the git-clone build step (faster, no exFAT AppleDouble breakage) and
+  the old `.git@vX` dedupe gotcha (helpers now pin each other from PyPI too).
+  Extractor error messages also gained a `https://brew.sh` hint. No version bump
+  yet — staged pending the paused quality round.
+
 ## [0.25.0] — 2026-07-19 — one-LLM lock, 100% docstrings, progressive disclosure
 
 Second ralph-loop conformance round (fresh from-scratch `.private/ASSESSMENT.md`).

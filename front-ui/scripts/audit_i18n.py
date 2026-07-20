@@ -166,8 +166,8 @@ def audit_py(path: Path) -> List[Dict[str, Any]]:
     """Flag LLM prompts inlined in a Python file (I18N002).
 
     Walks the AST for module- or class-level assignments whose target name
-    looks like a prompt (``*PROMPT*`` / ``*TEMPLATE*`` / ``*SYSTEM*`` /
-    ``*INSTRUCTION*``) and whose value is a string literal. Loading a prompt
+    looks like a prompt (``*PROMPT*`` / ``*INSTRUCTION*``, case-insensitive)
+    and whose value is a string literal. Loading a prompt
     from a catalog (``load_prompt(...)`` / ``render_prompt(...)``) is a call,
     not a constant string, so compliant code is never flagged.
 

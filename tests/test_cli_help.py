@@ -26,6 +26,8 @@ SCRIPTS = [
     # front-audio
     REPO_ROOT / "front-audio"           / "scripts" / "install_captions.py",
     REPO_ROOT / "front-audio"           / "scripts" / "captions_from_whisper.py",
+    REPO_ROOT / "front-audio"           / "scripts" / "name_from_transcript.py",
+    REPO_ROOT / "front-audio"           / "scripts" / "translate_captions.py",
     # front-colors
     REPO_ROOT / "front-colors"  / "scripts" / "audit_contrast.py",
     REPO_ROOT / "front-colors"  / "scripts" / "simulate_cvd.py",

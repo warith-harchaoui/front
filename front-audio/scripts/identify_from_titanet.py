@@ -103,7 +103,7 @@ DEFAULT_THRESHOLD: float = 0.55
 
 # ── NeMo TitaNet runner ────────────────────────────────────────────────────
 
-def _titanet_model(model_tag: str, device: str):
+def _titanet_model(model_tag: str, device: str) -> Any:
     """Load a TitaNet checkpoint via NeMo.
 
     Deferred import so ``--help`` works without pulling torch + NeMo.

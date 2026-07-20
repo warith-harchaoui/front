@@ -497,7 +497,11 @@ class Color:
 
     @classmethod
     def from_name(cls, name: str) -> "Color":
-        """Build a Color from a CSS/X11 colour name (e.g. ``"rebeccapurple"``)."""
+        """Build a Color from a curated palette base name (e.g. ``"Red"``, ``"Blue"``).
+
+        Names are the ``Base`` column of the curated palette (case-insensitive),
+        not the full CSS/X11 set; an unknown name raises ``KeyError``.
+        """
         return cls(name_to_hex(name))
 
     @property

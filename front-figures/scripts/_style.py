@@ -380,7 +380,7 @@ def matplotlib_rc(dark: bool = False) -> Dict[str, object]:
     }
 
 
-def _cycler(hexes: List[str]):  # noqa: ANN001 — matplotlib type at runtime only
+def _cycler(hexes: List[str]) -> Any:  # matplotlib cycler, typed at runtime only
     """Build a matplotlib cycler from a hex list.
 
     Deferred import so ``_style.py`` remains matplotlib-free at import

@@ -19,13 +19,13 @@ license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (favicons,
   site_indexes, plain_language, meta_from_ollama, md_to_html, lint_markdown)
-  need Python 3.9+ with stdlib + Pillow + PyYAML; meta_from_ollama and
+  need Python 3.10+ with stdlib + Pillow + PyYAML; meta_from_ollama and
   plain_language additionally need a running local Ollama daemon. Optional
   audio narration (narrate_post + OpenVoice v2 or ChatterboxTTS) pulls
   torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
 ---
 
 # front-publish — Markdown → website, meta, icons, indexes, plain language

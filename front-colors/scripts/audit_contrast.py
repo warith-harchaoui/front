@@ -37,7 +37,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, stdlib only.
+* Python 3.10+, stdlib only.
 * The "fix" search walks the OKLCH L axis at 0.01 resolution; in practice
   the search converges in tens of microseconds per pair.
 * Color math (sRGB transfer, WCAG luminance, OKLab / OKLCH) lives in

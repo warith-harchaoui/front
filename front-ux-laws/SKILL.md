@@ -18,11 +18,11 @@ description: >-
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The auditor needs
-  Python 3.9+ stdlib only (html.parser, argparse, json). No network
+  Python 3.10+ stdlib only (html.parser, argparse, json). No network
   access required. Reference is plain Markdown with no exec deps.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
   source: https://lawsofux.com/
 ---
 
@@ -153,9 +153,22 @@ warnings pass and only fail on real errors (Hick, Jakob).
 
 ## Scripts
 
-- `scripts/audit_laws_of_ux.py` — Python 3.9+ stdlib-only static
+- `scripts/audit_laws_of_ux.py` — Python 3.10+ stdlib-only static
   auditor. Run `--help` for the full flag list (`--json`, `--strict`,
   `--only LAW1,LAW2`, `--ignore LAW1,LAW2`).
+
+## Companion skills
+
+| You also need… | Install |
+|---|---|
+| Vanilla-JS + Tailwind UI generation (house style, tokens, components) | `front-ui` |
+| Static HTML a11y lint on the audited page | `front-accessibility` |
+| WCAG contrast audit + CVD simulation | `front-colors` |
+| Wrap a CLI in a GUI (argparse → web form) | `front-cli-gui` |
+| Markdown → website + meta + favicons + indexes | `front-publish` |
+| Data-viz / explainability / causality figures | `front-figures` |
+| W3C alt text via local Ollama vision | `front-vision` |
+| Local WebVTT / SRT captions via whisper.cpp | `front-audio` |
 
 ## Attribution
 

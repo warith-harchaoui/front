@@ -55,7 +55,7 @@ Central guidance. See ``front/references/meta-tags.md``.
 
 Notes
 -----
-* Requires Python 3.9+, ``requests``. No Pillow dependency.
+* Requires Python 3.10+, ``requests``. No Pillow dependency.
 * Default model and endpoint are inherited from :mod:`alt_from_ollama`
   (``OLLAMA_URL``, ``OLLAMA_MODEL`` — the one model is gemma3:4b).
 * On-disk cache lives under ``~/.cache/front-skill/meta/`` by default.

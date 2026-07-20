@@ -73,6 +73,7 @@ def test_gemma3_4b_is_the_declared_default() -> None:
         REPO_ROOT / "front-vision" / "scripts" / "install_alt_ai.py",
         REPO_ROOT / "front-publish" / "scripts" / "_ollama.py",
         REPO_ROOT / "front-audio" / "scripts" / "name_from_transcript.py",
+        REPO_ROOT / "front-audio" / "scripts" / "translate_captions.py",
         REPO_ROOT / "front-publish" / "scripts" / "narrate_post.py",
     ]
     for script in declarers:
@@ -89,6 +90,7 @@ LLM_SCRIPTS = [
     REPO_ROOT / "front-vision" / "scripts" / "alt_from_ollama.py",
     REPO_ROOT / "front-vision" / "scripts" / "install_alt_ai.py",
     REPO_ROOT / "front-audio" / "scripts" / "name_from_transcript.py",
+    REPO_ROOT / "front-audio" / "scripts" / "translate_captions.py",
     REPO_ROOT / "front-publish" / "scripts" / "plain_language.py",
     REPO_ROOT / "front-publish" / "scripts" / "meta_from_ollama.py",
     REPO_ROOT / "front-publish" / "scripts" / "narrate_post.py",

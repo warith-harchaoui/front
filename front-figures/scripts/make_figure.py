@@ -54,7 +54,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+.
+* Python 3.10+.
 * ``pip install -r requirements-dataviz.txt`` for pandas / matplotlib /
   seaborn / altair.
 * The Vega-Lite path uses ``json.dumps`` and does not require altair;
@@ -431,7 +431,7 @@ def render_matplotlib(spec_ctx: Dict[str, Any], out_path: str, fmt: str) -> None
     plt.close(fig)
 
 
-def _render_bar(ax, df, x, y, horizontal: bool, color: str) -> None:
+def _render_bar(ax: Any, df: Any, x: str, y: str, horizontal: bool, color: str) -> None:
     """Draw a bar chart (horizontal or vertical) in the house style."""
     if horizontal:
         ax.barh(df[x], df[y], color=color, edgecolor="none")

@@ -4,7 +4,7 @@ _vocab
 
 Shared vocabulary-extraction helpers for the local AI helpers.
 
-Both :mod:`captions_from_whisper` (whisper.cpp via vocal-helper) and
+Both :mod:`captions_from_whisper` (whisper.cpp / pywhispercpp) and
 :mod:`alt_from_ollama` (Gemma vision via Ollama) accept an optional
 vocabulary biasing input. The user supplies it in one of four shapes:
 

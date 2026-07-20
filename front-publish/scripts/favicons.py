@@ -47,7 +47,7 @@ Usage
 
 Notes
 -----
-* Requires Python 3.9+ and ``Pillow >= 10``.
+* Requires Python 3.10+ and ``Pillow >= 10``.
 * W3C / current best practice:
 
   * SVG is the preferred favicon format; rasters are fallback.

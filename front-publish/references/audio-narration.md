@@ -75,11 +75,11 @@ expressive output but is more sensitive to noise in the reference.
 
 | Engine | Code lic. | Weights lic. | Built-in voices | Clone | Strength |
 |---|---|---|---|---|---|
-| **OpenVoice v2** (MyShell) | MIT | MIT | 5+, multi-lang | ✅ | Cross-lingual, preserves accent of the sample. |
-| **ChatterboxTTS** (Resemble) | MIT | MIT | 1 default, lib via WAV files | ✅ | More expressive (continuous `exaggeration` dial). |
-| ~~F5-TTS~~ | MIT | **CC-BY-NC-4.0** | — | ✅ | Excluded — non-commercial weights. |
-| ~~XTTS-v2~~ (Coqui) | MIT | **CPML non-commercial** | — | ✅ | Excluded — non-commercial + project shut down 2024-01. |
-| ElevenLabs | proprietary | proprietary | many | ✅ | API-only, paid. Not shipped; documented as a hook for those who accept SaaS. |
+| **OpenVoice v2** (MyShell) | MIT | MIT | 5+, multi-lang | Yes | Cross-lingual, preserves accent of the sample. |
+| **ChatterboxTTS** (Resemble) | MIT | MIT | 1 default, lib via WAV files | Yes | More expressive (continuous `exaggeration` dial). |
+| ~~F5-TTS~~ | MIT | **CC-BY-NC-4.0** | — | Yes | Excluded — non-commercial weights. |
+| ~~XTTS-v2~~ (Coqui) | MIT | **CPML non-commercial** | — | Yes | Excluded — non-commercial + project shut down 2024-01. |
+| ElevenLabs | proprietary | proprietary | many | Yes | API-only, paid. Not shipped; documented as a hook for those who accept SaaS. |
 
 **Rule of thumb:** pick **OpenVoice v2** for multi-lingual content
 where you want the cloned voice to sound consistent across languages.
@@ -95,7 +95,7 @@ repo renamed the `pyproject.toml` package name from `openvoice` to
 `myshell-openvoice` without changing the import path. Modern pip
 rejects the mismatch:
 
-```
+```text
 Requested myshell-openvoice from git+https://github.com/myshell-ai/OpenVoice.git@main
 has inconsistent name: expected 'openvoice', but metadata has 'myshell-openvoice'.
 ERROR: No matching distribution found for openvoice (unavailable)

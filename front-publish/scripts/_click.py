@@ -1,5 +1,5 @@
 """
-_click — shared Click decorators and helpers for front-publish scripts.
+_click — shared Click decorators and helpers for a front-* skill's scripts.
 
 Mirrors the ``_argparse.make_parser`` factory in shape and intent: every
 Click-based script in this skill is registered through
@@ -29,7 +29,7 @@ from typing import Any, Callable, Optional, Sequence
 import click
 
 
-SKILL_VERSION = "0.25.0"
+SKILL_VERSION = "0.26.0"
 
 
 #: Context settings shared by every front Click command. ``-h`` joins

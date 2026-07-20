@@ -196,8 +196,8 @@ def _hint_graphviz_system() -> None:
     """Print a reminder that graphviz needs the system package too."""
     print(
         "[hint] The 'graphviz' Python package needs the system Graphviz binary. "
-        "Install via: brew install graphviz (macOS) / apt install graphviz (Linux) / "
-        "winget install graphviz (Windows).",
+        "Install via: brew install graphviz (macOS — https://brew.sh) / "
+        "apt install graphviz (Linux) / winget install graphviz (Windows).",
         file=sys.stderr,
     )
 

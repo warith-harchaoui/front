@@ -8,7 +8,7 @@ runnable as a module as well as via the installed ``front`` console script.
 
 Author
 ------
-Project maintainers.
+`Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>`_
 """
 
 from front_cli.cli import cli

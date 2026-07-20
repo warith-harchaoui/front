@@ -50,8 +50,11 @@ LANG_INSTRUCTIONS: dict[str, str] = {
 
 
 def pick_default_model() -> str:
-    """Pick the Ollama model tag for the current hardware."""
-    # OLLAMA_MODEL is a bare escape hatch for tests; else the one authorized model.
+    """Return the one authorized model tag (``gemma3:4b``).
+
+    ``OLLAMA_MODEL`` is honoured only as a bare test seam so the suite can point
+    the resolver at a stub; it is never a user-facing model choice.
+    """
     return os.environ.get("OLLAMA_MODEL") or DEFAULT_BASE
 
 

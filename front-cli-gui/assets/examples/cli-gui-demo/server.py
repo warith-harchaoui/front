@@ -40,6 +40,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -54,6 +55,14 @@ PUBLIC_DIR: Path = Path(__file__).resolve().parent / "public"
 
 #: Path to the mock CLI executable.
 CLI: Path = Path(__file__).resolve().parent / "cli" / "imgconvert.py"
+
+#: Hard cap on a request body. The GUI only ever POSTs a tiny JSON payload, so
+#: anything larger is malformed or hostile — reject before reading into memory.
+MAX_BODY_BYTES: int = 1 << 20  # 1 MiB
+
+#: Wall-clock ceiling on a wrapped-CLI run. A wedged child must not pin a server
+#: thread (and its SSE connection) forever.
+MAX_RUN_SECONDS: float = 120.0
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
@@ -154,14 +163,22 @@ class DemoHandler(BaseHTTPRequestHandler):
             self.send_error(404, "Not Found")
             return
 
-        # Read the JSON body. ``Content-Length`` is required for a clean read.
-        length = int(self.headers.get("Content-Length", "0"))
+        # Read the JSON body. ``Content-Length`` is required for a clean read;
+        # a malformed or oversized value is a client error, not a 500.
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+        except ValueError:
+            self.send_error(400, "Invalid Content-Length")
+            return
         if length <= 0:
             self.send_error(400, "Missing JSON body")
             return
+        if length > MAX_BODY_BYTES:
+            self.send_error(413, "Request body too large")
+            return
         try:
             req: dict = json.loads(self.rfile.read(length).decode("utf-8"))
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, UnicodeDecodeError):
             self.send_error(400, "Invalid JSON")
             return
 
@@ -193,14 +210,26 @@ class DemoHandler(BaseHTTPRequestHandler):
             self._sse("error", str(e))
             return
 
-        # Stream stdout line by line. ``bufsize=1`` + ``text=True`` gives us
-        # line-buffered output without manual decoding.
-        assert proc.stdout is not None
-        for line in proc.stdout:
-            self._sse("line", line.rstrip("\n"))
-
-        proc.wait()
-        self._sse("done", {"exit_code": proc.returncode})
+        # A watchdog kills a wedged child so it can never pin this thread past
+        # MAX_RUN_SECONDS. ``kill()`` unblocks the streaming loop below (EOF).
+        watchdog = threading.Timer(MAX_RUN_SECONDS, proc.kill)
+        watchdog.start()
+        try:
+            # Stream stdout line by line. ``bufsize=1`` + ``text=True`` gives us
+            # line-buffered output without manual decoding.
+            assert proc.stdout is not None
+            for line in proc.stdout:
+                self._sse("line", line.rstrip("\n"))
+            proc.wait()
+            self._sse("done", {"exit_code": proc.returncode})
+        finally:
+            # Always reap the child — on normal completion, on a client
+            # disconnect (BrokenPipeError bubbles out of ``_sse``), or on the
+            # watchdog kill. Leaving it running would leak a process per request.
+            watchdog.cancel()
+            if proc.poll() is None:
+                proc.kill()
+                proc.wait()
 
     # ── SSE helper ────────────────────────────────────────────────────────
 

@@ -34,7 +34,7 @@ python scripts/install_alt_ai.py
 The installer:
 
 - Detects the OS and uses the right package manager:
-  - Darwin (any chip): Homebrew (`brew install ollama`).
+  - Darwin (any chip): Homebrew (`brew install ollama` — [brew.sh](https://brew.sh)).
   - Linux: the official Ollama installer script.
   - Windows: `winget install Ollama.Ollama`.
 - Starts the Ollama daemon if it isn't already running.

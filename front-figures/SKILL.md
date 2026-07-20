@@ -14,18 +14,18 @@ description: >-
   "refutation", "DAG", "audit this figure", "colorblind safe palette", "dual
   y-axis", "bar / line / scatter chart", "Vega-Lite", "visualize data", "audit
   this chart", "install figures". Output: Vega JSON / PNG / SVG on disk +
-  ``<figure>`` snippet; auditor emits JSON + exit codes for CI.
+  an HTML figure snippet; auditor emits JSON + exit codes for CI.
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. The auditor (static) needs
-  Python 3.9+ stdlib + PyYAML only. The generators need Python 3.9+
+  Python 3.10+ stdlib + PyYAML only. The generators need Python 3.10+
   plus the tiered dependencies pinned in ``scripts/requirements-*.txt``
   — one per concern (dataviz, explainability, causality). The
   ``install_figures.py`` script installs each tier on demand. No
   network required at figure-generation time once installed.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
 ---
 
 # front-figures — data-viz, explainability, and causality figures

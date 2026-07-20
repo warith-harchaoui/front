@@ -1,6 +1,6 @@
 # front-cli
 
-A thin top-level driver for the four [`front`](https://github.com/warith-harchaoui/front) skills.
+A thin top-level driver for six of the [`front`](https://github.com/warith-harchaoui/front) skills.
 
 ```bash
 pip install ./front-cli         # from the repo root, or
@@ -10,7 +10,7 @@ pip install front-cli           # from PyPI when published
 Then:
 
 ```bash
-front --help                    # discoverable sub-commands across all 4 skills
+front --help                    # discoverable sub-commands across all six wired skills
 front --version
 
 front ui validate               # → python front-ui/scripts/validate.py

@@ -18,11 +18,11 @@ description: >-
 license: BSD-3-Clause
 compatibility: >-
   Runtime: Claude.ai, Claude Code, OpenCode. Core scripts (audit_contrast,
-  simulate_cvd) need Python 3.9+ stdlib + Pillow (for simulate_cvd only).
+  simulate_cvd) need Python 3.10+ stdlib + Pillow (for simulate_cvd only).
   No network or model required at any point.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
 ---
 
 # front-colors — color audit, curation, and perceptual transforms

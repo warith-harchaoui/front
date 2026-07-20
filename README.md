@@ -449,7 +449,7 @@ beyond `pre-commit install`.
 # .pre-commit-config.yaml — add the repo as one entry
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.25.0          # pin a tag — bump with renovate / dependabot
+    rev: v0.26.0          # pin a tag — bump with renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit

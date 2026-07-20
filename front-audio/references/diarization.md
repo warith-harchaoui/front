@@ -5,7 +5,7 @@ transcript-based LLM pass) to the caption stream.
 
 ## Pipeline
 
-```
+```text
     audio/video
         │
         ▼
@@ -84,7 +84,7 @@ python scripts/diarize_from_nemo.py talk.wav --device cpu
 
 Layout: one WAV per known speaker, filename stem = display name.
 
-```
+```text
 voices/
   Alice.wav        # ~5–15 s of clean speech per speaker
   Bob.wav

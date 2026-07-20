@@ -17,7 +17,7 @@ description: >-
   pre-commit and CI.
 license: BSD-3-Clause
 compatibility: >-
-  Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.9+ stdlib +
+  Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.10+ stdlib +
   Pillow + requests (see ``scripts/requirements-alt-text.txt``) and a
   running local Ollama daemon with a vision-capable model. The
   ``install_alt_ai.py`` script installs Ollama (brew on macOS, official
@@ -25,7 +25,7 @@ compatibility: >-
   first run.
 metadata:
   author: Warith Harchaoui
-  version: 0.25.0
+  version: 0.26.0
 ---
 
 # front-vision — local AI alt text for accessibility
@@ -161,7 +161,8 @@ python front-vision/scripts/alt_from_ollama.py public/hero.jpg       # AI alt te
 | Static HTML a11y lint | ``front-accessibility`` |
 | WCAG contrast audit, CVD simulation, curated palette | ``front-colors`` |
 | Local WebVTT / SRT captions via whisper.cpp | ``front-audio`` |
-| WCAG contrast audit, CVD simulation, curated palette | ``front-colors`` |
 | Vanilla-JS + Tailwind UI generation | ``front-ui`` |
 | Wrap a CLI in a GUI | ``front-cli-gui`` |
 | Markdown → website + meta + favicons + indexes | ``front-publish`` |
+| Data-viz / explainability / causality figures | ``front-figures`` |
+| Laws-of-UX audit on the surrounding page | ``front-ux-laws`` |

@@ -44,7 +44,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, ``requests`` (shared with :mod:`alt_from_ollama`).
+* Python 3.10+, ``requests`` (shared with :mod:`alt_from_ollama`).
 * Cache: ``~/.cache/front-skill/plain/`` — override with ``FRONT_CACHE_DIR``;
   disable with ``FRONT_NO_CACHE=1`` or ``--no-cache``.
 * The rewriter refuses to invent facts. If the input is already plain

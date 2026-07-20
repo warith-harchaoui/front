@@ -55,7 +55,7 @@ Usage
 
 Notes
 -----
-* Python 3.9+, stdlib only.
+* Python 3.10+, stdlib only.
 * The script reads ``.html`` files at the project root and inside common
   output folders (``public/``, ``dist/``, ``site/``, ``_site/``,
   ``build/``) to populate sitemap and llms.txt. ``.md`` files at the

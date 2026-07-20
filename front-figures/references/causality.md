@@ -10,7 +10,7 @@ Miguel Hernán & Jamie Robins' [*Causal Inference: What If*](https://miguelherna
 
 ## The four-step loop
 
-```
+```text
     ┌───────────┐   ┌────────────┐   ┌──────────┐   ┌────────┐
     │  Model    │ → │  Identify  │ → │ Estimate │ → │ Refute │
     └───────────┘   └────────────┘   └──────────┘   └────────┘
@@ -132,7 +132,7 @@ refuter. **Interpret the deltas, not just the point estimate.**
 | DML CI wildly wide | Overlap violated (few treated units with high-dim confounders) | Trim by propensity score (`--trim-quantile 0.05`) or reduce confounder set. |
 | Placebo refuter shows a non-zero effect | Model is picking up random noise | Reduce model complexity; try `--estimator linear` first. |
 | Random common cause refuter fails | Model is unstable to added noise | Try DR-learner (`--estimator dr`); it's more robust. |
-| Graphviz not installed | System package missing | `brew install graphviz` (macOS) / `apt install graphviz` (Linux) / `winget install graphviz` (Windows). |
+| Graphviz not installed | System package missing | `brew install graphviz` (macOS — [brew.sh](https://brew.sh)) / `apt install graphviz` (Linux) / `winget install graphviz` (Windows). |
 
 ## When NOT to use this skill
 

@@ -12,10 +12,10 @@ full flag surface.
 
 ## Two kinds of recipe
 
-- **Deterministic** (🟢) — pure Python, no model, no network. Runs anywhere;
+- **Deterministic** (`[det]`) — pure Python, no model, no network. Runs anywhere;
   output is byte-stable. These are the audit gates and the make-from-data
   generators. Safe in CI and `pre-commit`.
-- **Local-AI** (🤖) — calls a **local** model (Ollama for vision/text, a local
+- **Local-AI** (`[ai]`) — calls a **local** model (Ollama for vision/text, a local
   whisper.cpp build for audio). Never a SaaS. Requires a one-time `install_*`
   step; output varies by model. Draft-quality — verify before shipping.
 
@@ -24,7 +24,7 @@ findings or error (so the audits gate a commit).
 
 ---
 
-## front-accessibility 🟢 — static a11y lint
+## front-accessibility `[det]` — static a11y lint
 
 Lint a static HTML file for the 14 source-decidable accessibility rules
 (missing `alt`, unlabelled inputs, `<div onclick>`, heading order, …):
@@ -45,7 +45,7 @@ RULE message`) and exits non-zero. Add `--fix` to apply the safe repairs
 (lang attribute, redundant ARIA, positive tabindex, aria-hidden-interactive,
 motion-reduce guard) in place, and `--json` for machine-readable output.
 
-## front-ux-laws 🟢 — Laws-of-UX audit
+## front-ux-laws `[det]` — Laws-of-UX audit
 
 Audit HTML for the mechanically-detectable Laws of UX (Hick, Miller, Fitts,
 Jakob, Tesler, Aesthetic-Usability, …), as JSON:
@@ -73,7 +73,7 @@ Expected output (shape):
 Miller / Jakob) with an idempotent convergence loop; `--only hick,jakob` and
 `--ignore tesler,miller` scope the run; `--strict` upgrades warnings to errors.
 
-## front-colors 🟢 — WCAG contrast, CVD, palette → Tailwind
+## front-colors `[det]` — WCAG contrast, CVD, palette → Tailwind
 
 Audit a palette for WCAG contrast (suggests OKLCH-neighbour fixes):
 
@@ -96,7 +96,7 @@ python3 front-colors/scripts/simulate_cvd.py tests/fixtures/images/chart-bar.png
 
 All three are deterministic — no model, no network.
 
-## front-figures 🟢 — data-viz + an auditor
+## front-figures `[det]` — data-viz + an auditor
 
 Audit a Vega-Lite spec for data-viz sins (truncated baselines, dual y-axes,
 rainbow palettes, missing labels):
@@ -124,7 +124,7 @@ python3 front-figures/scripts/explain_model.py --model model.pkl --data X.csv --
 python3 front-figures/scripts/causal_estimate.py --data d.csv --treatment T --outcome Y --confounders "X1,X2,X3" --dag dag.gml
 ```
 
-## front-publish 🟢 — Markdown → site, meta, favicons, indexes
+## front-publish `[det]` — Markdown → site, meta, favicons, indexes
 
 Lint a Markdown file (heading sentinel, trailing whitespace, fenced-code
 language); `--fix` applies the safe rewrites:
@@ -148,9 +148,9 @@ python3 front-publish/scripts/site_indexes.py --root . --base-url https://exampl
 ```
 
 Narration (`narrate_post.py`) and meta-tag drafting (`meta_from_ollama.py`) are
-🤖 local-AI — see below.
+`[ai]` local-AI — see below.
 
-## front-cli-gui 🟢 — wrap a CLI in a GUI
+## front-cli-gui `[det]` — wrap a CLI in a GUI
 
 Introspect a Python CLI's argument parser (argparse **or** Click — auto-detected)
 and emit a single-page vanilla-JS + Tailwind GUI. Point `spec` at a zero-arg
@@ -178,7 +178,7 @@ The emitted HTML passes both the `front-ux-laws` and `front-accessibility`
 audits with zero findings (the emitter is its own customer). A runnable worked
 example ships in `front-cli-gui/assets/examples/cli-gui-demo/`.
 
-## front-vision 🤖 — alt text via a local vision model
+## front-vision `[ai]` — alt text via a local vision model
 
 One-time install (pulls a local Ollama vision model):
 
@@ -197,7 +197,7 @@ text|complex|group` forces the purpose; results are cached on disk so the same
 image + parameters never hit the model twice. Draft-quality — verify before
 committing.
 
-## front-audio 🤖 — captions, diarization, speaker naming
+## front-audio `[ai]` — captions, diarization, speaker naming
 
 One-time install (pip-installs `vocal-helper` / whisper.cpp and pre-downloads a
 GGML model so it runs offline):
@@ -220,7 +220,21 @@ python3 front-audio/scripts/diarize_from_nemo.py interview.wav --out interview.d
 python3 front-audio/scripts/caption_diarize.py --captions interview.vtt --diarization interview.diarization.json
 ```
 
-## front-ui 🟢 — the stack rules + component assets
+Add a **second, translated subtitle track** in the language of the page that
+embeds the video (native `captions` + translated `subtitles`). Runs on the
+`.vtt` only — no audio — via the local `gemma3:4b` model:
+
+```bash
+python3 front-audio/scripts/translate_captions.py interview.vtt --in article.html --media interview.mp4
+# → writes interview.<lang>.vtt and prints:
+#   <video controls>
+#     <source src="interview.mp4" />
+#     <track kind="captions" srclang="en" label="English" src="interview.vtt" default />
+#     <track kind="subtitles" srclang="fr" label="Français" src="interview.fr.vtt" />
+#   </video>
+```
+
+## front-ui `[det]` — the stack rules + component assets
 
 `front-ui` is reference-first: it sets the vanilla-JS + Tailwind house style
 (three-Roboto default, dark-mode peers, focus rings, reduced-motion guards) that
