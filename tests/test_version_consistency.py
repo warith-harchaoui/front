@@ -20,7 +20,6 @@ Project maintainers.
 from __future__ import annotations
 
 import re
-import tomllib
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -28,12 +27,17 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 _SKILL_VERSION_RE = re.compile(r'^\s*SKILL_VERSION\s*=\s*["\']([\d.]+)["\']', re.MULTILINE)
 _METADATA_VERSION_RE = re.compile(r'^\s*version:\s*([\d.]+)\s*$', re.MULTILINE)
 _DUNDER_VERSION_RE = re.compile(r'^\s*__version__\s*=\s*["\']([\d.]+)["\']', re.MULTILINE)
+# Regex rather than ``tomllib``: that module is stdlib only on Python 3.11+, and
+# this repo's floor is 3.10 (the CI matrix runs 3.10). ``[build-system]`` carries
+# no ``version`` key, so the first ``version = "…"`` in the file is the project's.
+_PYPROJECT_VERSION_RE = re.compile(r'^\s*version\s*=\s*["\']([\d.]+)["\']', re.MULTILINE)
 
 
 def _pyproject_version() -> tuple[str, str]:
     path = REPO_ROOT / "front-cli" / "pyproject.toml"
-    data = tomllib.loads(path.read_text(encoding="utf-8"))
-    return str(path.relative_to(REPO_ROOT)), data["project"]["version"]
+    m = _PYPROJECT_VERSION_RE.search(path.read_text(encoding="utf-8"))
+    assert m, f"{path.relative_to(REPO_ROOT)} has no project version"
+    return str(path.relative_to(REPO_ROOT)), m.group(1)
 
 
 def _collect() -> dict[str, str]:
