@@ -137,8 +137,8 @@ def validate(cmd: str, argv: list[str], sandbox_root: Path) -> None:
         Path(arg).resolve().relative_to(sandbox_root)
 ```
 
-Whitelist beats blacklist. If the user can introduce a new flag, they
-can introduce `--exec` or whatever undocumented backdoor the
+Allow-list, don't deny-list. If the user can introduce a new flag,
+they can introduce `--exec` or whatever undocumented backdoor the
 underlying CLI ships.
 
 ## 4. Subprocess sandbox

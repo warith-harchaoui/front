@@ -3,18 +3,18 @@
 audit_i18n
 ==========
 
-Static **audit** half of the front-ui unified-i18n rule: translatable strings
-— GUI labels **and** LLM prompts — belong in one per-project catalog,
+Static audit half of the front-ui unified-i18n rule: translatable strings
+— GUI labels and LLM prompts — belong in one per-project catalog,
 ``locales/i18n.yaml``, never embedded in JavaScript or inlined in Python.
 
 This script flags the two violations of that rule, deterministically and
 without a browser, a model, or the network:
 
-- **I18N001** — a **translation dictionary embedded in JS / HTML**: an object
+- I18N001 — a translation dictionary embedded in JS / HTML: an object
   literal that maps locale codes (``en``, ``fr``, …) to strings, or a variable
   named ``i18n`` / ``translations`` / ``messages`` / ``locales`` / ``strings``
   assigned an object literal. Those belong in ``locales/i18n.yaml``.
-- **I18N002** — an **LLM prompt inlined in Python**: a module- or class-level
+- I18N002 — an LLM prompt inlined in Python: a module- or class-level
   constant whose name contains ``PROMPT`` / ``TEMPLATE`` / ``SYSTEM`` /
   ``INSTRUCTION`` assigned a string literal, instead of being loaded from
   ``locales/i18n.yaml`` (or a ``prompts/*.yaml`` catalog).

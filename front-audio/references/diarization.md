@@ -5,34 +5,20 @@ transcript-based LLM pass) to the caption stream.
 
 ## Pipeline
 
-```text
-    audio/video
-        │
-        ▼
-    ┌───────────────────────────────┐
-    │ captions_from_whisper.py      │  WebVTT / SRT with the words
-    └───────────────────────────────┘
-        │
-        ▼
-    ┌───────────────────────────────┐
-    │ diarize_from_nemo.py          │  Sortformer → RTTM + turn JSON
-    └───────────────────────────────┘
-        │
-        ▼
-    ┌───────────────────────────────┐        ┌──────────────────────────────┐
-    │ identify_from_titanet.py      │   OR   │ name_from_transcript.py      │
-    │  (voice reference clips)      │        │  (vocatives + self-intro +   │
-    │                               │        │   optional local Ollama)     │
-    └───────────────────────────────┘        └──────────────────────────────┘
-        │                                                 │
-        └──────────────┬─────────────────────────┬────────┘
-                       ▼                         ▼
-                    speakers.json (Speaker id → display name)
-                       │
-                       ▼
-    ┌───────────────────────────────┐
-    │ caption_diarize.py            │  Speaker-labelled VTT / SRT / TXT
-    └───────────────────────────────┘
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Roboto, system-ui, sans-serif","lineColor":"#8E8E93"}}}%%
+flowchart TD
+    A[audio / video] --> CAP["captions_from_whisper.py<br/>WebVTT / SRT with the words"]
+    CAP --> DIA["diarize_from_nemo.py<br/>Sortformer → RTTM + turn JSON"]
+    DIA --> TIT["identify_from_titanet.py<br/>voice reference clips"]
+    DIA --> NAM["name_from_transcript.py<br/>vocatives + self-intro + optional Ollama"]
+    TIT --> SPK["speakers.json<br/>speaker id → display name"]
+    NAM --> SPK
+    SPK --> MRG["caption_diarize.py<br/>speaker-labelled VTT / SRT / TXT"]
+    classDef step fill:#CCE4FF,stroke:#007AFF,color:#1D1D1F;
+    classDef data fill:#D4F5D9,stroke:#28CD41,color:#1D1D1F;
+    class CAP,DIA,TIT,NAM,MRG step;
+    class A,SPK data;
 ```
 
 ## Models

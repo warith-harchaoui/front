@@ -20,6 +20,61 @@ Sources: [Vega-Lite gallery](https://vega.github.io/vega-lite/examples/),
 [Vega gallery](https://vega.github.io/vega/examples/),
 [vl-convert](https://github.com/vega/vl-convert).
 
+## Why this replaces matplotlib / seaborn / pyplot
+
+Default matplotlib is ugly — it takes a lot of tuning to look presentable.
+A house-styled Vega spec (`_style.vega_config`: rounded bars, no top/right
+spines, CVD-safe palette, Roboto) is good-looking by default, for free. The
+rest of the win: the spec carries its own data (reproducible), it drops into a
+front-ui page, and the [Ralph Eyeball Loop](ralph-eyeball-loop.md) rasterises
+the real spec.
+
+The claim "replace matplotlib / seaborn / pyplot" only holds if the base API
+of all three is covered. Here is the honest map — clean (idiomatic Vega-Lite),
+full-Vega (needs the Vega spec, see "Closing the residue" below), or the small
+set that genuinely stays in matplotlib.
+
+| pyplot / matplotlib | seaborn | Vega verdict |
+|---|---|---|
+| `plot` | `lineplot` / `relplot` | clean |
+| `scatter` | `scatterplot` | clean |
+| `bar` / `barh` | `barplot` / `countplot` | clean |
+| `hist` | `histplot` | clean |
+| `hist2d` | `displot` (2D) | clean |
+| `boxplot` | `boxplot` | clean |
+| `violinplot` | `violinplot` | clean (mirror = faceted trick) |
+| `pie` | — | clean (auditor discourages > 3 slices) |
+| `stackplot` | — | clean (stacked / streamgraph) |
+| `fill_between` | `kdeplot` fill / regplot CI | clean |
+| `step` / `stairs` | `ecdfplot` | clean |
+| `errorbar` | `pointplot` / barplot CI | clean |
+| `stem` | — | clean (lollipop) |
+| `axhline` / `axvline` / `hlines` / `vlines` | — | clean (`rule`) |
+| `loglog` / `semilogx` / `semilogy` | — | clean (`scale.type: log`) |
+| `subplots` | `FacetGrid` / `relplot` / `PairGrid` | clean (facet / concat / repeat) |
+| `annotate` / `text` | — | clean (`text` mark) |
+| — | `stripplot` | clean (jitter) |
+| — | `rugplot` | clean (`tick`) |
+| — | `ecdfplot` | clean (cumulative window) |
+| — | `jointplot` | clean (concat marginals) |
+| — | `pairplot` / SPLOM | clean (`repeat`) |
+| — | `heatmap` (annotated) | clean (`rect` + `text`) |
+| `hexbin` | `jointplot(kind="hex")` | full-Vega or offline hex + hexagon shape |
+| `contour` / `contourf` | `kdeplot` 2D | full-Vega (`kde2d` + `isocontour`) |
+| — | `swarmplot` | full-Vega (`force` + `collide`) |
+| — | `clustermap` | offline linkage + Vega heatmap + `rule` dendrograms |
+| `quiver` | — | Vega-Lite `angle` on a triangle mark |
+| `regplot` / `lmplot` CI band | `regplot` | offline fit + CI, then `area` band |
+| `imshow` (gridded) / `pcolormesh` | `heatmap` | clean (`rect`, no interpolation) |
+| `plot_surface` / `plot_wireframe` / 3D scatter | — | static 3D via offline projection + full-Vega polygons (below); live-rotatable 3D not possible |
+| `streamplot` | — | offline streamlines only (not shipped) |
+| `imshow` (interpolated raster) | — | not native (hard cells only) |
+| `twinx` (dual axis) | — | possible but discouraged (auditor flags) |
+| `table` | — | not a chart (render as HTML) |
+
+The full-Vega and offline-compute rows are all worked out with runnable,
+rendered examples in "Closing the residue — the hard cases, done" below.
+
 ## 1. Bar
 
 | Chart | seaborn / matplotlib | Key |
@@ -176,23 +231,41 @@ inches × dpi (e.g. Nature single column = 89 mm ≈ 3.5 in → 1050 px at
 density fields need **full Vega** (`isocontour` / `kde2d` transforms),
 not Vega-Lite.
 
-## The honest residue — where matplotlib still wins
+## Closing the residue — the hard cases, done
 
-Vega genuinely cannot (or cannot cleanly) do these; keep them in
-matplotlib / plotly / graphviz:
+These are the plots people assume need matplotlib. Each is a real Vega or
+full-Vega spec, rendered and eyeballed through the Ralph Eyeball Loop. The
+runnable specs (data inline) live in `assets/vega-examples/`; render any with
+`python scripts/render_diagram.py assets/vega-examples/<file> --out /tmp/x.png`.
 
-- **True 3D** surfaces / volumes (`plot_surface`, voxels).
-- **Filled contour fields** in Vega-Lite (2D contours live in full Vega).
-- **True beeswarm** collision packing (jitter only).
-- **Dendrograms / cluster trees**, **Sankey / alluvial**, **chord**,
-  **treemap / sunburst** — bespoke full-Vega recipes at best.
-- **Quiver / stream / vector fields.**
-- **`imshow` of raw arrays** with colormap interpolation (use `rect` for
-  gridded data).
-- **Broken axes, twin independent secondary axes** (deliberately
-  discouraged).
-- **>~50k marks** — in-browser rendering gets heavy; rasterise with
+| seaborn / pyplot | how | example |
+|---|---|---|
+| `regplot` / `lmplot` CI band | fit + 95% CI offline, then `area` (y/y2) + `line` + `point` layers | `regression-ci-band.vl.json` |
+| `hexbin` / `jointplot(kind="hex")` | hex-bin offline, then a `point` with a hexagon SVG `shape`, color = count | `hexbin.vl.json` |
+| `kdeplot` 2D / `contourf` | full Vega `kde2d` → `isocontour` → filled `path` levels over a faint scatter | `kde2d-contour.vg.json` |
+| `swarmplot` (true packing) | full Vega `force` + `collide`, x = value focus | `beeswarm.vg.json` |
+| `clustermap` | scipy linkage offline, then a heatmap with rows/cols `sort`ed by leaf order (margin dendrograms as `rule` marks from the linkage coords) | `clustermap.vl.json` |
+| `quiver` / vector field | a `point` `shape:"triangle"` with an `angle` encoding = direction, color/size = magnitude | `quiver.vl.json` |
+| `plot_surface` / 3D surface | project the mesh offline (isometric), painter's-sort the faces, shade each by its normal, draw as full-Vega `path` polygons | `surface-3d.vg.json` |
+
+## Where matplotlib genuinely still wins
+
+The residue is now short and specific:
+
+- **Live-interactive 3D** — rotating / zooming a 3D camera in the browser, and
+  volume rendering. *Static* 3D surfaces / wireframes / 3D scatter are doable
+  (project offline, draw full-Vega polygons — see "Closing the residue" above),
+  but Vega has no camera or z-axis, so live rotation stays in plotly / three.js.
+- **Streamplot** — integrated streamlines. Only doable by integrating the
+  lines offline and drawing them as `line` / `path` marks; not shipped here.
+- **Interpolated `imshow`** — matplotlib's bilinear / bicubic smoothing
+  between pixels, or an in-memory pixel array. Vega draws hard `rect` cells (a
+  fine grid approximates but is not true interpolation); its `image` mark only
+  takes an external URL.
+- **> ~50k marks** — in-browser rendering gets heavy; rasterise with
   matplotlib / datashader.
+- **Broken / twin-independent secondary axes** — deliberately discouraged
+  (the auditor flags dual axes).
 
-Everything else — families 1–11 and the extractable explainability plots —
-is idiomatic Vega and fully replaces seaborn / pyplot.
+Everything else — the everyday 2D statistical and scientific plotting API of
+matplotlib, seaborn, and pyplot — is covered above.

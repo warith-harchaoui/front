@@ -23,7 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.27.0
+  version: 0.28.0
 ---
 
 # front-cli-gui — CLI → web GUI
@@ -39,17 +39,17 @@ Solo developers and small teams who have a working CLI (Python / Node / Go / Rus
 
 ### Why this skill, not Gradio / Streamlit / Tauri / Taipy
 
-The auto-form generators are excellent at the 80% case and frustrating at the last 20%. They produce a UI that **looks like the tool's UI**, not yours. The trade-offs:
+The auto-form generators handle the common case well and get awkward at the last 20%. They produce a UI that looks like the tool's UI, not yours. The trade-offs:
 
-- **Gradio / Streamlit / Taipy / Shiny.** Server-side runtimes that auto-generate widgets from your function signature. Fast for ML demos. The cost: every Gradio app looks like a Gradio app; every Streamlit app looks like a Streamlit app. The CSS surface to override is non-trivial and brittle across versions. You also ship the runtime — minimum ~50 MB of Python deps and a long-lived server process.
+- **Gradio / Streamlit / Taipy / Shiny.** Server-side runtimes that auto-generate widgets from your function signature. Fast for ML demos. The cost: every Gradio app looks like a Gradio app; every Streamlit app looks like a Streamlit app. The CSS surface to override is large and brittle across versions. You also ship the runtime — minimum ~50 MB of Python deps and a long-lived server process.
 - **Tauri / Wails / Electron.** Native desktop wrappers. Real desktop integration, real binary you can hand to a non-technical user. They wrap a web view — `front-cli-gui` is what you'd put **inside** the web view. Pick Tauri when the deliverable must be a desktop app; pick `front-cli-gui` when the deliverable is a single HTML page that runs anywhere.
 - **Gooey / dearpygui.** Native widgets, no web. Pick these when you specifically want OS-native chrome.
 
 What `front-cli-gui` does instead:
 
-1. Emits **plain HTML + Tailwind + vanilla JS** — same files you'd write by hand. No runtime, no lock-in. You can edit it without learning a framework.
-2. Uses your **own** design tokens (semantic color, typography, dark mode, focus rings) via the shared front-ui stack rules. The UI does not look like every other auto-generated tool UI.
-3. Speaks to the CLI through a tiny adapter (HTTP + SSE, Tauri `invoke()`, or stub) — you pick the host. The GUI is decoupled from the runtime.
+1. Emits plain HTML + Tailwind + vanilla JS — same files you'd write by hand. No runtime, no lock-in. You can edit it without learning a framework.
+2. Uses your own design tokens (semantic color, typography, dark mode, focus rings) via the shared front-ui stack rules. The UI does not look like every other auto-generated tool UI.
+3. Speaks to the CLI through a small adapter (HTTP + SSE, Tauri `invoke()`, or stub) — you pick the host. The GUI is decoupled from the runtime.
 4. Ships a worked example you can copy in `assets/examples/cli-gui-demo/`.
 
 Honest limitation: this skill **scaffolds** the GUI. You still need to wire execution to your CLI through the host of your choice. We provide a Python SSE proxy reference implementation in the demo; for production you'll harden it (auth, rate-limit, sandbox).
@@ -64,7 +64,7 @@ gates on the emitted HTML.
 |---|---|---|
 | **Make** — CLI → HTML (three adapters) | `scripts/cli_to_gui.py` | Introspects a Python CLI and emits a single-page vanilla-JS + Tailwind GUI: one `<details>` per sub-command, form fields mapped per action type (str / int / float / choice / bool / file), required marker, default values pre-filled, a "Build command" button that constructs the CLI line locally. Output passes both `front-ux-laws` audit and `front-accessibility` lint with zero findings. **Three adapters**: argparse (stdlib, default), Click (`module:factory` returning a `click.Command`), and `--from-help` (subprocess + regex on the help text, works on non-Python CLIs — clap / cobra / commander). |
 | **Make** — worked scaffold | `assets/examples/cli-gui-demo/` | End-to-end runnable demo (HTML + ES module + Python SSE proxy) showing the host-wiring step the emitter leaves to the user. |
-| **Audit** — gate the emitted HTML | Pair with `front-accessibility/scripts/lint_a11y.py` and `front-ux-laws/scripts/audit_laws_of_ux.py` on the emitted output. | The emitter's HTML inherits front-ui stack rules; both auditors apply unmodified. The emitter itself is its own customer — the test suite asserts the output passes both gates. |
+| **Audit** — gate the emitted HTML | Pair with `front-accessibility/scripts/lint_a11y.py` and `front-ux-laws/scripts/audit_laws_of_ux.py` on the emitted output. | The emitter's HTML inherits front-ui stack rules; both auditors apply unmodified. The test suite asserts the output passes both gates. |
 
 ## Quick recipe — the one command
 
@@ -230,3 +230,4 @@ python server.py
 | W3C alt text for the wrapping page's images (local Ollama vision) | `front-vision` |
 | Captions for any embedded `<video>` / `<audio>` (local whisper.cpp) | `front-audio` |
 | Favicon / meta / docs site for the wrapping page | `front-publish` |
+| Screenshot the emitted GUI, look at it, and refine the markup (the Ralph Eyeball Loop) | `front-figures` (`front-figures/references/ralph-eyeball-loop.md`) |

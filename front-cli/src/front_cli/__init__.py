@@ -5,4 +5,4 @@ Author
 Warith Harchaoui, Ph.D. <https://www.linkedin.com/in/warith-harchaoui/>
 """
 
-__version__ = "0.27.0"
+__version__ = "0.28.0"

@@ -1,8 +1,8 @@
 # A11y linter — `lint_a11y.py`
 
-Fast, deterministic, no-DOM lint for CI and pre-commit hooks. No browser, no JS execution — runs in milliseconds over HTML source. Catches **14 source-decidable WCAG / WAI-ARIA failures** before anything reaches a user.
+Static, no-DOM lint for CI and pre-commit hooks. No browser, no JS execution — runs over HTML source. Catches **14 source-decidable WCAG / WAI-ARIA failures**.
 
-**Not a replacement for axe-core, Pa11y, or Lighthouse.** Those run a real browser and catch the dynamic / runtime failures that no static parser can see — colour-only state after JS, focus order after a route change, name/role/value after ARIA mutation, contrast after a runtime theme switch, live-region announcement order. Use `lint_a11y.py` in pre-commit; use axe-core (or Pa11y, or Lighthouse) in your end-to-end suite. Both, not either.
+**Not a replacement for axe-core, Pa11y, or Lighthouse.** Those run a real browser and catch the dynamic / runtime failures that no static parser can see — colour-only state after JS, focus order after a route change, name/role/value after ARIA mutation, contrast after a runtime theme switch, live-region announcement order. Use `lint_a11y.py` in pre-commit; use axe-core (or Pa11y, or Lighthouse) in your end-to-end suite. Run both.
 
 ## Install
 

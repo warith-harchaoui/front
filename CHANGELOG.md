@@ -57,6 +57,67 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.28.0] — 2026-07-24 — Ralph Eyeball Loop, Vega-first, SVG engine, publication-grade maps
+
+### Added — front-figures: Vega replaces the plotting toolboxes
+
+- **`references/vega-gallery.md` now maps the base API of matplotlib, seaborn,
+  and pyplot to Vega**, with an honest three-column coverage matrix (pyplot |
+  seaborn | Vega verdict). The plots people assume need matplotlib are worked
+  out and rendered through the Ralph Eyeball Loop: `regplot` CI band, `hexbin`,
+  2D-KDE `contourf` (full-Vega `kde2d`+`isocontour`), `swarmplot`
+  (`force`+`collide`), `clustermap` (scipy linkage + reordered heatmap),
+  `quiver`, and a **static 3D `plot_surface`** (offline isometric projection +
+  shaded full-Vega polygons). Runnable specs in `assets/vega-examples/`.
+- **SVG engine + auto-router.** `render_diagram.py` gained an `svg` source kind
+  and now auto-detects the kind from the file (no `--kind`): JSON→vega,
+  `<svg>`→svg, LaTeX→tikz, `graph`/`%%{init}`→mermaid. Policy: try Vega first
+  through the loop; when Vega's grammar can't express it, drop to hand-authored
+  SVG (still looped). That closes **interpolated `imshow`** (`feGaussianBlur`)
+  and **streamplot** (offline streamlines + arrowhead markers) — both promoted
+  to `assets/svg-examples/`.
+- **`front-figures/FIGURES.md`** — a catalog of every figure the vega + svg
+  engines produce, from fake data, each one rendered (`assets/figures-gallery/`).
+  Linked from README / LISEZMOI. The gitignored `.private/vega-failures/`
+  records the Vega dead ends.
+- Coverage now spans **plotly** too: its 2D interactivity and maps are Vega
+  native strengths; sunburst/treemap/sankey are full-Vega. Only live-interactive
+  3D and animation stay out.
+- front-figures triggers now fire on the toolbox vocabulary — `matplotlib`,
+  `seaborn`, `pyplot`, `plotly`, `boxplot`, `heatmap`, `pairplot`, `choropleth`,
+  `world map`, `GPS map`, `geojson`, `streamplot`, and more.
+- **Thematic maps.** A vendored, offline Natural Earth basemap
+  (`assets/geo/`, public domain) plus a publication-grade map set: Equal-Earth
+  classed choropleth, bivariate 3×3 choropleth, area-true proportional-symbol
+  map, great-circle connection/flow map, and per-region pie / bar glyph maps
+  (`assets/svg-examples/map-*.svg`). Visualization only — spatial analysis stays
+  in geopandas / QGIS.
+
+### Fixed — Agent Skills spec compliance
+
+- `compatibility` frontmatter is capped at **500 characters** by the
+  [Agent Skills spec](https://agentskills.io/specification). `front-figures`
+  (673) and `front-audio` (834) were over; both trimmed to a summary, with the
+  full dependency detail kept in each SKILL.md body (nothing lost, just
+  relocated). Verified `name` matches the parent dir and every `description`
+  is within 1024 chars across all nine skills.
+
+### Changed
+
+- **Voice pass across the docs and code comments.** Removed generated-sounding
+  phrasing (marketing aphorisms, "not just X but Y", filler openers, buzzwords)
+  from SKILL bodies, reference docs, and Python docstrings. Load-bearing content
+  (frontmatter, trigger phrases, CLI examples, banned-word lists) left untouched.
+- **ASCII diagrams → colored Mermaid.** The four-step causal loop
+  (`front-figures/references/causality.md`), the diarization pipeline
+  (`front-audio/references/diarization.md`), the modality decision tree
+  (`front-ui/.../patterns/modality.md`), and the Ralph Eyeball Loop diagram are
+  now Mermaid, palette-themed. File-listing trees (scaffold layouts, fixtures)
+  stay as text — a Mermaid diagram is the wrong tool for a file tree.
+- Removed the `Repository structure` ASCII tree from README / LISEZMOI.
+- `front-ui` and `front-cli-gui` now point to the Ralph Eyeball Loop for
+  screenshotting and refining their emitted UI.
+
 ## [0.27.0] — 2026-07-24 — the Ralph Eyeball Loop + Vega-first (front-figures)
 
 ### Added — the Ralph Eyeball Loop + Vega-first (front-figures)

@@ -36,7 +36,7 @@ Les neuf skills :
 | **front-vision** | Vous draftez du texte alternatif conforme W3C depuis des images, en local (pas de SaaS). | « texte alternatif », « décris cette image », « draft alt », « description d'image », « img sans alt ». |
 | **front-audio** | Vous draftez des sous-titres WebVTT / SRT pour `<video>` / `<audio>` en local (pas de SaaS). | « sous-titres », « transcris cette vidéo », « transcris cet audio », « WebVTT », « SRT », « fichier de sous-titres », « VTT », « piste sous-titres ». |
 | **front-ux-laws** | Vous voulez un vocabulaire partagé pour vos décisions d'UI ET un auditeur pre-commit qui échoue sur les violations détectables des Laws of UX (Hick, Fitts, Miller, Jakob, Tesler, Aesthetic-Usability, Selective Attention, Doherty, Choice Overload). | « Laws of UX », « Hick / Fitts / Miller / Jakob / Tesler / Peak-End / Postel / Paradox of the Active User », « audite ma nav / mon formulaire / ma page de prix », « cet onboarding combat-il l'utilisateur actif ». |
-| **front-figures** | Vous produisez des figures pour la data-science (**Vega-Lite d'abord** — matplotlib seulement en dernier recours), des plots d'explicabilité (SHAP / Shapash / TimeSHAP / LIME), des estimations d'effet causal (DoWhy / EconML), ou des diagrammes TikZ / Mermaid — affinés par la **Ralph Eyeball Loop** (rendre → regarder → corriger la source), avec un auditeur pre-commit pour les fautes de data-viz. | « make a figure », « prefer vega », « render this diagram », « tikz to png », « mermaid diagram », « ralph eyeball loop », « no ascii art », « SHAP plot », « explain this model », « causal inference », « DoWhy », « DAG », « audit this figure ». |
+| **front-figures** | Vous produisez des figures pour la data-science (**Vega-Lite d'abord** — matplotlib seulement en dernier recours), des plots d'explicabilité (SHAP / Shapash / TimeSHAP / LIME), des estimations d'effet causal (DoWhy / EconML), des diagrammes TikZ / Mermaid, ou des cartes thématiques — affinés par la **Ralph Eyeball Loop** (rendre → regarder → corriger la source), avec un auditeur pre-commit pour les fautes de data-viz. | « make a figure », « prefer vega », « render this diagram », « mermaid diagram », « ralph eyeball loop », « no ascii art », « SHAP plot », « choropleth », « world map », « DoWhy », « DAG », « audit this figure ». |
 
 Les skills compagnons héritent des règles de pile de `front-ui`.
 N'installez que ceux dont vous avez besoin.
@@ -96,7 +96,7 @@ reste en feuille de route.
 | **front-vision** | `alt_from_ollama.py` (alt W3C via Ollama local) | _(présence de `alt=` vérifiée par `front-accessibility`)_ |
 | **front-audio** | `captions_from_whisper.py` (WebVTT / SRT via whisper.cpp local) | _(présence de `<track>` vérifiée par `front-accessibility`)_ |
 | **front-ux-laws** | `references/laws-of-ux.md` (playbook des 30 lois) | `audit_laws_of_ux.py` (Hick / Miller / Fitts / Jakob / Tesler / …) |
-| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (dispatcher SHAP / Shapash / TimeSHAP / LIME), `causal_estimate.py` (boucle DoWhy + backends EconML + rendu DAG), `render_diagram.py` (Vega / TikZ / Mermaid → PNG / SVG / PDF pour la Ralph Eyeball Loop), `install_figures.py` (installeur par tier) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
+| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (dispatcher SHAP / Shapash / TimeSHAP / LIME), `causal_estimate.py` (boucle DoWhy + backends EconML + rendu DAG), `render_diagram.py` (Vega / TikZ / Mermaid / SVG auto-routés → PNG / SVG / PDF pour la Ralph Eyeball Loop ; catalogue rendu dans `front-figures/FIGURES.md`), `install_figures.py` (installeur par tier) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
 
 Le tableau est honnête sur les manques. Les cellules vides marquent
 de vraies entrées de roadmap, pas des oublis.
@@ -545,7 +545,7 @@ dans [pre-commit](https://pre-commit.com/) avec un seul bloc `repo:`
 # .pre-commit-config.yaml — ajouter le dépôt en une entrée
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.27.0          # fixer une tag — bumper via renovate / dependabot
+    rev: v0.28.0          # fixer une tag — bumper via renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit

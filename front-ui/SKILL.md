@@ -23,7 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.27.0
+  version: 0.28.0
 ---
 
 # front-ui — vanilla JS + Tailwind UI generation
@@ -59,6 +59,7 @@ For other work, use the companion skills:
 | W3C alt text via local Ollama vision | `front-vision` |
 | WebVTT / SRT captions via local whisper.cpp | `front-audio` |
 | Apply / audit the canonical Laws of UX (Hick, Fitts, Miller, Jakob, Peak-End, …) on emitted HTML | `front-ux-laws` |
+| Screenshot a rendered page, look at it, and refine the markup (the Ralph Eyeball Loop) | `front-figures` (`front-figures/references/ralph-eyeball-loop.md`) |
 
 The companion skills assume the same stack rules below.
 

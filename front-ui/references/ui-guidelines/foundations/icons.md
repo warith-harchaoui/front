@@ -9,7 +9,7 @@
 
 ## Core principles
 
-- **Icons clarify, not decorate.** Every icon must add comprehension; if it duplicates a label without aiding scan-ability, remove it.
+- **Every icon must add comprehension.** If it duplicates a label without aiding scan-ability, remove it.
 - **Use a consistent visual language.** One stroke weight, one corner radius family, one filled-vs-outlined convention across the app.
 - **Use canonical metaphors.** Heart for favorite, gear for settings, magnifier for search. Don't invent.
 - **Pair icons with labels** for primary navigation and actions. Icon-only is acceptable only when the metaphor is universally recognized (close, back, search) AND alternate text is provided.

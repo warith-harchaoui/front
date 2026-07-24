@@ -70,7 +70,7 @@ That last point is the difference between a static report and a tool.
 
 ## Iterate
 
-Once a dashboard is in users' hands, new questions surface. Self-service BI lets the user adapt the tile rather than file a ticket. Treat the dashboard as a conversation between question and answer, not a finished document.
+Once a dashboard is in users' hands, new questions surface. Self-service BI lets the user adapt the tile rather than file a ticket. Expect the dashboard to keep changing as questions change; it isn't a finished document.
 
 ## House rules (for emit)
 

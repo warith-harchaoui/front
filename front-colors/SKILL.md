@@ -22,7 +22,7 @@ compatibility: >-
   No network or model required at any point.
 metadata:
   author: Warith Harchaoui
-  version: 0.27.0
+  version: 0.28.0
 ---
 
 # front-colors — color audit, curation, and perceptual transforms
@@ -112,7 +112,7 @@ brand.meets_wcag("#FFFFFF", level="AA", size="normal")  # True
 
 ## Two modes — make and audit
 
-This skill is the most balanced front-* skill on color: one make-side
+This skill covers both sides of color: one make-side
 emitter, two audit-side gates, all backed by the same CSV.
 
 | Mode | Tool | Purpose |

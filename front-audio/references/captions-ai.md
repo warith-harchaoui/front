@@ -88,7 +88,7 @@ Whisper's accuracy on proper nouns and jargon drops sharply without domain conte
 | `--vocab-from path` | File OR directory. Directory → walked as a project root (top-level README / SKILL.md / manifests + `.md` files under `docs/`, `references/`, `src/`, …). |
 | `--auto-project` | Walk upward from the source to discover the project root, then mine the whole tree. |
 
-Beyond those flags, the resolver looks for a **sibling subtitle file** (`<stem>.vtt` / `.srt` / `.txt`) — for re-captioning runs, the prior transcript is the strongest signal — then a sibling README / `index.html`. Pass nothing, and the right thing usually happens.
+Beyond those flags, the resolver looks for a **sibling subtitle file** (`<stem>.vtt` / `.srt` / `.txt`) — for re-captioning runs, the prior transcript is the strongest signal — then a sibling README / `index.html`. Pass nothing to use those defaults.
 
 The composed `initial_prompt` is in natural prose, not a comma list — Whisper was trained on continuous text, so `"The following terms may appear in the audio: Tailwind, Montserrat, OKLCH."` outperforms `"Tailwind, Montserrat, OKLCH"`. The opener is selected from a per-language template.
 

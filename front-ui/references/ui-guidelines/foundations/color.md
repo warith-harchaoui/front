@@ -9,7 +9,7 @@
 
 ## Core principles
 
-- **Color is communication, not decoration.** Every hue should encode meaning: state, hierarchy, mood, or system semantic. If a color does not communicate something, remove it.
+- **Every hue should encode meaning:** state, hierarchy, mood, or system semantic. If a color does not communicate something, remove it.
 - **Use the curated base palette** in `references/color-psychology.md` for all hue choices.
 - **Design for both color schemes from the start.** Each color needs a light-mode value and a dark-mode value; do not just invert.
 - **Don't rely on color alone.** Pair color with shape, label, or icon so color-blind users and screen-reader users can still parse state.

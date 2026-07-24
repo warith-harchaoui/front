@@ -8,7 +8,7 @@
 
 ## Core principles
 
-- **One idea per screen.** Onboarding that tries to teach everything teaches nothing.
+- **One idea per screen.** Don't try to teach everything at once.
 - **Skippable.** Always offer "Skip" or "I'll explore on my own".
 - **≤ 8-word headline.** If you need more, redesign the feature, not the onboarding.
 - **No interstitial gates.** Don't block usage on signing up if browsing is possible.

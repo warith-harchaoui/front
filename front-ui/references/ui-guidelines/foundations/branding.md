@@ -7,7 +7,7 @@
 
 ## Core principles
 
-- **Branding through experience, not chrome.** The strongest brand expression is consistent voice, motion, and visual hierarchy — not a giant logo on every screen.
+- **Express brand through experience.** Consistent voice, motion, and visual hierarchy do more than a giant logo on every screen.
 - **Subtle and consistent.** Repeat brand cues (a tint, a typeface pairing, a corner radius, a motion curve) instead of stamping the logo everywhere.
 - **Don't restyle native controls in brand color.** Keep system-feeling controls (alerts, sheets, menus) neutral so users trust them.
 - **No splash screens beyond a brief launch.** Don't gate the user behind branded interstitials.
@@ -20,7 +20,7 @@
 2. **Logo size**: 24–40 px tall in the chrome. Larger only on the marketing landing surface.
 3. **Wordmark vs. logomark**: use the wordmark in the chrome (more legible), keep the standalone mark for favicons / very tight spots.
 4. **Brand tint**: one accent color (`bg-brand-blue`) applied to primary CTAs, links, focus rings. Secondary colors stay reserved for semantics.
-5. **Brand voice**: see `foundations/writing.md`. Voice is brand.
+5. **Brand voice**: see `foundations/writing.md`. Voice carries the brand.
 
 ## Pattern
 

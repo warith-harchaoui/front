@@ -3,19 +3,19 @@
 i18n_make
 =========
 
-**Make** half of the front-ui unified-i18n rule: establish
+Make half of the front-ui unified-i18n rule: establish
 ``locales/i18n.yaml`` as the single per-project source of truth for
-translatable strings — GUI labels **and** LLM prompts — and emit the glue so a
+translatable strings — GUI labels and LLM prompts — and emit the glue so a
 vanilla-JS front end and a Python prompt loader read from it instead of
 hardcoding strings.
 
 Three deterministic steps (all run by default; select one with a flag):
 
-1. **scaffold** — create ``locales/i18n.yaml`` if it is missing, with the
+1. scaffold — create ``locales/i18n.yaml`` if it is missing, with the
    declared ``locales`` and a couple of example ``gui:`` / ``prompts:`` entries.
-2. **compile** — read ``locales/i18n.yaml`` and write ``locales/i18n.json``
+2. compile — read ``locales/i18n.yaml`` and write ``locales/i18n.json``
    (browsers cannot parse YAML; the JS runtime fetches the JSON).
-3. **emit-loader** — write ``locales/i18n.js``, a tiny framework-free ES module
+3. emit-loader — write ``locales/i18n.js``, a small framework-free ES module
    that fetches ``i18n.json`` and exposes ``initI18n(locale)`` + ``t(id)``.
 
 Its counterpart is :mod:`audit_i18n` (the audit half), which flags strings that
@@ -52,7 +52,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _argparse import make_parser  # noqa: E402
 
 #: Starter catalog written by --init. One namespace for GUI strings, one for
-#: prompts — the user's insight: both are "the same message in language X".
+#: prompts — both are the same message in language X.
 _STARTER: Dict[str, Any] = {
     "locales": ["en", "fr"],
     "gui": {

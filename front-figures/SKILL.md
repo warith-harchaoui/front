@@ -2,34 +2,31 @@
 name: front-figures
 description: >-
   Data-science figures and diagrams for vanilla-JS + Tailwind, make and audit.
-  Vega-Lite JSON FIRST — prefer it over matplotlib / seaborn / pyplot
-  (reproducible: data lives in the spec); matplotlib is only an escape hatch.
-  Explainability (SHAP / Shapash / TimeSHAP / LIME) and causal DAGs (DoWhy /
-  EconML) as house-style Vega. TikZ and Mermaid rasterised to PNG. The Ralph
-  Eyeball Loop: render a source, look, refine it until right — never ASCII art,
-  prefer colored Mermaid. Static auditor flags data-viz sins (missing labels,
-  dual axes, truncated baselines, rainbow palettes). Trigger phrases: "make a
-  figure", "chart this", "visualize data", "prefer vega", "Vega-Lite", "render
-  this diagram", "tikz to png", "mermaid diagram", "no ascii art", "ascii to
-  mermaid", "ralph eyeball loop", "iterate on a figure", "SHAP plot", "explain
-  this model", "feature importance", "causal inference", "DoWhy", "DAG", "audit
-  this figure", "install figures". Output: Vega JSON / PNG / SVG / PDF + HTML;
-  auditor emits JSON + exit codes for CI.
+  Prefer Vega-Lite over matplotlib / seaborn / pyplot / plotly — reproducible
+  (data in the spec), better-looking by default, natively interactive. A
+  house-styled Vega spec (or hand-authored SVG when Vega cannot) covers nearly
+  their whole plotting API plus thematic maps: hexbin, KDE-2D contours,
+  beeswarm, clustermap, quiver, static 3D, streamplot, imshow, choropleth + GPS
+  / bubble / pie / bar maps (catalog in FIGURES.md). Only live-interactive 3D
+  and animation stay out. Explainability (SHAP/LIME) and causal DAGs (DoWhy)
+  render too. TikZ + Mermaid via the Ralph Eyeball Loop; never ASCII art.
+  Trigger phrases: "make a figure", "chart this", "matplotlib", "seaborn",
+  "pyplot", "plotly", "boxplot", "heatmap", "pairplot", "choropleth", "world
+  map", "GPS map", "geojson", "sankey", "render this diagram", "mermaid
+  diagram", "no ascii art", "ralph eyeball loop", "SHAP plot", "DAG", "audit
+  this figure". Output: Vega JSON / SVG / PNG / PDF.
 license: BSD-3-Clause
 compatibility: >-
-  Runtime: Claude.ai, Claude Code, OpenCode. The auditor (static) needs
-  Python 3.10+ stdlib + PyYAML only. The generators need Python 3.10+
-  plus the tiered dependencies pinned in ``scripts/requirements-*.txt``
-  — one per concern (dataviz, explainability, causality). The
-  ``install_figures.py`` script installs each tier on demand. The Ralph
-  Eyeball Loop renderer (``render_diagram.py``) needs, per source kind:
-  ``vl-convert-python`` (Vega, one offline wheel), ``tectonic`` or
-  ``pdflatex`` + ``pdftoppm``/``magick`` (TikZ), and ``mmdc`` /
-  mermaid-cli (Mermaid); each is optional and fails loud with an install
-  hint. No network required at figure-generation time once installed.
+  Runtime: Claude.ai, Claude Code, OpenCode. Python 3.10+; the static
+  auditor needs only stdlib + PyYAML. Generators use the tiers in
+  ``scripts/requirements-*.txt`` (dataviz / explainability / causality),
+  installed on demand by ``install_figures.py``. The render_diagram.py
+  renderer needs, per kind: vl-convert-python (Vega), tectonic/pdflatex +
+  pdftoppm/magick (TikZ), mmdc (Mermaid) — all optional, fail loud. No
+  network needed once installed.
 metadata:
   author: Warith Harchaoui
-  version: 0.27.0
+  version: 0.28.0
 ---
 
 # front-figures — data-viz, explainability, and causality figures
@@ -97,8 +94,8 @@ data-science figures:
 | "shapash report" / "give a stakeholder-facing explanation" | `explain_model.py` | `python scripts/explain_model.py --model model.pkl --data X.csv --engine shapash --report shapash --out ./explain/` — writes a full HTML report. |
 | "timeshap" / "explain my LSTM / transformer sequence model" | `explain_model.py` | `python scripts/explain_model.py --model seq_model.pkl --data X.npy --engine timeshap --sequence-cols "t_0,t_1,...,t_N" --out ./explain/` |
 | "causal effect" / "average treatment effect" / "DAG" / "DoWhy" | `causal_estimate.py` | `python scripts/causal_estimate.py --data d.csv --treatment T --outcome Y --confounders "X1,X2,X3" --dag dag.gml [--estimator dml\|dr\|causal-forest\|linear] [--refute all\|placebo\|subset\|random-cause]` |
-| "render this diagram" / "tikz to png" / "mermaid diagram" / "iterate on a figure" / "ralph eyeball loop" | `render_diagram.py` | `python scripts/render_diagram.py <source> --out fig.png [--background white\|transparent\|dark] [--kind vega\|tikz\|mermaid] [--format png\|svg\|pdf]` — render → look → refine the source. See `references/ralph-eyeball-loop.md`. |
-| "prefer vega" / "vega instead of matplotlib" / which chart in Vega | `make_figure.py` + gallery | Default to Vega-Lite; pick the skeleton from `references/vega-gallery.md`, fill the data, render with `render_diagram.py`. matplotlib only for the honest residue (3D, contours, dendrograms — see the gallery). |
+| "render this diagram" / "tikz to png" / "mermaid diagram" / "iterate on a figure" / "ralph eyeball loop" | `render_diagram.py` | `python scripts/render_diagram.py <source> --out fig.png [--background white\|transparent\|dark] [--format png\|svg\|pdf]` — the kind (vega / tikz / mermaid / svg) is auto-detected. Render → look → refine the source. See `references/ralph-eyeball-loop.md`. |
+| "prefer vega" / "vega instead of matplotlib" / which chart in Vega | `make_figure.py` + gallery | Default to Vega-Lite; pick the skeleton from `references/vega-gallery.md`, fill the data, render with `render_diagram.py`. matplotlib only for the cases Vega can't do (3D, contours, dendrograms — see the gallery). |
 | "audit this figure" / "is this chart misleading" | `audit_figure.py` | `python scripts/audit_figure.py <path>` — accepts a Vega-Lite JSON, a matplotlib SVG, or an HTML file with `<figure>` blocks. |
 | "colorblind-safe palette on the figure" | `audit_figure.py` + `front-colors` | `python scripts/audit_figure.py <path>` catches the pattern; run `front-colors/scripts/simulate_cvd.py` on the rendered PNG for a preview. |
 | "first-time setup" / "install the data-viz stack" | `install_figures.py` | `python scripts/install_figures.py --tier dataviz+explain+causal` — installs pinned versions of each tier. |
@@ -162,13 +159,13 @@ load the one you need):
   each with a severity and an `--ignore` escape. Full rule catalogue with
   false-positive notes: `references/audit-figure.md`.
 - **Ralph Eyeball Loop.** The render → look → refine discipline for any
-  graphic (Vega / TikZ / Mermaid / GUI): never ship a figure blind.
+  graphic (Vega / TikZ / Mermaid / GUI): look before you ship.
   Protocol, per-format renderers, palette-first, and why the agent is the
   visual critic (the one-LLM rule is untouched): `references/ralph-eyeball-loop.md`.
 - **Vega-first gallery.** The idiomatic Vega-Lite/Vega spec for every
   common chart and the extractable explainability plots (SHAP, LIME,
   importance, PD/ICE, DAG) that replace matplotlib / seaborn / pyplot —
-  plus the honest residue Vega can't do: `references/vega-gallery.md`.
+  plus what Vega can't do: `references/vega-gallery.md`.
 
 ## Curated defaults — user data wins
 

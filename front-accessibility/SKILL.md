@@ -21,7 +21,7 @@ compatibility: >-
   Python 3.10+ stdlib only — no third-party deps, no browser, no network.
 metadata:
   author: Warith Harchaoui
-  version: 0.27.0
+  version: 0.28.0
 ---
 
 # front-accessibility — static HTML a11y lint
@@ -65,8 +65,8 @@ for the user. `front-vision` covers the alt-text drafting side;
 
 For runtime DOM audits (post-JS, dynamic ARIA, focus traps after async)
 pair this skill with `axe-core` / `Pa11y` / `Lighthouse`. A green
-static lint is not WCAG compliance — it is the cheapest pre-commit
-gate that catches the static-decidable rules.
+static lint is not WCAG compliance; it catches the static-decidable
+rules before the diff lands.
 
 ## What `lint_a11y.py` catches
 

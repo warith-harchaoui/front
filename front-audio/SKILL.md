@@ -17,22 +17,17 @@ description: >-
   speaker-VTT file on disk + a ready-to-paste snippet on stdout.
 license: BSD-3-Clause
 compatibility: >-
-  Runtime: Claude.ai, Claude Code, OpenCode. Needs Python 3.10+ stdlib +
-  ``vocal-helper`` (the whisper.cpp over-layer, pulling ``pywhispercpp``) +
-  ``audio-helper`` / ``video-helper`` (see
-  ``scripts/requirements-captions.txt``), plus ``ffmpeg`` on PATH as a
-  fallback extractor for non-WAV inputs. The ``install_captions.py`` script
-  installs ``vocal-helper`` and pre-downloads a GGML model on first run. The diarization tier
-  (``scripts/requirements-diarize.txt``) additionally installs
-  ``nemo_toolkit[asr]`` and pre-downloads Sortformer + TitaNet via
-  ``install_diarize.py``; NeMo requires Python 3.10+ and pulls torch as
-  a transitive dependency. The transcript-based naming pass is stdlib-
-  only unless the optional local Ollama refinement (``--ollama``) is
-  requested. Network access not required at inference time after
-  install completes.
+  Runtime: Claude.ai, Claude Code, OpenCode. Python 3.10+ stdlib +
+  ``vocal-helper`` + ``audio-helper`` / ``video-helper`` (see
+  ``scripts/requirements-captions.txt``); ``ffmpeg`` on PATH for non-WAV
+  inputs. ``install_captions.py`` installs vocal-helper + a GGML model.
+  Diarization (``requirements-diarize.txt``) adds ``nemo_toolkit[asr]``
+  (pulls torch) + Sortformer/TitaNet via ``install_diarize.py``.
+  Transcript naming is stdlib-only unless ``--ollama``. No network at
+  inference after install.
 metadata:
   author: Warith Harchaoui
-  version: 0.27.0
+  version: 0.28.0
 ---
 
 # front-audio — local AI captions and transcripts

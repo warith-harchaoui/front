@@ -10,13 +10,12 @@ Miguel Hernán & Jamie Robins' [*Causal Inference: What If*](https://miguelherna
 
 ## The four-step loop
 
-```text
-    ┌───────────┐   ┌────────────┐   ┌──────────┐   ┌────────┐
-    │  Model    │ → │  Identify  │ → │ Estimate │ → │ Refute │
-    └───────────┘   └────────────┘   └──────────┘   └────────┘
-      (DAG)         (backdoor /       (DML / DR /   (placebo /
-                     IV / frontdoor)   forest /      subset /
-                                       matching)    random-cause)
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Roboto, system-ui, sans-serif","lineColor":"#8E8E93"}}}%%
+flowchart LR
+    M["Model<br/>(DAG)"] --> I["Identify<br/>backdoor / IV / frontdoor"] --> E["Estimate<br/>DML / DR / forest / matching"] --> R["Refute<br/>placebo / subset / random-cause"]
+    classDef step fill:#CCE4FF,stroke:#007AFF,color:#1D1D1F;
+    class M,I,E,R step;
 ```
 
 ### 1. Model — supply the DAG

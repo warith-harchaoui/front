@@ -96,30 +96,43 @@ python3 front-colors/scripts/simulate_cvd.py tests/fixtures/images/chart-bar.png
 
 All three are deterministic — no model, no network.
 
-## front-figures `[det]` — data-viz + an auditor
+## front-figures `[det]` — figures, diagrams, and the Ralph Eyeball Loop
 
-Audit a Vega-Lite spec for data-viz sins (truncated baselines, dual y-axes,
-rainbow palettes, missing labels):
+Prefer Vega-Lite over matplotlib / seaborn / pyplot / plotly: a house-styled
+spec carries its own data, looks better by default, and covers nearly their
+whole plotting API. The rendered proof is in
+[`front-figures/FIGURES.md`](front-figures/FIGURES.md).
+
+**The Ralph Eyeball Loop** — render a source to an image, *look* at it, refine
+the source, repeat. The kind (Vega / TikZ / Mermaid / SVG) is auto-detected. A
+runnable Vega spec ships in the repo, so this recipe needs no data of your own:
 
 ```bash
-python3 front-figures/scripts/audit_figure.py my_chart.vl.json
+python3 front-figures/scripts/render_diagram.py \
+  front-figures/assets/vega-examples/hexbin.vl.json --background white --out /tmp/hexbin.png
+# → wrote /tmp/hexbin.png   (now open it, critique, edit the spec, re-render)
 ```
 
-Make a publication-quality figure in the house style from a data file:
+Never draw diagrams in ASCII — write colored Mermaid and render it the same way:
+
+```bash
+printf 'flowchart LR\n  A[Browser] --> B[FastAPI] --> C[(DB)]\n' > /tmp/flow.mmd
+python3 front-figures/scripts/render_diagram.py /tmp/flow.mmd --background transparent --out /tmp/flow.png
+```
+
+Audit a Vega-Lite spec for data-viz sins (truncated baselines, dual y-axes,
+rainbow palettes, missing labels) — again against a committed spec:
+
+```bash
+python3 front-figures/scripts/audit_figure.py front-figures/assets/vega-examples/bar.vl.json
+```
+
+Make a figure straight from a data file, or run the explainability / causal
+recipes (these use *your* files and need the tiers via
+`install_figures.py --tier dataviz+explain+causal`):
 
 ```bash
 python3 front-figures/scripts/make_figure.py --data data.csv --kind bar --x category --y value --out chart
-```
-
-> **Note — figures loop.** When *generating* a Vega-Lite figure, don't ship it
-> blind: render the spec to PNG, look at it, critique (labels, baseline,
-> palette, CVD-safety, legibility), revise, and repeat until it reads clearly.
-> A spec that validates can still look wrong.
-
-Model-explainability and causal recipes (need the `explain` / `causal` tiers —
-`python3 front-figures/scripts/install_figures.py --tier dataviz+explain+causal`):
-
-```bash
 python3 front-figures/scripts/explain_model.py --model model.pkl --data X.csv --engine shapash --report shapash --out ./explain/
 python3 front-figures/scripts/causal_estimate.py --data d.csv --treatment T --outcome Y --confounders "X1,X2,X3" --dag dag.gml
 ```

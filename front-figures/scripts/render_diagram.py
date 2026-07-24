@@ -10,20 +10,24 @@ script provides: turn a text source you can edit (a Vega-Lite spec, a
 TikZ figure, a Mermaid diagram) into a PNG the agent can actually *look*
 at, then critique, then edit the **original source**, then re-render.
 
-Three source kinds, auto-detected from the file extension or the first
-non-blank line (override with ``--kind``):
+Four source kinds, detected automatically from the file — you never
+pass the kind (JSON is vega, ``<svg>`` is svg, a LaTeX preamble is tikz,
+a ``graph`` / ``%%{init}`` header is mermaid):
 
 * ``vega``    — a Vega-Lite v5 (or full Vega) JSON spec. Rasterised with
   ``vl-convert`` (a single self-contained wheel that bundles its own
   Vega runtime — no browser, no Node, offline). This renders the **real
   spec that ships in the browser**, not a matplotlib re-draw, so what you
-  eyeball is what your readers get. Because the spec carries its own data
-  inline, the emitted ``.json`` is a reproducible, diffable, re-traceable
-  scientific artifact (figure + data + encoding in one file).
+  look at is what your readers get. Because the spec carries its own data
+  inline, the emitted ``.json`` is a reproducible, diffable file (figure + data
+  + encoding together) that a reader can re-plot from.
 * ``tikz``    — a LaTeX / TikZ figure. Compiled with ``tectonic`` (a
   single-binary TeX engine) when present, else ``pdflatex`` / ``latexmk``,
   then rasterised from PDF with ``pdftoppm`` (poppler) or ImageMagick.
 * ``mermaid`` — a Mermaid diagram. Rendered with ``mmdc`` (mermaid-cli).
+* ``svg``     — a raw, hand-authored SVG document. Rasterised with
+  ``rsvg-convert`` (librsvg) or ImageMagick. The escape hatch for figures
+  Vega cannot express: a smoothing filter, arrowhead markers, a gradient.
 
 House style, by default: every kind is themed from the **canonical
 front-colors palette** (``front-colors/references/palette.csv``, the same
@@ -107,7 +111,7 @@ _LIGHT_FG = "#1D1D1F"
 _DARK_FG = "#F5F5F7"
 
 #: Source kinds this renderer understands.
-KINDS = ("vega", "tikz", "mermaid")
+KINDS = ("vega", "tikz", "mermaid", "svg")
 
 
 # ------------------------------------------------------------------
@@ -118,21 +122,22 @@ def build_parser() -> argparse.ArgumentParser:
     parser = make_parser(
         prog="render_diagram",
         description=(
-            "Rasterise a declarative graphical source (Vega-Lite JSON, TikZ, "
-            "or Mermaid) to an image for the Ralph Eyeball Loop: render -> "
-            "look -> edit the source -> re-render. Palette-themed from "
-            "front-colors by default; background is white / transparent / "
-            "dark selectable."
+            "Rasterise a graphical source (Vega-Lite / Vega JSON, TikZ, "
+            "Mermaid, or raw SVG) to an image for the Ralph Eyeball Loop: "
+            "render -> look -> edit the source -> re-render. The kind is "
+            "detected automatically from the file; you never pass it. "
+            "Palette-themed from front-colors; background is white / "
+            "transparent / dark selectable."
         ),
         epilog=(
-            "Kinds (auto-detected, override with --kind): vega, tikz, mermaid. "
-            "Vega needs vl-convert-python; tikz needs tectonic/pdflatex + "
-            "pdftoppm/magick; mermaid needs mmdc."
+            "Auto-routed by content: JSON -> vega (needs vl-convert-python); "
+            "\\documentclass / tikzpicture -> tikz (tectonic/pdflatex + "
+            "pdftoppm/magick); graph / %%{init} -> mermaid (mmdc); <svg> -> "
+            "svg (rsvg-convert / magick). SVG is the escape hatch for figures "
+            "Vega cannot express."
         ),
     )
-    parser.add_argument("source", help="Input source file (.vl.json / .json, .tex, .mmd).")
-    parser.add_argument("--kind", choices=("auto",) + KINDS, default="auto",
-                        help="Source kind. auto = detect from extension / content.")
+    parser.add_argument("source", help="Input source file (.json / .vg.json, .tex, .mmd, .svg).")
     parser.add_argument("--out", default=None,
                         help="Output image path. Required unless --dry-run.")
     parser.add_argument("--format", choices=("png", "svg", "pdf"), default="png",
@@ -183,19 +188,28 @@ def detect_kind(path: str, text: str) -> str:
         return "tikz"
     if suffix.endswith((".mmd", ".mermaid")):
         return "mermaid"
+    if suffix.endswith(".svg"):
+        return "svg"
     if suffix.endswith((".json", ".vl.json", ".vg.json")):
         return "vega"
 
-    head = text.lstrip()
+    # No decisive extension — route on the content. The four formats are
+    # syntactically distinct, so a first-token sniff is unambiguous: an XML
+    # document is SVG, a JSON object is a Vega spec, a LaTeX preamble is TikZ,
+    # a graph keyword is Mermaid.
+    head = text.lstrip("﻿ \t\r\n")
+    if head[:6].lower().startswith(("<?xml", "<svg")) or "<svg" in head[:400].lower():
+        return "svg"
     if "\\documentclass" in head[:400] or "\\begin{tikzpicture}" in text:
         return "tikz"
     if head.startswith("%%{init") or _looks_like_mermaid(head):
         return "mermaid"
-    if head.startswith("{") and ('"$schema"' in text or '"mark"' in text or '"encoding"' in text):
+    if head.startswith(("{", "[")):
         return "vega"
     raise SystemExit(
-        f"Could not detect the source kind of {path!r}. "
-        "Pass --kind vega|tikz|mermaid."
+        f"Could not detect the source kind of {path!r} from its extension or "
+        "content (expected JSON=vega, <svg>=svg, \\documentclass/tikzpicture="
+        "tikz, or graph/%%{init}=mermaid)."
     )
 
 
@@ -606,6 +620,52 @@ def render_mermaid(source: str, out: str, background: Optional[str]) -> None:
         _run_or_die(cmd, "Mermaid (mmdc) rendering failed")
 
 
+def render_svg(source: str, out: str, background: Optional[str]) -> None:
+    """Rasterise a raw, hand-authored SVG document to PNG.
+
+    The escape hatch below Vega: when a figure needs something the Vega
+    grammar cannot express — a smoothing filter, arrowhead markers, a
+    gradient — author the SVG by hand and rasterise it here so it still
+    goes through the render → look → refine loop. Prefers ``rsvg-convert``
+    (librsvg, faithful filter support), then ImageMagick.
+
+    Parameters
+    ----------
+    source : str
+        The SVG document text.
+    out : str
+        Output PNG path.
+    background : str or None
+        ``None`` keeps the SVG transparent; a hex flattens onto that color.
+
+    Raises
+    ------
+    SystemExit
+        When no SVG rasteriser is available or rasterisation fails.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        svg = Path(tmp) / "figure.svg"
+        svg.write_text(source, encoding="utf-8")
+        if shutil.which("rsvg-convert"):
+            cmd = ["rsvg-convert", "-o", out]
+            if background is not None:
+                cmd += ["--background-color", background]
+            cmd.append(str(svg))
+            _run_or_die(cmd, "rsvg-convert rasterisation failed")
+            return
+        magick = shutil.which("magick") or shutil.which("convert")
+        if magick is not None:
+            bg = "none" if background is None else background
+            _run_or_die([magick, "-background", bg, str(svg), out],
+                        "ImageMagick SVG rasterisation failed")
+            return
+        raise SystemExit(
+            "No SVG rasteriser found.\n"
+            "  brew install librsvg (rsvg-convert)  |  apt install librsvg2-bin\n"
+            "  brew install imagemagick             |  apt install imagemagick"
+        )
+
+
 def _run_or_die(cmd: List[str], message: str) -> None:
     """Run ``cmd``; raise :class:`SystemExit` with ``message`` on failure."""
     proc = subprocess.run(cmd, capture_output=True, text=True)
@@ -658,7 +718,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 2
     raw = src_path.read_text(encoding="utf-8")
 
-    kind = args.kind if args.kind != "auto" else detect_kind(args.source, raw)
+    kind = detect_kind(args.source, raw)
     background = resolve_background(args.background, args.dark)
     theme = not args.no_theme
 
@@ -679,11 +739,16 @@ def main(argv: Optional[List[str]] = None) -> int:
             print("tikz supports --format png only.", file=sys.stderr)
             return 2
         render_tikz(prepared, args.out, args.dpi, background)
-    else:  # mermaid
+    elif kind == "mermaid":
         if args.format != "png":
             print("mermaid supports --format png only.", file=sys.stderr)
             return 2
         render_mermaid(prepared, args.out, background)
+    else:  # svg
+        if args.format != "png":
+            print("svg supports --format png only.", file=sys.stderr)
+            return 2
+        render_svg(prepared, args.out, background)
 
     print(f"wrote {args.out}", file=sys.stderr)
     return 0

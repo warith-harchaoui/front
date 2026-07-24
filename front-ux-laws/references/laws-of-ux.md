@@ -111,7 +111,7 @@ For UX the takeaway is narrower than for protocol design:
    it. "Apply Miller's Law" is not an action; "chunk the IBAN field
    into four groups of four with a non-breaking space" is.
 3. When two laws conflict, **time beats decision beats perception**.
-   Doherty Threshold (response < 400 ms) trumps a more elegant
+   Doherty Threshold (response < 400 ms) trumps a tidier
    Hick-grouping that requires a server round-trip.
 4. **Refuse weaponisation.** Any law applied to extract behaviour the
    user did not consent to is a dark pattern — see `anti-patterns.md`.

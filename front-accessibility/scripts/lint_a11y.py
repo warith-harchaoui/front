@@ -3,14 +3,13 @@
 lint_a11y
 =========
 
-Lightweight accessibility linter for HTML emitted by (or for) the ``front``
+Accessibility linter for HTML emitted by (or for) the ``front``
 skill. The linter is **static** — no browser, no DOM, no JS execution —
-so it runs in milliseconds and slots cleanly into a code-emit pipeline or
-a pre-commit hook.
+so it fits into a code-emit pipeline or a pre-commit hook.
 
-The rules are curated to catch the ~20 violations that account for the
-bulk of real-world WCAG / WAI-ARIA failures. None of them require the
-runtime DOM; all are decidable from source.
+The rules cover the ~20 violations that account for the bulk of
+real-world WCAG / WAI-ARIA failures. None of them require the runtime
+DOM; all are decidable from source.
 
 Rule catalogue
 --------------

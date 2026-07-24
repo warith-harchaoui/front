@@ -25,7 +25,7 @@ compatibility: >-
   torch + torchaudio — installed only when explicitly opted into.
 metadata:
   author: Warith Harchaoui
-  version: 0.27.0
+  version: 0.28.0
 ---
 
 # front-publish — Markdown → website, meta, icons, indexes, plain language
@@ -55,8 +55,7 @@ This skill is **not** the right pick for a docs site with hundreds of versioned 
 
 ## Two modes — make and audit
 
-This skill is the most balanced front-* skill on the make/audit
-axis: ten make-side scripts paired with one audit-side gate.
+Ten make-side scripts paired with one audit-side gate.
 
 | Mode | Tool | Purpose |
 |---|---|---|

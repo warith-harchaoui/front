@@ -9,7 +9,7 @@
 
 ## Core principles
 
-- **Accessibility is a baseline, not a feature.** Every component you ship must work for VoiceOver, keyboard, and assistive switches.
+- **Treat accessibility as a baseline.** Every component you ship must work for VoiceOver, keyboard, and assistive switches.
 - **Match the system's accessibility primitives.** Use real semantic HTML (`<button>`, `<a>`, `<label>`, `<input>`) so platform AT just works. Only reach for `role=` if no native element fits.
 - **Respect user preferences.** Honor `prefers-reduced-motion`, `prefers-color-scheme`, `prefers-contrast`, `prefers-reduced-transparency`, dynamic type, and reduced data.
 - **Names, roles, values, states.** Every interactive element must expose all four to assistive tech.
