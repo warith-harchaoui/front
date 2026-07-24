@@ -32,6 +32,21 @@ ones you need.
 > generated from every `SKILL.md` description, lists every guaranteed
 > trigger phrase against the skill it invokes.
 
+## Docs & website
+
+Human-facing guides live in [`docs/`](docs/) — one landing page per skill
+([UI](docs/UI.md) · [CLI](docs/CLI.md) · [publish](docs/PUBLISH.md) ·
+[accessibility](docs/ACCESSIBILITY.md) · [colors](docs/COLORS.md) ·
+[vision](docs/VISION.md) · [audio](docs/AUDIO.md) · [UX-laws](docs/UX-LAWS.md) ·
+[figures & maps](docs/FIGURES.md)) — each a thin pointer to that skill's
+`SKILL.md`, its `references/`, and its `EXAMPLES.md` recipe (no duplication).
+`SKILL.md` is the agent-facing spec; `docs/` is for humans.
+
+A deployable static site — built with the `front-*` skills themselves
+(front-ui house style, front-publish meta / favicons / sitemap / llms.txt,
+front-colors palette, front-accessibility clean) — lives in [`web/`](web/) and
+publishes to <https://harchaoui.org/warith/front/>.
+
 ## Features — what's unusual for a Claude skill
 
 Most Claude skills — including Anthropic's own `document-skills` (docx, pdf,
@@ -79,7 +94,7 @@ when to load each skill and what is still on the roadmap.
 | **front-vision** | `alt_from_ollama.py` (W3C alt text via local Ollama) | _(presence of `alt=` checked by `front-accessibility`)_ |
 | **front-audio** | `captions_from_whisper.py` (WebVTT / SRT via local whisper.cpp) | _(presence of `<track>` checked by `front-accessibility`)_ |
 | **front-ux-laws** | `references/laws-of-ux.md` (30-law Markdown playbook) | `audit_laws_of_ux.py` (Hick / Miller / Fitts / Jakob / Tesler / …) |
-| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (SHAP / Shapash / TimeSHAP / LIME dispatcher), `causal_estimate.py` (DoWhy loop + EconML backends + DAG render), `render_diagram.py` (auto-routed Vega / TikZ / Mermaid / SVG → PNG / SVG / PDF for the Ralph Eyeball Loop; rendered catalog in `front-figures/FIGURES.md`), `install_figures.py` (tier installer) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
+| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (SHAP / Shapash / TimeSHAP / LIME dispatcher), `causal_estimate.py` (DoWhy loop + EconML backends + DAG render), `render_diagram.py` (auto-routed Vega / TikZ / Mermaid / SVG → PNG / SVG / PDF for the Ralph Eyeball Loop; rendered catalog in `docs/FIGURES.md`), `install_figures.py` (tier installer) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
 
 The matrix is honest about gaps. Empty cells mark genuine roadmap
 items, not omissions — see `.private/todo.md` (gitignored) for the
@@ -449,7 +464,7 @@ beyond `pre-commit install`.
 # .pre-commit-config.yaml — add the repo as one entry
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.28.0          # pin a tag — bump with renovate / dependabot
+    rev: v0.29.0          # pin a tag — bump with renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit
@@ -485,7 +500,7 @@ For an honest comparison against Gradio / Streamlit / Tauri / Taipy, see `front-
 
 Nine Claude / OpenCode **skills** for a single frontend stack: vanilla JavaScript, Tailwind CSS, and the three-Roboto typography rule (Roboto / Roboto Serif / Roboto Mono). Built to the [Anthropic skill specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
-Special thanks to [Audrey Dejoux](https://www.behance.net/dreyadesign/projects), [Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/), [Auguste Baum](https://www.linkedin.com/in/auguste-baum/) and [Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/) for fruitful discussions.
+Special thanks to [Audrey Dejoux](https://www.behance.net/dreyadesign/projects), [Laurent Pantanacce](https://www.linkedin.com/in/pantanacce/), [Auguste Baum](https://www.linkedin.com/in/auguste-baum/) and [Jérôme Gombert](https://www.linkedin.com/in/j%C3%A9r%C3%B4me-gombert-84675b1b/) and for fruitful discussions.
 
 Color palettes from <https://harchaoui.org/warith/colors/>.
 

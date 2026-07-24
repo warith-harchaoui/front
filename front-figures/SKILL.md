@@ -26,7 +26,7 @@ compatibility: >-
   network needed once installed.
 metadata:
   author: Warith Harchaoui
-  version: 0.28.0
+  version: 0.29.0
 ---
 
 # front-figures — data-viz, explainability, and causality figures

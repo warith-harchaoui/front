@@ -1,0 +1,8 @@
+# Front
+
+> Nine local-first Claude / OpenCode skills for one frontend stack.
+
+## Pages
+
+- [Head](https://harchaoui.org/warith/front/head.html)
+- [Front — nine Claude / OpenCode skills for vanilla JS + Tailwind](https://harchaoui.org/warith/front/): Front is nine local-first Claude / OpenCode skills for a single frontend stack: UI, CLI-to-GUI, publishing, accessibility, colors, alt text, captions, Laws of UX, and data-science figures & maps. Each skill both makes artifacts and audits them.

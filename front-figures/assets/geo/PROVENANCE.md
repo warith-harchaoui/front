@@ -1,7 +1,7 @@
 # Vector basemap library
 
 Vendored world geometry so maps render **offline** and reproducibly — no fetch
-at figure time. Used by the map figures in [`../../FIGURES.md`](../../FIGURES.md).
+at figure time. Used by the map figures in [`../../../docs/FIGURES.md`](../../../docs/FIGURES.md).
 
 ## Files
 

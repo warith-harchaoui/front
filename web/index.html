@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en" data-color-scheme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <title>Front — nine Claude / OpenCode skills for vanilla JS + Tailwind</title>
+  <meta name="description" content="Front is nine local-first Claude / OpenCode skills for a single frontend stack: UI, CLI-to-GUI, publishing, accessibility, colors, alt text, captions, Laws of UX, and data-science figures & maps. Each skill both makes artifacts and audits them.">
+  <link rel="canonical" href="https://harchaoui.org/warith/front/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B0B0C" media="(prefers-color-scheme: dark)">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Front">
+  <meta property="og:title" content="Front — nine Claude / OpenCode skills">
+  <meta property="og:description" content="A local-first design system for one frontend stack: UI, CLI→GUI, publishing, accessibility, colors, alt text, captions, Laws of UX, and data-science figures & maps. Make and audit.">
+  <meta property="og:url" content="https://harchaoui.org/warith/front/">
+  <meta property="og:image" content="https://harchaoui.org/warith/front/img/logo.png">
+  <meta property="og:image:alt" content="The Front project logo.">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Front — nine Claude / OpenCode skills">
+  <meta name="twitter:description" content="Local-first skills for one frontend stack: UI, CLI→GUI, publishing, a11y, colors, alt text, captions, Laws of UX, figures & maps.">
+  <meta name="twitter:image" content="https://harchaoui.org/warith/front/img/logo.png">
+
+  <!-- Favicons (relative paths — the site lives under /warith/front/) -->
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+  <link rel="manifest" href="site.webmanifest">
+
+  <!-- Three-Roboto rule, self-hosted (no font CDN in production) -->
+  <link rel="preload" href="fonts/roboto/Roboto-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="fonts/roboto/fonts.css">
+  <link rel="stylesheet" href="fonts/roboto-serif/fonts.css">
+  <link rel="stylesheet" href="fonts/roboto-mono/fonts.css">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '[data-color-scheme="dark"]'],
+      theme: { extend: {
+        fontFamily: {
+          sans:  ['Roboto', 'system-ui', 'sans-serif'],
+          serif: ['Roboto Serif', 'serif'],
+          mono:  ['Roboto Mono', 'ui-monospace', 'monospace'],
+        },
+        colors: { brand: {
+          blue:   '#007AFF', bluedark: '#0A84FF', bluelight: '#CCE4FF',
+          navy:   '#0A4DA0', red: '#FF3B30', green: '#28CD41',
+          orange: '#FF9500', purple: '#AF52DE',
+        }},
+      }},
+    };
+  </script>
+
+  <!-- GEO / structured data for AI overviews and search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebSite", "name": "Front",
+        "url": "https://harchaoui.org/warith/front/",
+        "description": "Nine local-first Claude / OpenCode skills for a single frontend stack.",
+        "inLanguage": "en" },
+      { "@type": "SoftwareSourceCode", "name": "Front",
+        "description": "A local-first design system delivered as nine Claude / OpenCode skills — UI, CLI→GUI, publishing, accessibility, colors, alt text, captions, Laws of UX, and data-science figures & maps. Each skill makes artifacts and audits them.",
+        "codeRepository": "https://github.com/warith-harchaoui/front",
+        "programmingLanguage": ["Python", "JavaScript", "HTML"],
+        "license": "https://spdx.org/licenses/BSD-3-Clause.html",
+        "author": { "@type": "Person", "name": "Warith Harchaoui",
+          "url": "https://www.linkedin.com/in/warith-harchaoui/" } }
+    ]
+  }
+  </script>
+
+  <style>
+    :root { color-scheme: light dark; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+
+<body class="bg-white text-neutral-900 dark:bg-[#0B0B0C] dark:text-neutral-100 font-sans antialiased">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-3 focus:left-3 focus:rounded-lg focus:bg-brand-blue focus:px-4 focus:py-2 focus:text-white">Skip to content</a>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b border-neutral-200/70 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-[#0B0B0C]/80">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3" aria-label="Primary">
+      <a href="#main" class="flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">
+        <img src="img/logo.png" alt="" width="28" height="28" class="rounded">
+        <span class="font-semibold tracking-tight">Front</span>
+      </a>
+      <div class="flex items-center gap-4 text-sm">
+        <a href="#skills" class="hidden rounded px-1 hover:text-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:inline">Skills</a>
+        <a href="#gallery" class="hidden rounded px-1 hover:text-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue sm:inline">Gallery</a>
+        <a href="https://github.com/warith-harchaoui/front" class="rounded px-1 hover:text-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue">GitHub</a>
+        <button id="theme-toggle" type="button" aria-label="Toggle dark mode" class="rounded-lg border border-neutral-300 px-2 py-1 text-xs hover:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:border-neutral-700">Theme</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="relative overflow-hidden">
+      <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-brand-bluelight/40 to-transparent dark:from-brand-navy/20"></div>
+      <div class="mx-auto max-w-6xl px-5 py-20 text-center sm:py-28">
+        <img src="img/logo.png" alt="Front logo" width="220" height="220" class="mx-auto mb-8 h-40 w-40 rounded-3xl shadow-md sm:h-56 sm:w-56">
+        <h1 class="font-serif text-4xl font-bold tracking-tight sm:text-6xl">Front</h1>
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-neutral-600 dark:text-neutral-300">
+          <strong>Local-first Claude / OpenCode skills</strong> for one frontend stack — in the
+          broadest sense: UI, CLI→GUI, publishing, accessibility, colors, alt text, captions,
+          Laws of UX, and data-science figures &amp; maps. Every skill both <em>makes</em>
+          artifacts and <em>audits</em> them.
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <a href="https://github.com/warith-harchaoui/front" class="rounded-xl bg-brand-blue px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-brand-bluedark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-blue motion-safe:hover:-translate-y-0.5">View on GitHub</a>
+          <a href="#gallery" class="rounded-xl border border-neutral-300 px-5 py-2.5 font-medium hover:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:border-neutral-700">See the gallery</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="mx-auto max-w-6xl px-5 py-16">
+      <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">The nine skills</h2>
+      <p class="mt-2 max-w-2xl text-neutral-600 dark:text-neutral-300">Install only the ones you need — the companions inherit the front-ui stack rules.</p>
+      <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+        <!-- cards injected below -->
+      </ul>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery" class="border-y border-neutral-200/70 bg-neutral-50/60 py-16 dark:border-neutral-800 dark:bg-neutral-900/30">
+      <div class="mx-auto max-w-6xl px-5">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Figures &amp; maps, rendered</h2>
+        <p class="mt-2 max-w-2xl text-neutral-600 dark:text-neutral-300">
+          From <code class="font-mono text-sm">front-figures</code>: house-styled Vega and hand-authored SVG,
+          on the Apple palette. Charts, model-explainability plots, and publication-grade thematic maps —
+          each rendered from fake data and checked by eye.
+        </p>
+        <div class="mt-8 columns-1 gap-4 sm:columns-2 lg:columns-3 [&>figure]:mb-4">
+          <!-- figures injected below -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Why -->
+    <section class="mx-auto max-w-6xl px-5 py-16">
+      <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">What's unusual</h2>
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        <article><h3 class="font-semibold">Make <em>and</em> audit</h3><p class="mt-1 text-neutral-600 dark:text-neutral-300">Skills for building from scratch or with legacy, validating and making.</p></article>
+        <article><h3 class="font-semibold">Local-first AI, zero SaaS</h3><p class="mt-1 text-neutral-600 dark:text-neutral-300">Local text, audio and vision models. Nothing leaves the machine unless you ask for it.</p></article>
+        <article><h3 class="font-semibold">Opinionated graphical choices</h3><p class="mt-1 text-neutral-600 dark:text-neutral-300">Skills cover accessibility, colors, font, languages, SEO, GEO etc.</p></article>
+        <article><h3 class="font-semibold">Runtime-portable</h3><p class="mt-1 text-neutral-600 dark:text-neutral-300">Skills serve Claude Code and OpenCode.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-neutral-200/70 py-10 dark:border-neutral-800">
+    <div class="mx-auto max-w-6xl px-5 text-sm text-neutral-500 dark:text-neutral-400">
+      <p>By <a class="underline hover:text-brand-blue" href="https://www.linkedin.com/in/warith-harchaoui/">Warith Harchaoui</a>.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Dark mode: respect stored choice, else system.
+    (function () {
+      const root = document.documentElement, KEY = 'front-theme';
+      const stored = localStorage.getItem(KEY);
+      if (stored) root.setAttribute('data-color-scheme', stored);
+      document.getElementById('theme-toggle').addEventListener('click', function () {
+        const dark = getComputedStyle(root).colorScheme.includes('dark') ||
+          root.getAttribute('data-color-scheme') === 'dark';
+        const next = dark ? 'light' : 'dark';
+        root.setAttribute('data-color-scheme', next);
+        localStorage.setItem(KEY, next);
+      });
+    })();
+
+    // Skill cards + gallery, built from data (keeps the markup honest).
+    const DOCS = 'https://github.com/warith-harchaoui/front/blob/main/docs/';
+    const SKILLS = [
+      ['front-ui', 'UI generation', 'Vanilla JS + Tailwind components, pages, forms, dashboards — three-Roboto, dark mode, focus rings by default.', 'UI.md'],
+      ['front-cli-gui', 'CLI → web GUI', 'Wrap a command-line tool in a single-page GUI; reads argparse / Click / clap / cobra.', 'CLI.md'],
+      ['front-publish', 'Markdown → website', 'Meta tags, favicons, sitemap, llms.txt, feeds, plain-language rewrites, local TTS narration.', 'PUBLISH.md'],
+      ['front-accessibility', 'Accessibility lint', 'Fourteen source-decidable a11y rules — a fast, CI-friendly pre-commit gate.', 'ACCESSIBILITY.md'],
+      ['front-colors', 'Color tooling', 'WCAG contrast, CVD simulation, the Apple palette, perceptual lighten / darken, Tailwind theme.', 'COLORS.md'],
+      ['front-vision', 'Alt text (local AI)', 'W3C alt text from a local Ollama vision model — per-image decision tree, any language, cached.', 'VISION.md'],
+      ['front-audio', 'Captions & diarization', 'WebVTT / SRT from local whisper.cpp, plus who-spoke-when and who-is-who. Local-first.', 'AUDIO.md'],
+      ['front-ux-laws', 'Laws of UX', 'Thirty laws plus an auditor for detectable violations — Hick, Fitts, Miller, Jakob, Tesler.', 'UX-LAWS.md'],
+      ['front-figures', 'Figures & maps', 'Vega-first charts, explainability, and publication-grade thematic maps via the Ralph Eyeball Loop.', 'FIGURES.md'],
+    ];
+    const skillsUl = document.querySelector('#skills ul');
+    skillsUl.innerHTML = SKILLS.map(([id, title, desc, doc]) => `
+      <li>
+        <a href="${DOCS}${doc}" class="group flex h-full flex-col rounded-2xl border border-neutral-200 p-5 transition hover:border-brand-blue hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue dark:border-neutral-800">
+          <h3 class="font-semibold">${title}</h3>
+          <p class="mt-0.5 font-mono text-xs text-brand-blue">${id}</p>
+          <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">${desc}</p>
+          <span class="mt-3 text-sm font-medium text-brand-blue">Learn more <span aria-hidden="true" class="inline-block transition group-hover:translate-x-0.5">→</span></span>
+        </a>
+      </li>`).join('');
+
+    const FIGURES = [
+      ['choropleth.png', 'World choropleth on an Equal-Earth projection, countries shaded in quintile classes on a blue ramp.'],
+      ['map-tilegrid.png', 'Tile-grid cartogram: every country an equal rounded square in a rough geographic layout, shaded by quintile class.'],
+      ['map-diverging.png', 'Diverging world choropleth of net change on a red-white-blue scale centered at zero, with no-data countries in gray and key countries labeled.'],
+      ['map-flow.png', 'Connection map: great-circle arcs between world hubs, line width by volume, on a muted world basemap.'],
+      ['map-bivariate.png', 'Bivariate choropleth: two variables blended on a 3-by-3 blue-and-orange color key.'],
+      ['surface-3d.png', 'A 3-D surface plot (sombrero function) rendered as shaded polygons in blue.'],
+      ['kde2d-contour.png', 'Two-dimensional kernel-density contour plot with filled blue level sets over a faint scatter.'],
+      ['map-bubble.png', 'Proportional-symbol world map: city values as area-true blue bubbles.'],
+      ['beeswarm.png', 'Beeswarm plot: three groups of points packed without overlap, colored red, blue, and green.'],
+      ['streamplot.png', 'Streamplot: flowing streamlines with arrowheads, colored by speed on a blue ramp.'],
+      ['hexbin.png', 'Hexbin density plot: two gaussian blobs binned into blue hexagonal tiles.'],
+      ['regression-ci-band.png', 'Scatter with a red regression line and a soft blue 95% confidence band.'],
+      ['bar.png', 'Horizontal bar chart with each category in a different Apple-palette color.'],
+      ['clustermap.png', 'Clustered heatmap: rows and columns reordered by hierarchical clustering, blue ramp, cell labels.'],
+    ];
+    const galleryDiv = document.querySelector('#gallery .columns-1');
+    galleryDiv.innerHTML = FIGURES.map(([f, alt]) => `
+      <figure class="break-inside-avoid overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
+        <img src="img/figures/${f}" alt="${alt}" loading="lazy" class="w-full">
+      </figure>`).join('');
+  </script>
+</body>
+</html>

@@ -46,6 +46,21 @@ N'installez que ceux dont vous avez besoin.
 > liste toutes les phrases garanties par leur description avec le
 > skill qu'elles activent.
 
+## Docs & site web
+
+Les guides pour humains vivent dans [`docs/`](docs/) — une page par skill
+([UI](docs/UI.md) · [CLI](docs/CLI.md) · [publish](docs/PUBLISH.md) ·
+[accessibility](docs/ACCESSIBILITY.md) · [colors](docs/COLORS.md) ·
+[vision](docs/VISION.md) · [audio](docs/AUDIO.md) · [UX-laws](docs/UX-LAWS.md) ·
+[figures & cartes](docs/FIGURES.md)) — chacune un simple pointeur vers le
+`SKILL.md` du skill, ses `references/` et sa recette dans `EXAMPLES.md` (aucune
+duplication). `SKILL.md` est l'artefact *agent* ; `docs/` est pour les humains.
+
+Un site statique déployable — construit avec les skills `front-*` eux-mêmes
+(house style front-ui, meta / favicons / sitemap / llms.txt de front-publish,
+palette front-colors, front-accessibility clean) — se trouve dans
+[`web/`](web/) et se publie sur <https://harchaoui.org/warith/front/>.
+
 ## Fonctionnalités — ce qui est inhabituel pour un skill Claude
 
 La plupart des skills Claude — y compris les `document-skills` d'Anthropic
@@ -96,7 +111,7 @@ reste en feuille de route.
 | **front-vision** | `alt_from_ollama.py` (alt W3C via Ollama local) | _(présence de `alt=` vérifiée par `front-accessibility`)_ |
 | **front-audio** | `captions_from_whisper.py` (WebVTT / SRT via whisper.cpp local) | _(présence de `<track>` vérifiée par `front-accessibility`)_ |
 | **front-ux-laws** | `references/laws-of-ux.md` (playbook des 30 lois) | `audit_laws_of_ux.py` (Hick / Miller / Fitts / Jakob / Tesler / …) |
-| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (dispatcher SHAP / Shapash / TimeSHAP / LIME), `causal_estimate.py` (boucle DoWhy + backends EconML + rendu DAG), `render_diagram.py` (Vega / TikZ / Mermaid / SVG auto-routés → PNG / SVG / PDF pour la Ralph Eyeball Loop ; catalogue rendu dans `front-figures/FIGURES.md`), `install_figures.py` (installeur par tier) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
+| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (dispatcher SHAP / Shapash / TimeSHAP / LIME), `causal_estimate.py` (boucle DoWhy + backends EconML + rendu DAG), `render_diagram.py` (Vega / TikZ / Mermaid / SVG auto-routés → PNG / SVG / PDF pour la Ralph Eyeball Loop ; catalogue rendu dans `docs/FIGURES.md`), `install_figures.py` (installeur par tier) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
 
 Le tableau est honnête sur les manques. Les cellules vides marquent
 de vraies entrées de roadmap, pas des oublis.
@@ -545,7 +560,7 @@ dans [pre-commit](https://pre-commit.com/) avec un seul bloc `repo:`
 # .pre-commit-config.yaml — ajouter le dépôt en une entrée
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.28.0          # fixer une tag — bumper via renovate / dependabot
+    rev: v0.29.0          # fixer une tag — bumper via renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit

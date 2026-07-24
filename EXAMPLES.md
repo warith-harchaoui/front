@@ -101,7 +101,7 @@ All three are deterministic — no model, no network.
 Prefer Vega-Lite over matplotlib / seaborn / pyplot / plotly: a house-styled
 spec carries its own data, looks better by default, and covers nearly their
 whole plotting API. The rendered proof is in
-[`front-figures/FIGURES.md`](front-figures/FIGURES.md).
+[`docs/FIGURES.md`](docs/FIGURES.md).
 
 **The Ralph Eyeball Loop** — render a source to an image, *look* at it, refine
 the source, repeat. The kind (Vega / TikZ / Mermaid / SVG) is auto-detected. A

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://harchaoui.org/warith/front/sitemap.xml

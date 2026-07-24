@@ -57,6 +57,26 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.29.0] — 2026-07-24 — human docs, a deployable website, editorial-grade maps
+
+### Added
+
+- **`docs/` — a human-facing guide per skill** (UI, CLI, PUBLISH, ACCESSIBILITY,
+  COLORS, VISION, AUDIO, UX-LAWS + FIGURES). Each is a thin landing page that
+  points to that skill's `SKILL.md`, `references/`, and `EXAMPLES.md` recipe —
+  no duplication. `SKILL.md` stays the agent-facing spec; `docs/` is for humans.
+  `FIGURES.md` moved here from `front-figures/`.
+- **`web/` — a deployable static site**, built with the `front-*` skills
+  themselves and publishing to <https://harchaoui.org/warith/front/>: front-ui
+  house style (Tailwind + self-hosted three-Roboto + Apple palette + dark mode),
+  full SEO (canonical, Open Graph, Twitter, Schema.org JSON-LD), GEO (`llms.txt`),
+  favicons / webmanifest + `robots.txt` / `sitemap.xml` / `humans.txt`, and a
+  clean `front-accessibility` pass. Skill cards link to the docs.
+- **Editorial-grade maps** in `front-figures`: a **tile-grid cartogram**
+  (equal-weight per country), a **diverging choropleth** (red–white–blue centered
+  at 0, no-data gray, key countries annotated), and **small multiples** (one
+  panel per year, class breaks frozen). All on the Equal-Earth projection.
+
 ## [0.28.0] — 2026-07-24 — Ralph Eyeball Loop, Vega-first, SVG engine, publication-grade maps
 
 ### Added — front-figures: Vega replaces the plotting toolboxes
@@ -76,7 +96,7 @@ Adoption-side milestones (user-driven; not engineering work):
   SVG (still looped). That closes **interpolated `imshow`** (`feGaussianBlur`)
   and **streamplot** (offline streamlines + arrowhead markers) — both promoted
   to `assets/svg-examples/`.
-- **`front-figures/FIGURES.md`** — a catalog of every figure the vega + svg
+- **`docs/FIGURES.md`** — a catalog of every figure the vega + svg
   engines produce, from fake data, each one rendered (`assets/figures-gallery/`).
   Linked from README / LISEZMOI. The gitignored `.private/vega-failures/`
   records the Vega dead ends.
