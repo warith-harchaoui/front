@@ -23,7 +23,7 @@ compatibility: >-
   required.
 metadata:
   author: Warith Harchaoui
-  version: 0.26.1
+  version: 0.27.0
 ---
 
 # front-ui — vanilla JS + Tailwind UI generation

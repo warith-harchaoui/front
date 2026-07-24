@@ -21,7 +21,7 @@ compatibility: >-
   Python 3.10+ stdlib only — no third-party deps, no browser, no network.
 metadata:
   author: Warith Harchaoui
-  version: 0.26.1
+  version: 0.27.0
 ---
 
 # front-accessibility — static HTML a11y lint

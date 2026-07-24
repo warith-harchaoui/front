@@ -23,7 +23,7 @@ The skills:
 | **front-vision** | You draft W3C-compliant alt text from images locally (no SaaS). | "alt text", "alt text for this image", "describe this image", "draft alt", "image description", "img has no alt". |
 | **front-audio** | You draft WebVTT / SRT captions for `<video>` / `<audio>` locally (no SaaS). | "captions", "transcribe video", "transcribe audio", "WebVTT", "SRT", "subtitle file", "VTT", "caption track". |
 | **front-ux-laws** | You want a shared vocabulary for UI decisions AND a pre-commit auditor that fails on detectable Laws-of-UX violations (Hick, Fitts, Miller, Jakob, Tesler, Aesthetic-Usability, Selective Attention, Doherty, Choice Overload). | "Laws of UX", "Hick / Fitts / Miller / Jakob / Tesler / Peak-End / Postel / Paradox of the Active User", "audit my nav / form / pricing page", "is this onboarding fighting the active user". |
-| **front-figures** | You emit data-science figures (Vega-Lite / matplotlib), model-explainability plots (SHAP / Shapash / TimeSHAP / LIME), or causal-effect estimates (DoWhy / EconML) — and want a pre-commit auditor that fails on data-viz sins. | "chart this", "make a figure", "SHAP plot", "explain this model", "feature importance", "shapash", "timeshap", "LIME", "causal inference", "DoWhy", "EconML", "treatment effect", "DAG", "audit this figure", "dual y-axis". |
+| **front-figures** | You emit data-science figures (**Vega-Lite first** — matplotlib only as an escape hatch), model-explainability plots (SHAP / Shapash / TimeSHAP / LIME), causal-effect estimates (DoWhy / EconML), or TikZ / Mermaid diagrams — refined through the **Ralph Eyeball Loop** (render → look → refine the source), with a pre-commit auditor for data-viz sins. | "make a figure", "prefer vega", "render this diagram", "tikz to png", "mermaid diagram", "ralph eyeball loop", "no ascii art", "SHAP plot", "explain this model", "causal inference", "DoWhy", "DAG", "audit this figure". |
 
 The companion skills inherit the front-ui stack rules. Install only the
 ones you need.
@@ -79,7 +79,7 @@ when to load each skill and what is still on the roadmap.
 | **front-vision** | `alt_from_ollama.py` (W3C alt text via local Ollama) | _(presence of `alt=` checked by `front-accessibility`)_ |
 | **front-audio** | `captions_from_whisper.py` (WebVTT / SRT via local whisper.cpp) | _(presence of `<track>` checked by `front-accessibility`)_ |
 | **front-ux-laws** | `references/laws-of-ux.md` (30-law Markdown playbook) | `audit_laws_of_ux.py` (Hick / Miller / Fitts / Jakob / Tesler / …) |
-| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (SHAP / Shapash / TimeSHAP / LIME dispatcher), `causal_estimate.py` (DoWhy loop + EconML backends + DAG render), `install_figures.py` (tier installer) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
+| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (SHAP / Shapash / TimeSHAP / LIME dispatcher), `causal_estimate.py` (DoWhy loop + EconML backends + DAG render), `render_diagram.py` (Vega / TikZ / Mermaid → PNG / SVG / PDF for the Ralph Eyeball Loop), `install_figures.py` (tier installer) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
 
 The matrix is honest about gaps. Empty cells mark genuine roadmap
 items, not omissions — see `.private/todo.md` (gitignored) for the
@@ -449,7 +449,7 @@ beyond `pre-commit install`.
 # .pre-commit-config.yaml — add the repo as one entry
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.26.1          # pin a tag — bump with renovate / dependabot
+    rev: v0.27.0          # pin a tag — bump with renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit
@@ -478,57 +478,6 @@ python server.py  # stdlib only, opens http://localhost:8787
 ```
 
 For an honest comparison against Gradio / Streamlit / Tauri / Taipy, see `front-cli-gui/SKILL.md` → "Why this skill, not Gradio / Streamlit / Tauri / Taipy" and [LANDSCAPE.md](LANDSCAPE.md) § 7.
-
-## Repository structure
-
-```text
-front/                                  ← repo root
-├── README.md / LISEZMOI.md             ← EN / FR
-├── LANDSCAPE.md                        ← comparison matrices vs alternatives
-├── CHANGELOG.md                        ← release notes
-├── CONTRIBUTING.md                     ← how to propose changes
-├── LICENSE.md                          ← BSD-3-Clause (OFL carve-out for Roboto / Roboto Serif / Roboto Mono)
-├── llms.txt                            ← https://llmstxt.org/ index for LLM consumers
-├── pytest.ini, requirements-dev.txt    ← shared dev tooling
-├── tests/                              ← shared pytest suite covers every skill
-├── assets/logo.png                     ← project logo
-│
-├── front-ui/                           ← UI generation skill
-│   ├── SKILL.md
-│   ├── references/                     ← color, stack, components, dataviz, design system, checklist
-│   ├── scripts/                        ← validate.py (stdlib only)
-│   └── assets/                         ← starter-page, components, the three Roboto families (sans / serif / mono)
-│
-├── front-cli-gui/                      ← CLI → GUI skill (flagship)
-│   ├── SKILL.md
-│   ├── references/cli-gui-workflow.md
-│   └── assets/examples/cli-gui-demo/   ← runnable worked example
-│
-├── front-publish/                      ← Markdown → website + meta + favicons + indexes + plain language
-│   ├── SKILL.md
-│   ├── references/                     ← meta-tags, site-indexes, plain-language, i18n
-│   └── scripts/                        ← favicons.py, meta_from_ollama.py, site_indexes.py, plain_language.py
-│
-├── front-accessibility/                ← Static HTML a11y lint
-│   ├── SKILL.md
-│   ├── references/                     ← lint-a11y
-│   └── scripts/                        ← lint_a11y.py
-│
-├── front-colors/                       ← WCAG contrast audit + CVD simulation + curated palette
-│   ├── SKILL.md
-│   ├── references/                     ← contrast-audit, cvd-simulation, palette.csv
-│   └── scripts/                        ← audit_contrast.py, simulate_cvd.py, _colors.py
-│
-├── front-vision/                       ← W3C alt text via local Ollama vision
-│   ├── SKILL.md
-│   ├── references/                     ← alt-text-ai
-│   └── scripts/                        ← alt_from_ollama.py, install_alt_ai.py, prompts/
-│
-└── front-audio/                        ← WebVTT / SRT captions via local whisper.cpp
-    ├── SKILL.md
-    ├── references/                     ← captions-ai
-    └── scripts/                        ← captions_from_whisper.py, install_captions.py
-```
 
 ## Author
 

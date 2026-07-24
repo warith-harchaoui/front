@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "front-cli"
-version = "0.26.1"
+version = "0.27.0"
 description = "Unified front driver — one entry point for six front skills (front-ui, front-accessibility, front-audio, front-vision, front-colors, front-publish)."
 readme = "README.md"
 requires-python = ">=3.10"

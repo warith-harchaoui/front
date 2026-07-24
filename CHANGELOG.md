@@ -57,6 +57,38 @@ Adoption-side milestones (user-driven; not engineering work):
 - 5 real users — the only signal that says whether anything else on
   this list is worth doing.
 
+## [0.27.0] — 2026-07-24 — the Ralph Eyeball Loop + Vega-first (front-figures)
+
+### Added — the Ralph Eyeball Loop + Vega-first (front-figures)
+
+- **`front-figures/scripts/render_diagram.py`** — render a declarative
+  graphical *source* to an image for the **Ralph Eyeball Loop** (render →
+  look → refine the source). Three kinds, auto-detected: **Vega-Lite/Vega**
+  (rasterised with `vl-convert` — the real spec that ships, not a matplotlib
+  re-draw), **TikZ** (tectonic/pdflatex + pdftoppm/magick), and **Mermaid**
+  (mmdc). Palette-themed from `front-colors/references/palette.csv`
+  (`\definecolor` for TikZ, injected `%%{init}%%` theme for Mermaid);
+  `--background white|transparent|dark|auto|#hex`; `--format png|svg|pdf`
+  for vector print. Fails loud with install hints; no GUI, no MCP, no model.
+- **`references/ralph-eyeball-loop.md`** — the named technique: never ship a
+  graphic blind; the agent is the visual critic (the one-LLM rule is
+  untouched). Strict preference order **Ralph-Eyeball-Loop Mermaid-with-colors
+  > Mermaid + colors > ASCII art** — never draw diagrams in ASCII.
+- **`references/vega-gallery.md`** — Vega-first template catalog that replaces
+  matplotlib / seaborn / pyplot for every common chart, plus explainability
+  (SHAP / LIME / importance / PD-ICE / DAG) rendered as extracted-data Vega,
+  and an honest list of the residue Vega genuinely can't do.
+- Tests: `tests/test_render_diagram.py`; `render_diagram.py` registered in the
+  `test_cli_help` smoke gate. New trigger phrases (tikz to png, mermaid
+  diagram, ralph eyeball loop, render this diagram, prefer vega, …).
+
+### Changed
+
+- **front-figures is now Vega-first.** SKILL.md leads with "prefer Vega-Lite
+  over matplotlib / seaborn / pyplot (the spec carries its own data, so figures
+  are reproducible); matplotlib is only an escape hatch." Description rewritten
+  within the 1024-char cap.
+
 ## [0.26.1] — 2026-07-20 — any-language alt-text + captions (best-of-both with md2star)
 
 - **Alt-text + captions now handle any detected language (best-of-both with

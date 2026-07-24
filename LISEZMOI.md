@@ -36,7 +36,7 @@ Les neuf skills :
 | **front-vision** | Vous draftez du texte alternatif conforme W3C depuis des images, en local (pas de SaaS). | « texte alternatif », « décris cette image », « draft alt », « description d'image », « img sans alt ». |
 | **front-audio** | Vous draftez des sous-titres WebVTT / SRT pour `<video>` / `<audio>` en local (pas de SaaS). | « sous-titres », « transcris cette vidéo », « transcris cet audio », « WebVTT », « SRT », « fichier de sous-titres », « VTT », « piste sous-titres ». |
 | **front-ux-laws** | Vous voulez un vocabulaire partagé pour vos décisions d'UI ET un auditeur pre-commit qui échoue sur les violations détectables des Laws of UX (Hick, Fitts, Miller, Jakob, Tesler, Aesthetic-Usability, Selective Attention, Doherty, Choice Overload). | « Laws of UX », « Hick / Fitts / Miller / Jakob / Tesler / Peak-End / Postel / Paradox of the Active User », « audite ma nav / mon formulaire / ma page de prix », « cet onboarding combat-il l'utilisateur actif ». |
-| **front-figures** | Vous produisez des figures pour la data-science (Vega-Lite / matplotlib), des plots d'explicabilité de modèle (SHAP / Shapash / TimeSHAP / LIME), ou des estimations d'effet causal (DoWhy / EconML) — et voulez un auditeur pre-commit qui échoue sur les fautes de data-viz. | « chart this », « make a figure », « SHAP plot », « explain this model », « feature importance », « shapash », « timeshap », « LIME », « causal inference », « DoWhy », « EconML », « treatment effect », « DAG », « audit this figure », « dual y-axis ». |
+| **front-figures** | Vous produisez des figures pour la data-science (**Vega-Lite d'abord** — matplotlib seulement en dernier recours), des plots d'explicabilité (SHAP / Shapash / TimeSHAP / LIME), des estimations d'effet causal (DoWhy / EconML), ou des diagrammes TikZ / Mermaid — affinés par la **Ralph Eyeball Loop** (rendre → regarder → corriger la source), avec un auditeur pre-commit pour les fautes de data-viz. | « make a figure », « prefer vega », « render this diagram », « tikz to png », « mermaid diagram », « ralph eyeball loop », « no ascii art », « SHAP plot », « explain this model », « causal inference », « DoWhy », « DAG », « audit this figure ». |
 
 Les skills compagnons héritent des règles de pile de `front-ui`.
 N'installez que ceux dont vous avez besoin.
@@ -96,7 +96,7 @@ reste en feuille de route.
 | **front-vision** | `alt_from_ollama.py` (alt W3C via Ollama local) | _(présence de `alt=` vérifiée par `front-accessibility`)_ |
 | **front-audio** | `captions_from_whisper.py` (WebVTT / SRT via whisper.cpp local) | _(présence de `<track>` vérifiée par `front-accessibility`)_ |
 | **front-ux-laws** | `references/laws-of-ux.md` (playbook des 30 lois) | `audit_laws_of_ux.py` (Hick / Miller / Fitts / Jakob / Tesler / …) |
-| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (dispatcher SHAP / Shapash / TimeSHAP / LIME), `causal_estimate.py` (boucle DoWhy + backends EconML + rendu DAG), `install_figures.py` (installeur par tier) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
+| **front-figures** | `make_figure.py` (CSV → Vega / matplotlib), `explain_model.py` (dispatcher SHAP / Shapash / TimeSHAP / LIME), `causal_estimate.py` (boucle DoWhy + backends EconML + rendu DAG), `render_diagram.py` (Vega / TikZ / Mermaid → PNG / SVG / PDF pour la Ralph Eyeball Loop), `install_figures.py` (installeur par tier) | `audit_figure.py` (missing-axis-title, dual-y-axis, truncated-baseline, pie-3d, rainbow-palette, cvd-unsafe, missing-polarity, chartjunk, role-img-missing) |
 
 Le tableau est honnête sur les manques. Les cellules vides marquent
 de vraies entrées de roadmap, pas des oublis.
@@ -545,7 +545,7 @@ dans [pre-commit](https://pre-commit.com/) avec un seul bloc `repo:`
 # .pre-commit-config.yaml — ajouter le dépôt en une entrée
 repos:
   - repo: https://github.com/warith-harchaoui/front
-    rev: v0.26.1          # fixer une tag — bumper via renovate / dependabot
+    rev: v0.27.0          # fixer une tag — bumper via renovate / dependabot
     hooks:
       - id: front-accessibility-lint
       - id: front-ux-laws-audit
@@ -582,57 +582,6 @@ python server.py  # stdlib uniquement, ouvre http://localhost:8787
 Pour une comparaison honnête face à Gradio / Streamlit / Tauri / Taipy,
 voir `front-cli-gui/SKILL.md` → « Why this skill, not Gradio / Streamlit
 / Tauri / Taipy » et [LANDSCAPE.md](LANDSCAPE.md) § 7.
-
-## Structure du dépôt
-
-```text
-front/                                  ← racine du dépôt
-├── README.md / LISEZMOI.md             ← EN / FR
-├── LANDSCAPE.md                        ← matrices comparatives vs alternatives
-├── CHANGELOG.md                        ← notes de version
-├── CONTRIBUTING.md                     ← comment proposer des changements
-├── LICENSE.md                          ← BSD-3-Clause (OFL pour Roboto / Roboto Serif / Roboto Mono)
-├── llms.txt                            ← index https://llmstxt.org/ pour les LLM
-├── pytest.ini, requirements-dev.txt    ← outillage dev partagé
-├── tests/                              ← suite pytest partagée pour les neuf skills
-├── assets/logo.png                     ← logo du projet
-│
-├── front-ui/                           ← skill de génération d'UI
-│   ├── SKILL.md
-│   ├── references/                     ← couleur, pile, composants, dataviz, design system, checklist
-│   ├── scripts/                        ← validate.py (stdlib uniquement)
-│   └── assets/                         ← starter-page, composants, les trois polices Roboto (sans / serif / mono)
-│
-├── front-cli-gui/                      ← skill CLI → IHM (phare)
-│   ├── SKILL.md
-│   ├── references/cli-gui-workflow.md
-│   └── assets/examples/cli-gui-demo/   ← exemple exécutable
-│
-├── front-publish/                      ← Markdown → site + meta + favicons + index + langage clair
-│   ├── SKILL.md
-│   ├── references/                     ← meta-tags, site-indexes, plain-language, i18n
-│   └── scripts/                        ← favicons.py, meta_from_ollama.py, site_indexes.py, plain_language.py
-│
-├── front-accessibility/                ← lint a11y HTML statique
-│   ├── SKILL.md
-│   ├── references/                     ← lint-a11y
-│   └── scripts/                        ← lint_a11y.py
-│
-├── front-colors/                       ← audit contraste + simulation CVD + palette curatée
-│   ├── SKILL.md
-│   ├── references/                     ← contrast-audit, cvd-simulation, palette.csv
-│   └── scripts/                        ← audit_contrast.py, simulate_cvd.py, _colors.py
-│
-├── front-vision/                       ← texte alternatif W3C via vision Ollama locale
-│   ├── SKILL.md
-│   ├── references/                     ← alt-text-ai
-│   └── scripts/                        ← alt_from_ollama.py, install_alt_ai.py, prompts/
-│
-└── front-audio/                        ← sous-titres WebVTT / SRT via whisper.cpp local
-    ├── SKILL.md
-    ├── references/                     ← captions-ai
-    └── scripts/                        ← captions_from_whisper.py, install_captions.py
-```
 
 ## Auteur
 

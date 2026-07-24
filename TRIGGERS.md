@@ -126,28 +126,25 @@ The trigger phrases below are what each skill's frontmatter description claims w
 | `cognitive load` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `Doherty threshold` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
 | `reduce clutter` | **front-ux-laws** — Applies / audits the canonical Laws of UX (30 laws) with `--fix` for four mechanical fixers. | Stable |
-| `chart this` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `make a figure` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `chart this` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `visualize data` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `prefer vega` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `Vega-Lite` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `render this diagram` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `tikz to png` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `mermaid diagram` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `no ascii art` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `ascii to mermaid` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `ralph eyeball loop` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
+| `iterate on a figure` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `SHAP plot` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `explain this model` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `feature importance` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `shapash` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `timeshap` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `LIME` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `causal inference` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `DoWhy` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `EconML` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `treatment effect` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `refute` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `refutation` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `DAG` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `audit this figure` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `colorblind safe palette` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `dual y-axis` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `bar / line / scatter chart` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `Vega-Lite` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `visualize data` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
-| `audit this chart` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 | `install figures` | **front-figures** — Emits data-viz / SHAP / Shapash / TimeSHAP / LIME / DoWhy figures + audits Vega specs and matplotlib SVGs. | Stable |
 
 ## How discovery works
